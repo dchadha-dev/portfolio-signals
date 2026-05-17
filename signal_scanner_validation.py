@@ -297,6 +297,7 @@ def main():
             'quality_t': best_params['quality_t'],
             'trend_t':   0.0,
         },
+          write_html_report(payload, all_hr, best_params, cv_windows, ok)
         'buy_weights':          BUY_WEIGHTS,
         'buy_wb_penalty':       -15,
         'fundamental_boost_max': 15,
