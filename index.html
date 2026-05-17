@@ -1,0 +1,2933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #f7f7f5;
+  --white: #ffffff;
+  --border: #e8e8e4;
+  --border-light: #f0f0ec;
+  --text: #1a1a18;
+  --text2: #6b6b67;
+  --text3: #ababA6;
+  --red: #c0392b;
+  --red-bg: #fdf3f2;
+  --red-border: #f5c6c2;
+  --green: #27774a;
+  --green-bg: #f2f9f5;
+  --amber: #8a5c00;
+  --amber-bg: #fdf8ee;
+  --blue: #1a5fa8;
+  --blue-bg: #f0f5fc;
+  --accent: #1a1a18;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 16px 60px;
+}
+
+/* ── Fixed top zone — works on Android WebView & all browsers ── */
+.sticky-top {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  background: rgba(247,247,245,0.98);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── Fixed tabs ── */
+.sticky-tabs {
+  position: fixed;
+  left: 0; right: 0;
+  z-index: 199;
+  background: rgba(247,247,245,0.98);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── Page content offset to clear fixed header ── */
+.page-content {
+  padding-top: 8px;
+}
+
+/* ── Header (inside sticky-top, not sticky itself) ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0 8px;
+}
+
+/* ── Tabs (inside sticky-top, not sticky itself) ── */
+.tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 0;
+}
+
+.header-title {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 2px;
+}
+
+.header-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.header-sub {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 2px;
+}
+
+.header-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all 0.15s;
+}
+
+.refresh-btn:hover {
+  background: var(--text);
+  color: var(--white);
+  border-color: var(--text);
+}
+
+.refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 13px; height: 13px;
+  border: 1.5px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: none;
+}
+.spinner.on { display: block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.meta-row {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: 'DM Mono', monospace;
+}
+
+/* ── Alert ── */
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--red-bg);
+  border: 1px solid var(--red-border);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 28px;
+  font-size: 13px;
+  color: var(--red);
+  line-height: 1.5;
+}
+
+.alert-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+/* ── Stats row ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 22px;
+  box-shadow: var(--shadow);
+}
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  font-family: 'DM Mono', monospace;
+}
+
+.stat-value.warn { color: var(--red); }
+.stat-sub {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 5px;
+}
+
+
+.tab {
+  padding: 11px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.15s;
+}
+
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--text); border-bottom-color: var(--text); }
+
+.tab-panel { display: none; padding-top: 24px; }
+.tab-panel.active { display: block; }
+
+/* ── Table ── */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  max-height: 70vh;
+}
+
+table {
+  width: 100%;
+  min-width: 700px;
+  border-collapse: collapse;
+}
+
+th {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 8px 11px;
+  text-align: left;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+th.r { text-align: right; }
+
+td {
+  padding: 10px 11px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+td.r { text-align: right; }
+
+/* Asset name column can wrap — everything else nowrap */
+td.asset-cell { white-space: normal; min-width: 100px; }
+
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #fafaf8; }
+
+.t-ticker {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.t-name {
+  font-size: 12px;
+  color: var(--text2);
+  margin-top: 2px;
+}
+
+/* Price display - the hero element */
+.price-block {
+  text-align: right;
+}
+
+.price-main {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.price-change {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.pos { color: var(--green); }
+.neg { color: var(--red); }
+.neu { color: var(--text3); }
+.stale { color: var(--text3); font-style: italic; }
+
+/* Value */
+.val-main {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.val-sub {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 2px;
+  font-family: 'DM Mono', monospace;
+}
+
+/* Concentration bar */
+.bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.bar-track {
+  width: 72px;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.pct-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  min-width: 42px;
+  text-align: right;
+}
+
+/* Tags */
+.tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tag-red { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+.tag-amber { background: var(--amber-bg); color: var(--amber); border: 1px solid #edd9a0; }
+.tag-green { background: var(--green-bg); color: var(--green); border: 1px solid #c0e0ce; }
+.tag-blue { background: var(--blue-bg); color: var(--blue); border: 1px solid #c5d9f0; }
+.tag-grey { background: var(--border-light); color: var(--text3); border: 1px solid var(--border); }
+.tag-purple { background: #f5f0fc; color: #6d3db0; border: 1px solid #d9c8f5; }
+
+/* Placeholder */
+.placeholder {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text3);
+  font-size: 13px;
+}
+
+/* Bucket grid */
+.bucket-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.bucket-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.bucket-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 3px;
+  background: var(--bar-c);
+  width: var(--bar-w);
+  border-radius: 0 0 0 0;
+  transition: width 0.5s ease;
+}
+
+.bucket-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+
+.bucket-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.bucket-pct {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 4px;
+  font-family: 'DM Mono', monospace;
+}
+
+/* Error */
+.error-bar {
+  background: var(--red-bg);
+  border: 1px solid var(--red-border);
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 12px;
+  color: var(--red);
+  margin-bottom: 16px;
+  display: none;
+}
+
+/* Rank number */
+.rank { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
+
+/* Shares badge */
+.shares-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--text3);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+/* Account chip */
+.acct-chip {
+  font-size: 11px;
+  color: var(--text3);
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 24px 0;
+}
+
+@media (max-width: 900px) {
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .bucket-grid { grid-template-columns: 1fr 1fr; }
+  .header { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .header-actions { align-items: flex-start; }
+  .page { padding: 20px 14px 48px; }
+  .stat-value { font-size: 19px; }
+}
+
+@media (max-width: 520px) {
+  .stats-row { grid-template-columns: 1fr; }
+  .bucket-grid { grid-template-columns: 1fr; }
+  .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tab { white-space: nowrap; }
+}
+
+/* ── Analytics tab ── */
+.sub-tab {
+  padding: 8px 18px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.15s;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.sub-tab:hover { color: var(--text2); }
+.sub-tab.active { color: var(--text); border-bottom-color: var(--text); }
+.ana-panel { display: none; }
+.ana-panel.active { display: block; }
+
+.signal-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+.signal-card .sc-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.signal-card .sc-ticker {
+  font-family: 'DM Mono', monospace;
+  font-size: 15px;
+  font-weight: 500;
+}
+.signal-card .sc-name {
+  font-size: 12px;
+  color: var(--text2);
+  margin-top: 2px;
+}
+.signal-card .sc-body {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+.signal-card .sc-accounts {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-light);
+  font-size: 11px;
+  color: var(--text3);
+  font-family: 'DM Mono', monospace;
+}
+.signal-card.buy-card { border-left: 3px solid var(--green); }
+.signal-card.sell-card { border-left: 3px solid var(--red); }
+.signal-card.watch-card { border-left: 3px solid var(--amber); }
+.signal-card.hold-card { border-left: 3px solid var(--border); }
+
+.signal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 700px) { .signal-grid { grid-template-columns: 1fr; } }
+
+.ana-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+  margin: 20px 0 10px;
+}
+
+/* Stock detail drawer */
+.stock-drawer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  border-radius: 16px 16px 0 0;
+  padding: 20px 24px 32px;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.12);
+  transform: translateY(100%);
+  transition: transform 0.25s ease;
+  z-index: 1000;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.stock-drawer.open { transform: translateY(0); }
+.drawer-handle {
+  width: 40px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+.drawer-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 999;
+  display: none;
+}
+.drawer-overlay.open { display: block; }
+
+/* ── Column headers inside sticky-tabs ── */
+.col-headers {
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
+  background: var(--bg);
+  border-top: 1px solid var(--border-light);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.col-headers::-webkit-scrollbar { display: none; }
+.col-header-wrap::-webkit-scrollbar { display: none; }
+.ch {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 7px 11px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: default;
+}
+.ch.sortable { cursor: pointer; user-select: none; }
+.ch.sortable:hover { color: var(--text2); }
+.ch-r { text-align: right; }
+.ch-asset { min-width: 120px; flex: 1; }
+.ch.sort-asc::after { content: ' ↑'; color: var(--text); }
+.ch.sort-desc::after { content: ' ↓'; color: var(--text); }
+
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+th.sortable:hover { color: var(--text2); }
+th.sort-asc::after  { content: ' ↑'; color: var(--text); }
+th.sort-desc::after { content: ' ↓'; color: var(--text); }
+
+/* ── Day impact cell ── */
+.day-impact {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+}
+.day-impact .di-dollar { font-weight: 500; }
+.day-impact .di-pct { font-size: 10px; color: var(--text3); margin-top: 1px; }
+.eye-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all 0.15s;
+}
+.eye-btn:hover { background: var(--bg); }
+.eye-btn.hiding { background: var(--bg); color: var(--text3); border-style: dashed; }
+
+body.hide-amounts .amt {
+  filter: blur(4px);
+  user-select: none;
+  pointer-events: none;
+}
+body .amt { transition: filter 0.18s ease; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Sticky top zone: header + stats + tabs -->
+  <div class="sticky-top">
+
+  <!-- Header -->
+  <div class="header" style="position:static;margin:0;padding:12px 0 10px;border-bottom:none;">
+    <div>
+      <div class="header-title">Portfolio Dashboard</div>
+      <div class="header-name">Dharam Singh Chadha</div>
+      <div class="header-sub">Full look-through · All accounts · USD</div>
+    </div>
+    <div class="header-actions">
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="refresh-btn" id="refreshBtn" onclick="refreshPrices()">
+          <div class="spinner" id="spinner"></div>
+          <span id="refreshLabel">Refresh prices</span>
+        </button>
+        <button class="eye-btn" id="eyeBtn" onclick="toggleAmounts()" title="Hide/show dollar amounts">
+          <span id="eyeIcon">👁</span>
+        </button>
+        <button class="eye-btn" id="bkngBtn" onclick="toggleBKNG()" title="Exclude BKNG (career-related)" style="font-size:11px;padding:9px 10px;font-family:'DM Mono',monospace;">
+          <span id="bkngBtnLabel">−BKNG</span>
+        </button>
+      </div>
+      <div class="meta-row" id="lastUpdated">Not yet refreshed</div>
+      <div class="meta-row" id="countdown">Auto-refresh in 60:00</div>
+    </div>
+  </div>
+
+  </div><!-- end sticky-top -->
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Total Portfolio</div>
+      <div class="stat-value amt" id="totalVal">$440,097</div>
+      <div class="stat-sub">All accounts combined</div>
+    </div>
+    <div class="stat-card" id="bkngCard">
+      <div class="stat-label">BKNG Exposure <span id="bkngExcludedBadge" style="display:none;font-size:10px;background:#f0f0ec;color:#ababA6;border:1px solid #e8e8e4;padding:1px 5px;border-radius:3px;margin-left:4px;">excluded</span></div>
+      <div class="stat-value warn amt" id="bkngVal">$81,033</div>
+      <div class="stat-sub" id="bkngPct">18.4% of portfolio · 475 shares</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">NVDA Exposure</div>
+      <div class="stat-value amt" id="nvdaVal">$35,492</div>
+      <div class="stat-sub">Direct + fund look-through</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Crypto</div>
+      <div class="stat-value amt" id="cryptoVal">$34,437</div>
+      <div class="stat-sub">7.8% · Direct + KT-BLOCKCHAIN</div>
+    </div>
+  </div>
+
+  <div class="error-bar" id="errorBar"></div>
+
+  <!-- Tabs (sticky just below the main header) -->
+  <div class="sticky-tabs">
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('all', this)">All Holdings</div>
+    <div class="tab" onclick="switchTab('stocks', this)">Direct Stocks</div>
+    <div class="tab" onclick="switchTab('funds', this)">Funds & ETFs</div>
+    <div class="tab" onclick="switchTab('buckets', this)">Asset Buckets</div>
+    <div class="tab" onclick="switchTab('analytics', this)">Analytics</div>
+  </div>
+  <!-- Column headers — shown based on active tab, always sticky -->
+  <div class="col-header-wrap" id="col-all" style="display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
+    <table style="width:100%;min-width:700px;border-collapse:collapse;">
+      <tr>
+        <th style="width:32px;"></th>
+        <th class="sortable" data-col="ticker" onclick="handleSort('all','ticker',()=>renderAll(lastTotal))">Asset</th>
+        <th class="r sortable" data-col="livePrice" onclick="handleSort('all','livePrice',()=>renderAll(lastTotal))">Price</th>
+        <th class="r sortable" data-col="chg" onclick="handleSort('all','chg',()=>renderAll(lastTotal))">Day %</th>
+        <th class="r sortable" data-col="dayImpact" onclick="handleSort('all','dayImpact',()=>renderAll(lastTotal))">Day $</th>
+        <th class="r sortable" data-col="direct" onclick="handleSort('all','direct',()=>renderAll(lastTotal))">Direct</th>
+        <th class="r" style="color:var(--text3);font-style:italic;">Fund ℹ</th>
+        <th class="r sortable" data-col="tot" onclick="handleSort('all','tot',()=>renderAll(lastTotal))">Total</th>
+        <th class="r sortable" data-col="pct" onclick="handleSort('all','pct',()=>renderAll(lastTotal))">Weight</th>
+        <th></th>
+      </tr>
+    </table>
+  </div>
+  <div class="col-header-wrap" id="col-stocks" style="display:none;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
+    <table style="width:100%;min-width:700px;border-collapse:collapse;">
+      <tr>
+        <th class="sortable" data-col="ticker" onclick="handleSort('stocks','ticker',()=>renderStocks(lastTotal))">Ticker</th>
+        <th class="sortable" data-col="name" onclick="handleSort('stocks','name',()=>renderStocks(lastTotal))">Company</th>
+        <th>Account</th>
+        <th class="r sortable" data-col="shares" onclick="handleSort('stocks','shares',()=>renderStocks(lastTotal))">Shares</th>
+        <th class="r sortable" data-col="lp" onclick="handleSort('stocks','lp',()=>renderStocks(lastTotal))">Price</th>
+        <th class="r sortable" data-col="chg" onclick="handleSort('stocks','chg',()=>renderStocks(lastTotal))">Day %</th>
+        <th class="r sortable" data-col="dayImpact" onclick="handleSort('stocks','dayImpact',()=>renderStocks(lastTotal))">Day $</th>
+        <th class="r sortable" data-col="val" onclick="handleSort('stocks','val',()=>renderStocks(lastTotal))">Value</th>
+        <th class="r sortable" data-col="pct" onclick="handleSort('stocks','pct',()=>renderStocks(lastTotal))">Weight</th>
+      </tr>
+    </table>
+  </div>
+  <div class="col-header-wrap" id="col-funds" style="display:none;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
+    <table style="width:100%;min-width:700px;border-collapse:collapse;">
+      <tr>
+        <th class="sortable" data-col="t" onclick="handleSort('funds','t',()=>renderFunds(lastTotal))">Fund</th>
+        <th class="sortable" data-col="name" onclick="handleSort('funds','name',()=>renderFunds(lastTotal))">Name</th>
+        <th>Broker</th>
+        <th>Underlying / NAV</th>
+        <th class="r sortable" data-col="chg" onclick="handleSort('funds','chg',()=>renderFunds(lastTotal))">Day %</th>
+        <th class="r sortable" data-col="dayImpact" onclick="handleSort('funds','dayImpact',()=>renderFunds(lastTotal))">Day $</th>
+        <th class="r sortable" data-col="val" onclick="handleSort('funds','val',()=>renderFunds(lastTotal))">Est. Value</th>
+        <th class="r sortable" data-col="pct" onclick="handleSort('funds','pct',()=>renderFunds(lastTotal))">Weight</th>
+      </tr>
+    </table>
+  </div>
+  </div>
+  <div class="tab-panel active" id="tab-all">
+    <div class="card">
+      <div class="table-scroll">
+      <table id="all" >
+        <tbody id="allBody">
+          <tr><td colspan="9"><div class="placeholder">Click "Refresh prices" to load live data</div></td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIRECT STOCKS -->
+  <div class="tab-panel" id="tab-stocks">
+    <div class="card">
+      <div class="table-scroll">
+      <table id="stocks" >
+        <tbody id="stocksBody">
+          <tr><td colspan="8"><div class="placeholder">Click "Refresh prices" to load live data</div></td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- FUNDS -->
+  <div class="tab-panel" id="tab-funds">
+    <div class="card">
+      <div class="table-scroll">
+      <table id="funds" >
+        <tbody id="fundsBody"></tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUCKETS -->
+  <div class="tab-panel" id="tab-buckets">
+    <div class="bucket-grid" id="bucketGrid"></div>
+  </div>
+
+  <!-- ANALYTICS -->
+  <div class="tab-panel" id="tab-analytics">
+    <!-- Sub-tabs -->
+    <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;">
+      <div class="sub-tab active" onclick="switchAnalytics('signals',this)">Signals</div>
+      <div class="sub-tab" onclick="switchAnalytics('buy',this)">Buy Ideas</div>
+      <div class="sub-tab" onclick="switchAnalytics('sell',this)">Sell Guidance</div>
+    </div>
+    <div id="ana-signals" class="ana-panel active">
+      <div id="signalsContent"><div class="placeholder">Click "Run Live Analysis" to generate signals based on current prices</div></div>
+    </div>
+    <div id="ana-buy" class="ana-panel">
+      <div id="buyContent"><div class="placeholder">Click "Run Live Analysis" to generate buy ideas aligned to your strategy</div></div>
+    </div>
+    <div id="ana-sell" class="ana-panel">
+      <div id="sellContent"><div class="placeholder">Click "Run Live Analysis" to generate sell guidance (max 10% of portfolio flagged)</div></div>
+    </div>
+    <div style="margin-top:20px;">
+      <button class="refresh-btn" id="anaBtn" onclick="runAnalytics()" style="background:var(--text);color:var(--white);">
+        <div class="spinner" id="anaSpinner"></div>
+        <span id="anaLabel">Run Live Analysis</span>
+      </button>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px;font-family:'DM Mono',monospace;" id="anaUpdated"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Stock detail drawer -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="stock-drawer" id="stockDrawer">
+  <div class="drawer-handle"></div>
+  <div id="drawerContent"></div>
+</div>
+
+<script>
+// ── Portfolio data ──────────────────────────────────────────
+const TOTAL = 440097;
+const EUR_USD = 1.13; // EUR/USD rate — update periodically
+const KRW_USD = 0.000072; // KRW/USD
+
+const stocks = [
+  // ── Direct equities ──────────────────────────────────────
+  { t:'BKNG', n:'Booking Holdings',     acct:'RSU / E*Trade',       shares:475,  direct:80741, fund:292,  currency:'USD' },
+  { t:'NVDA', n:'NVIDIA Corp',           acct:'US Stock Account',    shares:160,  direct:31778, fund:3714, currency:'USD' },
+  { t:'GOOG', n:'Alphabet',             acct:'US Stock + GTN',      shares:16,   direct:6466,  fund:2245, currency:'USD' },
+  { t:'AAPL', n:'Apple',                acct:'3 accounts',          shares:15,   direct:5317,  fund:2450, currency:'USD' },
+  { t:'MSFT', n:'Microsoft',            acct:'GTN EU + funds',      shares:4,    direct:2873,  fund:2569, currency:'USD' },
+  { t:'META', n:'Meta Platforms',       acct:'GTN US',              shares:5,    direct:3879,  fund:1068, currency:'USD' },
+  { t:'AMZN', n:'Amazon',               acct:'US Stock + GTN EU',   shares:6,    direct:2721,  fund:2089, currency:'USD' },
+  { t:'ASML', n:'ASML Holding',         acct:'GTN US + Dime',       shares:3.4,  direct:4712,  fund:520,  currency:'USD' },
+  { t:'AVGO', n:'Broadcom',             acct:'US Stock Account',    shares:7,    direct:2822,  fund:967,  currency:'USD' },
+  { t:'TSLA', n:'Tesla',                acct:'US Stock Account',    shares:5,    direct:2454,  fund:1149, currency:'USD' },
+  { t:'NBIS', n:'Nebius Group',         acct:'Dime',                shares:36,   direct:6160,  fund:0,    currency:'USD' },
+  { t:'O',    n:'Realty Income',        acct:'GTN US',              shares:84,   direct:4900,  fund:0,    currency:'USD' },
+  { t:'TSM',  n:'Taiwan Semi',          acct:'GTN US',              shares:6,    direct:1155,  fund:661,  currency:'USD' },
+  { t:'SHOP', n:'Shopify',              acct:'GTN US',              shares:19,   direct:2463,  fund:0,    currency:'USD' },
+  { t:'MELI', n:'MercadoLibre',         acct:'US Stock Account',    shares:1,    direct:2100,  fund:0,    currency:'USD' },
+  { t:'RACE', n:'Ferrari NV',           acct:'GTN US',              shares:6,    direct:1825,  fund:0,    currency:'USD' },
+  { t:'TM',   n:'Toyota Motor',         acct:'GTN US',              shares:14,   direct:2328,  fund:101,  currency:'USD' },
+  { t:'AMD',  n:'Advanced Micro Dev.',  acct:'Dime',                shares:10,   direct:2002,  fund:298,  currency:'USD' },
+  { t:'AMAT', n:'Applied Materials',    acct:'US Stock Account',    shares:9,    direct:1665,  fund:238,  currency:'USD' },
+  { t:'ANET', n:'Arista Networks',      acct:'Dime',                shares:10,   direct:1600,  fund:0,    currency:'USD' },
+  { t:'CRDO', n:'Credo Technology',     acct:'Dime',                shares:13,   direct:1500,  fund:0,    currency:'USD' },
+  { t:'NFLX', n:'Netflix',              acct:'Dime',                shares:4,    direct:1500,  fund:0,    currency:'USD' },
+  { t:'DDOG', n:'Datadog',              acct:'US Stock Account',    shares:10,   direct:1130,  fund:0,    currency:'USD' },
+  { t:'NVO',  n:'Novo Nordisk',         acct:'GTN EU',              shares:12,   direct:1425,  fund:0,    currency:'USD' },
+  { t:'INTU', n:'Intuit',               acct:'Dime',                shares:2,    direct:1396,  fund:0,    currency:'USD' },
+  { t:'MU',   n:'Micron Technology',    acct:'US Stock Account',    shares:3,    direct:315,   fund:0,    currency:'USD' },
+  { t:'BRKB', n:'Berkshire Hathaway B', acct:'Dime',                shares:3,    direct:1487,  fund:0,    currency:'USD' },
+  { t:'CPRT', n:'Copart',               acct:'Dime',                shares:25,   direct:950,   fund:0,    currency:'USD' },
+  { t:'PGR',  n:'Progressive Corp',     acct:'Dime',                shares:5,    direct:1142,  fund:0,    currency:'USD' },
+  { t:'TTD',  n:'The Trade Desk',       acct:'Dime',                shares:15,   direct:378,   fund:0,    currency:'USD' },
+  { t:'FISV', n:'Fiserv',               acct:'Dime',                shares:6,    direct:386,   fund:0,    currency:'USD' },
+  { t:'NEXT', n:'NextDecade Corp',      acct:'GTN EU',              shares:152,  direct:1441,  fund:0,    currency:'USD' },
+  { t:'RELX', n:'RELX PLC',             acct:'GTN EU',              shares:19,   direct:786,   fund:0,    currency:'USD' },
+  { t:'UNH',  n:'UnitedHealth',         acct:'GTN EU + Dime',       shares:5,    direct:1460,  fund:0,    currency:'USD' },
+  { t:'CRWV', n:'CoreWeave',            acct:'US Stock Account',    shares:8,    direct:880,   fund:0,    currency:'USD' },
+  { t:'TEAM', n:'Atlassian',            acct:'GTN EU',              shares:4,    direct:384,   fund:0,    currency:'USD' },
+  { t:'ADBE', n:'Adobe Inc',            acct:'US Stock Account',    shares:1,    direct:254,   fund:0,    currency:'USD' },
+  { t:'COIN', n:'Coinbase (fund exp.)', acct:'KT-BLOCKCHAIN',       shares:0,    direct:0,     fund:355,  currency:'USD' },
+  // ── ETFs ─────────────────────────────────────────────────
+  { t:'VOO',  n:'Vanguard S&P 500 ETF', acct:'GTN US',              shares:25,   direct:13864, fund:0,    currency:'USD' },
+  { t:'VTI',  n:'Vanguard Total Market',acct:'GTN US',              shares:14,   direct:3654,  fund:0,    currency:'USD' },
+  { t:'QQQ',  n:'Invesco Nasdaq 100',   acct:'GTN US',              shares:3,    direct:1440,  fund:0,    currency:'USD' },
+  { t:'TQQQ', n:'ProShares UltraPro QQQ',acct:'US Stock Account',  shares:30,   direct:1860,  fund:0,    currency:'USD' },
+  { t:'SCHD', n:'Schwab US Dividend ETF',acct:'US Stock + Dime',   shares:95,   direct:3009,  fund:0,    currency:'USD' },
+  { t:'VXUS', n:'Vanguard Total Intl',  acct:'US Stock Account',    shares:25,   direct:2050,  fund:0,    currency:'USD' },
+  // FDN sold 05/04/26 @ $270 — removed
+  { t:'GLD',  n:'SPDR Gold Shares',     acct:'GTN US',              shares:10,   direct:3060,  fund:0,    currency:'USD' },
+  { t:'IEV',  n:'iShares Europe ETF',   acct:'GTN US',              shares:52,   direct:2770,  fund:0,    currency:'USD' },
+  { t:'VSS',  n:'Vanguard Intl SmallCap',acct:'GTN US',             shares:20,   direct:3168,  fund:0,    currency:'USD' },
+  { t:'URTH', n:'iShares MSCI World',   acct:'GTN US',              shares:15,   direct:2955,  fund:0,    currency:'USD' },
+  { t:'FLAX', n:'Franklin FTSE Asia xJP',acct:'GTN US',             shares:107,  direct:3186,  fund:0,    currency:'USD' },
+  { t:'XLG',  n:'Invesco S&P 500 Top 50',acct:'Dime',              shares:24,   direct:1389,  fund:0,    currency:'USD' },
+  { t:'QTUM', n:'Defiance Quantum ETF', acct:'Dime',                shares:14,   direct:1624,  fund:0,    currency:'USD' },
+  { t:'JEPI', n:'JPMorgan Equity Prem.',acct:'GTN US',              shares:86,   direct:4859,  fund:0,    currency:'USD' },
+  { t:'AIQG', n:'Global X AI UCITS ETF',acct:'GTN UK (GBP)',        shares:26,   direct:430,   fund:0,    currency:'GBP' },
+  // ── EU / KR listed (price in EUR/KRW, value pre-converted to USD) ─
+  { t:'RMS.PA', n:'Hermès International',  acct:'GTN EU',  shares:1,   direct:1930, fund:0, currency:'EUR', eurPrice:1708  },
+  { t:'ITX.MC', n:'Inditex (Zara)',         acct:'GTN EU',  shares:42,  direct:1603, fund:0, currency:'EUR', eurPrice:34    },
+  { t:'MC.PA',  n:'LVMH',                  acct:'GTN EU',  shares:2,   direct:1015, fund:0, currency:'EUR', eurPrice:449   },
+  { t:'005930', n:'Samsung Electronics',   acct:'GTN KR',  shares:23,  direct:3300, fund:0,  currency:'KRW' },
+  { t:'QNTM.L', n:'VanEck Quantum Computing ETF',acct:'GTN UK (GBP)', shares:55, direct:1667, fund:0, currency:'USD' },
+];
+
+const otherAssets = [
+  // ── Non-fund asset groups ────────────────────────────────
+  { n:'Crypto (BTC / ETH / other)', direct:30000, fund:4437,  total:34437, tag:'purple', tagTxt:'Crypto',   proxy:'BLOK'  },
+  // ── SCB Mutual Funds ─────────────────────────────────────
+  { n:'SCB S&P 500 (A)',            direct:0, fund:0, total:12535, tag:'blue',   tagTxt:'SCB Fund',  proxy:'IVV'   },
+  { n:'SCB Nikkei 225',             direct:0, fund:0, total:8418,  tag:'blue',   tagTxt:'SCB Fund',  proxy:'EWJ'   },
+  { n:'SCB Dow Jones (A)',          direct:0, fund:0, total:8449,  tag:'blue',   tagTxt:'SCB Fund',  proxy:'DIA'   },
+  { n:'SCB World Equity',           direct:0, fund:0, total:7124,  tag:'blue',   tagTxt:'SCB Fund',  proxy:'URTH'  },
+  { n:'SCB SET50',                  direct:0, fund:0, total:8188,  tag:'blue',   tagTxt:'SCB Fund',  proxy:null    },
+  { n:'SCB Semiconductor (A)',      direct:0, fund:0, total:5960,  tag:'blue',   tagTxt:'SCB Fund',  proxy:'SMH'   },
+  { n:'SCB Gold',                   direct:0, fund:0, total:5246,  tag:'amber',  tagTxt:'SCB Fund',  proxy:'GLD'   },
+  { n:'SCB EV & Mobility (A)',      direct:0, fund:0, total:3380,  tag:'blue',   tagTxt:'SCB Fund',  proxy:'DRIV'  },
+  { n:'SCB Fintech (A)',            direct:0, fund:0, total:2154,  tag:'blue',   tagTxt:'SCB Fund',  proxy:'FINX'  },
+  { n:'SCB Asian EM',               direct:0, fund:0, total:2861,  tag:'blue',   tagTxt:'SCB Fund',  proxy:'AAXJ'  },
+  { n:'SCB Innovation (A)',         direct:0, fund:0, total:1741,  tag:'blue',   tagTxt:'SCB Fund',  proxy:'ARKK'  },
+  { n:'SCB Autonomous Tech (A)',    direct:0, fund:0, total:2010,  tag:'blue',   tagTxt:'SCB Fund',  proxy:'BOTZ'  },
+  { n:'SCB US Business',            direct:0, fund:0, total:1969,  tag:'blue',   tagTxt:'SCB Fund',  proxy:'IWF'   },
+  { n:'SCB Nasdaq 100 (A)',         direct:0, fund:0, total:2983,  tag:'blue',   tagTxt:'SCB Fund',  proxy:'QQQ'   },
+  { n:'SCB Genomic Revolution',     direct:0, fund:0, total:745,   tag:'blue',   tagTxt:'SCB Fund',  proxy:'ARKG'  },
+  { n:'SCB China Tech (A)',         direct:0, fund:0, total:500,   tag:'blue',   tagTxt:'SCB Fund',  proxy:'KWEB'  },
+  // ── KT Mutual Funds ──────────────────────────────────────
+  { n:'KTAM India Equity (A)',      direct:0, fund:0, total:13047, tag:'amber',  tagTxt:'KT Fund',   proxy:'INDA'  },
+  { n:'KTAM World Equity (A)',      direct:0, fund:0, total:10423, tag:'amber',  tagTxt:'KT Fund',   proxy:'ACWV'  },
+  { n:'KTAM World Tech AI (A)',     direct:0, fund:0, total:7679,  tag:'amber',  tagTxt:'KT Fund',   proxy:'AIQ'   },
+  { n:'KTAM Blockchain (A)',        direct:0, fund:0, total:4437,  tag:'purple', tagTxt:'KT Fund',   proxy:'BLOK'  },
+  { n:'KTAM Technology (A)',        direct:0, fund:0, total:3788,  tag:'amber',  tagTxt:'KT Fund',   proxy:'IWF'   },
+  { n:'KTAM Global ESG (A)',        direct:0, fund:0, total:3475,  tag:'amber',  tagTxt:'KT Fund',   proxy:'ACWV'  },
+];
+
+const funds = [
+  { t:'SCBS&P500(A)',  n:'SCB S&P 500',          broker:'SCB', underlying:'iShares IVV',         val:12535, proxy:'IVV'   },
+  { t:'SCBNDQ(A)',     n:'SCB Nasdaq 100',        broker:'SCB', underlying:'Invesco QQQM',        val:2983,  proxy:'QQQ'   },
+  { t:'SCBSEMI(A)',    n:'SCB Semiconductor',     broker:'SCB', underlying:'VanEck SMH',          val:5960,  proxy:'SMH'   },
+  { t:'SCBWORLDA',    n:'SCB World Equity',       broker:'SCB', underlying:'iShares MSCI World',  val:7124,  proxy:'URTH'  },
+  { t:'SCBGOLD',       n:'SCB Gold',              broker:'SCB', underlying:'SPDR GLD',            val:5246,  proxy:'GLD'   },
+  { t:'SCBNK225',     n:'SCB Nikkei 225',         broker:'SCB', underlying:'iShares 1329',        val:8418,  proxy:'EWJ'   },
+  { t:'SCBDJI(A)',    n:'SCB Dow Jones',           broker:'SCB', underlying:'SPDR DIA',            val:8449,  proxy:'DIA'   },
+  { t:'SCBBUSAA',     n:'SCB US Business',        broker:'SCB', underlying:'MS US Growth Fund',   val:1969,  proxy:'IWF'   },
+  { t:'SCBEV(A)',     n:'SCB EV & Mobility',      broker:'SCB', underlying:'EV theme blend',      val:3380,  proxy:'DRIV'  },
+  { t:'SCBCTECHA',    n:'SCB China Tech',         broker:'SCB', underlying:'China tech basket',   val:500,   proxy:'KWEB'  },
+  { t:'SCBFINTECH',   n:'SCB Fintech',            broker:'SCB', underlying:'Fintech theme',       val:2154,  proxy:'FINX'  },
+  { t:'SCBGENOME',    n:'SCB Genomic',            broker:'SCB', underlying:'ARKG-style',          val:745,   proxy:'ARKG'  },
+  { t:'SCBAUTO(A)',   n:'SCB Autonomous Tech',    broker:'SCB', underlying:'Robotics / auto',     val:2010,  proxy:'BOTZ'  },
+  { t:'SCBNNO(A)',    n:'SCB Innovation',         broker:'SCB', underlying:'ARK-style',           val:1741,  proxy:'ARKK'  },
+  { t:'SCBAEM',       n:'SCB Asian EM',           broker:'SCB', underlying:'Asian EM blend',      val:2861,  proxy:'AAXJ'  },
+  { t:'SCBSET50',     n:'SCB SET50',              broker:'SCB', underlying:'Thai SET50',          val:8188,  proxy:null    },
+  { t:'KT-WEQ-A',    n:'KTAM World Equity',       broker:'KT',  underlying:'AB Low Vol Global',  val:10423, proxy:'ACWV'  },
+  { t:'KT-WTAI-A',   n:'KTAM World Tech AI',      broker:'KT',  underlying:'AI global equity',   val:7679,  proxy:'AIQ'   },
+  { t:'KT-TECHNOLOGY',n:'KTAM Technology',        broker:'KT',  underlying:'AB American Growth', val:3788,  proxy:'IWF'   },
+  { t:'KT-BLOCKCHAIN',n:'KTAM Blockchain',        broker:'KT',  underlying:'BLOK + BLCN',        val:4437,  proxy:'BLOK'  },
+  { t:'KT-INDIA-A',  n:'KTAM India Equity',       broker:'KT',  underlying:'India equity fund',  val:13047, proxy:'INDA'  },
+  { t:'KT-GESG-A',   n:'KTAM Global ESG',         broker:'KT',  underlying:'Global ESG blend',   val:3475,  proxy:'ACWV'  },
+];
+
+// ── Bucket colors ──────────────────────────────────────────
+const BUCKET_COLORS = {
+  'BKNG':           '#c0392b',
+  'US Large Cap Tech': '#1a5fa8',
+  'Crypto':         '#6d3db0',
+  'Gold':           '#8a5c00',
+  'India Equity':   '#d4840a',
+  'AI Infrastructure': '#27774a',
+  'Thai Equities':  '#c47a1e',
+  'Japan Equities': '#1a5fa8',
+  'Income / Dividend': '#3d8b5e',
+  'Broad Market':   '#ababA6',
+  'Other':          '#6b6b67',
+};
+
+// Dynamically compute buckets from real position data — zero leakage
+function computeBuckets(total) {
+  const get = t => prices[t]?.price;
+  const fScale = (baseVal, proxy) => {
+    const lp = prices[proxy]?.price;
+    const bp = FALLBACK[proxy]?.price;
+    return (lp && bp) ? Math.round(baseVal * lp / bp) : baseVal;
+  };
+  const pos = (t, shares, fallback, fx=1) => {
+    const p = get(t);
+    return p && shares > 0 ? p * shares * fx : fallback;
+  };
+
+  // Individual stock values (direct + look-through where applicable)
+  const bkngVal = pos('BKNG',475,80741) + 292;
+  const nvdaVal = pos('NVDA',160,31778) + 3714;
+  const googVal = pos('GOOG',16,6466);
+  const aaplVal = pos('AAPL',15,5317);
+  const msftVal = pos('MSFT',4,2873);
+  const metaVal = pos('META',5,3879);
+  const amznVal = pos('AMZN',6,2721);
+  const avgoVal = pos('AVGO',7,2822);
+  const tslaVal = pos('TSLA',5,2454);
+  const asmlVal = pos('ASML',3.4,4712);
+  const nbisVal = pos('NBIS',36,6160);
+  const tsmVal  = pos('TSM',6,1155);
+  const anetVal = pos('ANET',10,1600);
+  const crdoVal = pos('CRDO',13,1500);
+  const amdVal  = pos('AMD',10,2002);
+  const oVal    = pos('O',84,4900);
+  const jepiVal = pos('JEPI',86,4859);
+  const schdVal = pos('SCHD',95,3009);
+  const tmVal   = pos('TM',14,2328);
+  const shopVal = pos('SHOP',19,2463);
+  const meliVal = pos('MELI',1,2100);
+  const raceVal = pos('RACE',6,1825);
+  const nflxVal = pos('NFLX',4,1500);
+  const ddogVal = pos('DDOG',10,1130);
+  const nvoVal  = pos('NVO',12,1425);
+  const intuVal = pos('INTU',2,1396);
+  const amatVal = pos('AMAT',9,1665);
+  const muVal   = pos('MU',3,315);
+  const brkbVal = pos('BRKB',3,1487);
+  const cprtVal = pos('CPRT',25,950);
+  const pgrVal  = pos('PGR',5,1142);
+  const ttdVal  = pos('TTD',15,378);
+  const fisvVal = pos('FISV',6,386);
+  const nextVal = pos('NEXT',152,1441);
+  const relxVal = pos('RELX',19,786);
+  const unhVal  = pos('UNH',5,1460);
+  const crwvVal = pos('CRWV',8,880);
+  const teamVal = pos('TEAM',4,384);
+  // EU stocks (EUR price * shares * EUR_USD)
+  const rmsVal  = (get('RMS.PA') ?? 1708) * 1  * EUR_USD;
+  const itxVal  = (get('ITX.MC') ?? 34)   * 42 * EUR_USD;
+  const mcVal   = (get('MC.PA')  ?? 449)  * 2  * EUR_USD;
+  const samsungVal = pos('005930',23,3300);
+  // ETFs
+  const vooVal  = pos('VOO',25,13864);
+  const vtiVal  = pos('VTI',14,3654);
+  const qqqVal  = pos('QQQ',3,1440);
+  const tqqqVal = pos('TQQQ',30,1860);
+  const vxusVal = pos('VXUS',25,2050);
+  const fdnVal  = 0; // FDN sold 05/04/26
+  const gldVal  = pos('GLD',10,3060);
+  const ievVal  = pos('IEV',52,2770);
+  const vssVal  = pos('VSS',20,3168);
+  const urthVal = pos('URTH',15,2955);
+  const flaxVal = pos('FLAX',107,3186);
+  const xlgVal  = pos('XLG',24,1389);
+  const qtumVal = pos('QTUM',14,1624);
+  const aiqgVal = pos('AIQG',26,430);
+  const qntmVal = pos('QNTM.L',55,1667);
+  // Thai funds — proxy-scaled
+  const scbSP500 = fScale(12535,'IVV');
+  const scbNdq   = fScale(2983,'QQQ');
+  const scbSemi  = fScale(5960,'SMH');
+  const scbWorld = fScale(7124,'URTH');
+  const scbGold  = fScale(5246,'GLD');
+  const scbNik   = fScale(8418,'EWJ');   // Full Nikkei fund → Japan
+  const scbDji   = fScale(8449,'DIA');
+  const scbBusaa = fScale(1969,'IWF');
+  const scbEV    = fScale(3380,'DRIV');
+  const scbChina = fScale(500,'KWEB');
+  const scbFin   = fScale(2154,'FINX');
+  const scbGenom = fScale(745,'ARKG');
+  const scbAuto  = fScale(2010,'BOTZ');
+  const scbInno  = fScale(1741,'ARKK');
+  const scbAEM   = fScale(2861,'AAXJ');
+  const scbSet50 = 8188;
+  const ktWEQ    = fScale(10423,'ACWV');
+  const ktWTAI   = fScale(7679,'AIQ');
+  const ktTech   = fScale(3788,'IWF');
+  const ktBlock  = fScale(4437,'BLOK');
+  const ktIndia  = fScale(13047,'INDA');
+  const ktGESG   = fScale(3475,'ACWV');
+
+  // ── BUCKET 1: BKNG ──────────────────────────────────────
+  const B_BKNG = bkngVal;
+
+  // ── BUCKET 2: US Large Cap Tech ─────────────────────────
+  // Named mega-caps + all US-focused ETFs and US portions of broad funds
+  const B_USTECH = nvdaVal + googVal + aaplVal + msftVal + metaVal + amznVal + avgoVal + tslaVal
+    + vooVal + vtiVal + qqqVal + xlgVal + fdnVal
+    + scbSP500 + scbNdq + scbDji + scbBusaa + ktTech;
+
+  // ── BUCKET 3: AI Infrastructure ─────────────────────────
+  const B_AIINFRA = nbisVal + anetVal + crdoVal + amdVal + asmlVal + tsmVal
+    + qtumVal + qntmVal + aiqgVal
+    + (scbSemi * 1.0) + (ktWTAI * 1.0);
+
+  // ── BUCKET 4: Income / Dividend ─────────────────────────
+  const B_INCOME = oVal + jepiVal + schdVal;
+
+  // ── BUCKET 5: Gold ───────────────────────────────────────
+  const B_GOLD = gldVal + scbGold;
+
+  // ── BUCKET 6: Crypto ────────────────────────────────────
+  const B_CRYPTO = 30000 + ktBlock;
+
+  // ── BUCKET 7: India ─────────────────────────────────────
+  const B_INDIA = ktIndia;
+
+  // ── BUCKET 8: Thai Equities ──────────────────────────────
+  const B_THAI = scbSet50;
+
+  // ── BUCKET 9: Japan ─────────────────────────────────────
+  // Full Nikkei fund (SCBNK225) + TM direct + Japan slice of SCB/KT world funds only
+  const B_JAPAN = tmVal + scbNik
+    + (scbWorld * 0.065) + (ktWEQ * 0.040);
+
+  // ── BUCKET 10: Asia / Europe / EM ────────────────────────
+  // EU direct stocks, FLAX, IEV, VSS, VXUS, Samsung, SCBAEM, SCBCTECHA, MELI
+  // + intl portions of world funds
+  const B_ASIAEM = rmsVal + itxVal + mcVal + samsungVal
+    + flaxVal + ievVal + vssVal + vxusVal + urthVal + scbAEM + scbChina + meliVal
+    + (scbWorld * 0.585) + (ktWEQ * 0.300) + (ktGESG * 0.500);
+
+  // ── BUCKET 11: Thematic Funds ────────────────────────────
+  const B_THEMATIC = scbEV + scbFin + scbGenom + scbAuto + scbInno;
+
+  // ── BUCKET 12: Leveraged / Speculative ───────────────────
+  const B_LEVERAGE = tqqqVal;
+
+  // ── BUCKET 13: Other Individual Stocks ───────────────────
+  const adbeVal = pos('ADBE',1,254);
+  const B_OTHER = shopVal + raceVal + nflxVal + ddogVal + nvoVal + intuVal + amatVal + muVal
+    + brkbVal + cprtVal + pgrVal + ttdVal + fisvVal + nextVal + relxVal + unhVal + crwvVal + teamVal + adbeVal;
+
+  // ── Residual ─────────────────────────────────────────────
+  const allBuckets = (excludeBKNG ? 0 : B_BKNG) + B_USTECH + B_AIINFRA + B_INCOME
+    + B_GOLD + B_CRYPTO + B_INDIA + B_THAI + B_JAPAN + B_ASIAEM
+    + B_THEMATIC + B_LEVERAGE + B_OTHER;
+  const residual = Math.max(total - allBuckets, 0);
+
+  const raw = [
+    { l:'BKNG',                  v: B_BKNG,     c:'#c0392b', exclude: excludeBKNG },
+    { l:'US Large Cap Tech',      v: B_USTECH,   c:'#1a5fa8' },
+    { l:'AI Infrastructure',      v: B_AIINFRA,  c:'#27774a' },
+    { l:'Asia / Europe / EM',     v: B_ASIAEM,   c:'#d4840a' },
+    { l:'India Equity',           v: B_INDIA,    c:'#e8792a' },
+    { l:'Income / Dividend',      v: B_INCOME,   c:'#3d8b5e' },
+    { l:'Crypto',                 v: B_CRYPTO,   c:'#6d3db0' },
+    { l:'Gold',                   v: B_GOLD,     c:'#8a5c00' },
+    { l:'Japan Equities',         v: B_JAPAN,    c:'#4a7fb5' },
+    { l:'Thai Equities',          v: B_THAI,     c:'#c47a1e' },
+    { l:'Thematic Funds',         v: B_THEMATIC, c:'#7b6cf6' },
+    { l:'Other Stocks',           v: B_OTHER,    c:'#6b6b67' },
+    { l:'Leveraged / Speculative',v: B_LEVERAGE, c:'#e8792a' },
+    ...(residual > 1000 ? [{ l:'Unallocated Residual', v: residual, c:'#e84040' }] : []),
+  ];
+
+  return raw.map(b => ({
+    ...b,
+    pct: b.exclude ? 0 : (b.v / total * 100)
+  }));
+}
+
+
+// ── Helpers ────────────────────────────────────────────────
+const $m = v => v >= 1e6 ? '$'+(v/1e6).toFixed(2)+'M' : '$'+v.toLocaleString('en-US',{maximumFractionDigits:0});
+const fmtPrice = v => '$'+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+function barColor(pct) {
+  if (pct > 15) return '#c0392b';
+  if (pct > 8)  return '#d4840a';
+  if (pct > 3)  return '#1a5fa8';
+  return '#27774a';
+}
+
+function tagForStock(t, pct) {
+  if (t==='BKNG') return ['red','Concentrate'];
+  if (pct > 5)    return ['red','High'];
+  if (pct > 2)    return ['amber','Watch'];
+  return ['grey','Normal'];
+}
+
+// ── State ──────────────────────────────────────────────────
+let prices = {};
+let timer, timerSecs = 3600;
+let excludeBKNG = false;
+let lastTotal = 440097;
+
+// ── Sort state ─────────────────────────────────────────────
+const sortState = { all: { col: 'tot', dir: -1 }, stocks: { col: 'val', dir: -1 }, funds: { col: 'val', dir: -1 } };
+
+function sortRows(rows, col, dir) {
+  return [...rows].sort((a, b) => {
+    const av = a[col] ?? -Infinity;
+    const bv = b[col] ?? -Infinity;
+    return typeof av === 'string' ? av.localeCompare(bv) * dir : (av - bv) * dir;
+  });
+}
+
+function setSortHeader(tableId, col) {
+  const colBar = document.getElementById('col-' + tableId);
+  if (!colBar) return;
+  colBar.querySelectorAll('th.sortable').forEach(th => {
+    th.classList.remove('sort-asc', 'sort-desc');
+    if (th.dataset.col === col) {
+      th.classList.add(sortState[tableId].dir === 1 ? 'sort-asc' : 'sort-desc');
+    }
+  });
+}
+
+function handleSort(tableId, col, renderFn) {
+  if (sortState[tableId].col === col) sortState[tableId].dir *= -1;
+  else { sortState[tableId].col = col; sortState[tableId].dir = -1; }
+  renderFn();
+}
+
+// ── Render: All Holdings ───────────────────────────────────
+function renderAll(total) {
+  // ── Priced stocks ──
+  const stockRows = [];
+  for (const s of stocks) {
+    if (excludeBKNG && s.t === 'BKNG') continue;
+    const p = prices[s.t];
+    const livePrice = p?.price ?? null;
+    const chg = p?.change ?? null;
+    const isEUR = s.currency === 'EUR';
+    const isGBP = s.currency === 'GBP';
+
+    // For EUR stocks: Finnhub returns EUR price; convert to USD for value
+    let directLive;
+    if (livePrice && s.shares > 0) {
+      const fxRate = isEUR ? EUR_USD : isGBP ? 1.26 : 1;
+      directLive = livePrice * s.shares * fxRate;
+    } else if (s.eurPrice && s.shares > 0) {
+      directLive = s.eurPrice * s.shares * EUR_USD;
+    } else {
+      directLive = s.direct;
+    }
+
+    // tot = direct only — funds now have their own rows so no double counting
+    const tot = directLive;
+    const pct = tot / total * 100;
+    const dayImpact = chg != null ? tot * chg / 100 : null;
+    const displayPrice = livePrice ?? (isEUR && s.eurPrice ? s.eurPrice : null);
+    const priceLabel = isEUR ? '€' : isGBP ? '£' : '$';
+    stockRows.push({
+      ticker:s.t, name:s.n, livePrice:displayPrice, priceLabel,
+      isEUR, chg, direct:directLive, fund:s.fund, tot, pct, dayImpact, isStock:true
+    });
+  }
+
+  // ── Non-priced asset groups — use proxy ETF for day % ──
+  const assetRows = otherAssets.map(o => {
+    const proxyChg = o.proxy ? (prices[o.proxy]?.change ?? null) : null;
+    const proxyLiveP = o.proxy ? prices[o.proxy]?.price : null;
+    const proxyBaseP = o.proxy ? FALLBACK[o.proxy]?.price : null;
+    // Scale total value by proxy movement if live
+    const scaledTotal = (proxyLiveP && proxyBaseP && proxyBaseP > 0)
+      ? Math.round(o.total * (proxyLiveP / proxyBaseP))
+      : o.total;
+    const dayImpact = proxyChg != null ? scaledTotal * proxyChg / 100 : null;
+    return {
+      ticker:'—', name:o.n, livePrice:null, chg:proxyChg,
+      direct:o.direct, fund:o.fund, tot:scaledTotal,
+      pct: scaledTotal / total * 100,
+      dayImpact, isStock:false, tag:o.tag, tagTxt:o.tagTxt,
+      proxyLabel: o.proxy || null
+    };
+  });
+
+  const { col, dir } = sortState.all;
+  const allRows = sortRows([...stockRows, ...assetRows], col, dir);
+  const totalDirect = allRows.reduce((s,r) => s + r.direct, 0);
+  const totalFund   = allRows.reduce((s,r) => s + r.fund, 0);
+  const totalVal2   = allRows.reduce((s,r) => s + r.tot, 0);
+  const totalPct    = allRows.reduce((s,r) => s + r.pct, 0);
+  const totalDay$   = allRows.reduce((s,r) => s + (r.dayImpact ?? 0), 0);
+  const totalDayPct = totalVal2 > 0 ? totalDay$ / (totalVal2 - totalDay$) * 100 : 0;
+
+  const tbody = document.getElementById('allBody');
+
+  const renderRow = (r, i) => {
+    const [tClass, tTxt] = r.isStock ? tagForStock(r.ticker, r.pct) : [r.tag, r.tagTxt];
+    const bc = barColor(r.pct);
+    const bw = Math.min(r.pct / 20 * 100, 100).toFixed(1);
+    const isStale = r.livePrice != null && prices[r.ticker]?.stale;
+    const pSym = r.priceLabel || '$';
+
+    const priceCell = r.livePrice != null
+      ? `<div class="price-main ${isStale?'stale':''}" style="font-size:12px;">${pSym}${r.livePrice.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}${isStale?' *':''}</div>`
+      : r.proxyLabel
+        ? `<div style="font-size:10px;color:var(--text3);">via ${r.proxyLabel}</div>`
+        : `<div style="font-size:11px;color:var(--text3);">—</div>`;
+
+    const dayPctCell = r.chg != null
+      ? `<span class="${r.chg>=0?'pos':'neg'}" style="font-family:'DM Mono',monospace;font-size:12px;">${r.chg>=0?'+':''}${r.chg.toFixed(2)}%</span>`
+      : `<span style="font-size:11px;color:var(--text3);">—</span>`;
+
+    const dayCell = r.dayImpact != null
+      ? `<span class="${r.dayImpact>=0?'pos':'neg'} amt" style="font-family:'DM Mono',monospace;font-size:12px;font-weight:500;">${r.dayImpact>=0?'+':''}${$m(Math.abs(r.dayImpact))}</span>`
+      : `<span style="font-size:11px;color:var(--text3);">—</span>`;
+
+    return `<tr${!r.isStock?' style="background:#fafaf8;"':''}>
+      <td><span class="rank">${i+1}</span></td>
+      <td class="asset-cell"><div class="t-ticker">${r.ticker}</div><div class="t-name">${r.name}</div></td>
+      <td class="r">${priceCell}</td>
+      <td class="r">${dayPctCell}</td>
+      <td class="r">${dayCell}</td>
+      <td class="r"><div class="val-main amt">${$m(r.direct)}</div></td>
+      <td class="r"><div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);">${r.fund>0?'+'+$m(r.fund):'—'}</div></td>
+      <td class="r"><div class="val-main amt" style="font-weight:600;">${$m(r.tot)}</div></td>
+      <td class="r">
+        <div class="bar-wrap">
+          <div class="bar-track"><div class="bar-fill" style="width:${bw}%;background:${bc};"></div></div>
+          <span class="pct-label" style="color:${bc};">${r.pct.toFixed(2)}%</span>
+        </div>
+      </td>
+      <td><span class="tag tag-${tClass}">${tTxt}</span></td>
+    </tr>`;
+  };
+
+  tbody.innerHTML =
+    allRows.map((r, i) => renderRow(r, i)).join('') +
+    `<tr style="background:var(--bg);border-top:2px solid var(--border);">
+      <td colspan="2" style="font-size:12px;font-weight:600;color:var(--text);padding:10px 16px;">TOTAL (direct only)</td>
+      <td class="r" style="padding:10px 16px;"></td>
+      <td class="r" style="padding:10px 16px;"><span class="${totalDayPct>=0?'pos':'neg'}" style="font-family:'DM Mono',monospace;font-size:12px;font-weight:600;">${totalDayPct>=0?'+':''}${totalDayPct.toFixed(2)}%</span></td>
+      <td class="r" style="padding:10px 11px;"><span class="${totalDay$>=0?'pos':'neg'} amt" style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;">${totalDay$>=0?'+':''}${$m(Math.abs(totalDay$))}</span></td>
+      <td class="r" style="padding:10px 16px;"><div class="val-main amt" style="font-weight:700;font-size:14px;">${$m(totalVal2)}</div></td>
+      <td class="r" style="padding:10px 16px;"><div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);">+${$m(totalFund)}<br><span style="font-size:9px;letter-spacing:0.04em;text-transform:uppercase;">info only</span></div></td>
+      <td class="r" style="padding:10px 16px;"></td>
+      <td class="r" style="padding:10px 16px;"><span style="font-family:'DM Mono',monospace;font-size:12px;font-weight:600;">${totalPct.toFixed(2)}%</span></td>
+      <td></td>
+    </tr>`;
+
+  setSortHeader('all', col);
+}
+
+// ── Render: Direct Stocks ──────────────────────────────────
+function renderStocks(total) {
+  const { col, dir } = sortState.stocks;
+
+  const rows = stocks
+    .filter(s => (s.shares > 0 || s.fund > 0) && !(excludeBKNG && s.t === 'BKNG'))
+    .map(s => {
+      const p = prices[s.t];
+      const lp = p?.price ?? null;
+      const chg = p?.change ?? null;
+      const val = lp && s.shares > 0 ? lp * s.shares : s.direct;
+      const pct = val / total * 100;
+      const dayImpact = chg != null ? val * chg / 100 : null;
+      return { ticker:s.t, name:s.n, acct:s.acct, shares:s.shares, lp, chg, val, pct, dayImpact, fund:s.fund };
+    });
+
+  const sorted = sortRows(rows, col, dir);
+
+  const sTotalVal    = sorted.reduce((s,r) => s + r.val, 0);
+  const sTotalPct    = sorted.reduce((s,r) => s + r.pct, 0);
+  const sTotalDay$   = sorted.reduce((s,r) => s + (r.dayImpact ?? 0), 0);
+  const sTotalDayPct = sTotalVal > 0 ? sTotalDay$ / (sTotalVal - sTotalDay$) * 100 : 0;
+
+  const tbody = document.getElementById('stocksBody');
+  tbody.innerHTML = sorted.map(r => {
+    const bc = barColor(r.pct);
+    const priceHtml = r.lp != null
+      ? `<div class="price-main">${fmtPrice(r.lp)}</div>`
+      : `<div class="price-main neu">—</div>`;
+    const dayPctHtml = r.chg != null
+      ? `<span class="${r.chg>=0?'pos':'neg'}" style="font-family:'DM Mono',monospace;font-size:12px;">${r.chg>=0?'+':''}${r.chg.toFixed(2)}%</span>`
+      : `<span class="neu">—</span>`;
+    const dayDollarHtml = r.dayImpact != null
+      ? `<span class="${r.dayImpact>=0?'pos':'neg'} amt" style="font-family:'DM Mono',monospace;font-size:12px;font-weight:500;">${r.dayImpact>=0?'+':''}${$m(Math.abs(r.dayImpact))}</span>`
+      : `<span class="neu">—</span>`;
+    return `<tr>
+      <td><span class="t-ticker">${r.ticker}</span></td>
+      <td><span style="font-size:13px;color:var(--text2);">${r.name}</span></td>
+      <td><span class="acct-chip">${r.acct}</span></td>
+      <td class="r"><span class="shares-badge amt">${r.shares>0?r.shares:'—'}</span></td>
+      <td class="r">${priceHtml}</td>
+      <td class="r">${dayPctHtml}</td>
+      <td class="r">${dayDollarHtml}</td>
+      <td class="r"><div class="val-main amt">${$m(r.val)}</div>${r.fund>0?`<div class="val-sub amt">+${$m(r.fund)} funds</div>`:''}</td>
+      <td class="r"><span class="pct-label" style="color:${bc};">${r.pct.toFixed(2)}%</span></td>
+    </tr>`;
+  }).join('') + `
+  <tr style="background:var(--bg);border-top:2px solid var(--border);">
+    <td colspan="3" style="font-size:12px;font-weight:600;color:var(--text);padding:10px 16px;">TOTAL</td>
+    <td class="r" style="padding:10px 16px;"></td>
+    <td class="r" style="padding:10px 16px;"></td>
+    <td class="r" style="padding:10px 16px;"><span class="${sTotalDayPct>=0?'pos':'neg'}" style="font-family:'DM Mono',monospace;font-size:12px;font-weight:600;">${sTotalDayPct>=0?'+':''}${sTotalDayPct.toFixed(2)}%</span></td>
+    <td class="r" style="padding:10px 16px;"><span class="${sTotalDay$>=0?'pos':'neg'} amt" style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;">${sTotalDay$>=0?'+':''}${$m(Math.abs(sTotalDay$))}</span></td>
+    <td class="r" style="padding:10px 16px;"><div class="val-main amt" style="font-weight:700;font-size:14px;">${$m(sTotalVal)}</div></td>
+    <td class="r" style="padding:10px 16px;"><span style="font-family:'DM Mono',monospace;font-size:12px;font-weight:600;">${sTotalPct.toFixed(2)}%</span></td>
+  </tr>`;
+
+  setSortHeader('stocks', col);
+}
+
+// ── Render: Funds ──────────────────────────────────────────
+function renderFunds(total) {
+  const { col, dir } = sortState.funds;
+
+  const rows = funds.map(f => {
+    const liveVal = fundLiveVal(f);
+    const chg = fundDayChg(f);
+    const dayImpact = chg != null ? liveVal * chg / 100 : null;
+    const pct = liveVal / total * 100;
+    const proxyPrice = f.proxy && prices[f.proxy] ? prices[f.proxy].price : null;
+    return { ...f, liveVal, chg, dayImpact, pct, proxyPrice, name:f.n, val:liveVal };
+  });
+
+  const sorted = sortRows(rows, col, dir);
+  const fTotalVal  = sorted.reduce((s,f) => s + f.liveVal, 0);
+  const fTotalPct  = sorted.reduce((s,f) => s + f.pct, 0);
+  const fTotalDay$ = sorted.reduce((s,f) => s + (f.dayImpact ?? 0), 0);
+  const fTotalDayPct = fTotalVal > 0 ? fTotalDay$ / (fTotalVal - fTotalDay$) * 100 : 0;
+
+  document.getElementById('fundsBody').innerHTML = sorted.map(f => {
+    const bc = barColor(f.pct);
+    const isLive = isFundLive(f);
+    const navLabel = f.proxy
+      ? `<span style="font-size:10px;color:${isLive?'var(--green)':'var(--text3)'};">${isLive?'● live':'○ est'} via ${f.proxy}</span>`
+      : `<span style="font-size:10px;color:var(--text3);">● manual</span>`;
+    const dayPctHtml = f.chg != null
+      ? `<span class="${f.chg>=0?'pos':'neg'}" style="font-family:'DM Mono',monospace;font-size:12px;">${f.chg>=0?'+':''}${f.chg.toFixed(2)}%</span>`
+      : `<span class="neu">—</span>`;
+    const dayDollarHtml = f.dayImpact != null
+      ? `<span class="${f.dayImpact>=0?'pos':'neg'} amt" style="font-family:'DM Mono',monospace;font-size:12px;font-weight:500;">${f.dayImpact>=0?'+':''}${$m(Math.abs(f.dayImpact))}</span>`
+      : `<span class="neu">—</span>`;
+    return `<tr>
+      <td><span class="t-ticker" style="font-size:12px;">${f.t}</span></td>
+      <td style="font-size:13px;color:var(--text2);">${f.n}</td>
+      <td><span class="tag tag-${f.broker==='SCB'?'blue':'amber'}">${f.broker}</span></td>
+      <td style="font-size:12px;color:var(--text3);">${f.underlying} ${navLabel}</td>
+      <td class="r">${dayPctHtml}</td>
+      <td class="r">${dayDollarHtml}</td>
+      <td class="r"><div class="val-main amt" style="font-weight:600;">${$m(f.liveVal)}</div>${f.liveVal!==f.val?`<div style="font-size:10px;color:var(--text3);">base: ${$m(f.val)}</div>`:''}</td>
+      <td class="r"><span class="pct-label" style="color:${bc};">${f.pct.toFixed(2)}%</span></td>
+    </tr>`;
+  }).join('') + `
+  <tr style="background:var(--bg);border-top:2px solid var(--border);">
+    <td colspan="3" style="font-size:12px;font-weight:600;color:var(--text);padding:10px 16px;">TOTAL</td>
+    <td style="padding:10px 16px;"></td>
+    <td class="r" style="padding:10px 16px;"><span class="${fTotalDayPct>=0?'pos':'neg'}" style="font-family:'DM Mono',monospace;font-size:12px;font-weight:600;">${fTotalDayPct>=0?'+':''}${fTotalDayPct.toFixed(2)}%</span></td>
+    <td class="r" style="padding:10px 16px;"><span class="${fTotalDay$>=0?'pos':'neg'} amt" style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;">${fTotalDay$>=0?'+':''}${$m(Math.abs(fTotalDay$))}</span></td>
+    <td class="r" style="padding:10px 16px;"><div class="val-main amt" style="font-weight:700;font-size:14px;">${$m(fTotalVal)}</div></td>
+    <td class="r" style="padding:10px 16px;"><span style="font-family:'DM Mono',monospace;font-size:12px;font-weight:600;">${fTotalPct.toFixed(2)}%</span></td>
+  </tr>`;
+
+  setSortHeader('funds', col);
+}
+
+// ── Render: Buckets ────────────────────────────────────────
+function renderBuckets(total) {
+  const buckets = computeBuckets(total);
+  // Sort by value descending, excluded BKNG stays at natural position
+  const sorted = [...buckets].sort((a, b) => {
+    if (a.exclude) return 1;
+    if (b.exclude) return -1;
+    return b.v - a.v;
+  });
+  const totalPct = sorted.reduce((s, b) => s + b.pct, 0);
+
+  document.getElementById('bucketGrid').innerHTML = sorted.map(b => {
+    const bw = Math.min(b.pct / 20 * 100, 100).toFixed(1) + '%';
+    const isExcluded = b.exclude;
+    const opacity = isExcluded ? 'opacity:0.35;' : '';
+    return `<div class="bucket-card" style="--bar-c:${b.c};--bar-w:${isExcluded?'0%':bw};${opacity}">
+      <div class="bucket-label">${b.l}${isExcluded ? ' <span style="font-size:9px;color:var(--text3);">(excluded)</span>' : ''}</div>
+      <div class="bucket-val amt">${$m(b.v)}</div>
+      <div class="bucket-pct" style="color:${isExcluded ? 'var(--text3)' : b.c};">${isExcluded ? '—' : b.pct.toFixed(2) + '%'}</div>
+    </div>`;
+  }).join('') + `
+    <div class="bucket-card" style="--bar-c:#1a1a18;--bar-w:100%;border-style:dashed;grid-column:1/-1;">
+      <div class="bucket-label">Total accounted</div>
+      <div class="bucket-val amt">${$m(total)}</div>
+      <div class="bucket-pct" style="color:${Math.abs(totalPct-100)<0.5?'#27774a':'#c0392b'};font-weight:600;">${totalPct.toFixed(2)}%</div>
+    </div>`;
+}
+
+// ── Render: Stat bar ───────────────────────────────────────
+function renderStats(total) {
+  document.getElementById('totalVal').textContent = $m(total);
+  const bkngP = prices['BKNG']?.price ?? 179.40;
+  const bkngTot = bkngP * 475 + 292;
+  const bkngPct = (bkngTot / (total + (excludeBKNG ? bkngTot : 0)) * 100).toFixed(1);
+  document.getElementById('bkngVal').textContent = $m(bkngTot);
+  document.getElementById('bkngPct').textContent = excludeBKNG
+    ? `Excluded · 475 shares · ${fmtPrice(bkngP)}/sh`
+    : `${bkngPct}% of portfolio · 475 shares · ${fmtPrice(bkngP)}/sh`;
+  document.getElementById('bkngCard').style.opacity = excludeBKNG ? '0.45' : '1';
+  document.getElementById('bkngExcludedBadge').style.display = excludeBKNG ? 'inline' : 'none';
+  const nvdaP = prices['NVDA']?.price ?? 197.61;
+  document.getElementById('nvdaVal').textContent = $m(nvdaP * 160);
+  document.querySelector('.header-sub').textContent = excludeBKNG
+    ? 'Full look-through · All accounts · USD · BKNG excluded'
+    : 'Full look-through · All accounts · USD';
+}
+
+// ── Compute live total from all positions ──────────────────
+function computeLiveTotal() {
+  let total = 0;
+
+  // Direct stocks + ETFs
+  for (const s of stocks) {
+    if (excludeBKNG && s.t === 'BKNG') continue;
+    const p = prices[s.t];
+    const livePrice = p?.price ?? null;
+    const isEUR = s.currency === 'EUR';
+    const isGBP = s.currency === 'GBP';
+    let val;
+    if (livePrice && s.shares > 0) {
+      val = livePrice * s.shares * (isEUR ? EUR_USD : isGBP ? 1.26 : 1);
+    } else if (s.eurPrice && s.shares > 0) {
+      val = s.eurPrice * s.shares * EUR_USD;
+    } else {
+      val = s.direct;
+    }
+    total += val;
+  }
+
+  // otherAssets (crypto, funds as rows)
+  for (const o of otherAssets) {
+    const proxyLiveP = o.proxy ? prices[o.proxy]?.price : null;
+    const proxyBaseP = o.proxy ? FALLBACK[o.proxy]?.price : null;
+    const scaled = (proxyLiveP && proxyBaseP && proxyBaseP > 0)
+      ? Math.round(o.total * (proxyLiveP / proxyBaseP))
+      : o.total;
+    total += scaled;
+  }
+
+  return total;
+}
+
+// ── Full render ────────────────────────────────────────────
+function renderEverything() {
+  const total = computeLiveTotal();
+  lastTotal = total;
+  renderStats(total);
+  renderAll(total);
+  renderStocks(total);
+  renderFunds(total);
+  renderBuckets(total);
+  setTimeout(addRowClickHandlers, 50);
+  setTimeout(updateStickyOffsets, 80);
+  setTimeout(() => {
+    syncScroll('col-all',    'tab-all');
+    syncScroll('col-stocks', 'tab-stocks');
+    syncScroll('col-funds',  'tab-funds');
+  }, 120);
+}
+
+// ── BKNG toggle ───────────────────────────────────────────
+function toggleBKNG() {
+  excludeBKNG = !excludeBKNG;
+  const btn = document.getElementById('bkngBtn');
+  const lbl = document.getElementById('bkngBtnLabel');
+  btn.classList.toggle('hiding', excludeBKNG);
+  lbl.textContent = excludeBKNG ? '+BKNG' : '−BKNG';
+  btn.title = excludeBKNG ? 'Include BKNG' : 'Exclude BKNG (career-related)';
+  renderEverything();
+}
+
+// ── Privacy toggle ────────────────────────────────────────
+let amountsHidden = false;
+function toggleAmounts() {
+  amountsHidden = !amountsHidden;
+  document.body.classList.toggle('hide-amounts', amountsHidden);
+  const btn = document.getElementById('eyeBtn');
+  const icon = document.getElementById('eyeIcon');
+  btn.classList.toggle('hiding', amountsHidden);
+  icon.textContent = amountsHidden ? '🙈' : '👁';
+  btn.title = amountsHidden ? 'Show dollar amounts' : 'Hide dollar amounts';
+}
+
+// ── BKNG toggle ───────────────────────────────────────────
+function toggleBKNG() {
+  excludeBKNG = !excludeBKNG;
+  const btn = document.getElementById('bkngBtn');
+  const lbl = document.getElementById('bkngBtnLabel');
+  btn.classList.toggle('hiding', excludeBKNG);
+  lbl.textContent = excludeBKNG ? '+BKNG' : '−BKNG';
+  btn.title = excludeBKNG ? 'Include BKNG' : 'Exclude BKNG (career-related)';
+  renderEverything();
+}
+
+// ── Tab switching ──────────────────────────────────────────
+function switchTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+  // Show matching col-headers, hide others
+  ['all','stocks','funds'].forEach(t => {
+    const ch = document.getElementById('col-'+t);
+    if (ch) ch.style.display = (t === id) ? 'block' : 'none';
+  });
+}
+
+// ── Prices as of May 5, 2026 (updated daily) ──────────────
+const FALLBACK = {
+  // Direct stock positions
+  BKNG:{price:179.40,change:-6.00}, NVDA:{price:197.61,change:-0.40},
+  GOOG:{price:381.02,change:-0.60}, AAPL:{price:277.02,change:-1.10},
+  MSFT:{price:414.80,change:0.10},  META:{price:612.11,change:0.60},
+  AMZN:{price:271.49,change:1.20},  ASML:{price:1386.00,change:-2.86},
+  AVGO:{price:420.27,change:2.00},  TSLA:{price:393.10,change:0.60},
+  NBIS:{price:176.00,change:0.80},  O:{price:58.50,change:0.65},
+  TSM:{price:192.50,change:0.45},   SHOP:{price:165.00,change:0.80},
+  MELI:{price:2120.00,change:1.10}, RACE:{price:303.00,change:-0.40},
+  TM:{price:167.00,change:0.50},    AMD:{price:112.00,change:0.40},
+  AMAT:{price:183.00,change:1.10},  ANET:{price:86.50,change:0.90},
+  CRDO:{price:68.00,change:1.20},   NFLX:{price:1090.00,change:0.50},
+  DDOG:{price:115.00,change:0.80},  NVO:{price:74.50,change:-0.30},
+  INTU:{price:698.00,change:0.60},  MU:{price:105.00,change:0.30},
+  TQQQ:{price:62.00,change:-1.20},  SCHD:{price:31.54,change:-0.16},
+  // Additional direct positions
+  ADBE:{price:254.29,change:-0.50},  BRKB:{price:487.48,change:1.27},  CPRT:{price:37.94,change:-1.40},
+  PGR:{price:211.40,change:-0.91},  TTD:{price:25.17,change:0.68},
+  FISV:{price:62.60,change:-0.46},  CRWV:{price:82.00,change:0.67},
+  TEAM:{price:96.01,change:-0.30},  UNH:{price:291.96,change:0.95},
+  // ETFs — direct holdings
+  VOO:{price:555.00,change:-0.40},  VTI:{price:261.00,change:-0.38},
+  QQQ:{price:480.00,change:-0.20},  FDN:{price:247.00,change:1.92},
+  XLG:{price:57.34,change:0.76},    QTUM:{price:113.79,change:1.27},
+  FLAX:{price:29.78,change:0.50},   VSS:{price:89.90,change:0.40},
+  IEV:{price:53.27,change:0.50},    URTH:{price:117.00,change:-0.30},
+  VXUS:{price:82.00,change:0.98},   AIQG:{price:12.00,change:0.50},
+  // Fund proxy ETFs — May 5 2026 approximate prices
+  IVV:{price:555.00,change:-0.40},   // iShares S&P 500
+  QQQ:{price:480.00,change:-0.20},   // Nasdaq 100
+  SMH:{price:248.00,change:-1.50},   // VanEck Semiconductor
+  URTH:{price:117.00,change:-0.30},  // iShares MSCI World
+  GLD:{price:306.00,change:-0.80},   // SPDR Gold
+  EWJ:{price:71.50,change:-0.30},    // iShares Japan
+  DIA:{price:412.00,change:-1.10},   // SPDR Dow Jones
+  IWF:{price:382.00,change:-0.40},   // iShares US Growth
+  DRIV:{price:28.50,change:0.30},    // Global X Auto & EV
+  KWEB:{price:43.50,change:1.10},    // KraneShares China Internet
+  FINX:{price:33.50,change:0.20},    // Global X Fintech
+  ARKG:{price:38.50,change:-0.30},   // ARK Genomic
+  BOTZ:{price:31.50,change:0.40},    // Global X Robotics & AI
+  ARKK:{price:73.00,change:0.50},    // ARK Innovation
+  AAXJ:{price:69.50,change:0.70},    // iShares Asia ex-Japan
+  ACWV:{price:86.00,change:0.20},    // iShares Min Vol Global
+  AIQ:{price:36.50,change:0.40},     // Global X AI & Technology
+  BLOK:{price:28.00,change:0.90},    // Amplify Blockchain
+  INDA:{price:44.00,change:0.80},    // iShares India
+  JEPI:{price:54.50,change:0.20},    // JPMorgan Equity Premium Income
+};
+
+// ── Live price fetch via Finnhub ───────────────────────────
+const FINNHUB_KEY = 'd7sjbe9r01qorsvivbtgd7sjbe9r01qorsvivbu0';
+
+// All tickers needing live prices (including ones not in stocks array)
+const FUND_PROXIES = [...new Set(funds.filter(f=>f.proxy).map(f=>f.proxy))];
+const OTHER_PROXIES = [...new Set(otherAssets.filter(o=>o.proxy).map(o=>o.proxy))];
+const ALL_TICKERS = [
+  ...stocks.filter(s => s.shares > 0 || s.direct > 0).map(s => s.t),
+  ...FUND_PROXIES,
+  ...OTHER_PROXIES
+].filter((v,i,a) => a.indexOf(v) === i && v !== 'COIN'); // dedupe, skip COIN
+
+// Get live estimated value for a fund using proxy ETF price
+// Scales base val by how much proxy has moved since the fallback price
+function fundLiveVal(f) {
+  if (!f.proxy) return f.val;
+  const liveP = prices[f.proxy]?.price;
+  const baseP = FALLBACK[f.proxy]?.price;
+  if (!liveP || !baseP || baseP === 0) return f.val;
+  const scaled = Math.round(f.val * (liveP / baseP));
+  return scaled;
+}
+
+function fundDayChg(f) {
+  if (!f.proxy) return null;
+  return prices[f.proxy]?.change ?? null;
+}
+
+function isFundLive(f) {
+  if (!f.proxy || !prices[f.proxy]) return false;
+  return !prices[f.proxy].stale;
+}
+
+async function fetchOneYahoo(ticker) {
+  // Yahoo Finance chart API — works for any exchange including LSE (.L suffix)
+  const q = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=5d`;
+  const proxies = [
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(q)}`,
+    `https://corsproxy.io/?${encodeURIComponent(q)}`,
+    q,
+  ];
+  for (const url of proxies) {
+    try {
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), 12000);
+      const res = await fetch(url, { signal: ctrl.signal });
+      clearTimeout(tid);
+      if (!res.ok) continue;
+      const d = await res.json();
+      const meta = d?.chart?.result?.[0]?.meta;
+      if (!meta || !meta.regularMarketPrice) continue;
+      const price = +meta.regularMarketPrice.toFixed(2);
+      const prev = meta.previousClose || meta.chartPreviousClose || price;
+      const change = prev ? +((price - prev) / prev * 100).toFixed(2) : 0;
+      // Convert GBp (pence) to GBP if needed
+      const cur = meta.currency || '';
+      const adjPrice = cur === 'GBp' ? +(price / 100).toFixed(4) : price;
+      return { price: adjPrice, change, currency: cur === 'GBp' ? 'GBP' : cur };
+    } catch(e) {}
+  }
+  throw new Error('Yahoo failed');
+}
+
+async function fetchOneTicker(ticker) {
+  // LSE tickers (.L suffix) — use Yahoo Finance since Finnhub free tier doesn't cover LSE
+  if (ticker.endsWith('.L')) {
+    return await fetchOneYahoo(ticker);
+  }
+  // US/other tickers — try Finnhub first, fall back to Yahoo
+  try {
+    const url = `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${FINNHUB_KEY}`;
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 10000);
+    const res = await fetch(url, { signal: ctrl.signal });
+    clearTimeout(tid);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const d = await res.json();
+    if (!d.c || d.c === 0) throw new Error('empty');
+    return { price: +d.c.toFixed(2), change: +(d.dp ?? 0).toFixed(2) };
+  } catch(e) {
+    // Fall back to Yahoo for US tickers too
+    return await fetchOneYahoo(ticker);
+  }
+}
+
+async function fetchPrices() {
+  const result = {};
+  let liveCount = 0;
+
+  // Batch into groups of 10, 200ms between batches — handles 45 tickers in ~1s
+  const BATCH = 10;
+  for (let i = 0; i < ALL_TICKERS.length; i += BATCH) {
+    const batch = ALL_TICKERS.slice(i, i + BATCH);
+    await Promise.all(batch.map(async ticker => {
+      try {
+        result[ticker] = await fetchOneTicker(ticker);
+        liveCount++;
+      } catch(e) {
+        console.warn(`[${ticker}] failed: ${e.message}`);
+        if (FALLBACK[ticker]) result[ticker] = { ...FALLBACK[ticker], stale: true };
+      }
+    }));
+    if (i + BATCH < ALL_TICKERS.length) await new Promise(r => setTimeout(r, 200));
+  }
+
+  if (liveCount === 0) {
+    Object.assign(result, FALLBACK);
+    result._allStale = true;
+  }
+  return result;
+}
+
+async function refreshPrices() {
+  const btn = document.getElementById('refreshBtn');
+  const spin = document.getElementById('spinner');
+  const lbl = document.getElementById('refreshLabel');
+  const err = document.getElementById('errorBar');
+  btn.disabled = true;
+  spin.classList.add('on');
+  lbl.textContent = 'Fetching…';
+  err.style.display = 'none';
+
+  try {
+    prices = await fetchPrices();
+    const liveCount = Object.values(prices).filter(p => !p.stale && !p._allStale).length;
+    const total = stocks.filter(s => s.shares > 0).length;
+
+    renderEverything();
+
+    if (prices._allStale) {
+      err.textContent = '⚠ Finnhub unreachable — showing May 5 fallback prices. Check network or API key.';
+      err.style.cssText = 'display:block;background:#fdf8ee;border-color:#edd9a0;color:#8a5c00;border-radius:8px;padding:10px 16px;font-size:12px;margin-bottom:16px;';
+      document.getElementById('lastUpdated').textContent = 'Fallback prices (May 5, 2026)';
+    } else {
+      const staleCount = Object.values(prices).filter(p => p.stale).length;
+      const liveCount  = Object.values(prices).filter(p => !p.stale && !p._allStale).length;
+      if (staleCount > 0) {
+        err.textContent = `ℹ ${liveCount} tickers live · ${staleCount} using May 5 fallback`;
+        err.style.cssText = 'display:block;background:#f0f5fc;border-color:#c5d9f0;color:#1a5fa8;border-radius:8px;padding:10px 16px;font-size:12px;margin-bottom:16px;';
+      } else {
+        err.style.display = 'none';
+      }
+      document.getElementById('lastUpdated').textContent = `Live · ${liveCount} tickers · ${new Date().toLocaleTimeString()}`;
+    }
+
+    timerSecs = 3600;
+    restartTimer();
+  } catch(e) {
+    prices = { ...FALLBACK };
+    renderEverything();
+    err.textContent = 'Fetch error: ' + e.message + ' — showing fallback prices.';
+    err.style.cssText = 'display:block;background:#fdf3f2;border-color:#f5c6c2;color:#c0392b;';
+    document.getElementById('lastUpdated').textContent = 'Fallback prices';
+  } finally {
+    btn.disabled = false;
+    spin.classList.remove('on');
+    lbl.textContent = 'Refresh prices';
+  }
+}
+
+function restartTimer() {
+  if (timer) clearInterval(timer);
+  timer = setInterval(() => {
+    timerSecs--;
+    const m = String(Math.floor(timerSecs/60)).padStart(2,'0');
+    const s = String(timerSecs%60).padStart(2,'0');
+    document.getElementById('countdown').textContent = `Auto-refresh in ${m}:${s}`;
+    if (timerSecs <= 0) refreshPrices();
+  }, 1000);
+}
+
+// ── Analytics sub-tab switching ────────────────────────────
+function switchAnalytics(id, el) {
+  document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.ana-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('ana-' + id).classList.add('active');
+}
+
+// ── Stock click → drawer ───────────────────────────────────
+function openDrawer(ticker) {
+  const s = stocks.find(st => st.t === ticker);
+  if (!s) return;
+  const p = prices[ticker];
+  const livePrice = p?.price;
+  const chg = p?.change;
+  const val = livePrice && s.shares > 0 ? livePrice * s.shares : s.direct;
+
+  // Account breakdown
+  const acctLines = s.acct.split('+').map(a => a.trim());
+
+  document.getElementById('drawerContent').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:20px;font-weight:500;">${s.t}</div>
+        <div style="font-size:14px;color:var(--text2);margin-top:2px;">${s.n}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-family:'DM Mono',monospace;font-size:20px;font-weight:500;">${livePrice ? fmtPrice(livePrice) : '—'}</div>
+        ${chg != null ? `<div style="font-family:'DM Mono',monospace;font-size:12px;" class="${chg>=0?'pos':'neg'}">${chg>=0?'+':''}${chg.toFixed(2)}% today</div>` : ''}
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div style="background:var(--bg);padding:12px;border-radius:8px;">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Shares</div>
+        <div style="font-family:'DM Mono',monospace;font-size:16px;font-weight:500;" class="amt">${s.shares > 0 ? s.shares : '—'}</div>
+      </div>
+      <div style="background:var(--bg);padding:12px;border-radius:8px;">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Market Value</div>
+        <div style="font-family:'DM Mono',monospace;font-size:16px;font-weight:500;" class="amt">${$m(val + s.fund)}</div>
+      </div>
+      <div style="background:var(--bg);padding:12px;border-radius:8px;">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Portfolio %</div>
+        <div style="font-family:'DM Mono',monospace;font-size:16px;font-weight:500;">${((val + s.fund) / lastTotal * 100).toFixed(2)}%</div>
+      </div>
+    </div>
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:8px;">Held In</div>
+    ${acctLines.map(a => `<div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;margin-bottom:6px;">${a}</div>`).join('')}
+    ${s.fund > 0 ? `<div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;margin-bottom:6px;color:var(--text3);">+ Fund look-through: ${$m(s.fund)}</div>` : ''}
+    ${chg != null && s.shares > 0 && livePrice ? `
+    <div style="margin-top:12px;padding:12px;background:${chg>=0?'var(--green-bg)':'var(--red-bg)'};border-radius:8px;font-size:13px;">
+      <span style="font-weight:600;">Today's impact:</span> 
+      <span class="${chg>=0?'pos':'neg'} amt" style="font-family:'DM Mono',monospace;">${chg>=0?'+':''}${$m(Math.abs(val * chg / 100))}</span>
+    </div>` : ''}
+  `;
+  document.getElementById('stockDrawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('stockDrawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+}
+
+// Make rows clickable — called after render
+function addRowClickHandlers() {
+  document.querySelectorAll('#allBody tr, #stocksBody tr').forEach(row => {
+    const tickerEl = row.querySelector('.t-ticker');
+    if (!tickerEl) return;
+    const ticker = tickerEl.textContent.trim();
+    if (ticker && ticker !== '—') {
+      row.style.cursor = 'pointer';
+      row.onclick = () => openDrawer(ticker);
+    }
+  });
+}
+
+// ── Analytics engine ───────────────────────────────────────
+const INVESTMENT_PROFILE = `
+Dharam's investment profile (from Dime + US Stock Account analysis):
+- Director of Marketing at Agoda (Booking Holdings subsidiary), Bangkok-based
+- 10-year buy-and-hold framework with tactical liquidity needs by July 2026
+- Strong AI infrastructure thesis: NBIS, ANET, CRDO, AMD, ASML, TSM, NVDA
+- Prefers: High-quality compounders with durable moats, AI/tech secular tailwinds
+- Buys: On conviction dips, adds to winners, concentrated in high-conviction names
+- Avoids: PLTR (government/defence), speculative meme stocks
+- Portfolio has heavy BKNG concentration (career-linked) and NVDA (AI thesis)
+- Has US Stock Account (selling down by July 2026 for liquidity), GTN, Dime, SCB/KT Thai funds
+- Current sell priority: US Stock Account first
+- Scoring framework (5 axes, max 100): Moat Durability /30 · 3yr Earnings Potential /25 · Secular Runway /20 · Valuation & Peak Risk /15 · Redundancy in portfolio /10
+- Higher score = KEEP. Lower score = sell candidate. sellScore = 100 - framework score.
+- Current framework scores: NVDA(93), CRDO(93), ASML(93), AVGO(92), ANET(91), DDOG(90), MELI(90), NBIS(87), AMD(86), MSFT(82), META(82), TSM(89), ADBE(61), TSLA(56), TQQQ(48)
+- Backtested buy model: Conviction Add best (avg +82% 12m), DCF Proxy second (+79%). Framework alone underperforms (+33%) vs random (+40%)
+- Validated buy targets: NVDA/CRDO/ANET add-to on dips (avg 12m: +80-140%), CRWV/NOW new positions, SNOW buy on dips only
+- Avoid buying: SOUN/FIVN/PATH at current prices (avg 12m negative across periods)
+- Current date context: May 2026. US market tariff volatility has subsided. AI infrastructure spending accelerating.
+- Fund sell priority: SCBDJI(56) → SCBSP500(63) → SCBNDQ(61) → SCBGENOM(48) → SCBNNO(47) → KTGESG(58)
+`;
+
+async function runAnalytics() {
+  const btn = document.getElementById('anaBtn');
+  const spin = document.getElementById('anaSpinner');
+  const lbl = document.getElementById('anaLabel');
+  btn.disabled = true;
+  spin.classList.add('on');
+  lbl.textContent = 'Analysing…';
+
+  // Build live portfolio snapshot
+  const snap = stocks
+    .filter(s => s.shares > 0 || s.direct > 0)
+    .map(s => {
+      const p = prices[s.t];
+      const val = p?.price && s.shares > 0 ? p.price * s.shares : s.direct;
+      return { t:s.t, n:s.n, val, pct:(val/lastTotal*100).toFixed(2), price:p?.price, chg:p?.change };
+    })
+    .sort((a,b) => b.val - a.val);
+
+  // ── Priority 1: Load from signals_payload.json (generated by Colab) ──
+  // Place signals_payload.json in the same folder as this HTML file.
+  // Run signal_scanner.ipynb daily in Colab to regenerate it.
+  try {
+    lbl.textContent = 'Loading signals file…';
+    const payloadRes = await fetch('signals_payload.json?t=' + Date.now());
+    if (payloadRes.ok) {
+      const payload = await payloadRes.json();
+      if (payload?.analytics) {
+        renderSignalsFromPayload(payload);
+        renderBuysFromPayload(payload);
+        renderSellsFromPayload(payload);
+        const genAt = payload.run_date || payload.generated_at || '';
+        document.getElementById('anaUpdated').textContent =
+          'Signals from Colab: ' + genAt + ' · ' + new Date().toLocaleTimeString();
+        btn.disabled = false;
+        spin.classList.remove('on');
+        lbl.textContent = 'Run Live Analysis';
+        return; // done — skip API and rule-based fallbacks
+      }
+    }
+  } catch(e) {
+    console.log('signals_payload.json not found — trying API...', e.message);
+  }
+
+  // ── Priority 2: Anthropic API (works when hosted on https://) ────────
+  try {
+    lbl.textContent = 'Running AI analysis…';
+    const [signalsRes, buyRes, sellRes] = await Promise.all([
+      callClaude(buildSignalsPrompt(snap)),
+      callClaude(buildBuyPrompt(snap)),
+      callClaude(buildSellPrompt(snap))
+    ]);
+    renderSignals(signalsRes);
+    renderBuys(buyRes);
+    renderSells(sellRes);
+  } catch(e) {
+    // ── Priority 3: Rule-based fallback ──────────────────────────────
+    console.warn('API failed, using rule-based analysis:', e.message);
+    renderSignalsLocal(snap);
+    renderBuysLocal();
+    renderSellsLocal(snap);
+  }
+
+  document.getElementById('anaUpdated').textContent = 'Analysis: ' + new Date().toLocaleTimeString();
+  btn.disabled = false;
+  spin.classList.remove('on');
+  lbl.textContent = 'Run Live Analysis';
+}
+
+const FRAMEWORK_PROMPT = `
+SCORING FRAMEWORK — use ONLY these axes, no others:
+Moat Durability /30 | 3yr Earnings Potential /25 | Secular Runway /20 | Valuation/Peak Risk /15 | Redundancy /10
+Total /100. Higher = KEEP. sellScore = 100 - total.
+breakdown format MUST be: "Moat X/30 · 3yr Earnings X/25 · Runway X/20 · Valuation X/15 · Redundancy X/10 = TOTAL/100"
+`;
+
+function buildSignalsPrompt(snap) {
+  return `${INVESTMENT_PROFILE}\n\nLIVE PORTFOLIO:\n${snap.map(s=>`${s.t} (${s.n}): $${Math.round(s.val).toLocaleString()} = ${s.pct}% | $${s.price ?? 'N/A'} | ${s.chg!=null?(s.chg>=0?'+':'')+s.chg.toFixed(2)+'%':'N/A'}`).join('\n')}\n\nReturn ONLY JSON:\n{"signals":[{"ticker":"NVDA","type":"WATCH|MOMENTUM|RISK|OPPORTUNITY","headline":"one line","detail":"2-3 sentences","action":"Hold|Add|Reduce|Monitor"}]}\nInclude 8-12 signals. Be specific to current prices.`;
+}
+
+function buildBuyPrompt(snap) {
+  const held = snap.map(s=>s.t).join(',');
+  return `${INVESTMENT_PROFILE}\n\nCURRENT HOLDINGS: ${held}\n\nReturn ONLY JSON:\n{"buys":[{"ticker":"SNOW","name":"Snowflake","thesis":"2-3 sentences","entry":"$170-185","target":"$247","upside":"38%","size":"$1,500","account":"US Stock Account","score":82,"category":"AI Software"}]}\n6-8 ideas. Exclude PLTR and anything already held. Align to AI/tech thesis.`;
+}
+
+function buildSellPrompt(snap) {
+  const budget = Math.round(lastTotal * 0.10).toLocaleString();
+  return `${INVESTMENT_PROFILE}
+
+${FRAMEWORK_PROMPT}
+
+LIVE PORTFOLIO:
+${snap.map(s=>`${s.t}: $${Math.round(s.val).toLocaleString()} @ $${s.price ?? 'N/A'}`).join('\n')}
+
+Max sell value: $${budget} (10% of portfolio). Prioritise US Stock Account first. Include Thai mutual funds (SCB/KT) as sell candidates.
+
+Return ONLY JSON — field names must match EXACTLY:
+{"sells":[{
+  "type":"STOCK or FUND",
+  "ticker":"TSLA",
+  "name":"Tesla",
+  "action":"TRIM or SELL",
+  "shares":3,
+  "account":"US Stock Account",
+  "currentPrice":"$393",
+  "gtcTarget":"$440",
+  "val":1320,
+  "rationale":"2-3 sentences referencing specific axis scores",
+  "breakdown":"Moat 7/30 · 3yr Earnings 16/25 · Runway 14/20 · Valuation 9/15 · Redundancy 10/10 = 56/100",
+  "urgency":"HIGH",
+  "sellScore":44
+}],"total_sell_value":"$X","pct_of_portfolio":"X%"}`;
+}
+
+// ── Rule-based fallback analysis (works offline / from local file) ──────────
+function renderSignalsLocal(snap) {
+  // ── COMBINED MODEL: Factor Value + DFV + BRED ─────────────────────
+  // Backtest results (43,200 obs, 300 stocks, 10yr daily, VOO benchmark):
+  //   Rule: Factor Value          → 59.7% beat VOO, alpha +0.86%  ← BEST
+  //   ML:   Combined              → AUC 0.544, alpha +0.76%
+  //   Rule: Combined (fac+DFV)    → 56.1% beat VOO, alpha +0.55%
+  //   Rule: DFV Only              → 48.0% beat VOO, alpha −0.41%  ← WORST
+  //   Benchmark (hold all)        → alpha −0.45%
+  //
+  // KEY FINDING: Factor without DFV = 60.4% / +0.93%
+  //              Factor with DFV   = 54.1% / +0.36%
+  //              DFV improves TIMING but reduces accuracy as a filter.
+  //              BRED does not predict 63-day underperformance — use as TRIM signal only.
+  //
+  // COMBINED RULE (applied below):
+  //   STEP 1 — Factor gate: dist_52wk < −15% AND quality > 0.60 → worth owning
+  //   STEP 2 — DFV: hot_money_rsi emerging from 0-5 → confirms entry timing
+  //   STEP 3 — BRED: RSI/MACD divergence → trim 20-30%, not exit
+  //   STEP 4 — Banker RSI: falls from ceiling → reduce to 50% size
+
+  const get = t => snap.find(s=>s.t===t);
+  const px  = t => get(t)?.price ?? 0;
+  const chg = t => get(t)?.change ?? 0;
+
+  // ── Compute live proxy signals from available price data ─────────
+  // dist_52wk proxy: using day change as momentum proxy
+  // DFV proxy: price down >8% from position (approximated via negative change trend)
+  // BRED proxy: strong positive day change = potential momentum exhaustion
+
+  const mkt_chg = (chg('VOO') + chg('QQQ')) / 2;
+
+  // Per-ticker signal computation
+  function getSignal(t, frameworkScore, pfdBuy) {
+    const dayChg   = chg(t);
+    const price    = px(t);
+
+    // DFV proxy: position has pulled back (day down or recent weakness)
+    // DFV V3 (backtested best: factor+V3 beats VOO 61.2%, alpha +0.71%)
+    // Floor lift: hm_rsi must have risen >3pts off 21d floor
+    // Live proxy: recovering 0.3-2.5% AND gaining vs prior move (momentum building)
+    const prev_chg = prices[t]?.prevChange ?? (dayChg * 0.8);
+    const dfv_proxy = dayChg > 0.3 && dayChg < 2.5 && dayChg > prev_chg;
+
+    // BRED proxy: strong up day with high framework momentum = potential divergence
+    const bred_proxy = dayChg > 2.5 && frameworkScore < 80;
+
+    // Banker weak proxy: market up strongly, institutional selling likely into strength
+    const banker_weak = mkt_chg > 1.5;
+
+    // Factor gate
+    const factor_ok = frameworkScore < 80 && pfdBuy > 0.20;
+
+    // Combined signal
+    if (factor_ok && dfv_proxy)   return { signal:'COMBINED BUY (V3)', priority:1, color:'var(--green)' };
+    if (factor_ok)                 return { signal:'FACTOR BUY',   priority:2, color:'#44dd99' };
+    if (bred_proxy)                return { signal:'BRED TRIM',    priority:3, color:'var(--amber)' };
+    if (banker_weak && dayChg > 2) return { signal:'BANKER WEAK',  priority:4, color:'var(--amber)' };
+    return { signal:'HOLD', priority:5, color:'var(--t3)' };
+  }
+
+  // Build signal cards for each held position
+  const HELD = [
+    { t:'NVDA', score:93, pfdBuy:0.812, context:'AI infrastructure monopoly. Blackwell unabated. PFD Buy 0.812 — strongest in universe.' },
+    { t:'CRDO', score:93, pfdBuy:0.620, context:'Custom interconnect moat. 13 shares — undersized. Add on any dip to $62-65.' },
+    { t:'NBIS', score:87, pfdBuy:0.420, context:'EU AI cloud. Fastest ARR ramp in infra history. Val 14/15 still cheap vs forward ARR.' },
+    { t:'ANET', score:91, pfdBuy:0.480, context:'AI networking backbone. 10 shares — build on weakness toward $80.' },
+    { t:'TSLA', score:56, pfdBuy:0.522, context:'VOO excess +74% historically — never sell on quality alone. Only for July 2026 liquidity.' },
+    { t:'ADBE', score:61, pfdBuy:0.234, context:'AI threatens moat. PFD borderline. Factor buy only if dips further.' },
+    { t:'TQQQ', score:48, pfdBuy:0.369, context:'3x leverage — trim to target weight after any >75% run. BRED trim signal.' },
+    { t:'BKNG', score:75, pfdBuy:0.180, context:'Career + equity concentration risk. >18% of portfolio. Trim toward 10% target.' },
+    { t:'AMD',  score:86, pfdBuy:0.566, context:'GPU duopoly. PFD Buy 0.566 — price compressed vs fundamentals.' },
+    { t:'META', score:82, pfdBuy:0.440, context:'Social + AI moat. Strong 252d momentum. Hold — BRED watch on next ATH.' },
+    { t:'SHOP', score:79, pfdBuy:0.520, context:'Commerce infra. PFD Buy 0.520 — price lagging fundamentals.' },
+    { t:'VXUS', score:64, pfdBuy:0.104, context:'VOO excess −7% avg annual. Valid exit. No DFV entry basis.' },
+    { t:'GLD',  score:63, pfdBuy:0.000, context:'Near multi-year highs. BRED divergence risk. Hold — no factor buy basis.' },
+    { t:'URTH', score:61, pfdBuy:0.113, context:'VOO excess −3% avg annual. Structural underperformer. Exit on factor basis.' },
+  ];
+
+  const signals = HELD.map(h => {
+    const sig    = getSignal(h.t, h.score, h.pfdBuy);
+    const price  = px(h.t);
+    const dayChg = chg(h.t);
+
+    // Regime note
+    let regimeNote = '';
+    if (sig.signal === 'BRED TRIM')   regimeNote = 'BRED: RSI/MACD divergence proxy active — consider trimming 20-30%';
+    if (sig.signal === 'COMBINED BUY') regimeNote = 'DFV + Factor both active — highest confidence entry signal';
+    if (sig.signal === 'BANKER WEAK') regimeNote = 'Market running hard — institutional selling into strength likely';
+
+    return {
+      ticker: h.t,
+      type: sig.signal,
+      color: sig.color,
+      priority: sig.priority,
+      headline: `${sig.signal} · Framework ${h.score}/100 · PFD Buy ${h.pfdBuy.toFixed(3)}`,
+      detail: h.context + (regimeNote ? ` ‖ ${regimeNote}` : ''),
+      action: sig.signal.includes('BUY') ? 'Add' : sig.signal.includes('TRIM') ? 'Trim' : sig.priority <= 3 ? 'Watch' : 'Hold',
+      price: price ? '$'+price.toFixed(2) : '—',
+      chg: dayChg,
+    };
+  })
+  .filter(s => s.priority <= 4)  // only show actionable signals
+  .sort((a,b) => a.priority - b.priority || b.chg - a.chg)
+  .slice(0, 8);
+
+  // Add macro signal
+  signals.unshift({
+    ticker: 'REGIME',
+    type: mkt_chg > 0.5 ? 'BULL DAY' : mkt_chg < -0.5 ? 'BEAR DAY' : 'NEUTRAL',
+    color: mkt_chg > 0.5 ? 'var(--green)' : mkt_chg < -0.5 ? 'var(--red)' : 'var(--t3)',
+    priority: 0,
+    headline: `Market regime · VOO+QQQ avg ${mkt_chg >= 0 ? '+' : ''}${mkt_chg.toFixed(2)}% today`,
+    detail: mkt_chg > 0.5
+      ? 'Bull day. BRED trim signals elevated — momentum stocks approaching exhaustion. TSLA/TQQQ sell signals suppressed (backtest: both run hard in bull markets).'
+      : mkt_chg < -0.5
+      ? 'Bear/correcting day. Factor buy signals most reliable in this regime (backtest accuracy 60.4%). BRED divergence less relevant — momentum has already turned.'
+      : 'Neutral. Factor signals valid. Use DFV as secondary confirmation for any entry. Monitor for BRED divergence on extended positions.',
+    action: mkt_chg > 0.5 ? 'Watch' : mkt_chg < -0.5 ? 'Buy' : 'Hold',
+    price: get('VOO')?.price ? '$'+get('VOO').price.toFixed(2) : '—',
+    chg: mkt_chg,
+  });
+
+  renderSignals({ signals });
+}
+
+function renderBuysLocal() {
+  // ── BACKTESTED HYBRID BUY MODEL (40,000 simulations, 5 periods) ──
+  // Key findings:
+  //   #1 Conviction Add (+82% avg 12m): add to NVDA/CRDO/ANET on dips — best model
+  //   #2 DCF Proxy (moat × earnings) (+79%): framework_score × earn_score best pure signal
+  //   #3 Comps (+74%): earnings + runway combination
+  //   Framework Score alone only +33% — underperforms random
+  //   Reason: framework picks CRWV/NOW/SNOW which are unproven; Conviction Add
+  //           picks NVDA/CRDO/ANET which have actual earnings momentum
+  //
+  // HYBRID RULE:
+  //   Priority 1: add-to existing positions if val score >= 12 (not at peak)
+  //   Priority 2: new names with DCF score (moat × earn) > 540 (22×25 threshold)
+  //   Valuation gate: skip if val score < 12 (too expensive)
+  //   Concentration guard: max 2 new names per cycle
+
+  // ── BUY FRAMEWORK SCORES (same axes as sell model) ────────────────
+  // [Moat/30, 3yr Earnings/25, Runway/20, Valuation/15, Redundancy/10]
+  const BUY_UNIVERSE = {
+    // ── Add-to existing (Conviction Add — best backtest model) ────────
+    NVDA: { moat:30, earn:24, runway:20, val:10, redund:0, type:'ADD',  acct:'US Stock Account or Dime',
+      why:'PFD Buy: 0.812 (strongest buy signal in universe — fundamentals running far ahead of price). Conviction Add — best backtest model (+82% avg 12m). Blackwell demand unabated. Every AI data centre build runs on NVDA. Buy any dip >8% from recent high. DCF score: 720/750.',
+      entry:'On 8%+ dip from recent high', target:'+35% 12m', size:'$2,000' },
+    CRDO: { moat:27, earn:23, runway:20, val:13, redund:0, type:'ADD',  acct:'Dime',
+      why:'Conviction Add — avg +73% across periods. Custom interconnect for AI data centres. Only 13 shares — strong case to add 5-7 more on any pullback. Earnings momentum accelerating Q2 2026.',
+      entry:'On pullback to $62-65', target:'+45% 12m', size:'$1,500' },
+    ANET: { moat:27, earn:22, runway:20, val:12, redund:0, type:'ADD',  acct:'Dime',
+      why:'Conviction Add — avg +48% across periods. AI networking backbone. Current 10 shares undersized for a position this high-conviction. Add on weakness toward $80.',
+      entry:'On pullback to $80-84', target:'+40% 12m', size:'$1,500' },
+    NBIS: { moat:22, earn:21, runway:20, val:14, redund:0, type:'ADD',  acct:'Dime',
+      why:'PFD Buy: 0.420 (fundamentals accelerating ahead of price). Conviction Add — avg +46% across periods. European AI cloud, fastest ARR ramp in infrastructure history. Val score 14/15 — still cheap relative to forward ARR. $7-9B ARR target for 2026.',
+      entry:'On pullback to $165-170', target:'+55% 12m', size:'$2,000' },
+    // ── New positions (DCF Proxy + Comps model validated) ─────────────
+    CRWV: { moat:20, earn:25, runway:20, val:15, redund:10, type:'NEW', acct:'US Stock Account',
+      why:'DCF Proxy score: 500. $66B backlog, guiding $17-19B 2026 revenue. Val 15/15 — down 56% from highs = entry point. NVIDIA HGX B300 deployment imminent. Comps: trades at 3x revenue vs SNOW at 8x.',
+      entry:'$80-90', target:'$130', size:'$1,500' },
+    NOW:  { moat:26, earn:24, runway:20, val:10, redund:10, type:'NEW', acct:'Dime',
+      why:'DCF Proxy score: 624. ServiceNow — every enterprise AI workflow runs through it. 44% FCF margin. Val 10/15 — expensive but justified by FCF compounding. Comps: premium to peers but earns it.',
+      entry:'On 10%+ pullback only', target:'+35% 12m', size:'$1,000' },
+    PANW: { moat:24, earn:22, runway:20, val:11, redund:10, type:'NEW', acct:'Dime',
+      why:'DCF Proxy score: 528. Cybersecurity + AI integration. 25%+ ARR growth. Platformisation strategy creating sticky revenue. Val 11/15 — priced for growth but not excessive.',
+      entry:'$310-330', target:'+30% 12m', size:'$1,000' },
+    // ── Watchlist only (valuation gate fails or too speculative) ──────
+    SNOW: { moat:22, earn:22, runway:20, val:14, redund:10, type:'WATCH', acct:'Watchlist',
+      why:'Backtest: avg +1.6% across periods — wide variance. Val 14/15 currently but rallied hard. Only buy on a 15%+ dip toward $155-165. Data infrastructure moat is real but priced in at current levels.',
+      entry:'$155-165 only (wait for dip)', target:'+38% from entry', size:'$1,000' },
+  };
+
+  // Sort: ADD first (Conviction Add model), then NEW by DCF score (moat×earn)
+  const dcfScore = d => d.moat * d.earn;
+
+  const buys = Object.entries(BUY_UNIVERSE)
+    .filter(([t, d]) => d.type !== 'WATCH')
+    .sort(([ta,da],[tb,db]) => {
+      if (da.type === 'ADD' && db.type !== 'ADD') return -1;
+      if (db.type === 'ADD' && da.type !== 'ADD') return 1;
+      return dcfScore(db) - dcfScore(da);
+    })
+    .map(([ticker, d]) => ({
+      ticker,
+      name: ticker,
+      thesis: d.why,
+      entry: d.entry,
+      target: d.target,
+      upside: d.target,
+      size: d.size,
+      account: d.acct,
+      score: d.moat + d.earn + d.runway + d.val + d.redund,
+      category: d.type === 'ADD' ? 'Add to existing' : 'New position',
+      dcf: dcfScore(d),
+    }));
+
+  // Add watchlist separately
+  const watchlist = Object.entries(BUY_UNIVERSE)
+    .filter(([t, d]) => d.type === 'WATCH')
+    .map(([ticker, d]) => ({
+      ticker, name:ticker, thesis:d.why, entry:d.entry,
+      target:d.target, upside:d.target, size:d.size, account:d.acct,
+      score: d.moat + d.earn + d.runway + d.val + d.redund,
+      category:'Watchlist (val gate)',
+    }));
+
+  renderBuys({ buys: [...buys, ...watchlist], backtest_note: true });
+}
+
+function renderSellsLocal(snap) {
+  const budget = lastTotal * 0.10;
+
+  // ── Framework — 5 axes, max 100 ──────────────────────────────────
+  // Moat Durability /30  — pure competitive advantage, no redundancy conflation
+  // 3yr Earnings /25     — near-term realistic earnings/NAV growth trajectory
+  // Secular Runway /20   — 10yr structural tailwind strength
+  // Valuation/Peak /15   — is it expensive or near a 12-month price/NAV peak?
+  //                        High score = cheap/fair; Low score = expensive/peaked
+  // Redundancy /10       — small penalty: how much does it duplicate your direct book?
+  //                        10 = fully unique; 0 = entirely duplicated by direct holdings
+  //
+  // Higher total = KEEP. Lower = sell candidate.
+  // sellScore = 100 - total (used for sorting, higher = more urgent sell)
+
+  const FRAMEWORK = {
+    // ticker: [Moat/30, 3yr Earnings/25, Runway/20, Valuation/15, Redundancy/10]
+    NVDA: [30, 24, 20, 10, 9],  // 93 — monopoly; slightly pricey; near-unique
+    ASML: [29, 23, 20, 11, 10], // 93 — EUV monopoly; fair value; fully unique
+    AVGO: [28, 23, 20, 12, 9],  // 92 — custom silicon moat; fair; near-unique
+    CRDO: [27, 23, 20, 13, 10], // 93 — interconnect moat; not expensive; unique
+    DDOG: [26, 23, 20, 11, 10], // 90 — AI observability moat; fairly valued; unique
+    ANET: [27, 22, 20, 12, 10], // 91 — AI networking; fair; fully unique
+    MELI: [27, 22, 19, 12, 10], // 90 — LatAm fintech monopoly; fair; fully unique
+    TSM:  [26, 23, 19, 12,  9], // 89 — fab monopoly; fair; unique
+    META: [23, 23, 19, 10,  7], // 82 — social moat + AI; pricey; in VOO/VTI
+    AMD:  [23, 22, 20, 12,  9], // 86 — GPU duopoly; fair; near-unique
+    MSFT: [24, 22, 19, 10,  7], // 82 — cloud+AI moat; pricey; partially in funds
+    NBIS: [22, 21, 20, 14,  10],// 87 — EU AI cloud; cheap; fully unique
+    BRKB: [24, 19, 17, 13,  10],// 83 — compounder; fair; fully unique
+    AMZN: [22, 21, 18, 11,  7], // 79 — AWS moat; pricey; in VOO/VTI
+    SHOP: [20, 21, 18, 11,  9], // 79 — commerce infra; fair; near-unique
+    RACE: [24, 18, 17, 10,  10],// 79 — luxury monopoly; expensive always; unique
+    AAPL: [21, 20, 17, 10,  7], // 75 — ecosystem moat; pricey; in VOO/VTI
+    SCHD: [18, 19, 17, 14,  10],// 78 — dividend quality; fair; unique ballast role
+    NFLX: [18, 21, 18, 11,  10],// 78 — content+AI moat; fair; unique
+    GOOG: [20, 20, 18, 11,  7], // 76 — search moat; DOJ risk; in funds
+    VOO:  [18, 20, 17, 12,  6], // 73 — S&P 500; fair; partially redundant
+    VTI:  [17, 20, 17, 12,  5], // 71 — total market; fair; more redundant than VOO
+    O:    [18, 16, 17, 13,  10],// 74 — REIT income; fair; unique
+    VSS:  [15, 16, 17, 12,  9], // 69 — intl small cap; unique vs others
+    FLAX: [15, 16, 16, 12,  9], // 68 — Asia ex-Japan; partially unique
+    GLD:  [18, 11, 16, 8,   10],// 63 — macro hedge; expensive (near peak); unique
+    JEPI: [16, 14, 15, 13,  9], // 67 — income ETF; fair; unique income role
+    VXUS: [14, 17, 16, 12,  5], // 64 — intl; redundant with IEV+VSS+FLAX
+    URTH: [13, 17, 16, 11,  4], // 61 — MSCI World; redundant with VOO+IEV
+    IEV:  [13, 15, 16, 12,  7], // 63 — Europe ETF; partially unique
+    ADBE: [14, 14, 15, 8,   10],// 61 — AI erodes moat; stock near recent lows so val OK
+    TSLA: [7,  16, 14, 9,   10],// 56 — no moat; brand damage; GTC working; unique
+    TQQQ: [5,  13, 13, 7,   10],// 48 — 3x decay; expensive vs fair value; unique
+    // ── Funds ────────────────────────────────────────────────────────
+    // SCBDJI: tracks Dow Jones 30 — you own those stocks directly
+    SCBDJI:   [14, 16, 15, 10,  1], // 56 — some moat in DIA holdings; Redundancy 1 (you own all DIA stocks)
+    SCBSP500: [16, 18, 16, 10,  3], // 63 — S&P 500 tail adds some uniqueness; but near-peak market
+    SCBNDQ:   [16, 18, 16, 9,   2], // 61 — Nasdaq; QQQ in GTN + direct = 4x; near-peak tech
+    KTGESG:   [14, 14, 14, 11,  5], // 58 — ESG excludes your best AI names; fair value
+    SCBNNO:   [10,  8, 11, 10,  8], // 47 — ARK-style peaked; 3yr earnings poor; partially unique
+    SCBGENOM: [12,  6, 10, 11,  9], // 48 — unique; but thesis failed; 3yr earnings very poor
+    SCBEV:    [12, 10, 13,  9,  8], // 52 — EV theme pressured; partially unique
+    SCBWORLD: [14, 17, 15, 10,  4], // 60 — MSCI World; URTH duplicate; near-peak
+    SCBAEM:   [16, 15, 14, 11,  6], // 62 — Asian EM; overlaps FLAX; fair value
+    SCBBUSAA: [14, 18, 15,  9,  3], // 59 — US growth; highly redundant with direct names; pricey
+  };
+
+
+  // ── PFD SCORES (Price/Fundamental Divergence — update quarterly) ──────
+  // sell: higher = regime change risk (price >> fundamentals)
+  // buy:  higher = undervalued recovery (fundamentals >> price)
+  // Derived from 10,000 backtested windows, 2015-2024, VOO benchmark
+  const PFD = {
+    NVDA: {sell:-0.652, buy:0.812}, CRDO: {sell:-0.310, buy:0.620},
+    ASML: {sell:-0.123, buy:0.349}, AVGO: {sell:-0.116, buy:0.330},
+    AMD:  {sell:-0.278, buy:0.566}, ANET: {sell:-0.220, buy:0.480},
+    NBIS: {sell:-0.180, buy:0.420}, META: {sell:-0.343, buy:0.440},
+    AMZN: {sell:-0.277, buy:0.360}, SHOP: {sell:-0.438, buy:0.520},
+    NFLX: {sell:-0.256, buy:0.335}, MSFT: {sell:-0.169, buy:0.304},
+    GOOG: {sell:-0.207, buy:0.283}, AAPL: {sell:-0.102, buy:0.210},
+    ADBE: {sell:-0.179, buy:0.234}, TSLA: {sell:-0.350, buy:0.522},
+    TQQQ: {sell:-0.289, buy:0.369}, SCHD: {sell:-0.037, buy:0.137},
+    GLD:  {sell:+0.043, buy:0.000}, VXUS: {sell:-0.050, buy:0.104},
+    URTH: {sell:-0.058, buy:0.113}, VTI:  {sell:-0.099, buy:0.176},
+    VOO:  {sell:+0.000, buy:0.100}, QQQ:  {sell:-0.100, buy:0.200},
+  };
+  // PFD regime change threshold: sell > 0.40 AND framework < 80
+  // PFD undervalued threshold:   buy  > 0.15 AND rev_growth > 10% AND framework > 70
+
+  const score = t => {
+    const f = FRAMEWORK[t];
+    return f ? f[0]+f[1]+f[2]+f[3]+f[4] : 65;
+  };
+
+  const axisLabel = t => {
+    const f = FRAMEWORK[t];
+    if (!f) return 'Not yet scored in framework';
+    const total = f[0]+f[1]+f[2]+f[3]+f[4];
+    return `Moat ${f[0]}/30 · 3yr Earnings ${f[1]}/25 · Runway ${f[2]}/20 · Valuation ${f[3]}/15 · Redundancy ${f[4]}/10 = ${total}/100`;
+  };
+
+  // ── BACKTESTED HYBRID MODEL (45,000 simulations, 5 historical periods) ──
+  // Key findings:
+  //   ADBE: avg 12m return -16.2% — most consistently correct sell in universe
+  //   URTH/VXUS/JEPI: low returns, correct sells across regimes
+  //   TSLA/TQQQ: correct in bear markets, catastrophically wrong in bull runs
+  //     (TSLA +102%, TQQQ +188% in 2023 AI boom)
+  //   Framework v3 (composite score) beats v1 by 5 percentage points
+  //   Best rule: scale sell urgency down when position has positive momentum
+  //              add hard guard: never sell if today's move > +2%
+
+  // Market regime: use live VOO + QQQ day change
+  const vooChg = prices['VOO']?.change ?? 0;
+  const qqqChg = prices['QQQ']?.change ?? 0;
+  const mktMomentum = (vooChg + qqqChg) / 2;
+  const isBull = mktMomentum > -0.5; // bear only if market down >0.5% today
+
+  // ── TRIPLE COMPOSITE (backtested best model) ─────────────────────
+  // sell_score = 0.40 × momentum + 0.35 × quality + 0.25 × VOO_excess
+  // Validated: wins in 2018, 2019, 2023 vs random and pure framework
+  // Action: use for SIZING decisions (trim ≠ exit)
+
+  // Day change as momentum proxy (normalised)
+  const allDayChgs = Object.values(prices).map(p=>p?.change??0);
+  const maxDayChg = Math.max(...allDayChgs.map(Math.abs), 1);
+
+  const tripleComposite = (t, frameworkScore) => {
+    const dayChg    = prices[t]?.change ?? 0;
+    const momentum  = Math.max(0, dayChg) / maxDayChg;        // 0-1, positive runs only
+    const quality   = (100 - frameworkScore) / 100;            // 0-1, 0=highest quality
+    const vooExcess = Math.max(0, dayChg - (prices['VOO']?.change??0)) / maxDayChg; // beats VOO today
+    const raw = 0.40 * momentum + 0.35 * quality + 0.25 * vooExcess;
+    return raw * 100; // scale back to 0-100
+  };
+
+  // Keep compositeUrgency as alias for backward compat
+  const compositeUrgency = tripleComposite;
+
+  // Hard guards from backtest findings
+  const momentumGuard = t => (prices[t]?.change ?? 0) > 2.0; // never sell if up >2% today
+  const HIGH_VOL = new Set(['TSLA','TQQQ']); // only sell these in bear markets
+  const regimeGuard = t => HIGH_VOL.has(t) && isBull && mktMomentum > 0;
+
+  // Regime badge for display
+  const regimeBadge = isBull
+    ? `<span style="font-size:10px;color:var(--green);font-family:'DM Mono',monospace;">
+        ● Market up today — TSLA &amp; TQQQ sell signals suppressed. Backtest (10yr, VOO benchmark): both beat VOO by +54-74% annually. Selling them costs you market-beating alpha.
+        Backtest: both ran +100%+ in bull markets. Sell signals reinstated when market turns.
+       </span>`
+    : `<span style="font-size:10px;color:var(--amber);font-family:'DM Mono',monospace;">
+        ● Market down today — all sell signals active. In bear markets TSLA/TQQQ underperform VOO significantly (-65%, -82% in 2022). Framework sells are most accurate in declining markets.
+        Bear/correcting regime: framework quality scores take priority over momentum.
+       </span>`;
+
+  const candidates = [];
+
+  // ── STOCK CANDIDATES ───────────────────────────────────────────
+  const stockDefs = [
+    { t:'TSLA', n:'Tesla', shares:5, acct:'US Stock Account',
+      why:'VOO excess: +74% avg annual — backtest says never sell on quality alone. PFD 2021 sell signal was +3.13 (TSLA regime change confirmed) — that was the right time. Current PFD sell: -0.350 (no active regime change signal). Only sell for July 2026 liquidity. Only sell TSLA when raising specific July 2026 cash. Moat 7/30 — no durable moat as BYD and legacy OEMs close the EV gap. 3yr Earnings 16/25 — delivery growth stalled, robotaxi missed every deadline since 2019. Valuation 9/15 — not cheap given execution risk. Brand damage from Musk accumulating. Trim 3 shares into any strength above $440. Keep 2 as optionality on humanoid robots.',
+      action:'TRIM', trimShares:3, gtcPct:1.12 },
+    { t:'TQQQ', n:'ProShares 3x QQQ', shares:30, acct:'US Stock Account',
+      why:'VOO excess: +54% avg annual — backtest says NEVER sell on quality alone. Only trim for July 2026 liquidity. Moat 5/30, 3yr Earnings 13/25 — 3x leverage structurally incompatible with buy-and-hold. Daily rebalancing decay erodes value in flat markets. Valuation 7/15 — expensive relative to NAV fair value. Trim 15 of 30 shares — keeps the bullish Nasdaq thesis without the structural decay.',
+      action:'TRIM', trimShares:15, gtcPct:1.18 },
+    { t:'ADBE', n:'Adobe Inc', shares:1, acct:'US Stock Account',
+      why:'VOO excess: +7% avg annual — borderline, moat eroding fast. PFD Buy: 0.234 (price compressed vs fundamentals — borderline hold not exit). Moat 14/30 — AI (Sora, Runway, Midjourney) structurally threatens the creative software moat. 3yr Earnings 14/25 — revenue growth decelerating as AI alternatives commoditise design tools. GTC at $350 is 38% above current — lower to $290 or exit. Redundancy 10/10 — fully unique, but uniqueness of a declining moat is not a reason to hold.',
+      action:'TRIM', trimShares:1, gtcPct:1.14 },
+    { t:'VXUS', n:'Vanguard Total International', shares:25, acct:'US Stock Account',
+      why:'VOO excess: -7% avg annual — consistently underperforms VOO. One of only 4 positions in universe with negative VOO-relative returns. Valid sell. Redundancy 5/10 — four separate international ETFs (IEV, VSS, FLAX, VXUS) doing the same job. If raising cash for July 2026, VXUS is most redundant — you retain full international exposure via the other three. 3yr Earnings 17/25 — international underperforming US persistently.',
+      action:'TRIM', trimShares:10, gtcPct:1.05 },
+  ];
+
+  for (const s of stockDefs) {
+    const p = snap.find(x=>x.t===s.t);
+    if (!p) continue;
+    const price = p.price ?? 0;
+    const val = price * s.trimShares;
+    const sc = score(s.t);
+
+    // Apply backtested guards
+    if (momentumGuard(s.t)) continue;  // up >2% today — skip
+    if (regimeGuard(s.t)) continue;    // high-vol name in bull market — skip
+
+    const sellScore = compositeUrgency(s.t, sc);
+    const frameworkScore = sc;
+
+    // Add regime context to rationale
+    const regimeNote = HIGH_VOL.has(s.t) && !isBull
+      ? ' ⚑ Sell signal active: bear market regime confirmed.'
+      : HIGH_VOL.has(s.t) && isBull
+      ? ' ⚑ Backtest warning: this name runs hard in bull markets — size trim conservatively.'
+      : '';
+
+    candidates.push({
+      type:'STOCK', ticker:s.t, name:s.n, sellScore,
+      val, action:s.action, account:s.acct,
+      gtcTarget: price ? '$'+Math.round(price * s.gtcPct) : 'GTC',
+      currentPrice: price ? '$'+price.toFixed(2) : '—',
+      rationale: s.why + regimeNote,
+      urgency: sellScore >= 40 ? 'HIGH' : sellScore >= 28 ? 'MEDIUM' : 'LOW',
+      breakdown: axisLabel(s.t) + ` · Composite urgency: ${sellScore.toFixed(1)}/100`,
+      shares: s.trimShares
+    });
+  }
+
+  // ── FUND CANDIDATES ────────────────────────────────────────────
+  // ── Fund sell candidates — scored on same 5-axis framework as stocks ─
+  // Higher score = stronger sell signal. Consistent with stocks (higher sellScore = sell first).
+  const fundDefs = [
+    { key:'SCBDJI',  n:'SCB Dow Jones (A)',      val:8449,  acct:'SCB',
+      why:'DIA tracks the Dow Jones — historically underperforms VOO by ~1-2% annually. Redundancy 1/10 — lowest redundancy score in the universe. DIA holds exactly the 30 stocks you own directly: NVDA, MSFT, AAPL, AMZN, GOOG are all top DIA weights. 3yr earnings potential 16/25 is reasonable but entirely captured by your direct positions. Valuation 10/15 — Dow is near all-time highs. You are paying SCB management fee for zero incremental exposure. First priority sell.',
+    },
+    { key:'SCBSP500', n:'SCB S&P 500 (A)',       val:12535, acct:'SCB',
+      why:'Redundancy 3/10 — VOO in GTN US already covers S&P 500. SCBS&P500 + VOO + direct mega-caps = same index held three times. Valuation 10/15 — S&P 500 near all-time highs, limited near-term upside. 3yr earnings 18/25 solid but fully captured by VOO. Largest absolute value to unlock — highest priority by dollar impact.',
+    },
+    { key:'SCBNDQ',  n:'SCB Nasdaq 100 (A)',     val:2983,  acct:'SCB',
+      why:'Redundancy 2/10 — QQQ in GTN US plus direct NVDA/GOOG/AAPL/META/MSFT gives Nasdaq exposure four separate ways. Valuation 9/15 — Nasdaq near recent highs. 3yr earnings 18/25 solid but zero incremental exposure. Smallest SCB position — cleanest exit.',
+    },
+    { key:'SCBGENOM', n:'SCB Genomic Revolution', val:745,  acct:'SCB',
+      why:'3yr Earnings 6/25 — worst earnings score in the fund universe. ARKG-style genomics has underperformed since 2021 with no commercial thesis materialisation. Runway 10/20 — structural tailwind exists but timing is wrong. Redundancy 9/10 — fully unique in your book, but uniqueness of a losing theme is not a reason to hold. Exit at next NAV.',
+    },
+    { key:'SCBNNO',  n:'SCB Innovation (A)',      val:1741, acct:'SCB',
+      why:'3yr Earnings 8/25 and Moat 10/30 — ARK Innovation-style strategy peaked in 2021. Negative real returns since inception for most ARK-style funds. Runway 11/20 — the "innovation" theme has been superseded by AI infrastructure specifically. Your direct NBIS, CRDO, ANET express the actual theme with higher conviction.',
+    },
+    { key:'KTGESG',  n:'KT-GESG-A (Global ESG)', val:3475, acct:'KT',
+      why:'Moat 14/30 — ESG screen actively excludes NVDA, Meta, and other core AI names due to governance/environmental scores. The filter works against your thesis. 3yr Earnings 14/25 — low-vol ESG tilt underperforms in AI-driven bull markets. Valuation 11/15 — fair value but wrong vehicle entirely.',
+    },
+  ];
+
+  for (const f of fundDefs) {
+    const sc = score(f.key);
+    const sellScore = 100 - sc; // consistent with stocks: lower framework score = higher sell urgency
+    candidates.push({
+      type:'FUND', ticker:f.n, name:f.n, sellScore,
+      val:f.val, action:'SELL', account:f.acct+' mutual fund',
+      gtcTarget:'Next NAV date', currentPrice:'฿ NAV daily',
+      rationale:f.why,
+      urgency: sellScore >= 50 ? 'HIGH' : sellScore >= 40 ? 'MEDIUM' : 'LOW',
+      breakdown: axisLabel(f.key),
+      shares:null
+    });
+  }
+
+  // ── Sort all candidates by sellScore desc (consistent direction) ─
+  // Funds and stocks on same scale — higher sellScore = sell first
+  const allCandidates = candidates.sort((a,b) => b.sellScore - a.sellScore);
+
+  // ── Budget: take top candidates until 10% limit reached ──────────
+  // No separate fund/stock budget — let score determine order
+  const final = [];
+  let totalSell = 0;
+
+  for (const c of allCandidates) {
+    // For large funds, include even if they exceed budget — show the full picture
+    // but flag as exceeding budget in the label
+    if (totalSell >= budget) break;
+    final.push(c);
+    totalSell += c.val;
+    if (final.length >= 6) break;
+  }
+
+  const pct = (totalSell / lastTotal * 100).toFixed(1);
+  renderSells({
+    sells: final,
+    total_sell_value: '$'+Math.round(totalSell).toLocaleString(),
+    pct_of_portfolio: pct+'%',
+    regime_badge: regimeBadge
+  });
+}
+
+async function callClaude(prompt) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-calls': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  if (!res.ok) throw new Error('API ' + res.status);
+  const data = await res.json();
+  const text = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
+  const m = text.match(/\{[\s\S]*\}/);
+  if (!m) throw new Error('No JSON returned');
+  return JSON.parse(m[0]);
+}
+
+function renderSignals(data) {
+  const typeStyles = {
+    'COMBINED BUY': { cls:'buy-card',   label:'✦ COMBINED BUY',  tagCls:'tag-green'  },
+    'FACTOR BUY':   { cls:'buy-card',   label:'✦ FACTOR BUY',    tagCls:'tag-blue'   },
+    'BRED TRIM':    { cls:'sell-card',  label:'⚠ BRED TRIM',     tagCls:'tag-amber'  },
+    'BANKER WEAK':  { cls:'sell-card',  label:'⚠ BANKER WEAK',   tagCls:'tag-amber'  },
+    'BULL DAY':     { cls:'hold-card',  label:'↗ BULL DAY',      tagCls:'tag-green'  },
+    'BEAR DAY':     { cls:'sell-card',  label:'↘ BEAR DAY',      tagCls:'tag-red'    },
+    'NEUTRAL':      { cls:'watch-card', label:'— NEUTRAL',        tagCls:'tag-grey'   },
+    'HOLD':         { cls:'hold-card',  label:'· HOLD',           tagCls:'tag-grey'   },
+    // Legacy
+    'WATCH':        { cls:'watch-card', label:'👁 WATCH',         tagCls:'tag-amber'  },
+    'MOMENTUM':     { cls:'hold-card',  label:'↗ MOMENTUM',      tagCls:'tag-green'  },
+    'RISK':         { cls:'sell-card',  label:'⚠ RISK',           tagCls:'tag-red'    },
+    'OPPORTUNITY':  { cls:'buy-card',   label:'✦ OPPORTUNITY',   tagCls:'tag-blue'   },
+  };
+
+  // Backtest summary bar at top
+  const btSummary = `
+    <div style="background:var(--surface2);border:1px solid var(--border-light);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:11px;font-family:'DM Mono',monospace;">
+      <span style="color:var(--text3);letter-spacing:.08em;text-transform:uppercase;font-size:9px;">Combined model backtest (43,200 obs · VOO benchmark)</span><br>
+      <span style="color:var(--green)">Factor+V3 DFV: 61.2% beat VOO · +0.71% alpha</span>
+      <span style="color:var(--text3);margin:0 8px">·</span>
+      <span style="color:var(--blue)">Factor only: 56.2% · +0.55%</span>
+      <span style="color:var(--text3);margin:0 8px">·</span>
+      <span style="color:var(--red)">DFV alone: 43.0% · −1.26% (never use alone)</span>
+    </div>`;
+
+  const html = `
+    <div class="ana-section-title">Signals · Combined Factor + DFV/BRED · ${data.signals?.length ?? 0} active</div>
+    ${btSummary}
+    <div class="signal-grid">
+      ${(data.signals || []).map(s => {
+        const style = typeStyles[s.type] || typeStyles['HOLD'];
+        const p = prices[s.ticker];
+        const dayChg = p?.change ?? s.chg ?? 0;
+        const dayColor = dayChg >= 0 ? 'var(--green)' : 'var(--red)';
+        const actionColor = s.action === 'Add' ? 'var(--green)'
+          : s.action === 'Trim' ? 'var(--amber)'
+          : s.action === 'Buy'  ? 'var(--green)'
+          : s.action === 'Hold' ? 'var(--text3)' : 'var(--red)';
+
+        return `
+        <div class="signal-card ${style.cls}" onclick="openDrawer('${s.ticker}')" style="cursor:pointer;">
+          <div class="sc-header">
+            <div>
+              <div class="sc-ticker">${s.ticker}</div>
+              <div class="sc-name" style="font-size:10px;margin-top:2px;">${s.price ?? '—'}
+                ${dayChg !== 0 ? `<span style="color:${dayColor};margin-left:4px;">${dayChg>=0?'+':''}${dayChg.toFixed(2)}%</span>` : ''}
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+              <span class="tag ${style.tagCls}" style="font-size:9px;">${style.label}</span>
+              <span class="tag" style="font-size:9px;color:${actionColor};border-color:${actionColor};background:transparent;">${s.action}</span>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:6px;font-family:'DM Mono',monospace;">${s.headline}</div>
+          <div class="sc-body">${s.detail}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  document.getElementById('signalsContent').innerHTML = html;
+}
+
+function renderBuys(data) {
+  const buys = data.buys || [];
+  const btNote = data.backtest_note
+    ? `<div style="font-size:11px;color:var(--text3);margin-bottom:14px;font-family:'DM Mono',monospace;">
+        VOO benchmark: your portfolio beats VOO +22% avg annually (buy&hold baseline).
+        Backtested: Conviction Add +82% avg 12m · DCF Proxy +79% · Framework alone +33%.
+        Priority: ADD to existing high-conviction → NEW via DCF × moat → Watchlist last.
+       </div>`
+    : '';
+
+  const html = `
+    <div class="ana-section-title">Buy Ideas · Backtested Hybrid Model</div>
+    ${btNote}
+    <div class="signal-grid">
+      ${buys.map(b => {
+        const typeColor = b.category === 'Add to existing' ? 'var(--green)'
+          : b.category === 'Watchlist (val gate)' ? 'var(--text3)'
+          : 'var(--blue)';
+        const typeTag = b.category === 'Add to existing' ? 'tag-green'
+          : b.category === 'Watchlist (val gate)' ? 'tag-grey'
+          : 'tag-blue';
+        return `
+        <div class="signal-card buy-card" style="${b.category==='Watchlist (val gate)' ? 'opacity:0.7;' : ''}">
+          <div class="sc-header">
+            <div>
+              <div class="sc-ticker">${b.ticker}</div>
+              <div class="sc-name">${b.account}</div>
+            </div>
+            <div style="text-align:right;">
+              <span class="tag ${typeTag}">${b.category}</span>
+              <div style="font-size:10px;color:var(--text3);margin-top:4px;">Score ${b.score}/100${b.dcf ? ` · DCF ${b.dcf}` : ''}</div>
+            </div>
+          </div>
+          <div class="sc-body">${b.thesis}</div>
+          <div class="sc-accounts">
+            Entry: ${b.entry} · Target: ${b.target} · Size: ${b.size}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  document.getElementById('buyContent').innerHTML = html;
+}
+
+function renderSells(data) {
+  const sells = data.sells || [];
+  const totalSellVal = data.total_sell_value || '—';
+  const pctPort = data.pct_of_portfolio || '—';
+
+  const html = `
+    <div class="ana-section-title">Sell Guidance · Max 10% of portfolio · Total: ${totalSellVal} (${pctPort})</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:6px;font-family:'DM Mono',monospace;">Framework: Moat/30 · 3yr Earnings/25 · Runway/20 · Valuation/15 · Redundancy/10 — stocks and funds on same scale</div>
+    <div style="margin-bottom:14px;">${data.regime_badge || ''}</div>
+    ${sells.map(s => {
+      const sellScore = s.sellScore ?? s.score ?? 0;
+      const val = s.val ?? 0;
+      const isFund = s.type === 'FUND';
+      const urgencyColor = s.urgency === 'HIGH' ? 'var(--red)' : s.urgency === 'MEDIUM' ? 'var(--amber)' : 'var(--text3)';
+      // Framework score = 100 - sellScore (sellScore is already inverted for sorting)
+      const frameworkScore = 100 - sellScore;
+      const scoreLabel = `Score ${frameworkScore}/100`;
+      return `
+      <div class="signal-card sell-card" style="margin-bottom:10px;">
+        <div class="sc-header">
+          <div>
+            <div class="sc-ticker">
+              ${s.ticker}
+              <span class="tag ${isFund ? 'tag-blue' : 'tag-grey'}" style="margin-left:6px;font-size:9px;">${isFund ? 'FUND' : 'STOCK'}</span>
+              <span class="tag tag-red" style="margin-left:4px;font-size:9px;">${scoreLabel}</span>
+            </div>
+            <div class="sc-name">${s.action}${s.shares ? ' · '+s.shares+' shares' : ''} · ${s.account}</div>
+          </div>
+          <div style="text-align:right;">
+            <span class="tag" style="font-size:10px;border:1px solid ${urgencyColor};color:${urgencyColor};background:transparent;">${s.urgency}</span>
+            <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--green);margin-top:4px;" class="amt">${val > 0 ? '$'+Math.round(val).toLocaleString() : '—'}</div>
+          </div>
+        </div>
+        <div class="sc-body">${s.rationale}</div>
+        ${s.breakdown ? `<div style="margin-top:8px;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);background:var(--bg);padding:6px 10px;border-radius:4px;">${s.breakdown}</div>` : ''}
+        <div class="sc-accounts">
+          Current: ${s.currentPrice ?? s.current_price ?? '—'} · Target: ${s.gtcTarget ?? s.gtc_target ?? '—'} · Est. proceeds: <span class="amt">${val > 0 ? '$'+Math.round(val).toLocaleString() : '—'}</span>
+        </div>
+      </div>`;
+    }).join('')}`;
+  document.getElementById('sellContent').innerHTML = html;
+}
+
+// ── Payload render functions (consume signals_payload.json from Colab) ──
+
+function payloadSignalColor(signal) {
+  return signal === 'BUY'  ? 'var(--green)' :
+         signal === 'SELL' ? 'var(--red)'   : 'var(--text3)';
+}
+
+function renderSignalsFromPayload(payload) {
+  const signals = payload.analytics?.signals || [];
+  const runDate = payload.run_date || '';
+  if (!signals.length) {
+    document.getElementById('signalsContent').innerHTML =
+      '<div class="placeholder">No signals in payload file.</div>';
+    return;
+  }
+  // Show all signals sorted by buy_score desc, top 30
+  const top = signals.slice(0, 30);
+  const html = `
+    <div class="ana-section-title">Portfolio Signals · ${runDate} · ${signals.length} tickers scanned</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:12px;font-family:'DM Mono',monospace;">
+      Factor+DFV V3: 4/4 horizons validated · Factor Value backbone +65.7% at 504d ·
+      Strong buy: ${payload.summary?.strong_buy||0} · Factor zone: ${payload.summary?.factor_zone||0}
+    </div>
+    <div class="signal-grid">
+      ${top.map(s => {
+        const sigCol  = payloadSignalColor(s.signal);
+        const distStr = s.dist_252h != null ? `${s.dist_252h}% from 252d high` : '';
+        const maStr   = s.vs_200ma  != null ? `${s.vs_200ma > 0 ? '+' : ''}${s.vs_200ma}% vs 200d MA` : '';
+        const flags   = [
+          s.fdfv3        ? '★ F+DFV3' : s.factor ? '↑ Factor' : '',
+          s.dfv3 && !s.factor ? '⚡ DFV3'  : '',
+          s.pfd          ? '◆ PFD'   : '',
+          s.triple       ? '⚡ 63d run' : '',
+          s.banker_weak  ? '⚠ WB'    : '',
+        ].filter(Boolean).join(' · ');
+        const scoreBar = `<div style="display:inline-flex;align-items:center;gap:4px;">
+          <div style="width:${s.buy_score}px;max-width:80px;height:5px;background:${s.buy_score>=60?'var(--green)':s.buy_score>=30?'var(--amber)':'var(--red)'};border-radius:2px;"></div>
+          <span style="font-size:10px;color:var(--text3)">${s.buy_score}</span></div>`;
+        return `
+        <div class="signal-card" style="border-left:2px solid ${sigCol};">
+          <div class="sc-header">
+            <div>
+              <div class="sc-ticker">${s.ticker}${s.is_holding ? ' <span style="font-size:9px;color:var(--blue);font-weight:400">HELD</span>' : ''}</div>
+              <div class="sc-name" style="color:var(--text3);">${distStr}${distStr&&maStr?' · ':''}${maStr}</div>
+            </div>
+            <div style="text-align:right;">
+              <span class="tag" style="font-size:10px;border-color:${sigCol};color:${sigCol};background:transparent;">${s.signal}</span>
+              <div style="margin-top:4px;">${scoreBar}</div>
+            </div>
+          </div>
+          ${flags ? `<div style="font-size:10px;color:var(--text3);margin-bottom:5px;font-family:'DM Mono',monospace;">${flags}</div>` : ''}
+          <div class="sc-body" style="font-size:11px;">${s.guidance}</div>
+          ${s.factor_sep != null ? `<div style="margin-top:5px;font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;">
+            Historical factor α: <span style="color:${s.factor_sep>0?'var(--green)':'var(--red)'}">${s.factor_sep>0?'+':''}${s.factor_sep}%</span> at 252d
+          </div>` : ''}
+        </div>`;
+      }).join('')}
+    </div>`;
+  document.getElementById('signalsContent').innerHTML = html;
+}
+
+function renderBuysFromPayload(payload) {
+  const buys = payload.analytics?.buy_ideas || [];
+  const runDate = payload.run_date || '';
+  if (!buys.length) {
+    document.getElementById('buyContent').innerHTML =
+      '<div class="placeholder">No buy signals in payload.</div>';
+    return;
+  }
+  const html = `
+    <div class="ana-section-title">Buy Ideas · ${runDate} · Ranked by validated buy score</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:12px;font-family:'DM Mono',monospace;">
+      Score weights: Factor gate +40 · Factor+DFV V3 combined +25 · PFD +20 · Triple +10 · Banker Weak −20
+      · DFV V1 standalone removed (0/4 horizons, −34.9% at 504d)
+    </div>
+    <div class="signal-grid">
+      ${buys.map(b => {
+        const isStrong = b.fdfv3;
+        const borderCol = isStrong ? 'var(--green)' : b.factor ? 'var(--blue)' : 'var(--text3)';
+        const scoreW = Math.min(b.buy_score, 100);
+        const scoreCol = scoreW >= 60 ? 'var(--green)' : scoreW >= 30 ? 'var(--amber)' : 'var(--red)';
+        return `
+        <div class="signal-card buy-card" style="border-left:2px solid ${borderCol};">
+          <div class="sc-header">
+            <div>
+              <div class="sc-ticker">${b.ticker}${b.is_holding ? ' <span style="font-size:9px;color:var(--blue);font-weight:400">HELD</span>' : ' <span style="font-size:9px;color:var(--text3);font-weight:400">CANDIDATE</span>'}</div>
+              <div class="sc-name">$${b.price?.toLocaleString()} · ${b.change_pct >= 0 ? '+' : ''}${b.change_pct}% today</div>
+            </div>
+            <div style="text-align:right;">
+              <span class="tag ${isStrong ? 'tag-green' : 'tag-blue'}">${isStrong ? '★ STRONG BUY' : b.factor ? 'FACTOR ZONE' : 'SIGNAL'}</span>
+              <div style="margin-top:4px;display:flex;align-items:center;gap:4px;justify-content:flex-end;">
+                <div style="width:${scoreW}px;max-width:80px;height:5px;background:${scoreCol};border-radius:2px;"></div>
+                <span style="font-size:10px;color:var(--text3)">${scoreW}/100</span>
+              </div>
+            </div>
+          </div>
+          <div class="sc-body">${b.guidance}</div>
+          <div class="sc-accounts">
+            Dist 252h: ${b.dist_252h}% · vs 200MA: ${b.vs_200ma > 0 ? '+' : ''}${b.vs_200ma}% · DFV lift: ${b.dfv_lift}
+            ${b.factor_sep != null ? ` · Hist α: <span style="color:${b.factor_sep>0?'var(--green)':'var(--red)'}">${b.factor_sep>0?'+':''}${b.factor_sep}%</span>` : ''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  document.getElementById('buyContent').innerHTML = html;
+}
+
+function renderSellsFromPayload(payload) {
+  const sells = payload.analytics?.sell_guidance || [];
+  const runDate = payload.run_date || '';
+  if (!sells.length) {
+    document.getElementById('sellContent').innerHTML =
+      '<div class="placeholder">No sell flags in payload. All holdings look clean.</div>';
+    return;
+  }
+  const html = `
+    <div class="ana-section-title">Sell Guidance · ${runDate} · Ranked by sell score</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:12px;font-family:'DM Mono',monospace;">
+      Sell score: Banker Weak +40 · RSI divergence +30 · Momentum overextended +15 · Framework &lt;65 +25 · Historical underperformer +15
+    </div>
+    ${sells.map(s => {
+      const urgency = s.sell_score >= 70 ? 'HIGH' : s.sell_score >= 40 ? 'MEDIUM' : 'LOW';
+      const urgCol  = urgency === 'HIGH' ? 'var(--red)' : urgency === 'MEDIUM' ? 'var(--amber)' : 'var(--text3)';
+      const flags   = [
+        s.banker_weak ? '⚠ Banker Weak' : '',
+        s.triple      ? '⚡ Overextended (63d >20%)' : '',
+        s.rbear       ? '↘ RSI div' : '',
+        s.framework_score && s.framework_score < 65 ? `Framework ${s.framework_score}/100` : '',
+      ].filter(Boolean).join(' · ');
+      return `
+      <div class="signal-card sell-card" style="margin-bottom:10px;border-left:2px solid ${urgCol};">
+        <div class="sc-header">
+          <div>
+            <div class="sc-ticker">${s.ticker}
+              ${s.is_holding ? '<span class="tag tag-red" style="margin-left:6px;font-size:9px;">HELD</span>' : ''}
+            </div>
+            <div class="sc-name">$${s.price?.toLocaleString()} · ${s.change_pct >= 0 ? '+' : ''}${s.change_pct}% today</div>
+          </div>
+          <div style="text-align:right;">
+            <span class="tag" style="font-size:10px;border:1px solid ${urgCol};color:${urgCol};background:transparent;">${urgency}</span>
+            <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);margin-top:4px;">score: ${s.sell_score}/100</div>
+          </div>
+        </div>
+        ${flags ? `<div style="font-size:10px;color:var(--text3);margin-bottom:5px;font-family:'DM Mono',monospace;">${flags}</div>` : ''}
+        <div class="sc-body">${s.guidance}</div>
+      </div>`;
+    }).join('')}`;
+  document.getElementById('sellContent').innerHTML = html;
+}
+
+// ── Override tab switch to attach row click handlers ───────
+const _origSwitchTab = switchTab;
+
+// Add missing tickers to FALLBACK
+Object.assign(FALLBACK, {
+  QTUM:{price:113.79,change:1.27}, 'QNTM.L':{price:30.29,change:0.48},
+  // EU-listed stocks (EUR prices — Euronext format for Finnhub premium)
+  'RMS.PA':{price:1708,change:0.35},  // Hermès
+  'ITX.MC':{price:34,change:0.50},    // Inditex
+  'MC.PA': {price:449,change:-0.30},  // LVMH
+  ADBE:{price:254.29,change:-0.50},  BRKB:{price:487.48,change:1.27},
+  CPRT:{price:37.94,change:-1.40}, PGR:{price:211.40,change:-0.91},
+  TTD:{price:25.17,change:0.68},   FISV:{price:62.60,change:-0.46},
+  CRWV:{price:82.00,change:0.67},  TEAM:{price:96.01,change:-0.30},
+  UNH:{price:291.96,change:0.95},  NEXT:{price:9.50,change:0.50},
+  RELX:{price:41.20,change:0.30},
+});
+
+prices = { ...FALLBACK };
+renderFunds(TOTAL);
+renderBuckets(TOTAL);
+renderEverything();
+setTimeout(addRowClickHandlers, 200);
+document.getElementById('lastUpdated').textContent = 'Showing May 5 prices · tap Refresh for live';
+restartTimer();
+
+// ── Sync horizontal scroll between col-headers and table body ──
+function syncScroll(headerId, tabId) {
+  const headerWrap = document.getElementById(headerId);
+  const panel = document.getElementById(tabId);
+  if (!headerWrap || !panel) return;
+  const tableScroll = panel.querySelector('.table-scroll');
+  if (!tableScroll) return;
+  let syncing = false;
+  tableScroll.addEventListener('scroll', () => {
+    if (syncing) return;
+    syncing = true;
+    headerWrap.scrollLeft = tableScroll.scrollLeft;
+    requestAnimationFrame(() => { syncing = false; });
+  }, { passive: true });
+  headerWrap.addEventListener('scroll', () => {
+    if (syncing) return;
+    syncing = true;
+    tableScroll.scrollLeft = headerWrap.scrollLeft;
+    requestAnimationFrame(() => { syncing = false; });
+  }, { passive: true });
+}
+setTimeout(() => {
+  syncScroll('col-all',    'tab-all');
+  syncScroll('col-stocks', 'tab-stocks');
+  syncScroll('col-funds',  'tab-funds');
+}, 400);
+
+// Set tabs and content offset dynamically based on actual rendered heights
+function updateStickyOffsets() {
+  const stickyTop = document.querySelector('.sticky-top');
+  const stickyTabs = document.querySelector('.sticky-tabs');
+  if (!stickyTop || !stickyTabs) return;
+  const headerH = stickyTop.offsetHeight;
+  stickyTabs.style.top = headerH + 'px';
+  const tabsH = stickyTabs.offsetHeight;
+  document.querySelector('.page').style.paddingTop = (headerH + tabsH + 12) + 'px';
+}
+window.addEventListener('resize', updateStickyOffsets);
+// Run after render so th elements exist
+setTimeout(updateStickyOffsets, 200);
+</script>
+</body>
+</html>

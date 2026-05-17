@@ -1,0 +1,45 @@
+name: Daily Signal Scanner
+
+on:
+  schedule:
+    # 11:00 PM UTC = 6:00 AM Bangkok (UTC+7), weekdays
+    - cron: '0 23 * * 1-5'
+    # 01:00 PM UTC = 8:00 PM Bangkok (UTC+7), weekdays
+    - cron: '0 13 * * 1-5'
+  workflow_dispatch:
+    # Manual trigger from GitHub Actions tab anytime
+
+jobs:
+  run-scanner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run signal scanner
+        env:
+          FINNHUB_TOKEN: ${{ secrets.FINNHUB_TOKEN }}
+        run: python signal_scanner.py
+
+      - name: Commit and push signals_payload.json
+        run: |
+          git config user.name  "Signal Bot"
+          git config user.email "bot@portfolio-signals"
+          git add signals_payload.json
+          if git diff --staged --quiet; then
+            echo "No changes — skipping commit"
+          else
+            git commit -m "chore: signals update $(date -u '+%Y-%m-%d %H:%M UTC')"
+            git push
+          fi
