@@ -105,15 +105,28 @@ def fetch_history():
     start = end - timedelta(days=YEARS*365 + 60)
     all_t = list(dict.fromkeys([BENCHMARK] + UNIVERSE))
     print(f'Fetching {len(all_t)} tickers ({YEARS}yr daily)...')
-    raw = yf.download(all_t, start=start, end=end, interval='1d',
-                      auto_adjust=True, progress=False, threads=True)
-    if isinstance(raw.columns, pd.MultiIndex):
-        closes = raw['Close'].dropna(how='all')
-    else:
-        closes = raw[['Close']]; closes.columns = [all_t[0]]
-    ok   = [t for t in all_t if t in closes.columns and closes[t].notna().sum() > 100]
-    fail = [t for t in all_t if t not in ok]
-    print(f'✓ {len(ok)} ok | ✗ {fail}')
+    
+    closes_dict = {}
+    ok   = []
+    fail = []
+    
+    for t in all_t:
+        try:
+            df = yf.download(t, start=start, end=end, interval='1d',
+                           auto_adjust=True, progress=False)
+            if df is not None and len(df) > 100:
+                if isinstance(df.columns, pd.MultiIndex):
+                    closes_dict[t] = df['Close'][t].dropna()
+                else:
+                    closes_dict[t] = df['Close'].dropna()
+                ok.append(t)
+            else:
+                fail.append(t)
+        except Exception as e:
+            fail.append(t)
+    
+    closes = pd.DataFrame(closes_dict)
+    print(f'✓ {len(ok)} ok | ✗ {len(fail)} failed: {fail[:5]}{"..." if len(fail)>5 else ""}')
     return closes, ok
 
 # ── HISTORICAL ALPHA ──────────────────────────────────────────────────
