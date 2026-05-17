@@ -297,7 +297,6 @@ def main():
             'quality_t': best_params['quality_t'],
             'trend_t':   0.0,
         },
-          write_html_report(payload, all_hr, best_params, cv_windows, ok)
         'buy_weights':          BUY_WEIGHTS,
         'buy_wb_penalty':       -15,
         'fundamental_boost_max': 15,
@@ -317,6 +316,7 @@ def main():
     with open(out, 'w') as f:
         json.dump(payload, f, indent=2, default=str)
     print(f'\nExported: {out} ({os.path.getsize(out):,} bytes)')
+    write_html_report(payload, all_hr, best_params, cv_windows, ok)
     print(f'Buy weights: {BUY_WEIGHTS}')
     print(f'Sell weights: {SELL_WEIGHTS}')
 
