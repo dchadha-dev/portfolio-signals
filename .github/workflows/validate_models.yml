@@ -1,0 +1,42 @@
+name: Quarterly Model Validation
+
+on:
+  schedule:
+    # Runs first Monday of every quarter at 2am Bangkok (7pm UTC Sunday)
+    - cron: '0 19 1-7 1,4,7,10 1'
+  workflow_dispatch:
+    # Manual trigger anytime from Actions tab
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90    # validation takes ~30-60 min with 180 tickers
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements-github-actions.txt scipy
+
+      - name: Run model validation
+        run: python signal_scanner_validation.py
+
+      - name: Commit validated_params.json
+        run: |
+          git config user.name  "Validation Bot"
+          git config user.email "bot@portfolio-signals"
+          git add validated_params.json
+          if git diff --staged --quiet; then
+            echo "No changes to validated_params.json"
+          else
+            git commit -m "chore: validated params update $(date -u '+%Y-%m-%d %H:%M UTC')"
+            git push
+          fi

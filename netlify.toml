@@ -1,10 +1,8 @@
+# Static site — no build step needed.
+# Python runs on GitHub Actions only, not here.
 [build]
   publish = "."
   command = ""
-  ignore = "exit 0"
-
-[build.environment]
-  PYTHON_VERSION = "3.12"
 
 [[headers]]
   for = "/signals_payload.json"
