@@ -3,9 +3,23 @@
 [build]
   publish = "."
   command = ""
+  ignore = "exit 0"
+
+[build.environment]
+  PYTHON_VERSION = "3.12"
 
 [[headers]]
   for = "/signals_payload.json"
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
     Access-Control-Allow-Origin = "*"
+
+[[headers]]
+  for = "/validated_params.json"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/validation_report.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
