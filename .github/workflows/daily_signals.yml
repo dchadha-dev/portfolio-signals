@@ -2,12 +2,9 @@ name: Daily Signal Scanner
 
 on:
   schedule:
-    # 11:00 PM UTC = 6:00 AM Bangkok (UTC+7), weekdays
     - cron: '0 23 * * 1-5'
-    # 01:00 PM UTC = 8:00 PM Bangkok (UTC+7), weekdays
     - cron: '0 13 * * 1-5'
   workflow_dispatch:
-    # Manual trigger from GitHub Actions tab anytime
 
 jobs:
   run-scanner:
@@ -22,7 +19,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache-dependency-path: 'requirements-github-actions.txt'
 
       - name: Install dependencies
         run: pip install -r requirements-github-actions.txt
