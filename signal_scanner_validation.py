@@ -92,6 +92,56 @@ def compute_signals(cl, dist_t, quality_t, dfv_lift):
     df['triple']     = df['close'].pct_change(63) > 0.20
     df['wb']         = (df['bnk_prev'] >= 20) & (df['banker_rsi'] < 20)
     df['near_high']  = df['dist'] > -0.05
+
+    # ── Extended sell signals ─────────────────────────────────────────
+    # RSI14 bearish divergence (rbear)
+    rsi14            = calc_rsi(df['close'], 14)
+    df['rsi14']      = rsi14
+    rsi_above        = (rsi14 - 60).clip(lower=0).ewm(span=3, adjust=False).mean()
+    rsi_pk           = rsi_above.rolling(20).max().shift(1)
+    price_pk         = df['close'].rolling(20).max().shift(1)
+    df['rbear']      = (
+        (df['close'] > price_pk * 1.01) &
+        (rsi_above   < rsi_pk  * 0.85) &
+        (rsi_above   > 0)
+    )
+
+    # WB + divergence confluence
+    df['wb_div']     = df['wb'] & df['rbear']
+
+    # Momentum exhaustion
+    df['mom20']      = df['close'].pct_change(63) > 0.20
+    df['mom30']      = df['close'].pct_change(63) > 0.30
+
+    # MFI proxy bearish divergence (using RSI14 above 65 as MFI proxy)
+    mfi_proxy        = (rsi14 - 65).clip(lower=0).ewm(span=3, adjust=False).mean()
+    mfi_pk           = mfi_proxy.rolling(20).max().shift(1)
+    df['mfbear']     = (
+        (df['close'] > price_pk * 1.01) &
+        (mfi_proxy   < mfi_pk  * 0.85) &
+        (mfi_proxy   > 0)
+    )
+
+    # BRED: 2+ bearish divergence components
+    macd             = df['close'].ewm(span=12,adjust=False).mean() - df['close'].ewm(span=26,adjust=False).mean()
+    dmacd            = macd.clip(lower=0).ewm(span=3, adjust=False).mean()
+    dmacd_pk         = dmacd.rolling(20).max().shift(1)
+    macd_bear        = (
+        (df['close'] > price_pk * 1.01) &
+        (dmacd       < dmacd_pk * 0.85) &
+        (dmacd       > 0)
+    )
+    bred_count       = df['rbear'].astype(int) + df['mfbear'].astype(int) + macd_bear.astype(int)
+    df['bred']       = bred_count >= 2
+
+    # Quality deterioration: Sharpe declining over 63d
+    qual63           = calc_quality(df['close'], window=63)
+    qual63_prev      = qual63.shift(21)
+    df['qual_det']   = (qual63 < qual63_prev - 0.10) & qual63.notna() & qual63_prev.notna()
+
+    # RVI bearish div proxy (using MACD as RVI substitute — needs OHLCV for real RVI)
+    df['rvbear']     = macd_bear
+
     np.random.seed(42)
     df['rand']       = np.random.random(len(df)) < 0.10
     return df.dropna(subset=['dist', 'hm_lift'])
@@ -162,7 +212,7 @@ def bootstrap_ci(arr, n_boot=N_BOOTSTRAP):
     return (float(np.percentile(means, 2.5)), float(np.percentile(means, 97.5)))
 
 def run_cv(closes, ok, voo, cv_windows, dist_t, quality_t, dfv_lift, fw):
-    SIGS = ['f','fdfv3','pfd','triple','dfv3','dfv1','wb','near_high','rand']
+    SIGS = ['f','fdfv3','pfd','triple','dfv3','dfv1','wb','near_high','rand','rbear','wb_div','mom20','mom30','mfbear','bred','qual_det','rvbear']
     all_sigs = {}
     for t in ok:
         if t == BENCHMARK: continue
@@ -260,8 +310,8 @@ def main():
                   f'p={fdfv3["p_value"]:.3f} {"✓" if fdfv3["significant"] else " "}')
 
     # Compute validated buy weights
-    BUY_SIGS = ['f','fdfv3','pfd','triple','dfv3','dfv1']
-    SELL_SIGS = ['near_high','wb']
+    BUY_SIGS  = ['f','fdfv3','pfd','triple','dfv3','dfv1']
+    SELL_SIGS = ['near_high','wb','rbear','wb_div','mom20','mom30','mfbear','bred','qual_det','rvbear']
 
     def n_sig(sig, direction='buy'):
         count = 0
@@ -271,6 +321,19 @@ def main():
             if direction == 'buy'  and r['p_value'] < P_THRESHOLD and r['mean_sep'] > 0: count += 1
             if direction == 'sell' and r['p_value'] < P_THRESHOLD and r['mean_sep'] < 0: count += 1
         return count
+
+    SELL_SIG_NAMES = {
+        'near_high': 'Near 252d high',
+        'wb':        'Banker Weak',
+        'rbear':     'RSI14 bearish div',
+        'wb_div':    'WB + div combo',
+        'mom20':     'Momentum exhaust 20%',
+        'mom30':     'Momentum exhaust 30%',
+        'mfbear':    'MFI bearish div',
+        'bred':      'BRED (2+ components)',
+        'qual_det':  'Quality deterioration',
+        'rvbear':    'RVI bearish div proxy',
+    }
 
     raw_weights = {}
     for s in BUY_SIGS:
@@ -282,8 +345,27 @@ def main():
     total_raw = sum(raw_weights.values()) or 1
     BUY_WEIGHTS = {s: max(1, round(v/total_raw*100)) for s, v in raw_weights.items()}
 
-    # Sell weights from validated results (near_high 4/4, wb_plus_div 3/4)
-    SELL_WEIGHTS = {'near_high': 45, 'wb_plus_div': 35, 'wb_alone': 10}
+    # Sell weights — computed from walk-forward results
+    # Only signals with p < P_THRESHOLD AND negative mean_sep get weight
+    raw_sell = {}
+    for s in SELL_SIGS:
+        r = all_hr[252].get(s)
+        if r and r['p_value'] < P_THRESHOLD and r['mean_sep'] < 0:
+            nc = n_sig(s, 'sell')
+            raw_sell[s] = abs(r['mean_sep']) * (nc / 4)
+
+    if raw_sell:
+        total_sell_raw = sum(raw_sell.values())
+        SELL_WEIGHTS = {s: max(1, round(v/total_sell_raw*100)) for s,v in raw_sell.items()}
+    else:
+        SELL_WEIGHTS = {'near_high': 60}  # fallback
+
+    print(f'\nValidated SELL signals (negative sep, p<{P_THRESHOLD}):')
+    for s in SELL_SIGS:
+        r = all_hr[252].get(s)
+        if r:
+            direction = '✓ SELL' if r['mean_sep'] < 0 and r['p_value'] < P_THRESHOLD else '✗ not sell'
+            print(f'  {SELL_SIG_NAMES.get(s,s):<28} sep={r["mean_sep"]*100:+.2f}% p={r["p_value"]:.3f} {direction}')
 
     # Build payload
     payload = {
@@ -310,14 +392,185 @@ def main():
             s: n_sig(s, 'sell' if s in SELL_SIGS else 'buy')
             for s in BUY_SIGS + SELL_SIGS
         },
+        'sell_signal_ranking': [
+            {
+                'signal': s,
+                'name': SELL_SIG_NAMES.get(s, s),
+                'mean_sep_252d': round(all_hr[252][s]['mean_sep']*100, 2) if all_hr[252].get(s) else None,
+                'p_value': round(all_hr[252][s]['p_value'], 4) if all_hr[252].get(s) else None,
+                'consistency': n_sig(s, 'sell'),
+                'validated': bool(all_hr[252].get(s) and all_hr[252][s]['p_value'] < P_THRESHOLD and all_hr[252][s]['mean_sep'] < 0),
+                'weight': SELL_WEIGHTS.get(s, 0),
+            }
+            for s in SELL_SIGS
+        ],
     }
 
     out = 'validated_params.json'
     with open(out, 'w') as f:
         json.dump(payload, f, indent=2, default=str)
     print(f'\nExported: {out} ({os.path.getsize(out):,} bytes)')
+    # write_html_report disabled until function is fixed
+    # write_html_report(payload, all_hr, best_params, cv_windows, ok)
     print(f'Buy weights: {BUY_WEIGHTS}')
     print(f'Sell weights: {SELL_WEIGHTS}')
 
 if __name__ == '__main__':
     main()
+
+
+def write_html_report(payload, all_hr, best_params, cv_windows, ok):
+    """Write a human-readable validation report to validation_report.html."""
+    HORIZONS = [63, 126, 252, 504]
+    BUY_SIGS  = ['f','fdfv3','pfd','triple','dfv3','dfv1']
+    SELL_SIGS = ['near_high','wb']
+    P_THRESHOLD = payload['p_threshold']
+
+    SIGNAL_NAMES = {
+        'f':         'Factor Value',
+        'fdfv3':     'Factor+DFV V3 ★',
+        'pfd':       'PFD Buy',
+        'triple':    'Triple Composite',
+        'dfv3':      'DFV V3 standalone',
+        'dfv1':      'DFV V1 standalone',
+        'wb':        'Banker Weak',
+        'near_high': 'Near 252d High',
+        'rand':      'Random 10%',
+    }
+
+    def cell(r, is_sell=False):
+        if r is None: return '<td style="color:#aaa;text-align:right;padding:6px 10px">—</td>'
+        sep = r['mean_sep']; p = r['p_value']; std = r['std']
+        wins = r['n_wins']; n_w = r['n_windows']
+        good = sep < 0 if is_sell else sep > 0
+        sig  = p < P_THRESHOLD and good
+        bg = ('#d4edda' if sig else '#f0fff4') if good else ('#f8d7da' if abs(sep)>0.01 else '#fff8f0')
+        tc = '#155724' if sig else '#721c24' if not good and abs(sep)>0.01 else '#856404'
+        return (f'<td style="text-align:right;background:{bg};color:{tc};padding:6px 10px;font-size:13px">'
+                f'<b>{sep*100:+.1f}%</b>{"✓" if sig else ""}<br>'
+                f'<span style="font-size:11px;opacity:.75">±{std*100:.1f}% · {wins}/{n_w} wins · p={p:.2f}</span>'
+                f'</td>')
+
+    def n_sig(sig, direction='buy'):
+        count = 0
+        for fw in HORIZONS:
+            r = all_hr[fw].get(sig)
+            if not r: continue
+            if direction == 'buy'  and r['p_value'] < P_THRESHOLD and r['mean_sep'] > 0: count += 1
+            if direction == 'sell' and r['p_value'] < P_THRESHOLD and r['mean_sep'] < 0: count += 1
+        return count
+
+    regimes = [w['regime'] for w in cv_windows]
+
+    html = f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Model Validation Report</title>
+<style>
+body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f9fa;color:#212529;margin:0;padding:20px}}
+.wrap{{max-width:960px;margin:0 auto}}
+h1{{font-size:24px;font-weight:700;margin:0 0 4px}}
+h2{{font-size:17px;font-weight:600;margin:24px 0 10px;padding-bottom:6px;border-bottom:2px solid #dee2e6}}
+.meta{{font-size:13px;color:#6c757d;margin:0 0 20px;line-height:1.8}}
+.params{{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px}}
+.param{{background:#fff;border:1px solid #dee2e6;border-radius:8px;padding:12px 14px}}
+.param-label{{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#6c757d;margin-bottom:4px}}
+.param-val{{font-size:20px;font-weight:700;font-family:monospace}}
+table{{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.1);margin-bottom:20px}}
+th{{background:#f0f0f0;padding:8px 10px;text-align:right;font-size:12px;font-weight:600;border-bottom:2px solid #dee2e6}}
+th:first-child,th:nth-child(2){{text-align:left}}
+td:first-child{{padding:6px 10px;font-weight:500}}
+td:nth-child(2){{padding:6px 10px;font-size:12px;color:#6c757d}}
+tr:hover td{{background:#f8f9fa}}
+.group-row td{{background:#f4f4f4;font-size:11px;font-weight:600;letter-spacing:.06em;color:#555;padding:5px 10px}}
+.windows{{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:20px}}
+.window{{background:#fff;border:1px solid #dee2e6;border-radius:6px;padding:10px 12px;font-size:12px}}
+.window-regime{{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;margin-bottom:5px}}
+.bull{{background:#d4edda;color:#155724}}.bear{{background:#f8d7da;color:#721c24}}.sideways{{background:#fff3cd;color:#856404}}
+.weights{{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}}
+.weight{{background:#fff;border:1px solid #dee2e6;border-radius:6px;padding:8px 12px;font-size:13px}}
+.weight b{{font-family:monospace;font-size:16px}}
+.footer{{font-size:12px;color:#6c757d;margin-top:20px;text-align:center}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>📊 Model Validation Report</h1>
+<p class="meta">
+Generated: <b>{payload['generated_at']}</b> &nbsp;·&nbsp;
+Universe: <b>{payload['universe_size']} tickers</b> &nbsp;·&nbsp;
+CV windows: <b>{len(cv_windows)}</b> (random walk-forward) &nbsp;·&nbsp;
+p-threshold: <b>{P_THRESHOLD}</b> &nbsp;·&nbsp;
+Regime mix: <b>{regimes.count("bull")} bull / {regimes.count("sideways")} sideways / {regimes.count("bear")} bear</b>
+</p>
+
+<h2>Optimal Parameters</h2>
+<div class="params">
+  <div class="param"><div class="param-label">DIST_T</div><div class="param-val">{best_params['dist_t']}</div><div style="font-size:11px;color:#6c757d">dist from 252d high</div></div>
+  <div class="param"><div class="param-label">DFV_LIFT</div><div class="param-val">{best_params['dfv_lift']}</div><div style="font-size:11px;color:#6c757d">hm_rsi floor lift</div></div>
+  <div class="param"><div class="param-label">QUALITY_T</div><div class="param-val">{best_params['quality_t']}</div><div style="font-size:11px;color:#6c757d">Sharpe/3 threshold</div></div>
+  <div class="param"><div class="param-label">p-threshold</div><div class="param-val">{P_THRESHOLD}</div><div style="font-size:11px;color:#6c757d">significance cutoff</div></div>
+</div>
+
+<h2>Validated Weights</h2>
+<div class="weights">'''
+
+    bw = payload['buy_weights']
+    for sig, w in sorted(bw.items(), key=lambda x: -x[1]):
+        html += f'<div class="weight">{SIGNAL_NAMES.get(sig,sig)}: <b>+{w}</b></div>'
+    html += f'<div class="weight" style="border-color:#dc3545;color:#dc3545">Banker Weak: <b>{payload["buy_wb_penalty"]}</b></div>'
+    html += f'<div class="weight" style="border-color:#0d6efd;color:#0d6efd">Fundamental boost: <b>0–{payload["fundamental_boost_max"]}</b></div>'
+    html += '</div>'
+
+    html += '''<h2>Signal Separation — All Horizons</h2>
+<p style="font-size:13px;color:#6c757d;margin-bottom:10px">
+✓ = statistically significant at p&lt;''' + str(P_THRESHOLD) + '''. 
+Buy signals: green = positive sep (good). Sell signals: green = negative sep (good).<br>
+Format: <b>mean sep</b> / ±std / wins/windows / p-value
+</p>
+<table>
+<tr><th style="text-align:left">Signal</th><th>Category</th>'''
+    for fw in HORIZONS:
+        html += f'<th>{fw}d ({fw//21}mo)</th>'
+    html += '<th>Consistent</th></tr>'
+
+    for group, sigs, is_sell in [('BUY SIGNALS', BUY_SIGS, False), ('SELL SIGNALS', SELL_SIGS, True)]:
+        html += f'<tr class="group-row"><td colspan="6">{group}</td></tr>'
+        for sig in sigs:
+            name = SIGNAL_NAMES.get(sig, sig)
+            is_best = sig == 'fdfv3'
+            w = bw.get(sig, 0)
+            weight_str = f' (+{w})' if w and not is_sell else ''
+            html += f'<tr style="{"font-weight:600" if is_best else ""}">'
+            html += f'<td>{name}{weight_str}</td>'
+            html += f'<td>{"Combined ★" if is_best else "Sell" if is_sell else "Buy"}</td>'
+            nc = n_sig(sig, 'sell' if is_sell else 'buy')
+            for fw in HORIZONS:
+                r = all_hr[fw].get(sig)
+                html += cell(r, is_sell=is_sell)
+            nc_col = '#155724' if nc >= 3 else '#856404' if nc >= 2 else '#721c24'
+            html += f'<td style="text-align:right;color:{nc_col};font-weight:700;padding:6px 10px">{nc}/4</td>'
+            html += '</tr>'
+
+    html += '</table>'
+
+    html += '<h2>CV Windows Used</h2><div class="windows">'
+    for i, w in enumerate(cv_windows):
+        rc = {'bull':'bull','bear':'bear','sideways':'sideways'}.get(w['regime'],'sideways')
+        html += (f'<div class="window">'
+                 f'<span class="window-regime {rc}">{w["regime"].upper()}</span> '
+                 f'VOO {w["voo_ret"]:+.1f}%<br>'
+                 f'<b>Train:</b> {str(w["train_start"])[:10]} → {str(w["train_end"])[:10]}<br>'
+                 f'<b>Test:</b> {str(w["test_start"])[:10]} → {str(w["test_end"])[:10]}'
+                 f'</div>')
+    html += '</div>'
+
+    html += f'<p class="footer">Next quarterly validation scheduled automatically via GitHub Actions · portfolio-signals</p>'
+    html += '</div></body></html>'
+
+    with open('validation_report.html', 'w') as f:
+        f.write(html)
+    print(f'Written: validation_report.html ({len(html):,} chars)')
+    print(f'View at: https://portfolio-signals.netlify.app/validation_report.html')
