@@ -1,0 +1,125 @@
+{
+  "generated_at": "2026-05-17T11:48:26Z",
+  "p_threshold": 0.15,
+  "n_cv_windows": 12,
+  "universe_size": 159,
+  "optimal_params": {
+    "dist_t": -0.15,
+    "dfv_lift": 2.5,
+    "quality_t": 0.2,
+    "trend_t": 0.0
+  },
+  "buy_weights": {
+    "f": 40,
+    "fdfv3": 38,
+    "pfd": 6,
+    "triple": 15
+  },
+  "buy_wb_penalty": -15,
+  "fundamental_boost_max": 15,
+  "sell_weights": {
+    "near_high": 45,
+    "wb_plus_div": 35,
+    "wb_alone": 10
+  },
+  "signal_results_252d": {
+    "f": {
+      "mean_sep": 0.2371,
+      "std": 0.3003,
+      "ci_lo": 0.0986,
+      "ci_hi": 0.4335,
+      "p_value": 0.0239,
+      "significant": true,
+      "n_wins": 10,
+      "n_windows": 12,
+      "win_rate": 0.8333
+    },
+    "fdfv3": {
+      "mean_sep": 0.2283,
+      "std": 0.3135,
+      "ci_lo": 0.0752,
+      "ci_hi": 0.3931,
+      "p_value": 0.0343,
+      "significant": true,
+      "n_wins": 9,
+      "n_windows": 12,
+      "win_rate": 0.75
+    },
+    "pfd": {
+      "mean_sep": 0.0513,
+      "std": 0.0986,
+      "ci_lo": -0.0045,
+      "ci_hi": 0.1095,
+      "p_value": 0.1124,
+      "significant": true,
+      "n_wins": 7,
+      "n_windows": 12,
+      "win_rate": 0.5833
+    },
+    "triple": {
+      "mean_sep": 0.0909,
+      "std": 0.1609,
+      "ci_lo": -0.0029,
+      "ci_hi": 0.1713,
+      "p_value": 0.0877,
+      "significant": true,
+      "n_wins": 7,
+      "n_windows": 12,
+      "win_rate": 0.5833
+    },
+    "dfv3": {
+      "mean_sep": -0.0034,
+      "std": 0.02,
+      "ci_lo": -0.0138,
+      "ci_hi": 0.0074,
+      "p_value": 0.5862,
+      "significant": false,
+      "n_wins": 7,
+      "n_windows": 12,
+      "win_rate": 0.5833
+    },
+    "dfv1": {
+      "mean_sep": -0.0126,
+      "std": 0.1117,
+      "ci_lo": -0.0718,
+      "ci_hi": 0.0571,
+      "p_value": 0.7161,
+      "significant": false,
+      "n_wins": 5,
+      "n_windows": 12,
+      "win_rate": 0.4167
+    },
+    "near_high": {
+      "mean_sep": -0.066,
+      "std": 0.0554,
+      "ci_lo": -0.1022,
+      "ci_hi": -0.037,
+      "p_value": 0.0023,
+      "significant": false,
+      "n_wins": 1,
+      "n_windows": 12,
+      "win_rate": 0.0833
+    },
+    "wb": {
+      "mean_sep": 0.0324,
+      "std": 0.1375,
+      "ci_lo": -0.0637,
+      "ci_hi": 0.1033,
+      "p_value": 0.4507,
+      "significant": false,
+      "n_wins": 6,
+      "n_windows": 12,
+      "win_rate": 0.5
+    }
+  },
+  "consistency": {
+    "f": 4,
+    "fdfv3": 4,
+    "pfd": 3,
+    "triple": 4,
+    "dfv3": 0,
+    "dfv1": 0,
+    "near_high": 4,
+    "wb": 0
+  }
+}
