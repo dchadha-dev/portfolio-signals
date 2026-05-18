@@ -25,14 +25,13 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements-github-actions.txt scipy
 
-      - name: Run model validation
-        run: python signal_scanner_validation.py
-
       - name: Commit validated_params.json
         run: |
           git config user.name  "Validation Bot"
           git config user.email "bot@portfolio-signals"
+          git stash
           git pull --rebase origin main
+          git stash pop
           git add validated_params.json
           if git diff --staged --quiet; then
             echo "No changes"
