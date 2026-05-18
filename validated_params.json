@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-17T11:48:26Z",
+  "generated_at": "2026-05-18T11:54:21Z",
   "p_threshold": 0.15,
   "n_cv_windows": 12,
   "universe_size": 159,
@@ -18,82 +18,80 @@
   "buy_wb_penalty": -15,
   "fundamental_boost_max": 15,
   "sell_weights": {
-    "near_high": 45,
-    "wb_plus_div": 35,
-    "wb_alone": 10
+    "near_high": 100
   },
   "signal_results_252d": {
     "f": {
-      "mean_sep": 0.2371,
-      "std": 0.3003,
-      "ci_lo": 0.0986,
-      "ci_hi": 0.4335,
-      "p_value": 0.0239,
+      "mean_sep": 0.2377,
+      "std": 0.2993,
+      "ci_lo": 0.0974,
+      "ci_hi": 0.4229,
+      "p_value": 0.0232,
       "significant": true,
       "n_wins": 10,
       "n_windows": 12,
       "win_rate": 0.8333
     },
     "fdfv3": {
-      "mean_sep": 0.2283,
-      "std": 0.3135,
-      "ci_lo": 0.0752,
-      "ci_hi": 0.3931,
-      "p_value": 0.0343,
+      "mean_sep": 0.2278,
+      "std": 0.3099,
+      "ci_lo": 0.0719,
+      "ci_hi": 0.4136,
+      "p_value": 0.033,
       "significant": true,
       "n_wins": 9,
       "n_windows": 12,
       "win_rate": 0.75
     },
     "pfd": {
-      "mean_sep": 0.0513,
-      "std": 0.0986,
-      "ci_lo": -0.0045,
-      "ci_hi": 0.1095,
-      "p_value": 0.1124,
+      "mean_sep": 0.0511,
+      "std": 0.0985,
+      "ci_lo": -0.0002,
+      "ci_hi": 0.1084,
+      "p_value": 0.1135,
       "significant": true,
       "n_wins": 7,
       "n_windows": 12,
       "win_rate": 0.5833
     },
     "triple": {
-      "mean_sep": 0.0909,
-      "std": 0.1609,
-      "ci_lo": -0.0029,
-      "ci_hi": 0.1713,
-      "p_value": 0.0877,
+      "mean_sep": 0.0896,
+      "std": 0.1602,
+      "ci_lo": -0.0054,
+      "ci_hi": 0.1765,
+      "p_value": 0.0907,
       "significant": true,
       "n_wins": 7,
       "n_windows": 12,
       "win_rate": 0.5833
     },
     "dfv3": {
-      "mean_sep": -0.0034,
-      "std": 0.02,
-      "ci_lo": -0.0138,
-      "ci_hi": 0.0074,
-      "p_value": 0.5862,
+      "mean_sep": -0.0029,
+      "std": 0.0201,
+      "ci_lo": -0.0134,
+      "ci_hi": 0.0094,
+      "p_value": 0.6392,
       "significant": false,
       "n_wins": 7,
       "n_windows": 12,
       "win_rate": 0.5833
     },
     "dfv1": {
-      "mean_sep": -0.0126,
-      "std": 0.1117,
-      "ci_lo": -0.0718,
-      "ci_hi": 0.0571,
-      "p_value": 0.7161,
+      "mean_sep": -0.0129,
+      "std": 0.1105,
+      "ci_lo": -0.0728,
+      "ci_hi": 0.0477,
+      "p_value": 0.706,
       "significant": false,
       "n_wins": 5,
       "n_windows": 12,
       "win_rate": 0.4167
     },
     "near_high": {
-      "mean_sep": -0.066,
-      "std": 0.0554,
-      "ci_lo": -0.1022,
-      "ci_hi": -0.037,
+      "mean_sep": -0.0662,
+      "std": 0.0559,
+      "ci_lo": -0.1038,
+      "ci_hi": -0.039,
       "p_value": 0.0023,
       "significant": false,
       "n_wins": 1,
@@ -101,15 +99,93 @@
       "win_rate": 0.0833
     },
     "wb": {
-      "mean_sep": 0.0324,
-      "std": 0.1375,
-      "ci_lo": -0.0637,
-      "ci_hi": 0.1033,
-      "p_value": 0.4507,
+      "mean_sep": 0.0318,
+      "std": 0.1395,
+      "ci_lo": -0.0518,
+      "ci_hi": 0.1052,
+      "p_value": 0.4653,
       "significant": false,
-      "n_wins": 6,
+      "n_wins": 7,
       "n_windows": 12,
-      "win_rate": 0.5
+      "win_rate": 0.5833
+    },
+    "rbear": {
+      "mean_sep": 0.1014,
+      "std": 0.1088,
+      "ci_lo": 0.0334,
+      "ci_hi": 0.1605,
+      "p_value": 0.0103,
+      "significant": true,
+      "n_wins": 8,
+      "n_windows": 12,
+      "win_rate": 0.6667
+    },
+    "wb_div": {},
+    "mom20": {
+      "mean_sep": 0.0896,
+      "std": 0.1602,
+      "ci_lo": -0.0063,
+      "ci_hi": 0.173,
+      "p_value": 0.0907,
+      "significant": true,
+      "n_wins": 7,
+      "n_windows": 12,
+      "win_rate": 0.5833
+    },
+    "mom30": {
+      "mean_sep": 0.1533,
+      "std": 0.2116,
+      "ci_lo": 0.0346,
+      "ci_hi": 0.268,
+      "p_value": 0.035,
+      "significant": true,
+      "n_wins": 8,
+      "n_windows": 12,
+      "win_rate": 0.6667
+    },
+    "mfbear": {
+      "mean_sep": 0.0665,
+      "std": 0.0663,
+      "ci_lo": 0.0281,
+      "ci_hi": 0.0982,
+      "p_value": 0.0068,
+      "significant": true,
+      "n_wins": 8,
+      "n_windows": 12,
+      "win_rate": 0.6667
+    },
+    "bred": {
+      "mean_sep": 0.0918,
+      "std": 0.0965,
+      "ci_lo": 0.0356,
+      "ci_hi": 0.1473,
+      "p_value": 0.0092,
+      "significant": true,
+      "n_wins": 8,
+      "n_windows": 12,
+      "win_rate": 0.6667
+    },
+    "qual_det": {
+      "mean_sep": -0.0114,
+      "std": 0.0536,
+      "ci_lo": -0.0415,
+      "ci_hi": 0.0191,
+      "p_value": 0.4939,
+      "significant": false,
+      "n_wins": 5,
+      "n_windows": 12,
+      "win_rate": 0.4167
+    },
+    "rvbear": {
+      "mean_sep": 0.0687,
+      "std": 0.0778,
+      "ci_lo": 0.0303,
+      "ci_hi": 0.1115,
+      "p_value": 0.0137,
+      "significant": true,
+      "n_wins": 9,
+      "n_windows": 12,
+      "win_rate": 0.75
     }
   },
   "consistency": {
@@ -120,6 +196,106 @@
     "dfv3": 0,
     "dfv1": 0,
     "near_high": 4,
-    "wb": 0
-  }
+    "wb": 0,
+    "rbear": 0,
+    "wb_div": 0,
+    "mom20": 0,
+    "mom30": 0,
+    "mfbear": 0,
+    "bred": 0,
+    "qual_det": 0,
+    "rvbear": 0
+  },
+  "sell_signal_ranking": [
+    {
+      "signal": "near_high",
+      "name": "Near 252d high",
+      "mean_sep_252d": -6.62,
+      "p_value": 0.0023,
+      "consistency": 4,
+      "validated": true,
+      "weight": 100
+    },
+    {
+      "signal": "wb",
+      "name": "Banker Weak",
+      "mean_sep_252d": 3.18,
+      "p_value": 0.4653,
+      "consistency": 0,
+      "validated": false,
+      "weight": 0
+    },
+    {
+      "signal": "rbear",
+      "name": "RSI14 bearish div",
+      "mean_sep_252d": 10.14,
+      "p_value": 0.0103,
+      "consistency": 0,
+      "validated": false,
+      "weight": 0
+    },
+    {
+      "signal": "wb_div",
+      "name": "WB + div combo",
+      "mean_sep_252d": null,
+      "p_value": null,
+      "consistency": 0,
+      "validated": false,
+      "weight": 0
+    },
+    {
+      "signal": "mom20",
+      "name": "Momentum exhaust 20%",
+      "mean_sep_252d": 8.96,
+      "p_value": 0.0907,
+      "consistency": 0,
+      "validated": false,
+      "weight": 0
+    },
+    {
+      "signal": "mom30",
+      "name": "Momentum exhaust 30%",
+      "mean_sep_252d": 15.33,
+      "p_value": 0.035,
+      "consistency": 0,
+      "validated": false,
+      "weight": 0
+    },
+    {
+      "signal": "mfbear",
+      "name": "MFI bearish div",
+      "mean_sep_252d": 6.65,
+      "p_value": 0.0068,
+      "consistency": 0,
+      "validated": false,
+      "weight": 0
+    },
+    {
+      "signal": "bred",
+      "name": "BRED (2+ components)",
+      "mean_sep_252d": 9.18,
+      "p_value": 0.0092,
+      "consistency": 0,
+      "validated": false,
+      "weight": 0
+    },
+    {
+      "signal": "qual_det",
+      "name": "Quality deterioration",
+      "mean_sep_252d": -1.14,
+      "p_value": 0.4939,
+      "consistency": 0,
+      "validated": false,
+      "weight": 0
+    },
+    {
+      "signal": "rvbear",
+      "name": "RVI bearish div proxy",
+      "mean_sep_252d": 6.87,
+      "p_value": 0.0137,
+      "consistency": 0,
+      "validated": false,
+      "weight": 0
+    }
+  ]
 }
