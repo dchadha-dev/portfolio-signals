@@ -258,7 +258,7 @@ def build_payload(all_signals, ticker_alpha, live_prices):
             pass
 
         # Signal classification uses sell_score from sell_side_scorer
-        if sell_score >= EXIT_T and is_holding:  signal = 'SELL'
+        if sell_score >= 70 and is_holding:  signal = 'SELL'
         elif buy >= 60:                          signal = 'BUY'
         else:                                    signal = 'HOLD'
 
