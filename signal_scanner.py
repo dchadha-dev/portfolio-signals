@@ -255,20 +255,10 @@ def build_payload(all_signals, ticker_alpha, live_prices):
         except Exception as e:
             pass
 
-        # SELL SCORE — validated 2026-05-17
-        # near_high: ONLY validated signal (-6.6% sep, p=0.002, 4/4)
-        # WB/rbear/triple removed as sell: wrong direction or 0/4
-        near_high = float(last['dist']) > -0.05
-        sell = 0
-        if near_high and is_holding:  sell += 60
-        if fs and fs < 55:            sell += 20
-        if fa_valid and fa < -0.10:   sell += 10
-        if fund_score is not None and fund_score < 0.2 and is_holding: sell += 10
-        sell = min(100, sell)
-
-        if sell >= 60 and is_holding:  signal = 'SELL'
-        elif buy >= 60:                signal = 'BUY'
-        else:                          signal = 'HOLD'
+        # Signal classification uses sell_score from sell_side_scorer
+        if sell_score >= EXIT_T and is_holding:  signal = 'SELL'
+        elif buy >= 60:                          signal = 'BUY'
+        else:                                    signal = 'HOLD'
 
         guidance = build_guidance(t, last, ta, fs)
 
