@@ -12,11 +12,13 @@ from datetime import datetime, timedelta
 try:
     from sell_side_scorer import (
         compute_sell_signals, fetch_sector_signals,
-        fetch_market_signals, score_ticker, apply_portfolio_cap
+        fetch_market_signals, score_ticker, apply_portfolio_cap,
+        EXIT_T, REDUCE_T, TRIM_T
     )
     SELL_SCORER_AVAILABLE = True
 except ImportError:
     SELL_SCORER_AVAILABLE = False
+    EXIT_T = 70; REDUCE_T = 55; TRIM_T = 35
     print("sell_side_scorer.py not found -- sell signals disabled")
 
 
