@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 import requests, json, os, time
 from datetime import datetime, timedelta
+
 try:
     from sell_side_scorer import (
         compute_sell_signals, fetch_sector_signals,
@@ -21,10 +22,7 @@ except ImportError:
     EXIT_T = 70; REDUCE_T = 55; TRIM_T = 35
     print("sell_side_scorer.py not found -- sell signals disabled")
 
-
-
 # ── CONFIGURATION ─────────────────────────────────────────────────────
-# Set FINNHUB_TOKEN as a GitHub Actions secret (never hardcode here)
 FINNHUB_TOKEN = os.environ.get('FINNHUB_TOKEN', '')
 
 MY_HOLDINGS = [
@@ -37,17 +35,17 @@ MY_HOLDINGS = [
 
 CANDIDATES = [
     'NOW','PANW','ORCL','COIN','AXON','CEG','CELH','DECK','ENPH','HIMS',
-    'IDXX','KNSL','LULU','MPWR','NET','PLNT','RCL','SPOT','SQ','UBER',
+    'IDXX','KNSL','LULU','MPWR','NET','PLNT','RCL','SPOT','UBER',
     'ULTA','VEEV','SMCI','CAVA','SNOW','MEDP','PODD','HEI','ACLS',
     'FICO','APP','HOOD','RKLB','ARM',
 ]
 
 UNIVERSE  = list(dict.fromkeys(MY_HOLDINGS + CANDIDATES))
 BENCHMARK = 'VOO'
-DIST_T    = -0.15   # validated 2026-05-17
-QUALITY_T =  0.20   # validated 2026-05-17
+DIST_T    = -0.15
+QUALITY_T =  0.20
 TREND_T   =  0.00
-DFV_LIFT  =  2.5   # validated 2026-05-17
+DFV_LIFT  =  2.5
 YEARS     =  5
 FWD_DAYS  =  252
 TEST_YRS  =  2
@@ -93,14 +91,14 @@ def compute_signals(cl):
     df['ma200']       = df['close'].rolling(200).mean()
     df['trend']       = (df['close'] - df['ma200']) / df['ma200']
     df['quality']     = calc_quality(df['close'])
-    df['f']           = (df['dist'] < DIST_T) & (df['trend'] > TREND_T) & (df['quality'] > 0.05)
+    df['f']           = (df['dist'] < DIST_T) & (df['trend'] > TREND_T) & (df['quality'] > QUALITY_T)
     df['dfv1']        = (df['hm_rsi'] > df['hm_prev']) & (df['hm_prev'] >= 0) & (df['hm_prev'] <= 5)
     df['dfv3']        = df['hm_lift'] > DFV_LIFT
     df['fdfv3']       = df['f'] & df['dfv3']
     df['fdfv1']       = df['f'] & df['dfv1']
     ret252            = df['close'].pct_change(252)
     ret126            = df['close'].pct_change(126)
-    df['pfd']         = ((ret252 - 2*ret126) > 0.05) & (df['quality'] > 0.10)
+    df['pfd']         = ((ret252 - 2*ret126) > 0.05) & (df['quality'] > QUALITY_T * 2)
     df['triple']      = df['close'].pct_change(63) > 0.20
     df['banker_weak'] = (df['banker_prev'] >= 20) & (df['banker_rsi'] < 20)
     rsi_above         = (df['rsi14'] - 60).clip(lower=0).ewm(span=3, adjust=False).mean()
@@ -123,16 +121,23 @@ def fetch_history():
                       auto_adjust=True, progress=False, threads=True)
     if isinstance(raw.columns, pd.MultiIndex):
         closes = raw['Close'].dropna(how='all')
+        try:
+            highs   = raw['High'].dropna(how='all')
+            lows    = raw['Low'].dropna(how='all')
+            volumes = raw['Volume'].dropna(how='all')
+        except:
+            highs = lows = volumes = closes
     else:
         closes = raw[['Close']]; closes.columns = [all_t[0]]
+        highs = lows = volumes = closes
     ok   = [t for t in all_t if t in closes.columns and closes[t].notna().sum() > 100]
     fail = [t for t in all_t if t not in ok]
     print(f'✓ {len(ok)} ok | ✗ {fail}')
-    return closes, ok
+    return closes, highs, lows, volumes, ok
 
 # ── HISTORICAL ALPHA ──────────────────────────────────────────────────
 def compute_ticker_alpha(all_signals, closes, voo):
-    cutoff      = closes.index[-1] - pd.Timedelta(days=TEST_YRS*365)
+    cutoff       = closes.index[-1] - pd.Timedelta(days=TEST_YRS*365)
     ticker_alpha = {}
     for t, sig in all_signals.items():
         cl = sig['close']; dates = sig.index; obs = []
@@ -155,10 +160,10 @@ def compute_ticker_alpha(all_signals, closes, voo):
         ticker_alpha[t] = {'factor_sep': sep('f'), 'fdfv3_sep': sep('fdfv3')}
     return ticker_alpha
 
-# ── FINNHUB LIVE PRICES ───────────────────────────────────────────────
+# ── LIVE PRICES ───────────────────────────────────────────────────────
 def fetch_live_prices(tickers):
     if not FINNHUB_TOKEN:
-        print('No FINNHUB_TOKEN — skipping live prices, using yfinance last close')
+        print('No FINNHUB_TOKEN — using yfinance last close')
         return {}
     live = {}
     print(f'Fetching live prices from Finnhub for {len(tickers)} tickers...')
@@ -186,7 +191,7 @@ def build_guidance(t, last, ta, fs):
     if last['fdfv3']:
         parts.append(
             f"Factor+DFV V3 active: {dist*100:.1f}% below 252d high, above 200d MA, "
-            f"DFV floor lift {lift:.1f}pts. Strongest entry signal (4/4 horizons, +62% at 504d).")
+            f"DFV floor lift {lift:.1f}pts. Strongest entry signal (4/4 horizons).")
     elif last['f'] and last['dfv1']:
         parts.append(
             f"Factor gate + DFV V1: value zone ({dist*100:.1f}% below 252d high) "
@@ -195,18 +200,16 @@ def build_guidance(t, last, ta, fs):
         parts.append(
             f"In factor value zone: {dist*100:.1f}% below 252d high, "
             f"{trend*100:.1f}% above 200d MA. "
-            f"Waiting for DFV trigger (lift {lift:.1f}, need >4.0).")
+            f"Waiting for DFV trigger (lift {lift:.1f}, need >{DFV_LIFT}).")
     elif last['pfd']:
-        parts.append(
-            f"PFD signal: price compressed vs own trend. "
-            f"Supporting buy (4/4 horizons, +17.4% at 504d).")
+        parts.append("PFD signal: price compressed vs own trend.")
 
     if last['triple'] and not last['f']:
-        parts.append(f"Caution: up >20% in 63 days — mean reversion risk short-term.")
+        parts.append("Caution: up >20% in 63 days — mean reversion risk short-term.")
     if last['banker_weak']:
-        parts.append(f"Banker Weak: RSI47 institutional signal dropping from max.")
+        parts.append("Banker Weak: RSI47 institutional signal dropping from max.")
     if last['rbear']:
-        parts.append(f"RSI14 bearish divergence vs price.")
+        parts.append("RSI14 bearish divergence vs price.")
     if fa_valid and abs(fa) > 0.03:
         direction = "outperformed" if fa > 0 else "underperformed"
         parts.append(f"Own-ticker historical alpha: {direction} VOO by {abs(fa*100):.1f}% at 252d.")
@@ -217,21 +220,23 @@ def build_guidance(t, last, ta, fs):
     return " ".join(parts) if parts else "No active signal. Monitoring."
 
 # ── SCORE + BUILD PAYLOAD ─────────────────────────────────────────────
-def build_payload(all_signals, ticker_alpha, live_prices):
+def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, volumes,
+                  sell_market, sell_sectors):
     signals_list = []; buy_ideas = []; sell_guidance = []
 
     for t, sig in all_signals.items():
         if len(sig) == 0: continue
-        last = sig.iloc[-1]
-        ta   = ticker_alpha.get(t, {})
-        lp   = live_prices.get(t, {})
-        fa   = ta.get('factor_sep', float('nan'))
+        last     = sig.iloc[-1]
+        ta       = ticker_alpha.get(t, {})
+        lp       = live_prices.get(t, {})
+        fa       = ta.get('factor_sep', float('nan'))
         fa_valid = not (isinstance(fa, float) and fa != fa)
-        fs   = FRAMEWORK_SCORES.get(t)
+        fs       = FRAMEWORK_SCORES.get(t)
         is_holding = t in MY_HOLDINGS
-        price  = lp.get('price') or round(float(last['close']), 2)
-        change = lp.get('change', 0.0)
+        price    = lp.get('price') or round(float(last['close']), 2)
+        change   = lp.get('change', 0.0)
 
+        # ── BUY SCORE ─────────────────────────────────────────────────
         buy = 0
         if last['f']:      buy += 40
         if last['fdfv3']:  buy += 25
@@ -242,27 +247,28 @@ def build_payload(all_signals, ticker_alpha, live_prices):
         if last['rbear']:       buy -= 10
         buy = max(0, min(100, buy))
 
-    # ── SELL SCORE ────────────────────────────────────────────────────
-    sell_score = 0; sell_action = 'HOLD'; sell_flags = '—'; sell_caution = '—'
-    sell_sigs_data = {}
-    if SELL_SCORER_AVAILABLE:
-        try:
-            cl_s  = closes[t].dropna() if t in closes.columns else None
-            hi_s  = highs[t].dropna()   if t in highs.columns   else cl_s
-            lo_s  = lows[t].dropna()    if t in lows.columns    else cl_s
-            vol_s = volumes[t].dropna() if t in volumes.columns else pd.Series(dtype=float)
-            sell_sigs_data = compute_sell_signals(cl_s, hi_s, lo_s, vol_s)
-            sell_score, sell_action, sell_flags, sell_caution = score_ticker(
-                t, sell_sigs_data, sell_market, sell_sectors)
-        except Exception as e:
-            pass
+        # ── SELL SCORE ────────────────────────────────────────────────
+        sell_score = 0; sell_action = 'HOLD'
+        sell_flags = '—'; sell_caution = '—'; sell_sigs_data = {}
 
-        # Signal classification uses sell_score from sell_side_scorer
-        if sell_score >= EXIT_T and is_holding:  signal = 'SELL'
-        elif buy >= 60:                          signal = 'BUY'
-        else:                                    signal = 'HOLD'
+        if SELL_SCORER_AVAILABLE:
+            try:
+                cl_s  = closes[t].dropna() if t in closes.columns else None
+                hi_s  = highs[t].dropna()  if t in highs.columns  else cl_s
+                lo_s  = lows[t].dropna()   if t in lows.columns   else cl_s
+                vol_s = volumes[t].dropna() if t in volumes.columns else pd.Series(dtype=float)
+                sell_sigs_data = compute_sell_signals(cl_s, hi_s, lo_s, vol_s)
+                sell_score, sell_action, sell_flags, sell_caution = score_ticker(
+                    t, sell_sigs_data, sell_market, sell_sectors)
+            except:
+                pass
 
-    guidance = build_guidance(t, last, ta, fs)
+        # ── SIGNAL CLASSIFICATION ─────────────────────────────────────
+        if sell_score >= EXIT_T and is_holding: signal = 'SELL'
+        elif buy >= 60:                         signal = 'BUY'
+        else:                                   signal = 'HOLD'
+
+        guidance = build_guidance(t, last, ta, fs)
 
         row = {
             'ticker':          t,
@@ -271,7 +277,14 @@ def build_payload(all_signals, ticker_alpha, live_prices):
             'signal':          signal,
             'guidance':        guidance,
             'buy_score':       buy,
-            'sell_score':      sell,
+            'sell_score':      sell_score,
+            'sell_action':     sell_action,
+            'sell_flags':      sell_flags,
+            'sell_caution':    sell_caution,
+            'sell_dist':       sell_sigs_data.get('dist'),
+            'sell_cmf':        sell_sigs_data.get('cmf_20'),
+            'sell_rv_z':       sell_sigs_data.get('rv_z'),
+            'sell_weekly_rsi': sell_sigs_data.get('weekly_rsi'),
             'is_holding':      is_holding,
             'dist_252h':       round(float(last['dist'])*100, 1),
             'vs_200ma':        round(float(last['trend'])*100, 1),
@@ -282,12 +295,13 @@ def build_payload(all_signals, ticker_alpha, live_prices):
             'pfd':             bool(last['pfd']),
             'triple':          bool(last['triple']),
             'banker_weak':     bool(last['banker_weak']),
-            'factor_sep':      None if not fa_valid else round(fa*100, 1),
+            'factor_sep':      None if not fa_valid else round(float(fa)*100, 1),
             'framework_score': fs,
         }
+
         signals_list.append(row)
-        if signal == 'BUY' or buy >= 30:             buy_ideas.append(row)
-        if signal == 'SELL' or (sell >= 40 and is_holding): sell_guidance.append(row)
+        if signal == 'BUY' or buy >= 30:                         buy_ideas.append(row)
+        if signal == 'SELL' or (sell_score >= 40 and is_holding): sell_guidance.append(row)
 
     signals_list.sort(key=lambda x: -x['buy_score'])
     if SELL_SCORER_AVAILABLE:
@@ -299,6 +313,12 @@ def build_payload(all_signals, ticker_alpha, live_prices):
         'generated_at':  datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'),
         'run_date':      datetime.today().strftime('%A %d %b %Y'),
         'universe_size': len(signals_list),
+        'market': {
+            'cnn_score':       sell_market.get('cnn_score', 50),
+            'cnn_label':       sell_market.get('cnn_label', 'Neutral'),
+            'sp500_extended':  sell_market.get('sp500_extended', False),
+            'buffett_extended':sell_market.get('buffett_extended', False),
+        },
         'summary': {
             'strong_buy':  sum(1 for s in signals_list if s['fdfv3']),
             'buy':         sum(1 for s in signals_list if s['signal']=='BUY'),
@@ -317,8 +337,19 @@ def build_payload(all_signals, ticker_alpha, live_prices):
 def main():
     print(f'Signal scanner starting — {datetime.today().strftime("%Y-%m-%d %H:%M UTC")}')
 
-    closes, ok = fetch_history()
+    closes, highs, lows, volumes, ok = fetch_history()
     voo = closes[BENCHMARK].dropna()
+
+    # Sell-side market + sector signals (fetched once)
+    if SELL_SCORER_AVAILABLE:
+        print("Fetching sell-side market + sector signals...")
+        sell_market  = fetch_market_signals()
+        sell_sectors = fetch_sector_signals()
+        print(f"CNN: {sell_market['cnn_score']:.0f} ({sell_market['cnn_label']}) | "
+              f"SP500_ext: {sell_market['sp500_extended']}")
+    else:
+        sell_market  = {'cnn_score':50,'cnn_label':'Neutral','sp500_extended':False,'buffett_extended':False}
+        sell_sectors = {}
 
     print('Computing signals...')
     all_signals = {}
@@ -336,7 +367,9 @@ def main():
 
     live_prices = fetch_live_prices(list(all_signals.keys()))
 
-    payload = build_payload(all_signals, ticker_alpha, live_prices)
+    payload = build_payload(all_signals, ticker_alpha, live_prices,
+                            closes, highs, lows, volumes,
+                            sell_market, sell_sectors)
 
     out = 'signals_payload.json'
     with open(out, 'w') as f:
@@ -344,8 +377,8 @@ def main():
 
     print(f'Written: {out} ({os.path.getsize(out):,} bytes)')
     print(f"Summary: {payload['summary']}")
+    print(f"Sell signals: {sum(1 for s in payload['analytics']['signals'] if s.get('sell_action') not in ['HOLD','—'])}")
 
-    # Print top signals
     for b in payload['analytics']['buy_ideas'][:5]:
         star = '★' if b['fdfv3'] else '↑' if b['factor'] else '·'
         print(f"  {star} {b['ticker']:<8} buy={b['buy_score']} {'(held)' if b['is_holding'] else ''}")
