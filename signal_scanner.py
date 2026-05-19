@@ -132,17 +132,7 @@ def fetch_history():
 def compute_ticker_alpha(all_signals, closes, voo):
     cutoff      = closes.index[-1] - pd.Timedelta(days=TEST_YRS*365)
     ticker_alpha = {}
-    # ── Sell-side market + sector signals ─────────────────────────────────
-if SELL_SCORER_AVAILABLE:
-    print("Fetching sell-side market + sector signals...")
-    sell_market  = fetch_market_signals()
-    sell_sectors = fetch_sector_signals()
-    print(f"CNN: {sell_market['cnn_score']:.0f} ({sell_market['cnn_label']}) | SP500_ext: {sell_market['sp500_extended']}")
-else:
-    sell_market = {'cnn_score':50,'cnn_label':'Neutral','sp500_extended':False,'buffett_extended':False}
-    sell_sectors = {}
-
-for t, sig in all_signals.items():
+    for t, sig in all_signals.items():
         cl = sig['close']; dates = sig.index; obs = []
         for i in range(len(dates) - FWD_DAYS):
             if dates[i] < cutoff: continue
