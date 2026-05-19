@@ -845,6 +845,7 @@ body .amt { transition: filter 0.18s ease; }
       <div class="sub-tab active" onclick="switchAnalytics('signals',this)">Signals</div>
       <div class="sub-tab" onclick="switchAnalytics('buy',this)">Buy Ideas</div>
       <div class="sub-tab" onclick="switchAnalytics('sell',this)">Sell Guidance</div>
+      <div class="sub-tab" onclick="switchAnalytics('ref',this)">&#128216; Reference</div>
     </div>
     <div id="ana-signals" class="ana-panel active">
       <div id="signalsContent"><div class="placeholder">Click "Run Live Analysis" to generate signals based on current prices</div></div>
@@ -854,6 +855,9 @@ body .amt { transition: filter 0.18s ease; }
     </div>
     <div id="ana-sell" class="ana-panel">
       <div id="sellContent"><div class="placeholder">Click "Run Live Analysis" to generate sell guidance (max 10% of portfolio flagged)</div></div>
+    </div>
+    <div id="ana-ref" class="ana-panel">
+      <div id="refContent" style="max-height:70vh;overflow-y:auto;"></div>
     </div>
     <div style="margin-top:20px;">
       <button class="refresh-btn" id="anaBtn" onclick="runAnalytics()" style="background:var(--text);color:var(--white);">
@@ -946,7 +950,7 @@ const stocks = [
 
 const otherAssets = [
   // ── Non-fund asset groups ────────────────────────────────
-  { n:'Crypto (BTC / ETH / other)', direct:30000, fund:4437,  total:34437, tag:'purple', tagTxt:'Crypto',   proxy:'BLOK'  },
+  { n:'Crypto (BTC / ETH / other)', direct:30000, fund:4437,  total:34437, tag:'purple', tagTxt:'Crypto',   proxy:null    },
   // ── SCB Mutual Funds ─────────────────────────────────────
   { n:'SCB S&P 500 (A)',            direct:0, fund:0, total:12535, tag:'blue',   tagTxt:'SCB Fund',  proxy:'IVV'   },
   { n:'SCB Nikkei 225',             direct:0, fund:0, total:8418,  tag:'blue',   tagTxt:'SCB Fund',  proxy:'EWJ'   },
@@ -1856,7 +1860,140 @@ function switchAnalytics(id, el) {
   document.querySelectorAll('.ana-panel').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('ana-' + id).classList.add('active');
+  if (id === 'ref') loadReference();
 }
+
+async function loadReference() {
+  const el = document.getElementById('refContent');
+  if (el.dataset.loaded) return; // already loaded
+  el.innerHTML = '<div style="color:var(--text3);padding:20px;font-family:\'DM Mono\',monospace;font-size:12px;">Loading reference...</div>';
+  try {
+    const res = await fetch('FRAMEWORK_SCORE_README.md?t=' + Date.now());
+    if (!res.ok) throw new Error('not found');
+    const md = await res.text();
+    el.innerHTML = renderMarkdown(md);
+    el.dataset.loaded = '1';
+  } catch(e) {
+    // Inline fallback — embed the key content directly
+    el.innerHTML = renderMarkdown(REFERENCE_MD);
+    el.dataset.loaded = '1';
+  }
+}
+
+function renderMarkdown(md) {
+  // Simple markdown renderer — handles headers, tables, bold, code, horizontal rules
+  let html = md
+    // Escape HTML
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    // Headers
+    .replace(/^#### (.+)$/gm,'<h4 style="font-size:13px;font-weight:600;margin:16px 0 6px;color:var(--text)">$1</h4>')
+    .replace(/^### (.+)$/gm,'<h3 style="font-size:15px;font-weight:600;margin:20px 0 8px;color:var(--text)">$1</h3>')
+    .replace(/^## (.+)$/gm,'<h2 style="font-size:17px;font-weight:700;margin:28px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);color:var(--text)">$1</h2>')
+    .replace(/^# (.+)$/gm,'<h1 style="font-size:22px;font-weight:700;margin:0 0 16px;color:var(--text)">$1</h1>')
+    // Bold
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    // Inline code
+    .replace(/`([^`]+)`/g,'<code style="background:var(--s2);padding:1px 5px;border-radius:3px;font-family:\'DM Mono\',monospace;font-size:11px">$1</code>')
+    // Horizontal rule
+    .replace(/^---$/gm,'<hr style="border:none;border-top:1px solid var(--border);margin:20px 0">')
+    // Table of contents links (just bold them)
+    .replace(/^\d+\. \[(.+?)\]\(#.+?\)$/gm,'<div style="padding:2px 0;font-size:13px">→ <strong>$1</strong></div>')
+    // Italic
+    .replace(/\*(.+?)\*/g,'<em style="color:var(--text3)">$1</em>');
+
+  // Handle tables
+  html = html.replace(/(\|.+\|\n)+/g, match => {
+    const rows = match.trim().split('\n');
+    let table = '<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:12px">';
+    rows.forEach((row, i) => {
+      if (row.match(/^\|[\s\-|]+\|$/)) return; // skip separator
+      const cells = row.split('|').filter((_,j,a)=>j>0&&j<a.length-1);
+      const tag = i === 0 ? 'th' : 'td';
+      const style = i === 0
+        ? 'background:var(--s2);padding:6px 10px;text-align:left;border:1px solid var(--border);font-weight:600;font-size:11px;font-family:\'DM Mono\',monospace;letter-spacing:.04em'
+        : 'padding:5px 10px;border:1px solid var(--border);vertical-align:top';
+      table += '<tr>' + cells.map(c => `<${tag} style="${style}">${c.trim()}</${tag}>`).join('') + '</tr>';
+    });
+    table += '</table>';
+    return table;
+  });
+
+  // Paragraphs and line breaks
+  html = html
+    .replace(/\n\n/g,'</p><p style="margin:0 0 10px;line-height:1.7;font-size:13px">')
+    .replace(/\n/g,'<br>');
+
+  return `<div style="padding:4px 0 40px;color:var(--text);font-family:'Space Grotesk',sans-serif;line-height:1.7">
+    <p style="margin:0 0 10px;line-height:1.7;font-size:13px">${html}</p></div>`;
+}
+
+// Inline fallback if FRAMEWORK_SCORE_README.md not on same server
+const REFERENCE_MD = `# Portfolio Signal & Framework Reference
+
+## Table of Contents
+1. Framework Score — The 5 Axes
+2. Current Framework Scores
+3. Buy-Side Signal Models (validated)
+4. Sell-Side Signal Models (validated)
+5. How the Two Systems Work Together
+6. Fundamental Layer
+7. How the Backtesting Works
+8. Thai Mutual Fund Proxies
+
+---
+
+## Overview
+
+Two separate systems drive every buy and sell decision.
+
+**Framework Score (0-100)** — qualitative conviction: is this business worth owning? Changes quarterly.
+
+**Signal Models** — quantitative timing: is now a good time to act? Changes daily.
+
+A high framework score protects great businesses from being sold on temporary weakness. A low framework score means planning an exit regardless of signals.
+
+---
+
+## Buy-Side Models (validated 10yr, 4 horizons)
+
+| Model | 504d sep | Consistency |
+|---|---|---|
+| Factor Value | +65.7% | 4/4 |
+| Factor+DFV V3 | +62.0% | 4/4 |
+| PFD Buy | +17.4% | 4/4 |
+| Triple Composite | +22.3% | 4/4 |
+| DFV V1 standalone | -34.9% | 0/4 — REMOVED |
+
+**Buy score weights:** Factor gate +40 · Factor+DFV V3 +25 · PFD +20 · Triple +10 · Fundamental boost +0 to +15 · WB -15
+
+---
+
+## Sell-Side Models (validated 10yr, 4 horizons)
+
+For sell signals: NEGATIVE separation = GOOD (stock underperformed VOO after signal).
+
+| Signal | Avg sep | Consistency |
+|---|---|---|
+| Near 252d high (dist &gt; -5%) | -2.42% | 4/4 — PRIMARY |
+| WB + divergence combo | -2.20% | 3/4 — STRONG |
+| Banker Weak alone | -0.28% | 3/4 — weak |
+| BRED (2+ components) | +3.03% | 1/4 — REMOVED |
+| Momentum exhaust 20%/30% | positive | 0/4 — REMOVED |
+
+**Sell score weights:** Near 252d high +45 · WB+div combo +35 · WB alone +10 · Framework &lt;65 +20
+
+---
+
+## Framework Score Axes
+
+**Moat /30** — Network effects, switching costs, proprietary technology
+**Earnings /25** — 3yr revenue growth trajectory and TAM
+**Runway /20** — Secular vs cyclical trend
+**Valuation /15** — PEG, distance from highs, consensus
+**Redundancy /10** — Unique exposure vs existing holdings
+
+Place FRAMEWORK_SCORE_README.md in the same folder as this dashboard for the full reference with all scores and examples.`;
+
 
 // ── Stock click → drawer ───────────────────────────────────
 function openDrawer(ticker) {
@@ -2767,6 +2904,11 @@ function renderSignalsFromPayload(payload) {
           ${s.factor_sep != null ? `<div style="margin-top:5px;font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;">
             Historical factor α: <span style="color:${s.factor_sep>0?'var(--green)':'var(--red)'}">${s.factor_sep>0?'+':''}${s.factor_sep}%</span> at 252d
           </div>` : ''}
+          ${s.sell_score != null && s.sell_score > 0 ? `<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:10px;color:var(--text3);">Sell signal</span>
+            <span style="font-size:11px;font-weight:600;padding:1px 7px;border-radius:3px;background:${s.sell_action==='EXIT'?'#8b0000':s.sell_action==='REDUCE'?'#c0392b':s.sell_action==='TRIM'?'#e67e22':'transparent'};color:${s.sell_action!=='HOLD'?'#fff':'var(--text3)'}">${s.sell_action} ${s.sell_score}</span>
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'DM Mono',monospace;">${s.sell_flags||''}</div>` : ''}
         </div>`;
       }).join('')}
     </div>`;

@@ -9,6 +9,17 @@ import pandas as pd
 import numpy as np
 import requests, json, os, time
 from datetime import datetime, timedelta
+try:
+    from sell_side_scorer import (
+        compute_sell_signals, fetch_sector_signals,
+        fetch_market_signals, score_ticker, apply_portfolio_cap
+    )
+    SELL_SCORER_AVAILABLE = True
+except ImportError:
+    SELL_SCORER_AVAILABLE = False
+    print("sell_side_scorer.py not found -- sell signals disabled")
+
+
 
 # ── CONFIGURATION ─────────────────────────────────────────────────────
 # Set FINNHUB_TOKEN as a GitHub Actions secret (never hardcode here)
@@ -31,9 +42,10 @@ CANDIDATES = [
 
 UNIVERSE  = list(dict.fromkeys(MY_HOLDINGS + CANDIDATES))
 BENCHMARK = 'VOO'
-DIST_T    = -0.12
+DIST_T    = -0.15   # validated 2026-05-17
+QUALITY_T =  0.20   # validated 2026-05-17
 TREND_T   =  0.00
-DFV_LIFT  =  4.0
+DFV_LIFT  =  2.5   # validated 2026-05-17
 YEARS     =  5
 FWD_DAYS  =  252
 TEST_YRS  =  2
@@ -105,35 +117,32 @@ def fetch_history():
     start = end - timedelta(days=YEARS*365 + 60)
     all_t = list(dict.fromkeys([BENCHMARK] + UNIVERSE))
     print(f'Fetching {len(all_t)} tickers ({YEARS}yr daily)...')
-    
-    closes_dict = {}
-    ok   = []
-    fail = []
-    
-    for t in all_t:
-        try:
-            df = yf.download(t, start=start, end=end, interval='1d',
-                           auto_adjust=True, progress=False)
-            if df is not None and len(df) > 100:
-                if isinstance(df.columns, pd.MultiIndex):
-                    closes_dict[t] = df['Close'][t].dropna()
-                else:
-                    closes_dict[t] = df['Close'].dropna()
-                ok.append(t)
-            else:
-                fail.append(t)
-        except Exception as e:
-            fail.append(t)
-    
-    closes = pd.DataFrame(closes_dict)
-    print(f'✓ {len(ok)} ok | ✗ {len(fail)} failed: {fail[:5]}{"..." if len(fail)>5 else ""}')
+    raw = yf.download(all_t, start=start, end=end, interval='1d',
+                      auto_adjust=True, progress=False, threads=True)
+    if isinstance(raw.columns, pd.MultiIndex):
+        closes = raw['Close'].dropna(how='all')
+    else:
+        closes = raw[['Close']]; closes.columns = [all_t[0]]
+    ok   = [t for t in all_t if t in closes.columns and closes[t].notna().sum() > 100]
+    fail = [t for t in all_t if t not in ok]
+    print(f'✓ {len(ok)} ok | ✗ {fail}')
     return closes, ok
 
 # ── HISTORICAL ALPHA ──────────────────────────────────────────────────
 def compute_ticker_alpha(all_signals, closes, voo):
     cutoff      = closes.index[-1] - pd.Timedelta(days=TEST_YRS*365)
     ticker_alpha = {}
-    for t, sig in all_signals.items():
+    # ── Sell-side market + sector signals ─────────────────────────────────
+if SELL_SCORER_AVAILABLE:
+    print("Fetching sell-side market + sector signals...")
+    sell_market  = fetch_market_signals()
+    sell_sectors = fetch_sector_signals()
+    print(f"CNN: {sell_market['cnn_score']:.0f} ({sell_market['cnn_label']}) | SP500_ext: {sell_market['sp500_extended']}")
+else:
+    sell_market = {'cnn_score':50,'cnn_label':'Neutral','sp500_extended':False,'buffett_extended':False}
+    sell_sectors = {}
+
+for t, sig in all_signals.items():
         cl = sig['close']; dates = sig.index; obs = []
         for i in range(len(dates) - FWD_DAYS):
             if dates[i] < cutoff: continue
@@ -241,12 +250,30 @@ def build_payload(all_signals, ticker_alpha, live_prices):
         if last['rbear']:       buy -= 10
         buy = max(0, min(100, buy))
 
+    # ── SELL SCORE ────────────────────────────────────────────────────
+    sell_score = 0; sell_action = 'HOLD'; sell_flags = '—'; sell_caution = '—'
+    sell_sigs_data = {}
+    if SELL_SCORER_AVAILABLE:
+        try:
+            cl_s  = closes[t].dropna() if t in closes.columns else None
+            hi_s  = highs[t].dropna()   if t in highs.columns   else cl_s
+            lo_s  = lows[t].dropna()    if t in lows.columns    else cl_s
+            vol_s = volumes[t].dropna() if t in volumes.columns else pd.Series(dtype=float)
+            sell_sigs_data = compute_sell_signals(cl_s, hi_s, lo_s, vol_s)
+            sell_score, sell_action, sell_flags, sell_caution = score_ticker(
+                t, sell_sigs_data, sell_market, sell_sectors)
+        except Exception as e:
+            pass
+
+        # SELL SCORE — validated 2026-05-17
+        # near_high: ONLY validated signal (-6.6% sep, p=0.002, 4/4)
+        # WB/rbear/triple removed as sell: wrong direction or 0/4
+        near_high = float(last['dist']) > -0.05
         sell = 0
-        if last['banker_weak']: sell += 40
-        if last['rbear']:       sell += 30
-        if last['triple'] and not last['f']: sell += 15
-        if fs and fs < 65:      sell += 25
-        if fa_valid and fa < -0.10: sell += 15
+        if near_high and is_holding:  sell += 60
+        if fs and fs < 55:            sell += 20
+        if fa_valid and fa < -0.10:   sell += 10
+        if fund_score is not None and fund_score < 0.2 and is_holding: sell += 10
         sell = min(100, sell)
 
         if sell >= 60 and is_holding:  signal = 'SELL'
@@ -281,6 +308,8 @@ def build_payload(all_signals, ticker_alpha, live_prices):
         if signal == 'SELL' or (sell >= 40 and is_holding): sell_guidance.append(row)
 
     signals_list.sort(key=lambda x: -x['buy_score'])
+if SELL_SCORER_AVAILABLE:
+    signals_list = apply_portfolio_cap(signals_list)
     buy_ideas.sort(key=lambda x: -x['buy_score'])
     sell_guidance.sort(key=lambda x: -x['sell_score'])
 
