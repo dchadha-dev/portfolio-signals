@@ -287,7 +287,7 @@ def build_payload(all_signals, ticker_alpha, live_prices):
         }
         signals_list.append(row)
         if signal == 'BUY' or buy >= 30:             buy_ideas.append(row)
-        if signal == 'SELL' or (sell >= 40 and is_holding): sell_guidance.append(row)
+        if signal == 'SELL' or (sell_score >= 40 and is_holding): sell_guidance.append(row)
 
     signals_list.sort(key=lambda x: -x['buy_score'])
     if SELL_SCORER_AVAILABLE:
