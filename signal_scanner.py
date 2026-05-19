@@ -26,11 +26,24 @@ except ImportError:
 FINNHUB_TOKEN = os.environ.get('FINNHUB_TOKEN', '')
 
 MY_HOLDINGS = [
+    # Direct US stocks
     'NVDA','AVGO','TSLA','MELI','AMAT','MSFT','AAPL','AMZN','META','GOOG',
-    'NFLX','BKNG','SHOP','RACE','AMD','CRWV',
-    'ASML','ANET','DDOG','CRDO','NBIS','TSM','TM','MU','INTU','CPRT',
-    'PGR','TTD','UNH','FISV','O','TEAM',
-    'VOO','VTI','QQQ','TQQQ','SCHD','JEPI','VXUS','VSS','IEV','URTH','GLD',
+    'NFLX','BKNG','SHOP','RACE','AMD','CRWV','ASML','ANET','DDOG','CRDO',
+    'NBIS','TSM','TM','MU','INTU','CPRT','PGR','TTD','UNH','FISV','O','TEAM',
+    'BRKB','NVO','RELX',
+    # European stocks
+    'RMS.PA','MC.PA','ITX.MC',
+    # US ETFs
+    'VOO','VTI','QQQ','TQQQ','SCHD','JEPI','VXUS','VSS','IEV','URTH','GLD','XLG',
+    # Thematic ETFs
+    'AIQG','QNTM.L','QTUM','FLAX',
+    # Crypto
+    'COIN',
+    # Thai mutual funds (signal via proxy ETF)
+    'SCB_SP500','SCB_NDQ','SCB_SEMI','SCB_WORLD','SCB_GOLD','SCB_NK225',
+    'SCB_SET50','SCB_DJ','SCB_AIEM','SCB_FINTECH','SCB_AUTO','SCB_INNOV',
+    'SCB_GENO','SCB_CHINA','SCB_EV','SCB_US',
+    'KT_INDIA','KT_WORLD','KT_WTAI','KT_BLOCK','KT_TECH','KT_ESG',
 ]
 
 CANDIDATES = [
@@ -40,7 +53,23 @@ CANDIDATES = [
     'FICO','APP','HOOD','RKLB','ARM',
 ]
 
-UNIVERSE  = list(dict.fromkeys(MY_HOLDINGS + CANDIDATES))
+
+# ── THAI FUND PROXY MAP ───────────────────────────────────────────────
+# Thai mutual funds are analysed via their underlying ETF proxy
+TICKER_PROXY_MAP = {
+    'SCB_SP500':'VOO','SCB_NDQ':'QQQ','SCB_SEMI':'SMH','SCB_WORLD':'URTH',
+    'SCB_GOLD':'GLD','SCB_NK225':'EWJ','SCB_SET50':'VOO','SCB_DJ':'DIA',
+    'SCB_AIEM':'AAXJ','SCB_FINTECH':'QQQ','SCB_AUTO':'QQQ','SCB_INNOV':'QQQ',
+    'SCB_GENO':'XLV','SCB_CHINA':'QQQ','SCB_EV':'QQQ','SCB_US':'SPY',
+    'KT_INDIA':'INDA','KT_WORLD':'URTH','KT_WTAI':'QQQ','KT_BLOCK':'QQQ',
+    'KT_TECH':'QQQ','KT_ESG':'URTH',
+}
+
+# Proxy tickers to fetch for Thai funds
+PROXY_TICKERS = list(set(TICKER_PROXY_MAP.values()))
+# Full universe for signal computation — direct tickers only (Thai funds use proxy)
+DIRECT_HOLDINGS = [t for t in MY_HOLDINGS if t not in TICKER_PROXY_MAP]
+UNIVERSE  = list(dict.fromkeys(DIRECT_HOLDINGS + CANDIDATES + PROXY_TICKERS))
 BENCHMARK = 'VOO'
 DIST_T    = -0.15
 QUALITY_T =  0.20
@@ -302,6 +331,71 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         signals_list.append(row)
         if signal == 'BUY' or buy >= 30:                         buy_ideas.append(row)
         if signal == 'SELL' or (sell_score >= 40 and is_holding): sell_guidance.append(row)
+
+    # ── Add Thai fund rows using proxy signal data ───────────────────
+    for fund, proxy in TICKER_PROXY_MAP.items():
+        if proxy not in all_signals: continue
+        sig = all_signals[proxy]
+        if len(sig) == 0: continue
+        last = sig.iloc[-1]
+        ta   = ticker_alpha.get(proxy, {})
+        lp   = {}  # no live price for Thai funds
+        fa   = ta.get('factor_sep', float('nan'))
+        fa_valid = not (isinstance(fa, float) and fa != fa)
+        fs   = FRAMEWORK_SCORES.get(fund)
+        price  = round(float(last['close']), 2)
+
+        buy = 0
+        if last['f']:      buy += 40
+        if last['fdfv3']:  buy += 25
+        if last['pfd']:    buy += 20
+        if last['triple']: buy += 10
+        if last['dfv3'] and not last['f']: buy += 5
+        if last['banker_weak']: buy -= 20
+        buy = max(0, min(100, buy))
+
+        sell_score = 0; sell_action = 'HOLD'; sell_flags = '—'; sell_caution = '—'
+        sell_sigs_data = {}
+        if SELL_SCORER_AVAILABLE:
+            try:
+                cl_s  = closes[proxy].dropna() if proxy in closes.columns else None
+                hi_s  = highs[proxy].dropna()  if proxy in highs.columns  else cl_s
+                lo_s  = lows[proxy].dropna()   if proxy in lows.columns   else cl_s
+                vol_s = volumes[proxy].dropna() if proxy in volumes.columns else pd.Series(dtype=float)
+                sell_sigs_data = compute_sell_signals(cl_s, hi_s, lo_s, vol_s)
+                sell_score, sell_action, sell_flags, sell_caution = score_ticker(
+                    fund, sell_sigs_data, sell_market, sell_sectors)
+            except: pass
+
+        if sell_score >= EXIT_T: signal = 'SELL'
+        elif buy >= 60:          signal = 'BUY'
+        else:                    signal = 'HOLD'
+
+        guidance = build_guidance(proxy, last, ta, fs)
+
+        row = {
+            'ticker': fund, 'price': price, 'change_pct': 0.0,
+            'signal': signal, 'guidance': f"[via {proxy}] {guidance}",
+            'buy_score': buy, 'sell_score': sell_score,
+            'sell_action': sell_action, 'sell_flags': sell_flags,
+            'sell_caution': sell_caution,
+            'sell_dist': sell_sigs_data.get('dist'),
+            'sell_cmf': sell_sigs_data.get('cmf_20'),
+            'sell_rv_z': sell_sigs_data.get('rv_z'),
+            'sell_weekly_rsi': sell_sigs_data.get('weekly_rsi'),
+            'is_holding': True, 'proxy': proxy,
+            'dist_252h': round(float(last['dist'])*100, 1),
+            'vs_200ma':  round(float(last['trend'])*100, 1),
+            'dfv_lift':  round(float(last['hm_lift']), 1),
+            'factor': bool(last['f']), 'dfv3': bool(last['dfv3']),
+            'fdfv3': bool(last['fdfv3']), 'pfd': bool(last['pfd']),
+            'triple': bool(last['triple']), 'banker_weak': bool(last['banker_weak']),
+            'factor_sep': None if not fa_valid else round(float(fa)*100, 1),
+            'framework_score': fs,
+        }
+        signals_list.append(row)
+        if signal == 'BUY' or buy >= 30:                          buy_ideas.append(row)
+        if signal == 'SELL' or (sell_score >= 40):                sell_guidance.append(row)
 
     signals_list.sort(key=lambda x: -x['buy_score'])
     if SELL_SCORER_AVAILABLE:
