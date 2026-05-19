@@ -257,44 +257,37 @@ def build_payload(all_signals, ticker_alpha, live_prices):
         except Exception as e:
             pass
 
-    # Signal classification
-    if sell_score >= 70 and is_holding:  signal = 'SELL'
-    elif buy >= 60:                      signal = 'BUY'
-    else:                                signal = 'HOLD'
+        # Signal classification uses sell_score from sell_side_scorer
+        if sell_score >= EXIT_T and is_holding:  signal = 'SELL'
+        elif buy >= 60:                          signal = 'BUY'
+        else:                                    signal = 'HOLD'
 
     guidance = build_guidance(t, last, ta, fs)
 
-    row = {
-        'ticker':          t,
-        'price':           price,
-        'change_pct':      change,
-        'signal':          signal,
-        'guidance':        guidance,
-        'buy_score':       buy,
-        'sell_score':      sell_score,
-        'sell_action':     sell_action,
-        'sell_flags':      sell_flags,
-        'sell_caution':    sell_caution,
-        'sell_dist':       sell_sigs_data.get('dist'),
-        'sell_cmf':        sell_sigs_data.get('cmf_20'),
-        'sell_rv_z':       sell_sigs_data.get('rv_z'),
-        'sell_weekly_rsi': sell_sigs_data.get('weekly_rsi'),
-        'is_holding':      is_holding,
-        'dist_252h':       round(float(last['dist'])*100, 1),
-        'vs_200ma':        round(float(last['trend'])*100, 1),
-        'dfv_lift':        round(float(last['hm_lift']), 1),
-        'factor':          bool(last['f']),
-        'dfv3':            bool(last['dfv3']),
-        'fdfv3':           bool(last['fdfv3']),
-        'pfd':             bool(last['pfd']),
-        'triple':          bool(last['triple']),
-        'banker_weak':     bool(last['banker_weak']),
-        'factor_sep':      None if not fa_valid else round(fa*100, 1),
-        'framework_score': fs,
-    }
-    signals_list.append(row)
-    if signal == 'BUY' or buy >= 30:                        buy_ideas.append(row)
-    if signal == 'SELL' or (sell_score >= 40 and is_holding): sell_guidance.append(row)
+        row = {
+            'ticker':          t,
+            'price':           price,
+            'change_pct':      change,
+            'signal':          signal,
+            'guidance':        guidance,
+            'buy_score':       buy,
+            'sell_score':      sell,
+            'is_holding':      is_holding,
+            'dist_252h':       round(float(last['dist'])*100, 1),
+            'vs_200ma':        round(float(last['trend'])*100, 1),
+            'dfv_lift':        round(float(last['hm_lift']), 1),
+            'factor':          bool(last['f']),
+            'dfv3':            bool(last['dfv3']),
+            'fdfv3':           bool(last['fdfv3']),
+            'pfd':             bool(last['pfd']),
+            'triple':          bool(last['triple']),
+            'banker_weak':     bool(last['banker_weak']),
+            'factor_sep':      None if not fa_valid else round(fa*100, 1),
+            'framework_score': fs,
+        }
+        signals_list.append(row)
+        if signal == 'BUY' or buy >= 30:             buy_ideas.append(row)
+        if signal == 'SELL' or (sell >= 40 and is_holding): sell_guidance.append(row)
 
     signals_list.sort(key=lambda x: -x['buy_score'])
     if SELL_SCORER_AVAILABLE:
