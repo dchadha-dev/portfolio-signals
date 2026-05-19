@@ -2962,45 +2962,79 @@ function renderBuysFromPayload(payload) {
 }
 
 function renderSellsFromPayload(payload) {
-  const sells = payload.analytics?.sell_guidance || [];
-  const runDate = payload.run_date || '';
+  // Uses sell_action/sell_score from signals_payload.json (set by sell_side_scorer.py)
+  // Validated signals: near_high (-15.8% 252d) · CMF_dist (-9.1%) · ATR_ext (-13.4%) · RVz>2 (-1.4% 30d)
+  const allSigs  = payload.analytics?.signals || [];
+  const market   = payload.market || {};
+  const runDate  = payload.run_date || '';
+
+  // Use validated sell_action from payload; fall back to old sell_guidance if missing
+  const newSells = allSigs.filter(s => s.sell_action && s.sell_action !== 'HOLD' && s.is_holding)
+                           .sort((a,b) => b.sell_score - a.sell_score);
+  const oldSells = payload.analytics?.sell_guidance || [];
+  const sells    = newSells.length > 0 ? newSells : oldSells;
+
   if (!sells.length) {
     document.getElementById('sellContent').innerHTML =
-      '<div class="placeholder">No sell flags in payload. All holdings look clean.</div>';
+      '<div class="placeholder">No sell signals active. Portfolio within 10% cap — all holdings clean.</div>';
     return;
   }
+
+  const cnnScore = market.cnn_score || 50;
+  const cnnLabel = market.cnn_label || 'Neutral';
+  const cnnColor = cnnScore > 75 ? 'var(--red)' : cnnScore > 50 ? 'var(--amber)' : 'var(--green)';
+  const ac = a => a==='EXIT'?'#8b0000':a==='REDUCE'?'#c0392b':a==='TRIM'?'#e67e22':'var(--amber)';
+
+  const usingNew = newSells.length > 0;
+
   const html = `
-    <div class="ana-section-title">Sell Guidance · ${runDate} · Ranked by sell score</div>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:12px;font-family:'DM Mono',monospace;">
-      Sell score: Banker Weak +40 · RSI divergence +30 · Momentum overextended +15 · Framework &lt;65 +25 · Historical underperformer +15
+    <div class="ana-section-title">Sell Priority · ${runDate} · ${sells.length} position(s) flagged (≤10% cap)</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:10px;font-family:'DM Mono',monospace;">
+      ${usingNew
+        ? `Validated signals: near_high · CMF_dist@high · ATR_ext · RVz>2 · Thresholds: TRIM≥35 · REDUCE≥55 · EXIT≥70`
+        : `Sell score: Banker Weak +40 · RSI divergence +30 · Momentum overextended +15 · Framework &lt;65 +25`
+      }
+      &nbsp;·&nbsp; CNN F&amp;G: <span style="color:${cnnColor};font-weight:600">${cnnScore.toFixed(0)} (${cnnLabel})</span>
     </div>
     ${sells.map(s => {
-      const urgency = s.sell_score >= 70 ? 'HIGH' : s.sell_score >= 40 ? 'MEDIUM' : 'LOW';
-      const urgCol  = urgency === 'HIGH' ? 'var(--red)' : urgency === 'MEDIUM' ? 'var(--amber)' : 'var(--text3)';
-      const flags   = [
-        s.banker_weak ? '⚠ Banker Weak' : '',
-        s.triple      ? '⚡ Overextended (63d >20%)' : '',
-        s.rbear       ? '↘ RSI div' : '',
-        s.framework_score && s.framework_score < 65 ? `Framework ${s.framework_score}/100` : '',
-      ].filter(Boolean).join(' · ');
+      const action  = s.sell_action || (s.sell_score >= 70 ? 'EXIT' : s.sell_score >= 55 ? 'REDUCE' : 'TRIM');
+      const acColor = ac(action);
       return `
-      <div class="signal-card sell-card" style="margin-bottom:10px;border-left:2px solid ${urgCol};">
+      <div class="signal-card sell-card" style="margin-bottom:10px;border-left:3px solid ${acColor};">
         <div class="sc-header">
           <div>
             <div class="sc-ticker">${s.ticker}
               ${s.is_holding ? '<span class="tag tag-red" style="margin-left:6px;font-size:9px;">HELD</span>' : ''}
             </div>
-            <div class="sc-name">$${s.price?.toLocaleString()} · ${s.change_pct >= 0 ? '+' : ''}${s.change_pct}% today</div>
+            <div class="sc-name">$${s.price?.toLocaleString()} · ${s.change_pct >= 0 ? '+' : ''}${s.change_pct}% today
+              ${s.sell_dist != null ? ` · ${s.sell_dist}% from 252d high` : s.dist_252h != null ? ` · ${s.dist_252h}% from 252d high` : ''}
+            </div>
           </div>
           <div style="text-align:right;">
-            <span class="tag" style="font-size:10px;border:1px solid ${urgCol};color:${urgCol};background:transparent;">${urgency}</span>
-            <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);margin-top:4px;">score: ${s.sell_score}/100</div>
+            <span style="background:${acColor};color:#fff;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:700;">${action}</span>
+            <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);margin-top:3px;">Score: ${s.sell_score}/100</div>
           </div>
         </div>
-        ${flags ? `<div style="font-size:10px;color:var(--text3);margin-bottom:5px;font-family:'DM Mono',monospace;">${flags}</div>` : ''}
-        <div class="sc-body">${s.guidance}</div>
+        ${s.sell_flags && s.sell_flags !== '—'
+          ? `<div style="font-size:10px;color:var(--text3);margin:5px 0;font-family:'DM Mono',monospace;">${s.sell_flags}</div>`
+          : s.banker_weak || s.triple || s.rbear ? `<div style="font-size:10px;color:var(--text3);margin:5px 0;font-family:'DM Mono',monospace;">${[s.banker_weak?'⚠ Banker Weak':'',s.triple?'⚡ Overextended':'',s.rbear?'↘ RSI div':''].filter(Boolean).join(' · ')}</div>` : ''
+        }
+        ${s.sell_caution && s.sell_caution !== '—'
+          ? `<div style="font-size:10px;color:var(--amber);font-family:'DM Mono',monospace;margin-bottom:4px;">Caution: ${s.sell_caution}</div>`
+          : ''
+        }
+        <div style="display:flex;gap:14px;margin-top:6px;font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);">
+          ${s.sell_weekly_rsi != null ? `<span>wRSI: ${s.sell_weekly_rsi}</span>` : ''}
+          ${s.sell_cmf != null ? `<span>CMF: ${s.sell_cmf}</span>` : ''}
+          ${s.sell_rv_z != null ? `<span>RV-Z: ${s.sell_rv_z}</span>` : ''}
+          <span>Framework: ${s.framework_score || '—'}/100</span>
+        </div>
       </div>`;
-    }).join('')}`;
+    }).join('')}
+    <div style="margin-top:10px;font-size:10px;color:var(--text3);background:var(--s2);padding:8px 12px;border-radius:6px;">
+      Holding style: buy-and-hold years · cash months · single signals not enough — look for confluence
+    </div>`;
+
   document.getElementById('sellContent').innerHTML = html;
 }
 
