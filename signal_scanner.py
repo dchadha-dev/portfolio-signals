@@ -271,7 +271,7 @@ def build_payload(all_signals, ticker_alpha, live_prices):
             'signal':          signal,
             'guidance':        guidance,
             'buy_score':       buy,
-            'sell_score':      sell,
+            'sell_score':      sell_score,
             'is_holding':      is_holding,
             'dist_252h':       round(float(last['dist'])*100, 1),
             'vs_200ma':        round(float(last['trend'])*100, 1),
