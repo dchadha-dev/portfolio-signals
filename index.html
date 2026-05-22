@@ -845,7 +845,9 @@ body .amt { transition: filter 0.18s ease; }
       <div class="sub-tab active" onclick="switchAnalytics('signals',this)">Signals</div>
       <div class="sub-tab" onclick="switchAnalytics('buy',this)">Buy Ideas</div>
       <div class="sub-tab" onclick="switchAnalytics('sell',this)">Sell Guidance</div>
+      <div class="sub-tab" onclick="switchAnalytics('rank',this)">&#128202; Rankings</div>
       <div class="sub-tab" onclick="switchAnalytics('ref',this)">&#128216; Reference</div>
+      <div class="sub-tab" onclick="switchAnalytics('pine',this)">&#128251; Pine Script</div>
     </div>
     <div id="ana-signals" class="ana-panel active">
       <div id="signalsContent"><div class="placeholder">Click "Run Live Analysis" to generate signals based on current prices</div></div>
@@ -855,6 +857,12 @@ body .amt { transition: filter 0.18s ease; }
     </div>
     <div id="ana-sell" class="ana-panel">
       <div id="sellContent"><div class="placeholder">Click "Run Live Analysis" to generate sell guidance (max 10% of portfolio flagged)</div></div>
+    </div>
+    <div id="ana-rank" class="ana-panel">
+      <div id="rankContent"><div class="placeholder">Click "Run Live Analysis" to load rankings.</div></div>
+    </div>
+    <div id="ana-pine" class="ana-panel">
+      <div id="pineContent" style="max-height:70vh;overflow-y:auto;"></div>
     </div>
     <div id="ana-ref" class="ana-panel">
       <div id="refContent" style="max-height:70vh;overflow-y:auto;"></div>
@@ -1860,8 +1868,555 @@ function switchAnalytics(id, el) {
   document.querySelectorAll('.ana-panel').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('ana-' + id).classList.add('active');
-  if (id === 'ref') loadReference();
+  if (id === 'rank') renderRankings();
+  if (id === 'ref')  loadReference();
+  if (id === 'pine') loadPineScript();
 }
+
+async function loadPineScript() {
+  const el = document.getElementById('pineContent');
+  if (el.dataset.loaded) return;
+
+  const pine = `// ============================================================
+// Portfolio Signal Model — Validated Buy & Sell Signals
+// Based on walk-forward CV (24 windows, dual-seed 2026-05-19)
+//
+// BUY SIGNALS (validated positive separation vs VOO):
+//   Factor+DFV V3  +22.8% at 252d  p=0.034  weight=38
+//   Factor Value   +23.7% at 252d  p=0.024  weight=40
+//   Triple         +9.1%  at 252d  p=0.088  weight=15
+//   PFD Buy        +5.1%  at 252d  p=0.112  weight=6
+//
+// SELL SIGNALS (validated negative separation vs VOO):
+//   near_high      -15.8% at 252d  p=0.000  weight=35
+//   CMF dist@high  -9.1%  at 252d  p=0.000  weight=30
+//   SMA/ATR >3.5   -13.4% at 252d  p=0.001  weight=20
+//   rv_z2 (30d)    -1.4%  at 30d   p=0.000  weight=10
+// ============================================================
+
+//@version=5
+indicator("Portfolio Signal Model", overlay=true, max_labels_count=500)
+
+// ── INPUTS ────────────────────────────────────────────────────────────
+dist_t      = input.float(-0.15,  "Factor DIST_T",    step=0.01, tooltip="Max distance below 252d high to qualify. Validated: -0.15")
+dfv_lift    = input.float(2.5,    "DFV Lift Threshold",step=0.5,  tooltip="Min hm_rsi floor lift. Validated: 2.5")
+quality_t   = input.float(0.20,   "Quality Threshold", step=0.05, tooltip="Min Sharpe/3. Validated: 0.20")
+atr_thresh  = input.float(3.5,    "SMA/ATR Threshold", step=0.5,  tooltip="ATR units above 200d SMA. Validated: 3.5")
+show_buy    = input.bool(true,     "Show Buy Signals")
+show_sell   = input.bool(true,     "Show Sell Signals")
+show_scores = input.bool(true,     "Show Score Labels")
+
+// ── RSI HELPER ────────────────────────────────────────────────────────
+rsi_val(src, len) =>
+    delta    = ta.change(src)
+    gain     = ta.ema(math.max(delta, 0), len)
+    loss     = ta.ema(math.max(-delta, 0), len)
+    rs       = gain / loss
+    100 - 100 / (1 + rs)
+
+// ── CORE INPUTS ───────────────────────────────────────────────────────
+rsi14 = rsi_val(close, 14)
+rsi40 = rsi_val(close, 40)
+rsi47 = rsi_val(close, 47)
+
+// ── HOT MONEY RSI (DFV) ───────────────────────────────────────────────
+// Pine Script original: sensitivity=0.7, base=30, period=40
+hm_rsi     = math.max(math.min((rsi40 - 30) * 0.7, 20), 0)
+hm_prev    = hm_rsi[1]
+hm_floor10 = ta.lowest(hm_rsi, 10)[1]
+hm_lift    = hm_rsi - hm_floor10
+
+// ── BANKER RSI (WB) ───────────────────────────────────────────────────
+// Pine Script original: sensitivity=1.5, base=51, period=47
+banker_rsi  = math.max(math.min((rsi47 - 51) * 1.5, 20), 0)
+banker_prev = banker_rsi[1]
+banker_weak = banker_prev >= 20 and banker_rsi < 20
+
+// ── FACTOR VALUE GATE ─────────────────────────────────────────────────
+high252  = ta.highest(high, 252)[1]
+dist     = (close - high252) / high252
+ma200    = ta.sma(close, 200)
+trend    = (close - ma200) / ma200
+
+// Quality: Sharpe/3 proxy using 252d return / annualised vol
+ret252   = (close - close[252]) / close[252]
+log_ret  = math.log(close / close[1])
+vol252   = ta.stdev(log_ret, 252) * math.sqrt(252)
+quality  = vol252 > 0 ? math.max(math.min(ret252 / vol252 / 3, 1), 0) : 0
+
+factor_gate = dist < dist_t and trend > 0 and quality > quality_t
+
+// ── BUY SIGNALS ───────────────────────────────────────────────────────
+
+// Signal 1: DFV V3 — floor lift (validated DFV_LIFT=2.5)
+dfv3  = hm_lift > dfv_lift
+
+// Signal 2: DFV V1 — original Pine Script single-bar turn
+dfv1  = hm_rsi > hm_prev and hm_prev >= 0 and hm_prev <= 5
+
+// Signal 3: Factor+DFV V3 combined (★ best signal: +22.8% at 252d)
+fdfv3 = factor_gate and dfv3
+
+// Signal 4: PFD — price compressed vs own trend
+ret126 = (close - close[126]) / close[126]
+pfd    = (ret252 - 2 * ret126) > 0.05 and quality > quality_t * 2
+
+// Signal 5: Triple — 63d momentum (continuation, not reversal)
+triple = (close - close[63]) / close[63] > 0.20
+
+// ── SELL SIGNALS ──────────────────────────────────────────────────────
+
+// Signal 1: near_high — primary sell (validated: -15.8% at 252d, p=0.000)
+near_high = dist > -0.05
+
+// Signal 2: SMA/ATR distance (validated: -13.4% at 252d, p=0.001)
+tr_val   = math.max(high - low, math.abs(high - close[1]), math.abs(low - close[1]))
+atr14    = ta.sma(tr_val, 14)
+sma_atr  = atr14 > 0 ? (close - ma200) / atr14 : 0
+atr_ext  = sma_atr > atr_thresh
+
+// Signal 3: CMF negative while near high (validated: -9.1% at 252d, p=0.000)
+hl_range = high - low
+mfm      = hl_range > 0 ? ((close - low) - (high - close)) / hl_range : 0
+cmf20    = ta.sma(mfm * volume, 20) / ta.sma(volume, 20)
+cmf_dist = cmf20 < 0 and near_high
+
+// Signal 4: RV z-score (validated SHORT-TERM: -1.4% at 30d, p=0.000)
+rv20     = ta.stdev(log_ret, 20) * math.sqrt(252)
+rv_mean  = ta.sma(rv20, 252)
+rv_std   = ta.stdev(rv20, 252)
+rv_z     = rv_std > 0 ? (rv20 - rv_mean) / rv_std : 0
+rv_z2    = rv_z > 2.0
+rv_z3    = rv_z > 3.0   // caution: buy continuation at 252d
+
+// ── BUY SCORE (0-100) ─────────────────────────────────────────────────
+buy_score = 0
+buy_score := factor_gate ? buy_score + 40 : buy_score
+buy_score := fdfv3        ? buy_score + 38 : buy_score
+buy_score := triple       ? buy_score + 15 : buy_score
+buy_score := pfd          ? buy_score + 6  : buy_score
+buy_score := dfv3 and not factor_gate ? buy_score + 5 : buy_score
+buy_score := banker_weak  ? buy_score - 15 : buy_score
+buy_score  = math.max(0, math.min(100, buy_score))
+
+// ── SELL SCORE (0-100) ────────────────────────────────────────────────
+sell_score = 0
+sell_score := near_high   ? sell_score + 35 : sell_score
+sell_score := cmf_dist    ? sell_score + 30 : sell_score
+sell_score := atr_ext     ? sell_score + 20 : sell_score
+sell_score := rv_z2       ? sell_score + 10 : sell_score
+sell_score  = math.max(0, math.min(100, sell_score))
+
+// ── SIGNAL CONDITIONS ─────────────────────────────────────────────────
+strong_buy  = fdfv3 and buy_score >= 60
+factor_only = factor_gate and not dfv3 and buy_score >= 40
+pfd_signal  = pfd and not factor_gate
+
+sell_trim   = sell_score >= 35 and sell_score < 55
+sell_reduce = sell_score >= 55 and sell_score < 70
+sell_exit   = sell_score >= 70
+
+// ── PLOTS ─────────────────────────────────────────────────────────────
+
+// Background zones
+bgcolor(factor_gate and not fdfv3 ? color.new(color.blue, 92) : na,
+        title="Factor zone (waiting for DFV)")
+bgcolor(fdfv3 ? color.new(color.green, 88) : na,
+        title="Factor+DFV V3 active")
+bgcolor(near_high ? color.new(color.red, 92) : na,
+        title="Near 252d high (sell zone)")
+
+// 200d MA
+plot(ma200, "200d MA", color=color.new(color.gray, 40), linewidth=1)
+
+// 252d high reference line
+plot(high252, "252d High", color=color.new(color.orange, 50),
+     style=plot.style_stepline, linewidth=1)
+
+// ── BUY LABELS ────────────────────────────────────────────────────────
+if show_buy
+    if strong_buy
+        label.new(bar_index, low,
+            "★ F+DFV3\\n" + str.tostring(buy_score),
+            style=label.style_label_up,
+            color=color.new(color.green, 0),
+            textcolor=color.white, size=size.small)
+
+    else if factor_only
+        label.new(bar_index, low,
+            "↑ FACTOR\\n" + str.tostring(buy_score),
+            style=label.style_label_up,
+            color=color.new(color.teal, 20),
+            textcolor=color.white, size=size.tiny)
+
+    else if pfd_signal
+        label.new(bar_index, low,
+            "◆ PFD\\n" + str.tostring(buy_score),
+            style=label.style_label_up,
+            color=color.new(color.blue, 20),
+            textcolor=color.white, size=size.tiny)
+
+// ── SELL LABELS ───────────────────────────────────────────────────────
+if show_sell
+    if sell_exit
+        label.new(bar_index, high,
+            "EXIT\\n" + str.tostring(sell_score),
+            style=label.style_label_down,
+            color=color.new(color.maroon, 0),
+            textcolor=color.white, size=size.small)
+
+    else if sell_reduce
+        label.new(bar_index, high,
+            "REDUCE\\n" + str.tostring(sell_score),
+            style=label.style_label_down,
+            color=color.new(color.red, 20),
+            textcolor=color.white, size=size.tiny)
+
+    else if sell_trim
+        label.new(bar_index, high,
+            "TRIM\\n" + str.tostring(sell_score),
+            style=label.style_label_down,
+            color=color.new(color.orange, 20),
+            textcolor=color.white, size=size.tiny)
+
+// ── SIGNAL INDICATORS (bottom pane) ──────────────────────────────────
+// Add these as separate indicators if needed:
+
+// hline(0, "Zero", color=color.gray)
+// plot(hm_rsi,    "Hot Money RSI",  color=color.green,  linewidth=2)
+// plot(hm_lift,   "HM Lift",        color=color.teal)
+// plot(banker_rsi,"Banker RSI",     color=color.orange)
+// plot(cmf20 * 20,"CMF x20",        color=color.purple)
+// plot(rv_z,      "RV Z-score",     color=color.red)
+// hline(2.5, "DFV Lift threshold",  color=color.green, linestyle=hline.style_dashed)
+// hline(2.0, "RV Z2",               color=color.red,   linestyle=hline.style_dashed)
+
+// ── ALERTS ────────────────────────────────────────────────────────────
+alertcondition(fdfv3,      "★ Factor+DFV V3 BUY",     "Factor+DFV V3 buy signal fired — strongest validated entry")
+alertcondition(factor_gate and not fdfv3,
+                            "↑ Factor gate active",    "In factor value zone — waiting for DFV trigger")
+alertcondition(sell_exit,  "EXIT sell signal",         "Sell score ≥70 — validated exit signal")
+alertcondition(sell_reduce,"REDUCE sell signal",       "Sell score ≥55 — consider reducing position")
+alertcondition(sell_trim,  "TRIM sell signal",         "Sell score ≥35 — consider trimming")
+alertcondition(banker_weak,"⚠ Banker Weak",           "Institutional RSI dropping from max — reduces buy conviction")
+alertcondition(near_high and cmf_dist, "CMF dist @ high", "Institutional distribution while near 252d high — strongest sell signal")
+
+// ── TABLE (top right) ─────────────────────────────────────────────────
+if show_scores and barstate.islast
+    var table t = table.new(position.top_right, 2, 10,
+        bgcolor=color.new(color.black, 80),
+        border_color=color.new(color.gray, 50),
+        border_width=1)
+
+    table.cell(t, 0, 0, "SIGNAL",     text_color=color.gray,  text_size=size.small)
+    table.cell(t, 1, 0, "STATE",      text_color=color.gray,  text_size=size.small)
+
+    table.cell(t, 0, 1, "Buy Score",  text_color=color.white, text_size=size.small)
+    table.cell(t, 1, 1, str.tostring(buy_score) + "/100",
+        text_color = buy_score >= 60 ? color.green : buy_score >= 30 ? color.orange : color.gray,
+        text_size=size.small)
+
+    table.cell(t, 0, 2, "Sell Score", text_color=color.white, text_size=size.small)
+    table.cell(t, 1, 2, str.tostring(sell_score) + "/100",
+        text_color = sell_score >= 70 ? color.red : sell_score >= 35 ? color.orange : color.gray,
+        text_size=size.small)
+
+    table.cell(t, 0, 3, "Factor Gate",text_color=color.white, text_size=size.small)
+    table.cell(t, 1, 3, factor_gate ? "✓ ACTIVE" : "—",
+        text_color = factor_gate ? color.green : color.gray, text_size=size.small)
+
+    table.cell(t, 0, 4, "DFV V3",     text_color=color.white, text_size=size.small)
+    table.cell(t, 1, 4, dfv3 ? "✓ " + str.tostring(math.round(hm_lift, 1)) + " pts" : str.tostring(math.round(hm_lift, 1)) + " pts",
+        text_color = dfv3 ? color.green : color.gray, text_size=size.small)
+
+    table.cell(t, 0, 5, "Near 252h",  text_color=color.white, text_size=size.small)
+    table.cell(t, 1, 5, near_high ? "⚠ YES" : str.tostring(math.round(dist * 100, 1)) + "%",
+        text_color = near_high ? color.red : color.gray, text_size=size.small)
+
+    table.cell(t, 0, 6, "CMF",        text_color=color.white, text_size=size.small)
+    table.cell(t, 1, 6, str.tostring(math.round(cmf20, 3)),
+        text_color = cmf_dist ? color.red : cmf20 > 0 ? color.green : color.gray,
+        text_size=size.small)
+
+    table.cell(t, 0, 7, "SMA/ATR",    text_color=color.white, text_size=size.small)
+    table.cell(t, 1, 7, str.tostring(math.round(sma_atr, 2)),
+        text_color = atr_ext ? color.red : color.gray, text_size=size.small)
+
+    table.cell(t, 0, 8, "RV Z-score", text_color=color.white, text_size=size.small)
+    table.cell(t, 1, 8, str.tostring(math.round(rv_z, 2)),
+        text_color = rv_z3 ? color.orange : rv_z2 ? color.yellow : color.gray,
+        text_size=size.small)
+
+    table.cell(t, 0, 9, "Banker Weak",text_color=color.white, text_size=size.small)
+    table.cell(t, 1, 9, banker_weak ? "⚠ FIRED" : str.tostring(math.round(banker_rsi, 1)),
+        text_color = banker_weak ? color.orange : color.gray, text_size=size.small)
+`;
+
+  el.innerHTML = `<div style="padding:16px 0 40px">
+    <h2 style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;margin:0 0 6px">Pine Script v5 — TradingView</h2>
+    <p style="font-family:'Space Grotesk',sans-serif;font-size:12px;color:var(--text3);margin:0 0 16px">
+      Exact implementation of all validated buy and sell signals. Parameters match the daily scanner.
+      <br>To use: Open TradingView → Pine Editor → paste → Add to chart.
+    </p>
+    <div style="background:var(--s2);border-radius:8px;padding:14px 16px;margin-bottom:16px;">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;margin-bottom:10px;color:var(--text)">Signals included:</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;font-family:'DM Mono',monospace;">
+        <div style="color:var(--green)">★ Factor+DFV V3 BUY — +22.8% at 252d</div>
+        <div style="color:var(--red)">EXIT — near_high −15.8% at 252d</div>
+        <div style="color:#44dd99">↑ Factor Value — +23.7% at 252d</div>
+        <div style="color:var(--red)">REDUCE — CMF dist −9.1% at 252d</div>
+        <div style="color:var(--blue)">◆ PFD Buy — +5.1% at 252d</div>
+        <div style="color:var(--amber)">TRIM — SMA/ATR −13.4% at 252d</div>
+        <div style="color:var(--text3)">⚡ Triple — +9.1% at 252d</div>
+        <div style="color:var(--text3)">RV Z-score −1.4% at 30d (short)</div>
+      </div>
+    </div>
+    <div style="position:relative">
+      <button onclick="copyPine()" style="position:absolute;top:8px;right:8px;background:var(--blue);color:#fff;border:none;padding:5px 12px;border-radius:4px;font-size:11px;cursor:pointer;font-family:'Space Grotesk',sans-serif">Copy to clipboard</button>
+      <pre id="pine-code" style="background:#1e1e2e;color:#cdd6f4;padding:20px 16px;border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;overflow-x:auto;white-space:pre;line-height:1.5;max-height:50vh;overflow-y:auto">\${pine}</pre>
+    </div>
+  </div>`;
+
+  el.dataset.loaded = '1';
+}
+
+function copyPine() {
+  const code = document.getElementById('pine-code').innerText;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.querySelector('#pineContent button');
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = 'Copy to clipboard', 2000);
+  });
+}
+
+
+// ── RANKINGS TABLE ────────────────────────────────────────────────────
+// Mirrors Colab output: full ranked table with all signals per ticker
+
+function renderRankings() {
+  const el = document.getElementById('rankContent');
+  if (!window._lastPayload) {
+    el.innerHTML = '<div class="placeholder">Run Live Analysis first to load signal data.</div>';
+    return;
+  }
+
+  const payload = window._lastPayload;
+  const signals = payload.analytics?.signals || [];
+  const market  = payload.market || {};
+  const runDate = payload.run_date || '';
+
+  if (!signals.length) {
+    el.innerHTML = '<div class="placeholder">No signal data available.</div>';
+    return;
+  }
+
+  const cnnScore = market.cnn_score || 50;
+  const cnnLabel = market.cnn_label || 'Neutral';
+  const cnnColor = cnnScore > 75 ? 'var(--red)' : cnnScore > 50 ? 'var(--amber)' : 'var(--green)';
+
+  // Sort controls state
+  const sortKey  = el.dataset.sortKey  || 'buy_score';
+  const sortDir  = el.dataset.sortDir  || 'desc';
+  const filter   = el.dataset.filter   || 'all';
+  const search   = el.dataset.search   || '';
+
+  // Filter
+  let rows = signals.filter(s => {
+    if (filter === 'held'      && !s.is_holding) return false;
+    if (filter === 'candidate' && s.is_holding)  return false;
+    if (filter === 'buy'       && s.buy_score < 60) return false;
+    if (filter === 'sell'      && (!s.sell_action || s.sell_action === 'HOLD')) return false;
+    if (search && !s.ticker.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
+
+  // Sort
+  rows = [...rows].sort((a, b) => {
+    let av = a[sortKey] ?? -999;
+    let bv = b[sortKey] ?? -999;
+    if (sortKey === 'sell_action') {
+      const order = {EXIT:4, REDUCE:3, TRIM:2, HOLD:1};
+      av = order[a.sell_action] || 0;
+      bv = order[b.sell_action] || 0;
+    }
+    return sortDir === 'desc' ? bv - av : av - bv;
+  });
+
+  // Summary counts
+  const nHeld       = signals.filter(s => s.is_holding).length;
+  const nBuy        = signals.filter(s => s.buy_score >= 60).length;
+  const nFactor     = signals.filter(s => s.factor).length;
+  const nDFV        = signals.filter(s => s.fdfv3).length;
+  const nSellFlag   = signals.filter(s => s.sell_action && s.sell_action !== 'HOLD').length;
+
+  function sortIcon(col) {
+    if (sortKey !== col) return '<span style="opacity:0.3">↕</span>';
+    return sortDir === 'desc' ? '↓' : '↑';
+  }
+
+  function thClick(col) {
+    return `onclick="rankSort('${col}')"`;
+  }
+
+  function buyBar(score) {
+    const c = score >= 78 ? 'var(--green)' : score >= 60 ? '#44dd99' : score >= 30 ? 'var(--amber)' : 'var(--s2)';
+    return `<div style="display:flex;align-items:center;gap:5px;">
+      <div style="width:${Math.min(score,100)}px;max-width:80px;height:4px;background:${c};border-radius:2px;flex-shrink:0"></div>
+      <span style="font-size:10px;font-family:'DM Mono',monospace;color:${c};font-weight:600">${score}</span>
+    </div>`;
+  }
+
+  function sellBadge(action, score) {
+    if (!action || action === 'HOLD') return '<span style="color:var(--text3);font-size:10px">—</span>';
+    const c = action==='EXIT' ? '#8b0000' : action==='REDUCE' ? 'var(--red)' : 'var(--amber)';
+    return `<span style="background:${c};color:#fff;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:700;font-family:'DM Mono',monospace">${action} ${score}</span>`;
+  }
+
+  function signalDots(s) {
+    const dots = [];
+    if (s.fdfv3)       dots.push('<span style="color:var(--green);font-size:10px" title="Factor+DFV V3">★★</span>');
+    else if (s.factor) dots.push('<span style="color:var(--teal,#0891b2);font-size:10px" title="Factor gate">★</span>');
+    if (s.near_high)   dots.push('<span style="color:var(--red);font-size:10px" title="Near 252d high">⚠H</span>');
+    if (s.sell_cmf != null && s.sell_cmf < 0 && s.near_high) dots.push('<span style="color:var(--red);font-size:10px" title="CMF distribution">⚠C</span>');
+    if (s.banker_weak) dots.push('<span style="color:var(--amber);font-size:10px" title="Banker Weak">WB</span>');
+    if (s.triple)      dots.push('<span style="color:#8b5cf6;font-size:10px" title="Triple — up 20% in 63d">3x</span>');
+    return dots.join(' ') || '<span style="color:var(--text3);font-size:10px">—</span>';
+  }
+
+  function fw(s) {
+    const v = s.framework_score;
+    if (!v) return '<span style="color:var(--text3)">—</span>';
+    const c = v>=85?'var(--green)':v>=70?'#0891b2':v>=55?'var(--amber)':'var(--red)';
+    return `<span style="color:${c};font-weight:700;font-family:'DM Mono',monospace">${v}</span>`;
+  }
+
+  function distCell(s) {
+    const d = s.dist_252h;
+    if (d == null) return '—';
+    const c = d > -5 ? 'var(--red)' : d > -15 ? 'var(--amber)' : 'var(--green)';
+    return `<span style="color:${c};font-family:'DM Mono',monospace;font-size:11px">${d > 0 ? '+' : ''}${d}%</span>`;
+  }
+
+  const html = `
+    <div style="padding:14px 0 6px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+        <div>
+          <div style="font-size:15px;font-weight:700;font-family:'Space Grotesk',sans-serif">${rows.length} positions · ${runDate}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px;font-family:'DM Mono',monospace">
+            CNN F&G: <span style="color:${cnnColor};font-weight:600">${cnnScore.toFixed(0)} (${cnnLabel})</span>
+            &nbsp;·&nbsp; S&P500 ext: ${market.sp500_extended||false}
+            &nbsp;·&nbsp; Buffett: ${market.buffett_extended||false}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          <input type="text" placeholder="Search ticker..." value="${search}"
+            oninput="rankSearch(this.value)"
+            style="background:var(--s2);border:1px solid var(--border);color:var(--text);padding:4px 10px;border-radius:5px;font-size:11px;width:130px">
+          ${['all','held','candidate','buy','sell'].map(f =>
+            `<button onclick="rankFilter('${f}')" style="padding:3px 10px;border-radius:4px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;border:1px solid var(--border);background:${filter===f?'var(--blue)':'transparent'};color:${filter===f?'#fff':'var(--text3)'}">${f.toUpperCase()}</button>`
+          ).join('')}
+        </div>
+      </div>
+
+      <!-- Summary badges -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <div style="background:var(--s2);border-radius:6px;padding:6px 12px;font-size:11px;font-family:'DM Mono',monospace">
+          <span style="color:var(--text3)">Universe</span> <b>${signals.length}</b>
+        </div>
+        <div style="background:var(--s2);border-radius:6px;padding:6px 12px;font-size:11px;font-family:'DM Mono',monospace">
+          <span style="color:var(--text3)">Held</span> <b>${nHeld}</b>
+        </div>
+        <div style="background:var(--s2);border-radius:6px;padding:6px 12px;font-size:11px;font-family:'DM Mono',monospace">
+          <span style="color:var(--green)">Buy ≥60</span> <b style="color:var(--green)">${nBuy}</b>
+        </div>
+        <div style="background:var(--s2);border-radius:6px;padding:6px 12px;font-size:11px;font-family:'DM Mono',monospace">
+          <span style="color:var(--green)">★★ DFV</span> <b style="color:var(--green)">${nDFV}</b>
+        </div>
+        <div style="background:var(--s2);border-radius:6px;padding:6px 12px;font-size:11px;font-family:'DM Mono',monospace">
+          <span style="color:var(--amber)">Factor</span> <b style="color:var(--amber)">${nFactor}</b>
+        </div>
+        <div style="background:var(--s2);border-radius:6px;padding:6px 12px;font-size:11px;font-family:'DM Mono',monospace">
+          <span style="color:var(--red)">Sell flag</span> <b style="color:var(--red)">${nSellFlag}</b>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div style="overflow-x:auto;border-radius:8px;border:1px solid var(--border)">
+        <table style="border-collapse:collapse;width:100%;font-size:11px">
+          <thead>
+            <tr style="background:var(--s2);border-bottom:1px solid var(--border)">
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);white-space:nowrap">TICKER</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer" ${thClick('buy_score')}>BUY SCORE ${sortIcon('buy_score')}</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer" ${thClick('sell_score')}>SELL ${sortIcon('sell_score')}</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer" ${thClick('framework_score')}>FW ${sortIcon('framework_score')}</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3)">SIGNALS</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer" ${thClick('dist_252h')}>DIST 252H ${sortIcon('dist_252h')}</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer" ${thClick('price')}>PRICE ${sortIcon('price')}</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer" ${thClick('change_pct')}>DAY ${sortIcon('change_pct')}</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3)">DFV LIFT</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3)">TYPE</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map((s, i) => {
+              const dayChg   = s.change_pct || 0;
+              const dayColor = dayChg >= 0 ? 'var(--green)' : 'var(--red)';
+              const rowBg    = s.fdfv3 ? 'background:rgba(22,163,74,0.06)' :
+                               s.factor && !s.fdfv3 ? 'background:rgba(8,145,178,0.06)' :
+                               s.sell_action && s.sell_action !== 'HOLD' ? 'background:rgba(220,38,38,0.05)' : '';
+              const isHeld   = s.is_holding;
+              return `<tr style="border-bottom:1px solid var(--border);${rowBg}">
+                <td style="padding:7px 10px;white-space:nowrap">
+                  <span style="font-family:'DM Mono',monospace;font-weight:700;color:var(--text);font-size:12px">${s.ticker}</span>
+                  ${isHeld ? '<span style="background:var(--red);color:#fff;font-size:8px;padding:1px 4px;border-radius:2px;margin-left:4px;font-family:monospace">HELD</span>' : '<span style="border:1px solid var(--border);color:var(--text3);font-size:8px;padding:1px 4px;border-radius:2px;margin-left:4px;font-family:monospace">CAND</span>'}
+                </td>
+                <td style="padding:7px 10px">${buyBar(s.buy_score || 0)}</td>
+                <td style="padding:7px 10px">${sellBadge(s.sell_action, s.sell_score)}</td>
+                <td style="padding:7px 10px">${fw(s)}</td>
+                <td style="padding:7px 10px">${signalDots(s)}</td>
+                <td style="padding:7px 10px">${distCell(s)}</td>
+                <td style="padding:7px 10px;font-family:'DM Mono',monospace;color:var(--text2)">$${(s.price||0).toFixed(2)}</td>
+                <td style="padding:7px 10px;font-family:'DM Mono',monospace;color:${dayColor}">${dayChg>=0?'+':''}${dayChg.toFixed(2)}%</td>
+                <td style="padding:7px 10px;font-family:'DM Mono',monospace;color:var(--text3)">${s.dfv_lift != null ? s.dfv_lift.toFixed(1) : '—'}</td>
+                <td style="padding:7px 10px">
+                  ${s.signal === 'BUY'  ? '<span style="color:var(--green);font-size:10px;font-weight:700">BUY</span>'  :
+                    s.signal === 'SELL' ? '<span style="color:var(--red);font-size:10px;font-weight:700">SELL</span>' :
+                    '<span style="color:var(--text3);font-size:10px">HOLD</span>'}
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:8px;font-size:10px;color:var(--text3);font-family:'DM Mono',monospace">
+        Click column headers to sort · BUY=score≥60 · ★★=Factor+DFV3 · ★=Factor only · ⚠H=near high · ⚠C=CMF dist · WB=Banker Weak
+      </div>
+    </div>`;
+
+  el.innerHTML = html;
+}
+
+function rankSort(col) {
+  const el = document.getElementById('rankContent');
+  if (el.dataset.sortKey === col) {
+    el.dataset.sortDir = el.dataset.sortDir === 'desc' ? 'asc' : 'desc';
+  } else {
+    el.dataset.sortKey = col;
+    el.dataset.sortDir = 'desc';
+  }
+  renderRankings();
+}
+
+function rankFilter(f) {
+  document.getElementById('rankContent').dataset.filter = f;
+  renderRankings();
+}
+
+function rankSearch(val) {
+  document.getElementById('rankContent').dataset.search = val;
+  renderRankings();
+}
+
 
 async function loadReference() {
   const el = document.getElementById('refContent');
@@ -1938,8 +2493,8 @@ const REFERENCE_MD = `# Portfolio Signal & Framework Reference
 5. [Buy-Side Signal Models](#5-buy-side)
 6. [Sell-Side Signal Models](#6-sell-side)
 7. [How the Systems Work Together](#7-combined)
-8. [Exact Model Logic](#8-model-logic)
-9. [Backtesting Methodology — V1 vs V2](#9-backtesting)
+8. [Signal Models in Plain English](#8-plain-english)
+9. [Backtesting Methodology](#9-backtesting)
 10. [Fundamental Layer](#10-fundamentals)
 11. [Thai Fund Proxies](#11-thai-funds)
 12. [Scoring Any New Ticker](#12-new-ticker)
@@ -1953,67 +2508,44 @@ Two systems work together on every position. Neither is sufficient alone.
 | | Framework Score | Signal Models |
 |---|---|---|
 | Question | Is this business worth owning? | Is now a good time to act? |
-| Inputs | Qualitative — moat, quality, growth, valuation, fit | Price, volume, RSI, momentum + yfinance fundamentals |
-| Updates | Quarterly | Daily (6am + 8pm Bangkok via GitHub Actions) |
+| Inputs | Qualitative — moat, quality, growth, valuation, fit | Price, volume, RSI, momentum |
+| Updates | Quarterly | Daily (6am + 8pm Bangkok) |
 | Output | 0–100 conviction score | Buy score 0–100 + Sell score 0–100 |
-| NVDA example | 93/100 — outstanding business | Near highs → sell score elevated |
 
-Framework score prevents selling great businesses on temporary weakness. Signals prevent buying bad businesses because they look cheap. The combination of value zone entry (factor gate) + institutional momentum (DFV) + near-high exit is the complete cycle.
+Framework score prevents selling great businesses on temporary weakness. Signals prevent buying bad businesses just because they look cheap. The combination of value zone entry + institutional momentum confirmation + near-high exit is the complete cycle.
 
-**Pipeline:**
-'''
-GitHub Actions (daily 6am + 8pm Bangkok)
-  → signal_scanner.py + sell_side_scorer.py
-  → signals_payload.json committed to repo
-  → Netlify auto-deploys
-  → Dashboard loads fresh signals
-
-GitHub Actions (monthly, first Monday)
-  → signal_scanner_validation.py
-  → Walk-forward CV across 24 random windows
-  → validated_params.json committed
-  → Daily scanner reads new params automatically
-'''
+**Automated pipeline:** GitHub Actions runs the scanner twice daily → writes signals_payload.json → Netlify deploys → dashboard loads fresh signals. Parameters auto-update monthly via walk-forward validation.
 
 ---
 
 ## 2. System Performance Summary
 
-### Buy-Side (validated, 24 walk-forward windows, dual-seed)
+### Buy-Side (24 walk-forward windows, dual-seed validation)
 
-| Signal | 252d mean sep | p-value | Win rate | Weight |
+| Signal | What it identifies | 252d separation vs VOO | p-value | Weight |
 |---|---|---|---|---|
-| Factor Value | +23.7% | 0.024 | 10/12 | 40 |
-| Factor+DFV V3 ★ | +22.8% | 0.034 | 9/12 | 38 |
-| Triple Composite | +9.1% | 0.088 | 7/12 | 15 |
-| PFD Buy | +5.1% | 0.112 | 7/12 | 6 |
-| DFV V3 standalone | −0.3% | 0.586 | — | **0 (removed)** |
-| DFV V1 standalone | −1.3% | 0.716 | — | **0 (removed)** |
+| Factor+DFV V3 ★ | Quality stock beaten down + institutional money returning | +22.8% | 0.034 | 38 |
+| Factor Value | Quality stock beaten down from highs, still in uptrend | +23.7% | 0.024 | 40 |
+| Triple Composite | Stock up >20% in 3 months — momentum continues | +9.1% | 0.088 | 15 |
+| PFD Buy | Price lagging its own recent trend — quiet accumulation | +5.1% | 0.112 | 6 |
+| DFV V3 standalone | Momentum turn without value context | −0.3% | 0.586 | **0 removed** |
 
-**Separation** = avg excess return vs VOO when signal fires minus when silent. Positive = signal correctly identifies outperformers.
+### Sell-Side (24 walk-forward windows, dual-seed validation)
 
-### Sell-Side (validated, 24 walk-forward windows, dual-seed)
-
-| Signal | 252d sep | p-value | Win rate | Weight |
+| Signal | What it identifies | 252d separation vs VOO | p-value | Weight |
 |---|---|---|---|---|
-| near_high | −15.8% | **0.000** | 11/12 | 35 |
-| CMF dist @ high | −9.1% | **0.000** | — | 30 |
-| SMA/ATR > 3.5 | −13.4% | 0.001 | — | 20 |
-| rv_z2 (30d) | −1.4% at 30d | **0.000** | 17/22 | 10 |
-| Banker Weak | +3.2% | 0.451 | — | **0 (wrong direction)** |
-| Weekly RSI >75/80 | positive | — | — | **0 (buy continuation)** |
-| Momentum exhaust | positive | — | — | **0 (buy continuation)** |
+| Near 252d high | Stock fully recovered — original buy thesis exhausted | −15.8% | 0.000 | 35 |
+| SMA/ATR extension | Price stretched 3.5× its normal daily range above 200d average | −13.4% | 0.001 | 20 |
+| CMF distribution | Institutions selling quietly while price is at highs | −9.1% | 0.000 | 30 |
+| RV Z-score (short) | Vol climax — stock moving 2× faster than its 3yr average | −1.4% at 30d | 0.000 | 10 |
+| Banker Weak | RSI47 dropping from peak | +3.2% | 0.451 | **0 wrong direction** |
+| Weekly RSI >75 | Overbought on weekly chart | +8.2% | — | **0 buy continuation** |
 
-For sell signals: **negative separation = good** (flagged stocks underperformed VOO after signal).
+**Separation** = avg excess return vs VOO when signal fires minus when silent. Positive = outperforms VOO after signal. Negative (sell signals) = underperforms VOO after signal.
 
-### Optimal parameters (from grid search, validated 2026-05-17)
+### Optimal parameters (grid searched, validated 2026-05-17)
 
-| Parameter | Value | Tested range |
-|---|---|---|
-| DIST_T | −0.15 | −0.08, −0.10, −0.12, −0.15 |
-| DFV_LIFT | 2.5 | 2.5, 4.0, 5.5, 7.0 |
-| QUALITY_T | 0.20 | 0.10, 0.15, 0.20 |
-| p_threshold | 0.15 | — |
+DIST_T = −0.15 · DFV_LIFT = 2.5 · QUALITY_T = 0.20 · p_threshold = 0.15
 
 ---
 
@@ -2021,380 +2553,387 @@ For sell signals: **negative separation = good** (flagged stocks underperformed 
 
 ### Axis 1 — Competitive Moat (30 pts)
 
-What makes this business structurally unassailable over 5–10 years?
+**What it measures:** How defensible is the business over 5–10 years? Can a well-funded competitor replicate it?
 
-| Score | Evidence |
-|---|---|
-| 25–30 | Network effects compounding at scale OR switching costs making migration prohibitive OR unique technology with multi-year R&D lead time |
-| 15–24 | Real competitive advantage but replicable with capital + time |
-| 0–14 | Commodity or scale-only moat |
+**High score (25–30):** Network effects that grow stronger with every new user (Booking.com — more hotels attract more travellers, which attract more hotels). Switching costs so high that customers are effectively locked in (Microsoft Azure — migrating your entire cloud infrastructure costs years and millions). Proprietary technology with an insurmountable R&D lead (ASML — the only company on earth that can make EUV lithography machines, requiring decades of physics research to build).
 
-Examples: NVDA 28 (CUDA ecosystem — 4M+ developers), ASML 28 (EUV monopoly), BKNG 23 (network effects but OTA competition), TSLA 14 (EV moat eroding)
+**Low score (0–14):** Commodity businesses where the product is identical regardless of who makes it. Scale advantages that a better-capitalised competitor could match within a few years.
+
+Examples: NVDA 28 (CUDA ecosystem — 4M+ developers can't be migrated), ASML 28 (EUV monopoly), BKNG 23 (network effects but Expedia/Airbnb compete), TSLA 14 (EV moat eroding fast as BYD and legacy OEMs catch up)
 
 ### Axis 2 — Financial Quality (25 pts)
 
-Can the business convert revenue into durable profit efficiently?
+**What it measures:** Can this business turn revenue into real cash efficiently? High-quality businesses have pricing power (high margins), generate more cash than they report as earnings (high FCF conversion), and earn strong returns on the capital they deploy (high ROIC).
 
-| Score | Evidence |
-|---|---|
-| 20–25 | Gross margin >60% + FCF conversion >80% + ROIC >20% + minimal debt |
-| 12–19 | Good margins but capital-intensive or moderate FCF conversion |
-| 0–11 | Low margins, poor FCF, or leveraged balance sheet |
+**High score (20–25):** Gross margin above 60%, free cash flow conversion above 80%, ROIC above 20%, minimal debt. These businesses can self-fund growth and return capital to shareholders.
 
-Distinct from growth — AAPL scores 22 (high quality, moderate growth); CRDO scores 15 (quality still scaling but growing fast).
+**Low score (0–11):** Thin margins requiring high volume, heavy capex that burns cash, or a leveraged balance sheet that constrains flexibility.
+
+This axis is deliberately separate from growth. Apple scores 22 (exceptional quality, moderate growth). CoreWeave scores 13 (quality still being established at scale, growing extremely fast).
 
 ### Axis 3 — Growth & Runway (20 pts)
 
-Is there a large, expanding market AND a credible path to capture it?
+**What it measures:** Is there a large, expanding market ahead, and is this company well-positioned to capture it over the next 3+ years?
 
-| Score | Evidence |
-|---|---|
-| 16–20 | TAM expanding faster than company + multi-year backlog + structural AI/cloud/semiconductor tailwind |
-| 10–15 | Good growth but cyclical risk OR mature market with share gains only |
-| 0–9 | Single-digit growth or structurally declining |
+**High score (16–20):** The company is riding a multi-decade structural shift (AI infrastructure, cloud computing, semiconductor complexity), not just a cyclical upturn. The total addressable market is expanding faster than the company is growing, meaning the opportunity ahead is larger than what's already been captured.
+
+**Low score (0–9):** Mature markets where growth only comes from taking share. Cyclical businesses where the current expansion will eventually reverse. Technologies facing displacement risk within the scoring horizon.
 
 ### Axis 4 — Valuation Risk (20 pts)
 
-*Raised from 15pts in previous version. Price paid matters.*
+**What it measures:** What is the downside if growth disappoints? Even great businesses can be catastrophic buys at the wrong price.
 
-| Score | Evidence |
-|---|---|
-| 16–20 | PEG <1.5 OR >15% below own historical median multiple OR clear re-rating catalyst |
-| 10–15 | Fair value — reasonable multiple relative to growth |
-| 0–9 | Priced for perfection — PSR >20x with slowing growth, or consensus already pricing bull case |
+**High score (16–20):** The stock is reasonably priced relative to its growth rate (PEG below 1.5), is meaningfully below its recent highs, or has a clear catalyst that could expand its multiple. There is a margin of safety.
+
+**Low score (0–9):** The stock is priced for perfection — any slowdown in growth or margin pressure would cause a significant de-rating. The consensus has already priced in the optimistic scenario.
+
+*This axis was raised from 15pts to 20pts in the current version. The price you pay for a great business determines your return, not just the quality of the business itself.*
 
 ### Axis 5 — Portfolio Fit (5 pts)
 
-Does this add unique exposure or duplicate an existing position?
+**What it measures:** Does this position add something genuinely different to the portfolio, or does it duplicate exposure you already have?
 
-| Score | Situation |
-|---|---|
-| 4–5 | Unique sector/geographic exposure not replicated elsewhere |
-| 2–3 | Moderate overlap |
-| 0–1 | Heavy overlap — duplicates theme without adding diversification |
+**High score (4–5):** Unique geographic or sector exposure not covered elsewhere. KTAM India is the only India exposure in the portfolio.
 
-*Portfolio-dependent — changes when you add/remove positions.*
+**Low score (0–1):** Owning both QQQ and SCB Nasdaq is near-pure redundancy. Owning NVDA, AVGO, AMAT, and ASML means adding MU adds limited new exposure to the semiconductor thesis.
+
+*Note: This score is portfolio-dependent and changes when you add or remove positions.*
 
 ---
 
 ## 4. Current Framework Scores
 
-| Ticker | Moat /30 | Quality /25 | Growth /20 | Val /20 | Fit /5 | **Total** |
+| Ticker | Moat | Quality | Growth | Valuation | Fit | **Total** |
 |---|---|---|---|---|---|---|
 | NVDA | 28 | 23 | 18 | 13 | 11 | **93** |
 | ASML | 28 | 21 | 18 | 15 | 11 | **93** |
 | CRDO | 27 | 15 | 19 | 14 | 18 | **93** |
 | AVGO | 26 | 22 | 17 | 14 | 13 | **92** |
-| TSM | 25 | 20 | 18 | 13 | 13 | **89** |
 | ANET | 26 | 21 | 18 | 14 | 12 | **91** |
 | DDOG | 24 | 20 | 18 | 13 | 15 | **90** |
 | MELI | 23 | 18 | 19 | 14 | 16 | **90** |
+| TSM | 25 | 20 | 18 | 13 | 13 | **89** |
 | NBIS | 22 | 16 | 18 | 17 | 14 | **87** |
 | AMD | 23 | 18 | 17 | 14 | 14 | **86** |
 | BKNG | 23 | 20 | 15 | 13 | 14 | **85** |
-| AMAT | 21 | 18 | 17 | 13 | 13 | **82** |
+| GOOG | 24 | 20 | 17 | 12 | 10 | **83** |
+| AMZN | 24 | 19 | 17 | 13 | 9 | **82** |
 | MSFT | 26 | 22 | 15 | 11 | 8 | **82** |
 | META | 24 | 20 | 16 | 12 | 10 | **82** |
-| AMZN | 24 | 19 | 17 | 13 | 9 | **82** |
-| GOOG | 24 | 20 | 17 | 12 | 10 | **83** |
+| AMAT | 21 | 18 | 17 | 13 | 13 | **82** |
+| RMS.PA | 24 | 21 | 14 | 12 | 11 | **82** |
+| NVO | 22 | 20 | 17 | 12 | 9 | **80** |
 | AAPL | 23 | 22 | 14 | 11 | 10 | **80** |
 | CPRT | 21 | 19 | 16 | 13 | 11 | **80** |
-| SHOP | 19 | 16 | 16 | 13 | 14 | **78** |
+| MC.PA | 23 | 20 | 14 | 12 | 11 | **80** |
 | INTU | 21 | 19 | 16 | 12 | 11 | **79** |
 | RACE | 21 | 19 | 14 | 13 | 12 | **79** |
-| NVO | 22 | 20 | 17 | 12 | 9 | **80** |
+| SHOP | 19 | 16 | 16 | 13 | 14 | **78** |
 | PGR | 19 | 17 | 15 | 13 | 14 | **78** |
+| BRKB | 22 | 19 | 13 | 13 | 11 | **78** |
 | NFLX | 20 | 18 | 14 | 12 | 12 | **76** |
 | MU | 18 | 16 | 16 | 14 | 12 | **76** |
+| ITX.MC | 19 | 17 | 14 | 14 | 12 | **76** |
+| RELX | 20 | 18 | 15 | 13 | 11 | **77** |
 | TTD | 19 | 17 | 16 | 13 | 12 | **77** |
 | UNH | 20 | 17 | 14 | 12 | 14 | **77** |
-| BRKB | 22 | 19 | 13 | 13 | 11 | **78** |
-| RELX | 20 | 18 | 15 | 13 | 11 | **77** |
 | TEAM | 19 | 17 | 15 | 12 | 12 | **75** |
 | FISV | 19 | 16 | 14 | 12 | 13 | **74** |
 | CRWV | 17 | 13 | 17 | 10 | 15 | **72** |
-| RMS.PA | 24 | 21 | 14 | 12 | 11 | **82** |
-| MC.PA | 23 | 20 | 14 | 12 | 11 | **80** |
-| ITX.MC | 19 | 17 | 14 | 14 | 12 | **76** |
-| TM | 17 | 13 | 11 | 14 | 9 | **64** |
 | O | 15 | 14 | 11 | 14 | 11 | **65** |
+| TM | 17 | 13 | 11 | 14 | 9 | **64** |
 | ADBE | 17 | 17 | 11 | 8 | 6 | **59** |
 | COIN | 14 | 10 | 16 | 8 | 10 | **58** |
 | TSLA | 14 | 11 | 13 | 7 | 5 | **50** |
 | TQQQ | 7 | 5 | 9 | 4 | 9 | **34** |
 
-**Thresholds:** ≥85 = core keeper. 70–84 = good, monitor. 55–69 = marginal, consider rotating. <55 = sell candidate.
+**Thresholds:** ≥85 = core keeper · 70–84 = good, monitor · 55–69 = marginal, consider rotating · <55 = sell candidate
 
 ---
 
 ## 5. Buy-Side Signal Models
 
-### Validated weights (from walk-forward CV, 24 windows)
+### How the buy score works
+
+Every morning, each position receives a buy score from 0 to 100 based on four validated signals. A score of 60 or above triggers a BUY signal. The signals are layered — the first two must both be true to achieve the highest scores, which prevents the model from triggering on noise.
 
 '''
-Factor gate active         +40   backbone — 4/4 horizons
-Factor+DFV V3 combined     +38   best entry signal — 4/4 horizons
-Triple Composite (63d>20%) +15   momentum confirmation — 4/4
-PFD Buy                    +6    supporting — 3/4 horizons
-─────────────────────────────────────────────────────
-Sum if all active         = 99   (clean — no arbitrary cap)
-+ Fundamental boost        0–15  (when factor gate active)
-- Banker Weak penalty       −15  (institutional exit reduces conviction)
-Capped 0–100
+Factor gate active          +40
+Factor+DFV V3 combined      +38   (only adds if factor gate also active)
+Triple Composite            +15
+PFD Buy                     +6
+────────────────────────────────
+Maximum if all active       99
++ Fundamental boost         0–15  (when factor gate active)
+- Banker Weak penalty       −15
+Capped at 100
 '''
 
-**Buy signal thresholds:** Score ≥60 = BUY. Score 30–59 = watchlist. Score <30 = HOLD.
+### Signal 1 — Factor Value Gate (weight +40)
+
+**In plain English:** This is the backbone of the entire buy system. It asks three questions simultaneously: (1) Has this stock been knocked down significantly from its recent peak? (2) Is it still above its long-term trend line, meaning it hasn't turned into a falling knife? (3) Does it have a reasonable risk-adjusted return history, meaning it's a quality business and not just cheap for a reason?
+
+All three must be true at the same time. A stock down 20% from its high but below its 200-day average fails (falling knife). A stock above its average but only 5% below its high fails (not cheap enough). Only stocks that are beaten down, trending up, and quality-proven pass the gate.
+
+**Validated result:** +23.7% average excess return vs VOO at the 252-day horizon across 10/12 random test windows. This is the most reliable signal in the model.
+
+### Signal 2 — Factor+DFV V3 Combined (weight +38, adds on top of Signal 1)
+
+**In plain English:** DFV stands for Deep Fucking Value — the name of the original Pine Script indicator. The V3 version measures whether institutional "hot money" is starting to flow back into a stock after it's been beaten down. It does this by tracking a momentum indicator derived from RSI40, scaled to a 0–20 range, and measuring how much it has lifted off its recent floor.
+
+When both the Factor gate AND the DFV timing signal fire simultaneously, it means: (a) the stock is in the value zone AND (b) smart money is actually starting to buy it. This is the strongest buy signal in the model.
+
+Think of the Factor gate as identifying the opportunity and DFV as confirming that the market is starting to agree with you. Entering on Factor alone means you might sit flat for weeks before DFV confirms. Waiting for both together means you catch slightly less of the early move but with much higher conviction.
+
+**Practical implication:** When Factor fires without DFV, consider a half-position. When both fire, add the rest.
+
+**Validated result:** +22.8% average excess return vs VOO at 252 days across 9/12 windows.
+
+### Signal 3 — Triple Composite (weight +15)
+
+**In plain English:** Simply measures whether a stock has risen more than 20% in the past 63 trading days (roughly 3 months). Counter-intuitively, this is a buy continuation signal — not a sell signal. Stocks that have run 20%+ in 3 months tend to keep outperforming VOO over the next year, not revert.
+
+This signal fires on momentum leaders, which are a different profile from the beaten-down value plays that the Factor gate identifies. It rarely fires simultaneously with the Factor gate on the same stock, so it mostly adds buy score to strong trend-following situations.
+
+**Validated result:** +9.1% average excess return vs VOO at 252 days. Positive at all 4 horizons (30d/63d/126d/252d).
+
+### Signal 4 — PFD Buy (weight +6)
+
+**In plain English:** PFD stands for Price/Fundamental Divergence. It detects when a stock's 1-year return looks compressed relative to its recent 6-month run. Specifically, when the 1-year return is less than twice the 6-month return, it means the stock ran early in the year and has been quietly consolidating — which often signals institutional accumulation before the next leg up.
+
+This is the weakest of the four validated signals but it's consistently positive across 3 out of 4 test horizons, so it earns a small weight rather than being removed.
+
+**Validated result:** +5.1% average excess return vs VOO at 252 days.
+
+### What was removed and why
+
+**DFV V1 standalone (−1.3%):** The original Pine Script single-bar DFV signal fires when the hot money RSI turns up from the 0–5 zone on a single bar. Without the Factor gate providing context, it fires on any stock with an oversold RSI bounce — including stocks that are cheap for structural reasons. Negative separation across all horizons. Removed from scoring. Still shown as context in the interface.
+
+**DFV V3 standalone (−0.3%):** Same problem. The DFV timing signals are only meaningful when combined with the Factor gate's quality and value filters.
 
 ---
 
 ## 6. Sell-Side Signal Models
 
-### Validated weights (walk-forward CV, 24 windows, dual-seed)
+### How the sell score works
+
+The sell model runs every day on all held positions. A score of 35 triggers TRIM (sell 25%), 55 triggers REDUCE (sell 50%), and 70 triggers EXIT. A hard cap ensures no more than 10% of positions are flagged at any time — preventing mass sell signals in bull markets where everything looks extended.
 
 '''
-near_high (dist > -5%)     +35   stock within 5% of 252d high — value thesis exhausted
-CMF_dist @ high            +30   institutional distribution while near highs — strongest signal
-SMA/ATR > 3.5              +20   price >3.5 ATRs above 200d MA — extreme extension
-rv_z2 (short-term)         +10   vol climax: valid 30-126d, flips at 252d
-────────────────────────────────────────────────────────────────────
-Max stock-only score:       95
-+ CNN greed >75            +15   (>90 = +25 instead)
-+ S&P500 >15% above 200d   +10
-+ Buffett proxy extended    +10
-+ Sector extension          +10   (max 1 per ticker)
-Capped 0–100
+near_high (stock level)     +35   primary — value thesis exhausted
+CMF distribution            +30   institutions selling at highs
+SMA/ATR extension           +20   price stretched beyond normal range
+RV z-score (short-term)     +10   volatility climax — short-term mean reversion
+────────────────────────────────
+Max stock-only score         95
++ CNN greed >75             +15   (>90 replaces with +25)
++ S&P500 >15% above 200d    +10   market structurally extended
++ Buffett proxy extended     +10   macro valuation extreme
++ Sector extension           +10   per-sector ETF bubble signal (max 1 per ticker)
+Capped at 100
 '''
 
-**Sell thresholds:** TRIM ≥35 · REDUCE ≥55 · EXIT ≥70
+### Signal 1 — Near 252d High (weight +35)
 
-**Portfolio cap:** Max 10% of positions flagged at TRIM+ at any time. Prevents mass sell signals in bull markets.
+**In plain English:** This is the exact mirror image of the Factor gate. The Factor gate buys stocks more than 15% below their 252-day high. The near-high signal flags stocks within 5% of their 252-day high. When a stock has fully recovered to near its annual peak, the original reason to own it — the value discount — no longer exists.
 
-### Removed signals (wrong direction — stocks outperform after these fire)
+At this point two forces work against the stock: anyone who held through the drawdown and is now back to breakeven will consider selling, and the stock has less room to run before hitting resistance from previous sellers. Historically, stocks in this zone underperform VOO by 15.8% over the next year on average.
 
-| Signal | 252d sep | Reason removed |
-|---|---|---|
-| Weekly RSI >75/80 | +8.2% | Buy continuation — stocks keep rising |
-| Momentum exhaust 20%/30% | +15.3% | Same — momentum continues |
-| Banker Weak (as sell) | +3.2% | Stocks outperform after WB fires |
-| BRED (2+ components) | +3.0% | Wrong direction |
-| Framework score <55 | +12.7% | Cheap stocks outperform |
+**Validated result:** −15.8% at 252 days, p=0.000 (essentially certain), 11 out of 12 test windows showed underperformance.
+
+### Signal 2 — CMF Distribution at Highs (weight +30)
+
+**In plain English:** CMF stands for Chaikin Money Flow. It measures the balance between buying and selling volume — specifically whether stocks close near the top of their daily range (buying pressure) or near the bottom (selling pressure) on a given day, weighted by volume. A 20-day CMF below zero while the stock is near its highs means that even as the price stays elevated, the volume-weighted action each day is tilted toward distribution. Institutions are quietly selling into strength while retail buyers hold the price up. This is the classic distribution pattern before a significant decline.
+
+This is the most consistently validated sell signal — significant at 2 out of 4 horizons and p=0.000 at 252 days.
+
+**Validated result:** −9.1% at 252 days, p=0.000. Most consistent of all sell signals.
+
+### Signal 3 — SMA/ATR Extension (weight +20)
+
+**In plain English:** This measures how far above its 200-day average a stock has moved, but expressed in units of the stock's own daily range (ATR — Average True Range) rather than a fixed percentage. This normalises for each stock's natural volatility. A reading above 3.5 means the stock has moved more than 3.5 times its typical daily range above its long-term average. That level of extension is historically unusual and tends to mean-revert over the following year.
+
+The reason to use ATR rather than a fixed percentage threshold is that NVDA is naturally more volatile than JEPI. A 40% extension for NVDA might be 3 ATRs (moderate for NVDA), but for JEPI it would be 8 ATRs (extreme). Normalising by ATR makes the signal comparable across all tickers.
+
+**Validated result:** −13.4% at 252 days, p=0.001.
+
+### Signal 4 — RV Z-Score (weight +10, short-term only)
+
+**In plain English:** This measures whether a stock is currently moving much faster than its own historical average volatility. A z-score above 2.0 means the stock's 20-day realised volatility is more than 2 standard deviations above its 3-year average — a statistical rarity that happens roughly 2.5% of the time in normal conditions.
+
+This is a short-term signal only. At the 30-day and 63-day horizons it reliably predicts underperformance (17/22 windows, CI entirely negative). But by the 252-day horizon the stock has usually stabilised and the pattern reverses. Given the holding style of this portfolio (cash held months before reinvesting), the 30-63 day horizon is directly actionable.
+
+**Validated result:** −1.4% at 30 days, p=0.000, 17/22 windows negative. CI = [−2.2%, −0.8%] — entirely below zero.
+
+### What was removed and why
+
+Every other signal we tested showed stocks *outperforming* VOO after the signal fired — the exact opposite of what a sell signal should do.
+
+**Weekly RSI >75:** Stocks with overbought weekly RSI go on to outperform by +8.2% at 252 days. High weekly RSI is a sign of strong momentum, not exhaustion at the 1-year horizon.
+
+**Momentum exhaustion 20%/30%:** Stocks up 20-30% in 63 days continue to outperform by 9-15% over the next year. Same reason as above — this threshold is momentum continuation, not reversal.
+
+**Banker Weak (WB) as sell signal:** p=0.451, +3.2% separation — essentially random and slightly positive. Stocks outperform after WB fires. The institutional RSI dropping from its peak often happens mid-consolidation before the stock continues higher. WB is kept as a buy score reducer (−15) because it reduces conviction when you're thinking of entering, but it is never a sell trigger.
+
+**Framework score <55:** Cheap, low-quality stocks outperform by +12.7% at 252 days. This reflects mean reversion — beaten-down businesses recover even when the fundamentals are poor.
 
 ---
 
 ## 7. How the Systems Work Together
 
-### Buy: signal × framework
+### Practical decision framework
 
-| Factor+DFV V3 | Fundamentals | Framework | Action |
+**Buying — what you want:**
+The ideal entry is when three layers agree: (1) The framework score is ≥80, confirming you want to own this business long-term. (2) The Factor gate is active, meaning it's in the value zone. (3) DFV V3 has fired, confirming institutional re-entry. Together this means: great business, temporarily beaten down, smart money starting to buy.
+
+If you only have the Factor gate without DFV, consider a half-position and wait for DFV to confirm. If the framework score is below 55, do not buy regardless of what the signals say.
+
+**Selling — what you want:**
+The ideal exit trigger is near_high + CMF distribution firing simultaneously. That combination means: the value thesis is exhausted AND institutions are quietly reducing. If the framework score is also below 70, that is a full exit signal. If the framework score remains high (≥80), trim rather than exit — the business is still worth owning, just not at this price.
+
+### Buy decision table
+
+| Factor gate | DFV V3 | Framework | Action |
 |---|---|---|---|
-| ✓ active | Strong | ≥80 | **Full conviction add** |
-| ✓ active | Weak | ≥80 | Buy — trust framework |
-| Factor only | Strong | ≥80 | Watchlist — wait for DFV |
-| ✓ active | Any | <55 | **Do not buy — poor business** |
-| No signal | — | ≥80 | Hold — not an entry point |
+| ✓ | ✓ | ≥80 | Full conviction add |
+| ✓ | — | ≥80 | Half position — wait for DFV |
+| ✓ | ✓ | 60–79 | Smaller position — less certain thesis |
+| ✓ | ✓ | <55 | Do not buy — poor business |
+| — | — | ≥80 | Hold — not an entry point |
 
-### Sell: signal × framework
+### Sell decision table
 
-| near_high | CMF dist | Framework | Action |
+| Near high | CMF dist | Framework | Action |
 |---|---|---|---|
-| — | — | ≥80 | Hold |
-| ✓ | — | ≥80 | TRIM — value thesis exhausted, business strong |
+| — | — | Any | Hold |
+| ✓ | — | ≥80 | TRIM — value exhausted, business still strong |
 | ✓ | ✓ | ≥80 | REDUCE |
 | ✓ | ✓ | 60–79 | EXIT |
-| ✓ | ✓ | <55 | **EXIT immediately** |
+| ✓ | ✓ | <55 | EXIT immediately — all layers agree |
 
 ---
 
-## 8. Exact Model Logic
+## 8. Signal Models in Plain English — Quick Reference
 
-### Factor Value ('f')
+A one-paragraph summary of each signal as you would explain it to someone who doesn't follow markets:
 
-'''python
-high252  = close.rolling(252).max().shift(1)   # shift avoids lookahead
-dist     = (close - high252) / high252
-ma200    = close.rolling(200).mean()
-trend    = (close - ma200) / ma200
-quality  = (ret_252d / vol_252d / 3).clip(0, 1)  # Sharpe/3
+**Factor Value Gate:** Finds high-quality stocks that have been significantly beaten down from their recent peak but haven't broken their long-term upward trend. Think of it as finding a good business on sale — but only if the business was genuinely good before the dip, and only if the dip hasn't turned into a structural collapse.
 
-f = (dist < -0.15) AND (trend > 0) AND (quality > 0.20)
-'''
+**DFV V3 (Deep Fucking Value):** Tracks whether institutional money — the big funds that move markets — is starting to flow back into a beaten-down stock. It uses a scaled version of the RSI40 indicator and fires when that reading lifts meaningfully off its recent floor. It's the difference between a stock just sitting in the cheap zone and a stock where the smart money is actually starting to buy again.
 
-DIST_T=−0.15: stock must be >15% below 252d high. QUALITY_T=0.20: Sharpe must exceed 0.60 (=0.20×3). shift(1) on high252 prevents the current bar from being included in its own high calculation.
+**Factor+DFV V3 Combined:** The best signal in the model. Both of the above are simultaneously true. Value zone + institutional re-entry = highest confidence entry point.
 
-### DFV V3 ('dfv3') — Pine Script exact match
+**Triple Composite:** A stock that has risen more than 20% in the past 3 months tends to keep outperforming. Counter-intuitive but statistically validated — at this threshold, momentum is a continuation signal not a reversal signal.
 
-'''python
-rsi40    = wilder_rsi(close, 40)
-hm_rsi   = (0.7 * (rsi40 - 30)).clip(0, 20)      # hot money RSI: 0=oversold, 20=max
-hm_floor = hm_rsi.rolling(10).min().shift(1)      # 10-day floor
-hm_lift  = hm_rsi - hm_floor
-dfv3     = hm_lift > 2.5                          # validated: DFV_LIFT=2.5
-'''
+**PFD Buy:** When a stock has run strongly in the first half of the year but gone quiet recently, it often means institutions are accumulating before the next move. A quiet stock consolidating after a strong run is often more attractive than one still making headlines.
 
-### DFV V1 ('dfv1') — Pine Script original buy signal
+**Near 252d High:** When a stock has fully recovered to within 5% of its annual peak, the value discount that justified owning it is gone. Historically this is the strongest sell signal — stocks in this zone underperform the market by 16% on average over the next year.
 
-'''python
-dfv1 = (hm_rsi > hm_prev) AND (hm_prev >= 0) AND (hm_prev <= 5)
-# Fires on single bar when hm_rsi turns up from 0-5 zone (RSI40 was 30-37)
-'''
+**CMF Distribution at Highs:** The volume tells a different story than the price. When the price is near highs but most of the daily trading volume is happening near the bottom of each day's range, institutions are quietly selling into retail buying pressure. Price stays elevated while the underlying ownership is quietly shifting to weaker hands.
 
-### Factor+DFV V3 combined ('fdfv3')
+**SMA/ATR Extension:** The stock has moved so far above its 200-day average — measured in units of its own typical daily move — that it has mathematically borrowed performance from the future. Extreme extension in either direction eventually corrects.
 
-'''python
-fdfv3 = f AND dfv3
-# Best entry: value zone + quality + institutional re-entry momentum
-'''
+**RV Z-Score:** When a stock is moving twice as fast as its own 3-year average daily range, it's in a volatility climax. This predicts short-term underperformance (1–3 months) but not long-term. Given that cash is typically redeployed within a few months, this short-horizon signal is actionable.
 
-### Banker Weak ('wb') — Pine Script exact match
-
-'''python
-rsi47      = wilder_rsi(close, 47)
-banker_rsi = (1.5 * (rsi47 - 51)).clip(0, 20)
-wb         = (banker_rsi_prev >= 20) AND (banker_rsi < 20)
-# Fires when institutional RSI drops from max — used as BUY penalty only (-15)
-# Validated as SELL signal: p=0.451, +3.2% sep → wrong direction, not a sell trigger
-'''
-
-### PFD Buy ('pfd')
-
-'''python
-pfd = ((ret252 - 2*ret126) > 0.05) AND (quality > QUALITY_T * 2)
-# Fires when 1yr return compressed vs recent 6mo — accumulation pattern
-'''
-
-### Near 252d High — primary sell signal
-
-'''python
-near_high = dist > -0.05   # within 5% of 252d high
-# Exact inverse of factor gate. Validated: -15.8% at 252d, p=0.000, 11/12 windows
-'''
-
-### SMA/ATR Distance — sell signal
-
-'''python
-tr       = max(high-low, |high-prev_close|, |low-prev_close|)
-atr14    = tr.rolling(14).mean()
-sma_atr  = (close - sma200) / atr14
-# sell when sma_atr > 3.5: price >3.5 ATRs above 200d MA
-# Validated: -13.4% at 252d, p=0.001
-'''
-
-### CMF (Chaikin Money Flow) — sell signal
-
-'''python
-mfm      = ((close - low) - (high - close)) / (high - low)
-cmf_20   = (mfm * volume).rolling(20).sum() / volume.rolling(20).sum()
-# Negative CMF while near_high = institutions distributing at highs
-# Validated: -9.1% at 252d, p=0.000, most consistent sell signal (2/4 horizons)
-'''
-
-### RV Z-Score — short-term sell signal
-
-'''python
-rv20     = log_returns.rolling(20).std() * sqrt(252)  # annualised 20d vol
-rv_mean  = rv20.rolling(756).mean()                   # 3yr average
-rv_std   = rv20.rolling(756).std()
-rv_z     = (rv20 - rv_mean) / rv_std
-rv_z2    = rv_z > 2.0
-# Validated SHORT-TERM: -1.4% at 30d p=0.000, 17/22 windows, CI=[-2.2%,-0.8%]
-# Flips to +9.7% at 252d — only actionable when cash held 1-3 months
-'''
+**Banker Weak (WB):** The institutional RSI dropping from its maximum. Used as a reason to reduce conviction on a new buy — not as a sell trigger. The data shows stocks actually outperform after WB fires, so it is never used to sell an existing position.
 
 ---
 
-## 9. Backtesting Methodology — V1 vs V2
+## 9. Backtesting Methodology
 
-### V1 (deprecated) — single fixed split
+### Why backtesting matters
 
-One fixed 7yr train / 3yr test window. Single result per signal with no uncertainty estimate. Entirely determined by which 3 years happened to be the test window. Factor+DFV V3 showed +62% at 504d — plausible but one data point.
+Any model that looks good on the data it was trained on is worthless — it has simply memorised the past. The only meaningful test is whether the model works on data it has never seen. All results in this document come from out-of-sample test windows the model was never trained on.
 
-### V2 (current) — walk-forward cross-validation
+### V1 vs V2 — what changed
 
-| | V1 | V2 |
-|---|---|---|
-| Windows | 1 fixed split | 24 random (seed=42 + seed=99) |
-| Train length | Fixed 7yr | Random 1.5–4yr |
-| Test length | Fixed 3yr | Random 6–18mo (min 30d) |
-| Purge gap | None | 20 days (prevents lookahead) |
-| Uncertainty | None | Mean ± std, 95% bootstrap CI |
-| p-value | Not reported | t-test vs zero, p<0.15 required |
-| Parameters | Fixed arbitrary | Grid searched |
-| Factor+DFV V3 504d | +62% (one window) | +54.6% ±92.9% (24 windows) |
+**V1 (old, deprecated):** One fixed 7-year training window, one fixed 3-year test window. Every result was a single number with no measure of uncertainty. If those 3 years happened to be a bull market, every signal looked good. If they happened to be a bear market, every signal looked bad. The 504-day separation of +62% for Factor+DFV V3 came from a single test window — one data point.
 
-**How windows are generated:** Random non-overlapping test windows across 10yr history. Each tagged bull/bear/sideways by VOO return. Current mix: 8 bull / 3 sideways / 1 bear — known limitation.
+**V2 (current):** 24 randomly generated windows (12 from seed=42 plus 12 from seed=99) across the full 10-year history. Each window has a random training period (1.5–4 years), a 20-day purge gap to prevent any information from leaking between train and test, and a random test period (30 days to 18 months). Results are averaged across all 24 windows, giving a mean, standard deviation, 95% confidence interval, and p-value. A signal must show p<0.15 to be trusted.
 
-**Parameter grid search:** DIST_T × DFV_LIFT × QUALITY_T across 36 combinations. Best = highest mean separation on Factor+DFV V3 at 252d, statistically significant only. Re-runs monthly.
+### What the numbers mean
 
-**Metrics per signal:** Mean separation · std · 95% bootstrap CI · p-value (t-test) · window win rate · consistency (horizons significant in correct direction).
+**Mean separation:** The average difference in return between stocks when the signal was active versus when it was not, measured against VOO. A mean separation of +22.8% for Factor+DFV V3 at 252 days means that, on average across all 24 test windows, stocks with this signal active outperformed VOO by 22.8% over the following year.
 
-**p-value threshold p<0.15:** Relaxed from standard p<0.05. Appropriate for financial signal research — low signal-to-noise ratio means p<0.05 rejects genuinely real signals. Walk-forward CV already controls false positive rate by averaging across 24 independent windows.
+**Standard deviation:** How much the result varied across the 24 windows. Factor+DFV V3 shows ±31.3% std at 252 days, meaning the true effect could plausibly range from near zero to quite large. This is why the p-value matters.
+
+**p-value:** The probability that the result occurred by chance. p=0.034 means there is only a 3.4% chance the observed +22.8% separation is random noise. p<0.15 is the threshold for including a signal in the model.
+
+**Win rate:** What fraction of the 24 test windows showed the separation in the correct direction. Factor Value: 10/12 positive. Near 252d High: 11/12 negative. These are consistent signals.
+
+**95% confidence interval:** The range within which the true effect lies with 95% probability. The RV Z-Score short-term sell signal has CI = [−2.2%, −0.8%] at 30 days — the entire interval is below zero, meaning we can be confident the effect is real even in the worst-case scenario.
+
+### Parameter optimisation
+
+DIST_T, DFV_LIFT, and QUALITY_T are not arbitrary — they are grid-searched across 36 combinations and the best-performing set (as measured on out-of-sample test windows) is selected. This runs monthly via GitHub Actions and auto-updates the scanner.
 
 ### Limitations
 
-1. Survivorship bias — universe excludes delisted stocks
-2. Transaction costs ignored — low-frequency signals limit this concern
-3. Regime concentration — 8/12 windows are bull markets
-4. High std at 504d (±92.9%) — 252d is the most reliable horizon
-5. ~76 direct tickers — meaningful but not a full market cross-section
+Survivorship bias — the universe only includes stocks that exist today, slightly overstating results. The 10-year period (2015–2025) was broadly bullish with only two significant corrections (2020, 2022), so bear market performance may differ. The universe of ~76 direct tickers is statistically meaningful but not comprehensive.
 
 ---
 
 ## 10. Fundamental Layer
 
-Added May 2026 via yfinance '.info'. Adds up to +15 to buy score when factor gate is active.
+Adds up to +15 points to the buy score when the Factor gate is active. Fetched from Yahoo Finance daily.
 
-| Component | Max weight | Full score trigger |
+| Component | Max contribution | What triggers full marks |
 |---|---|---|
-| Revenue growth (TTM YoY) | 0.30 | >50% |
-| Gross margin | 0.25 | >60% |
-| Earnings growth (quarterly) | 0.20 | >50% |
-| Analyst upside (≥3 analysts) | 0.15 | >30% vs current |
-| PEG ratio | 0.10 | <0.75 |
+| Revenue growth (1yr YoY) | 30% of boost | Growing revenue >50% year-over-year |
+| Gross margin | 25% of boost | Gross margin above 60% |
+| Earnings growth (quarterly) | 20% of boost | Earnings growing >50% year-over-year |
+| Analyst upside | 15% of boost | Mean analyst target >30% above current price (min 3 analysts) |
+| PEG ratio | 10% of boost | PEG ratio below 0.75 |
 
-Fundamental boost only applies when factor gate is active — fundamentals confirm the value thesis, they don't replace timing discipline. No penalty if yfinance has no data (ETFs, foreign-listed).
+The boost only applies when the Factor gate is active. The reasoning: a stock at all-time highs with great fundamentals is not a value buy — the fundamentals confirm the thesis but don't replace the timing discipline. If Yahoo Finance has no data (ETFs, foreign-listed stocks), no penalty is applied.
 
 ---
 
 ## 11. Thai Fund Proxies
 
-| Thai Fund | Proxy | Sectors |
-|---|---|---|
-| SCB S&P500 (A) | VOO | us_equity, broad |
-| SCB Nasdaq (A) | QQQ | us_equity, tech |
-| SCB Semiconductor (A) | SMH | semiconductor |
-| SCB World (A) | URTH | global, broad |
-| SCB Gold (A) | GLD | gold, commodity |
-| SCB Nikkei 225 (A) | EWJ | japan |
-| SCB Dow Jones (A) | DIA | us_equity, dividend |
-| SCB Asian EM (A) | AAXJ | asia, em |
-| SCB Fintech (A) | QQQ | fintech |
-| SCB Innovation (A) | QQQ | innovation |
-| SCB Genomic Rev (A) | XLV | healthcare, biotech |
-| SCB China Tech (A) | QQQ | china, tech |
-| SCB EV & Mobility (A) | QQQ | ev, auto |
-| SCB US Business (A) | SPY | us_equity |
-| KTAM India (A) | INDA | india, em |
-| KTAM World Equity (A) | URTH | global, broad |
-| KTAM World Tech AI (A) | QQQ | ai, tech |
-| KTAM Blockchain (A) | QQQ | crypto, blockchain |
-| KTAM Technology (A) | QQQ | tech, global |
-| KTAM Global ESG (A) | URTH | esg, global |
+Thai mutual funds are analysed using the closest equivalent ETF as a proxy. Signals on the proxy are applied to the fund position.
 
-Signal on proxy = signal applies to Thai fund. KTAM India (INDA) is the most uniquely positioned — genuine diversification. Most others overlap significantly with direct holdings.
+| Thai Fund | Proxy ETF | Primary exposure |
+|---|---|---|
+| SCB S&P500 (A) | VOO | US large cap |
+| SCB Nasdaq (A) | QQQ | US tech |
+| SCB Semiconductor (A) | SMH | Semiconductors |
+| SCB World (A) | URTH | Global equity |
+| SCB Gold (A) | GLD | Gold |
+| SCB Nikkei 225 (A) | EWJ | Japan equity |
+| SCB Dow Jones (A) | DIA | US dividend |
+| SCB Asian EM (A) | AAXJ | Asia ex-Japan |
+| SCB Fintech / Innovation / Auto / China / EV | QQQ | Tech proxy |
+| SCB Genomic Revolution (A) | XLV | Healthcare |
+| SCB US Business (A) | SPY | US broad market |
+| KTAM India (A) | INDA | India equity |
+| KTAM World Equity (A) | URTH | Global equity |
+| KTAM World Tech AI (A) | QQQ | AI/tech |
+| KTAM Blockchain (A) | QQQ | Crypto/blockchain proxy |
+| KTAM Technology (A) | QQQ | Global tech |
+| KTAM Global ESG (A) | URTH | ESG global |
+
+KTAM India is the most uniquely positioned — INDA provides genuine diversification from the rest of the portfolio. Most SCB funds that proxy to QQQ overlap significantly with direct technology holdings.
 
 ---
 
 ## 12. Scoring Any New Ticker
 
-1. **Moat /30** — Network effects, switching costs, proprietary tech, regulatory barriers
-2. **Financial Quality /25** — Gross margin, FCF conversion, ROIC, debt level
-3. **Growth & Runway /20** — Revenue CAGR, TAM expansion, secular vs cyclical
-4. **Valuation Risk /20** — PEG vs peers, distance from historical median multiple
-5. **Portfolio Fit /5** — Unique exposure vs what you already hold
+Apply the 5 axes in order:
 
-Score ≥85: core keeper. 70–84: good. 55–69: marginal. <55: sell candidate.
+1. **Moat /30** — Can competitors replicate this in 5–10 years? What would it take? Network effects, switching costs, proprietary tech, regulatory barriers?
 
-Then overlay signal models for entry/exit timing. Strongest setup: framework ≥80 + Factor+DFV V3 active + strong fundamentals = full conviction add.
+2. **Financial Quality /25** — What is the gross margin? How much of operating income converts to free cash flow? What does ROIC look like? Is the balance sheet clean?
+
+3. **Growth & Runway /20** — What structural trend is this riding? How large is the TAM relative to current revenue? Is the growth cyclical or secular?
+
+4. **Valuation Risk /20** — What is the PEG ratio relative to peers? Is the stock near historical highs or below them? Has the consensus already priced in the bull case?
+
+5. **Portfolio Fit /5** — What does this add that the existing portfolio doesn't already cover?
+
+Score ≥85: core keeper, hold through weakness. 70–84: good position, monitor valuation. 55–69: marginal, consider replacing with higher-conviction name. <55: sell candidate — wait for a signal to time the exit efficiently.
+
+Then overlay signal models. The strongest possible setup: framework ≥80 + Factor gate active + DFV V3 fired + positive fundamentals = full-size add.
 `;
 
 
@@ -2515,6 +3054,7 @@ async function runAnalytics() {
     if (payloadRes.ok) {
       const payload = await payloadRes.json();
       if (payload?.analytics) {
+        window._lastPayload = payload;
         renderSignalsFromPayload(payload);
         renderBuysFromPayload(payload);
         renderSellsFromPayload(payload);

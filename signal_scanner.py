@@ -9,6 +9,9 @@ import pandas as pd
 import numpy as np
 import requests, json, os, time
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+
+BANGKOK = ZoneInfo("Asia/Bangkok")
 
 try:
     from sell_side_scorer import (
@@ -47,10 +50,40 @@ MY_HOLDINGS = [
 ]
 
 CANDIDATES = [
+    # Original candidates
     'NOW','PANW','ORCL','COIN','AXON','CEG','CELH','DECK','ENPH','HIMS',
     'IDXX','KNSL','LULU','MPWR','NET','PLNT','RCL','SPOT','UBER',
     'ULTA','VEEV','SMCI','CAVA','SNOW','MEDP','PODD','HEI','ACLS',
     'FICO','APP','HOOD','RKLB','ARM',
+    # Full screener universe (all 179 new tickers)
+    'QBTS','RGTI','APLD','QUBT','IONQ','ASTS',
+    'QUCY','SERV','VRT','DELL','ALAB','LRCX',
+    'CDNS','SNPS','KLAC','QCOM','MRVL','ADI',
+    'TXN','TSEM','COHR','GLW','RMBS','NVTS',
+    'WDC','STX','HIMX','LSCC','CRM','CRWD',
+    'ISRG','ADBE','MA','V','SPGI','MSCI',
+    'IBKR','ICE','CME','NDAQ','JPM','GS',
+    'MS','BAC','C','SCHW','AXP','KKR',
+    'BX','LLY','ZTS','TMO','JNJ','ABBV',
+    'PFE','GILD','BIIB','MRNA','MDT','BSX',
+    'ABT','UTHR','UHS','ELV','NVS','ABNB',
+    'DASH','SE','TOST','GRAB','DKNG','SOFI',
+    'CVNA','FUTU','TCOM','EXPE','MAR','ONON',
+    'COST','CMG','MCD','HD','LOW','SBUX',
+    'NKE','PG','KO','PEP','MNST','CL',
+    'UL','DIS','NEE','FSLR','CCJ','NXE',
+    'XOM','CVX','BP','SHEL','EQNR','EQT',
+    'VLO','HAL','BKR','OXY','EOSE','BE',
+    'CAT','DE','GE','WM','UPS','FDX',
+    'RTX','LMT','BA','MMM','GEV','MSI',
+    'HON','BABA','BIDU','PDD','JD','T',
+    'VZ','WMT','IBM','CSCO','INTC','ON',
+    'INFY','SONY','HDB','HSBC','AER','CB',
+    'HPE','SOUN','FIVN','ONDS','CBRS','NXT',
+    'BULL','SOLS','RDDT','IREN','KEEL','SEDG',
+    'SNDK','SYM','FORM','VICR','RIO','FCX',
+    'GOLD','BEP','DNN','MSTR','AAL','OWL',
+    'PI','ALGN',
 ]
 
 
@@ -405,7 +438,7 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
 
     return {
         'generated_at':  datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'),
-        'run_date':      datetime.today().strftime('%A %d %b %Y'),
+        'run_date':      datetime.now(BANGKOK).strftime('%A %d %b %Y'),
         'universe_size': len(signals_list),
         'market': {
             'cnn_score':       sell_market.get('cnn_score', 50),
@@ -429,7 +462,7 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
 
 # ── MAIN ──────────────────────────────────────────────────────────────
 def main():
-    print(f'Signal scanner starting — {datetime.today().strftime("%Y-%m-%d %H:%M UTC")}')
+    print(f'Signal scanner starting — {datetime.now(BANGKOK).strftime("%Y-%m-%d %H:%M")} Bangkok')
 
     closes, highs, lows, volumes, ok = fetch_history()
     voo = closes[BENCHMARK].dropna()
