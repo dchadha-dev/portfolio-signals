@@ -2225,7 +2225,9 @@ function renderRankings() {
     if (filter === 'held'      && !s.is_holding) return false;
     if (filter === 'candidate' && s.is_holding)  return false;
     if (filter === 'buy'       && s.buy_score < 60) return false;
+    if (filter === 'buy'       && s.signal === 'WEAK_BUY') return false;
     if (filter === 'sell'      && (!s.sell_action || s.sell_action === 'HOLD')) return false;
+    if (filter === 'signal'    && s.signal !== 'WEAK_BUY') return false;
     if (search && !s.ticker.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
@@ -2248,6 +2250,7 @@ function renderRankings() {
   const nFactor     = signals.filter(s => s.factor).length;
   const nDFV        = signals.filter(s => s.fdfv3).length;
   const nSellFlag   = signals.filter(s => s.sell_action && s.sell_action !== 'HOLD').length;
+  const nWeakBuy   = signals.filter(s => s.signal === 'WEAK_BUY').length;
 
   function sortIcon(col) {
     if (sortKey !== col) return '<span style="opacity:0.3">↕</span>';
@@ -2280,6 +2283,7 @@ function renderRankings() {
     if (s.sell_cmf != null && s.sell_cmf < 0 && s.near_high) dots.push('<span style="color:var(--red);font-size:10px" title="CMF distribution">⚠C</span>');
     if (s.banker_weak) dots.push('<span style="color:var(--amber);font-size:10px" title="Banker Weak">WB</span>');
     if (s.triple)      dots.push('<span style="color:#8b5cf6;font-size:10px" title="Triple — up 20% in 63d">3x</span>');
+    if (s.signal === 'WEAK_BUY') dots.push('<span style="color:var(--amber);font-size:9px;border:1px solid var(--amber);padding:0 3px;border-radius:2px" title="Signal fires but framework score too low to act — FW<55">FW⚠</span>');
     return dots.join(' ') || '<span style="color:var(--text3);font-size:10px">—</span>';
   }
 
@@ -2312,7 +2316,7 @@ function renderRankings() {
           <input type="text" placeholder="Search ticker..." value="${search}"
             oninput="rankSearch(this.value)"
             style="background:var(--s2);border:1px solid var(--border);color:var(--text);padding:4px 10px;border-radius:5px;font-size:11px;width:130px">
-          ${['all','held','candidate','buy','sell'].map(f =>
+          ${['all','held','candidate','buy','signal','sell'].map(f =>
             `<button onclick="rankFilter('${f}')" style="padding:3px 10px;border-radius:4px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;border:1px solid var(--border);background:${filter===f?'var(--blue)':'transparent'};color:${filter===f?'#fff':'var(--text3)'}">${f.toUpperCase()}</button>`
           ).join('')}
         </div>
@@ -2328,6 +2332,9 @@ function renderRankings() {
         </div>
         <div style="background:var(--s2);border-radius:6px;padding:6px 12px;font-size:11px;font-family:'DM Mono',monospace">
           <span style="color:var(--green)">Buy ≥60</span> <b style="color:var(--green)">${nBuy}</b>
+        </div>
+        <div style="background:var(--s2);border-radius:6px;padding:6px 12px;font-size:11px;font-family:'DM Mono',monospace">
+          <span style="color:var(--amber)">Signal/FW⚠</span> <b style="color:var(--amber)">${nWeakBuy}</b>
         </div>
         <div style="background:var(--s2);border-radius:6px;padding:6px 12px;font-size:11px;font-family:'DM Mono',monospace">
           <span style="color:var(--green)">★★ DFV</span> <b style="color:var(--green)">${nDFV}</b>
@@ -2361,7 +2368,8 @@ function renderRankings() {
             ${rows.map((s, i) => {
               const dayChg   = s.change_pct || 0;
               const dayColor = dayChg >= 0 ? 'var(--green)' : 'var(--red)';
-              const rowBg    = s.fdfv3 ? 'background:rgba(22,163,74,0.06)' :
+              const rowBg    = s.signal === 'WEAK_BUY' ? 'background:rgba(217,119,6,0.06)' :
+                               s.fdfv3 ? 'background:rgba(22,163,74,0.06)' :
                                s.factor && !s.fdfv3 ? 'background:rgba(8,145,178,0.06)' :
                                s.sell_action && s.sell_action !== 'HOLD' ? 'background:rgba(220,38,38,0.05)' : '';
               const isHeld   = s.is_holding;
@@ -2379,8 +2387,9 @@ function renderRankings() {
                 <td style="padding:7px 10px;font-family:'DM Mono',monospace;color:${dayColor}">${dayChg>=0?'+':''}${dayChg.toFixed(2)}%</td>
                 <td style="padding:7px 10px;font-family:'DM Mono',monospace;color:var(--text3)">${s.dfv_lift != null ? s.dfv_lift.toFixed(1) : '—'}</td>
                 <td style="padding:7px 10px">
-                  ${s.signal === 'BUY'  ? '<span style="color:var(--green);font-size:10px;font-weight:700">BUY</span>'  :
-                    s.signal === 'SELL' ? '<span style="color:var(--red);font-size:10px;font-weight:700">SELL</span>' :
+                  ${s.signal === 'BUY'      ? '<span style="color:var(--green);font-size:10px;font-weight:700">BUY</span>'  :
+                    s.signal === 'SELL'     ? '<span style="color:var(--red);font-size:10px;font-weight:700">SELL</span>' :
+                    s.signal === 'WEAK_BUY' ? '<span style="color:var(--amber);font-size:10px;font-weight:700" title="Price signal fires but framework score <55 — do not act">SIGNAL</span>' :
                     '<span style="color:var(--text3);font-size:10px">HOLD</span>'}
                 </td>
               </tr>`;

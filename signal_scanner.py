@@ -364,9 +364,10 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
                 pass
 
         # ── SIGNAL CLASSIFICATION ─────────────────────────────────────
+        fw_blocks_buy = fs is not None and fs < 55
         if sell_score >= EXIT_T and is_holding: signal = 'SELL'
-        elif buy >= 60:                         signal = 'BUY'
-        else:                                   signal = 'HOLD'
+        elif buy >= 60 and fw_blocks_buy:    signal = 'WEAK_BUY'
+        else:                                 signal = 'BUY' if buy >= 60 else 'HOLD'
 
         guidance = build_guidance(t, last, ta, fs)
 
@@ -438,9 +439,10 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
                     fund, sell_sigs_data, sell_market, sell_sectors)
             except: pass
 
+        fw_blocks_buy2 = fs is not None and fs < 55
         if sell_score >= EXIT_T: signal = 'SELL'
-        elif buy >= 60:          signal = 'BUY'
-        else:                    signal = 'HOLD'
+        elif buy >= 60 and fw_blocks_buy2: signal = 'WEAK_BUY'
+        else:                              signal = 'BUY' if buy >= 60 else 'HOLD'
 
         guidance = build_guidance(proxy, last, ta, fs)
 
@@ -487,6 +489,7 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         'summary': {
             'strong_buy':  sum(1 for s in signals_list if s['fdfv3']),
             'buy':         sum(1 for s in signals_list if s['signal']=='BUY'),
+            'weak_buy':    sum(1 for s in signals_list if s['signal']=='WEAK_BUY'),
             'sell':        sum(1 for s in signals_list if s['signal']=='SELL'),
             'factor_zone': sum(1 for s in signals_list if s['factor']),
             'banker_weak': sum(1 for s in signals_list if s['banker_weak']),
