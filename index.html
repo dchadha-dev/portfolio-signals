@@ -715,29 +715,7 @@ body .amt { transition: filter 0.18s ease; }
 
   </div><!-- end sticky-top -->
 
-  <!-- Stats -->
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-label">Total Portfolio</div>
-      <div class="stat-value amt" id="totalVal">$440,097</div>
-      <div class="stat-sub">All accounts combined</div>
-    </div>
-    <div class="stat-card" id="bkngCard">
-      <div class="stat-label">BKNG Exposure <span id="bkngExcludedBadge" style="display:none;font-size:10px;background:#f0f0ec;color:#ababA6;border:1px solid #e8e8e4;padding:1px 5px;border-radius:3px;margin-left:4px;">excluded</span></div>
-      <div class="stat-value warn amt" id="bkngVal">$81,033</div>
-      <div class="stat-sub" id="bkngPct">18.4% of portfolio · 475 shares</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">NVDA Exposure</div>
-      <div class="stat-value amt" id="nvdaVal">$35,492</div>
-      <div class="stat-sub">Direct + fund look-through</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Crypto</div>
-      <div class="stat-value amt" id="cryptoVal">$34,437</div>
-      <div class="stat-sub">7.8% · Direct + KT-BLOCKCHAIN</div>
-    </div>
-  </div>
+  <!-- Stats row removed per user request -->
 
   <div class="error-bar" id="errorBar"></div>
 
@@ -748,7 +726,9 @@ body .amt { transition: filter 0.18s ease; }
     <div class="tab" onclick="switchTab('stocks', this)">Direct Stocks</div>
     <div class="tab" onclick="switchTab('funds', this)">Funds & ETFs</div>
     <div class="tab" onclick="switchTab('buckets', this)">Asset Buckets</div>
-    <div class="tab" onclick="switchTab('analytics', this)">Analytics</div>
+    <div class="tab" onclick="switchTab('analytics', this)">Trading Advice</div>
+    <div class="tab" onclick="switchTab('rankings', this)">Rankings</div>
+    <div class="tab" onclick="switchTab('tools', this)">Tools</div>
   </div>
   <!-- Column headers — shown based on active tab, always sticky -->
   <div class="col-header-wrap" id="col-all" style="display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
@@ -839,15 +819,12 @@ body .amt { transition: filter 0.18s ease; }
   </div>
 
   <!-- ANALYTICS -->
+  <!-- ── TAB: Trading Advice ─────────────────────────────────── -->
   <div class="tab-panel" id="tab-analytics">
-    <!-- Sub-tabs -->
     <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;">
-      <div class="sub-tab active" onclick="switchAnalytics('signals',this)">Signals</div>
-      <div class="sub-tab" onclick="switchAnalytics('buy',this)">Buy Ideas</div>
-      <div class="sub-tab" onclick="switchAnalytics('sell',this)">Sell Guidance</div>
-      <div class="sub-tab" onclick="switchAnalytics('rank',this)">&#128202; Rankings</div>
-      <div class="sub-tab" onclick="switchAnalytics('ref',this)">&#128216; Reference</div>
-      <div class="sub-tab" onclick="switchAnalytics('pine',this)">&#128251; Pine Script</div>
+      <div class="sub-tab active" onclick="switchAnalytics('signals',this)">&#9889; Signals</div>
+      <div class="sub-tab" onclick="switchAnalytics('buy',this)">&#11088; Buy Ideas</div>
+      <div class="sub-tab" onclick="switchAnalytics('sell',this)">&#9888; Sell Guidance</div>
     </div>
     <div id="ana-signals" class="ana-panel active">
       <div id="signalsContent"><div class="placeholder">Click "Run Live Analysis" to generate signals based on current prices</div></div>
@@ -858,21 +835,31 @@ body .amt { transition: filter 0.18s ease; }
     <div id="ana-sell" class="ana-panel">
       <div id="sellContent"><div class="placeholder">Click "Run Live Analysis" to generate sell guidance (max 10% of portfolio flagged)</div></div>
     </div>
-    <div id="ana-rank" class="ana-panel">
-      <div id="rankContent"><div class="placeholder">Click "Run Live Analysis" to load rankings.</div></div>
-    </div>
-    <div id="ana-pine" class="ana-panel">
-      <div id="pineContent" style="max-height:70vh;overflow-y:auto;"></div>
-    </div>
-    <div id="ana-ref" class="ana-panel">
-      <div id="refContent" style="max-height:70vh;overflow-y:auto;"></div>
-    </div>
     <div style="margin-top:20px;">
       <button class="refresh-btn" id="anaBtn" onclick="runAnalytics()" style="background:var(--text);color:var(--white);">
         <div class="spinner" id="anaSpinner"></div>
         <span id="anaLabel">Run Live Analysis</span>
       </button>
       <div style="font-size:11px;color:var(--text3);margin-top:8px;font-family:'DM Mono',monospace;" id="anaUpdated"></div>
+    </div>
+  </div>
+
+  <!-- ── TAB: Rankings ─────────────────────────────────────────── -->
+  <div class="tab-panel" id="tab-rankings">
+    <div id="rankContent"><div class="placeholder">Switch to this tab after running Live Analysis to see full ranked universe.</div></div>
+  </div>
+
+  <!-- ── TAB: Tools ────────────────────────────────────────────── -->
+  <div class="tab-panel" id="tab-tools">
+    <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;">
+      <div class="sub-tab active" id="tools-pine-tab" onclick="switchTools('pine',this)">&#128251; Pine Script</div>
+      <div class="sub-tab" id="tools-ref-tab" onclick="switchTools('ref',this)">&#128216; Reference</div>
+    </div>
+    <div id="tools-pine-panel" style="max-height:70vh;overflow-y:auto;">
+      <div id="pineContent"></div>
+    </div>
+    <div id="tools-ref-panel" style="display:none;max-height:70vh;overflow-y:auto;">
+      <div id="refContent"></div>
     </div>
   </div>
 
@@ -1628,15 +1615,13 @@ function toggleBKNG() {
 
 // ── Tab switching ──────────────────────────────────────────
 function switchTab(id, el) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('tab-'+id).classList.add('active');
-  // Show matching col-headers, hide others
-  ['all','stocks','funds'].forEach(t => {
-    const ch = document.getElementById('col-'+t);
-    if (ch) ch.style.display = (t === id) ? 'block' : 'none';
-  });
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const panel = document.getElementById('tab-' + id);
+  if (panel) panel.classList.add('active');
+  if (el) el.classList.add('active');
+  if (id === 'rankings' && window._lastPayload) renderRankings();
+  if (id === 'tools') loadPineScript();
 }
 
 // ── Prices as of May 5, 2026 (updated daily) ──────────────
@@ -1864,11 +1849,18 @@ function restartTimer() {
 
 // ── Analytics sub-tab switching ────────────────────────────
 function switchAnalytics(id, el) {
-  document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.ana-panel').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('ana-' + id).classList.add('active');
-  if (id === 'rank') renderRankings();
+  document.querySelectorAll('#tab-analytics .ana-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('#tab-analytics .sub-tab').forEach(t => t.classList.remove('active'));
+  const panel = document.getElementById('ana-' + id);
+  if (panel) panel.classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+function switchTools(id, el) {
+  document.getElementById('tools-pine-panel').style.display = id === 'pine' ? '' : 'none';
+  document.getElementById('tools-ref-panel').style.display  = id === 'ref'  ? '' : 'none';
+  document.querySelectorAll('#tab-tools .sub-tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
   if (id === 'ref')  loadReference();
   if (id === 'pine') loadPineScript();
 }
@@ -2195,6 +2187,7 @@ function copyPine() {
 
 function renderRankings() {
   const el = document.getElementById('rankContent');
+  if (!el) return;
   if (!window._lastPayload) {
     el.innerHTML = '<div class="placeholder">Run Live Analysis first to load signal data.</div>';
     return;
@@ -2424,6 +2417,7 @@ function renderRankings() {
 
 function rankSort(col) {
   const el = document.getElementById('rankContent');
+  if (!el) return;
   if (el.dataset.sortKey === col) {
     el.dataset.sortDir = el.dataset.sortDir === 'desc' ? 'asc' : 'desc';
   } else {
@@ -3084,6 +3078,8 @@ async function runAnalytics() {
         renderSignalsFromPayload(payload);
         renderBuysFromPayload(payload);
         renderSellsFromPayload(payload);
+        // Pre-populate rankings in background
+        renderRankings();
         const genAt = payload.run_date || payload.generated_at || '';
         document.getElementById('anaUpdated').textContent =
           'Signals from Colab: ' + genAt + ' · ' + new Date().toLocaleTimeString();
