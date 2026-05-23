@@ -104,7 +104,7 @@ PROXY_TICKERS = list(set(TICKER_PROXY_MAP.values()))
 DIRECT_HOLDINGS = [t for t in MY_HOLDINGS if t not in TICKER_PROXY_MAP]
 UNIVERSE  = list(dict.fromkeys(DIRECT_HOLDINGS + CANDIDATES + PROXY_TICKERS))
 BENCHMARK = 'VOO'
-DIST_T    = -0.15
+DIST_T    = -0.20   # raised from -0.15 — requires 20%+ below 252d high
 QUALITY_T =  0.20
 TREND_T   =  0.00
 DFV_LIFT  =  2.5
@@ -364,10 +364,12 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
                 pass
 
         # ── SIGNAL CLASSIFICATION ─────────────────────────────────────
-        fw_blocks_buy = fs is not None and fs < 55
+        fw_blocks_buy = fs is not None and fs < 70  # raised FW minimum from 55 to 70
         if sell_score >= EXIT_T and is_holding: signal = 'SELL'
-        elif buy >= 60 and fw_blocks_buy:    signal = 'WEAK_BUY'
-        else:                                 signal = 'BUY' if buy >= 60 else 'HOLD'
+        elif buy >= 80 and fw_blocks_buy:    signal = 'WEAK_BUY'
+        elif buy >= 80:                      signal = 'BUY'
+        elif buy >= 60:                      signal = 'WATCH'   # factor zone but not full conviction
+        else:                                signal = 'HOLD'
 
         guidance = build_guidance(t, last, ta, fs)
 
@@ -441,8 +443,10 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
 
         fw_blocks_buy2 = fs is not None and fs < 55
         if sell_score >= EXIT_T: signal = 'SELL'
-        elif buy >= 60 and fw_blocks_buy2: signal = 'WEAK_BUY'
-        else:                              signal = 'BUY' if buy >= 60 else 'HOLD'
+        elif buy >= 80 and fw_blocks_buy2: signal = 'WEAK_BUY'
+        elif buy >= 80:                    signal = 'BUY'
+        elif buy >= 60:                    signal = 'WATCH'
+        else:                              signal = 'HOLD'
 
         guidance = build_guidance(proxy, last, ta, fs)
 
@@ -473,6 +477,24 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
     signals_list.sort(key=lambda x: -x['buy_score'])
     if SELL_SCORER_AVAILABLE:
         signals_list = apply_portfolio_cap(signals_list)
+
+    # ── BUY CAP: max 3 strong buy + 3 regular buy ──────────────────────
+    # Strong buy = fdfv3 (Factor+DFV V3) with buy_score >= 95
+    # Regular buy = BUY signal, score 80-94
+    strong_buy_count = 0; regular_buy_count = 0
+    for row in signals_list:
+        if row['signal'] == 'BUY':
+            if row.get('fdfv3') and row['buy_score'] >= 95:
+                if strong_buy_count >= 3:
+                    row['signal'] = 'WATCH'; row['buy_capped'] = True
+                else:
+                    row['signal_tier'] = 'STRONG'; strong_buy_count += 1
+            else:
+                if regular_buy_count >= 3:
+                    row['signal'] = 'WATCH'; row['buy_capped'] = True
+                else:
+                    row['signal_tier'] = 'BUY'; regular_buy_count += 1
+    print(f"Buy cap: {strong_buy_count} strong buy + {regular_buy_count} regular buy flagged")
     buy_ideas.sort(key=lambda x: -x['buy_score'])
     sell_guidance.sort(key=lambda x: -x['sell_score'])
 
@@ -488,7 +510,9 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         },
         'summary': {
             'strong_buy':  sum(1 for s in signals_list if s['fdfv3']),
-            'buy':         sum(1 for s in signals_list if s['signal']=='BUY'),
+            'buy':         sum(1 for s in signals_list if s['signal']=='BUY'),  # score>=80, FW>=70
+            'strong_buy':  sum(1 for s in signals_list if s['signal']=='BUY' and s.get('signal_tier')=='STRONG'),
+            'watch':       sum(1 for s in signals_list if s['signal']=='WATCH' and s['buy_score']>=60),
             'weak_buy':    sum(1 for s in signals_list if s['signal']=='WEAK_BUY'),
             'sell':        sum(1 for s in signals_list if s['signal']=='SELL'),
             'factor_zone': sum(1 for s in signals_list if s['factor']),
