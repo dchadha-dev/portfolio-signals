@@ -73,10 +73,16 @@ def _calc_rsi(series, period=14):
     return 100 - (100 / (1 + rs))
 
 def compute_sell_signals(cl, hi, lo, vol):
-    if cl is None or len(cl) < 100: return {}
+    if cl is None or len(cl) < 20: return {}
+    # Ensure hi/lo/vol are valid series — fall back to close if needed
+    if hi is None or len(hi) < len(cl): hi = cl
+    if lo is None or len(lo) < len(cl): lo = cl
+    if vol is None or len(vol) < len(cl): vol = pd.Series(1e6, index=cl.index)
     df = pd.DataFrame({"close":cl,"high":hi,"low":lo,"volume":vol})
-    df["high252"]   = df["close"].rolling(252).max().shift(1)
-    df["dist"]      = (df["close"] - df["high252"]) / df["high252"]
+    # Use available history for high — 252d if possible, else max available
+    lookback = min(252, len(df)-1)
+    df["high252"]   = df["close"].rolling(lookback).max().shift(1)
+    df["dist"]      = (df["close"] - df["high252"]) / df["high252"].replace(0, float('nan'))
     df["near_high"] = df["dist"] > -0.05
     wkly = df["close"].resample("W").last().dropna()
     wrsi = _calc_rsi(wkly, 14)
@@ -167,12 +173,14 @@ def score_ticker(ticker, sell_sigs, market, sector_states):
     atr  = sell_sigs.get("sma_atr_gt35", False)
     rv2  = sell_sigs.get("rv_z2", False)
 
-    # near_high alone = caution only, no score — must have confluence
-    # Mirrors buy side: Factor alone = watch, Factor+DFV = act
+    # near_high alone = low score (15pts), below TRIM threshold (35)
+    # near_high + confluence = full weight (35pts)
+    # This ensures all tickers show a sell score — no blank cells
     if near and (cmf or atr):
         score+=SELL_WEIGHTS["near_high"]; flags.append(f"near_high+{SELL_WEIGHTS['near_high']}")
     elif near:
-        caution.append("near_high(no confluence — watch only)")
+        score+=15  # watch-only score — below TRIM threshold but shows in rankings
+        caution.append("near_high — watch only (no CMF/ATR confluence)")
 
     if cmf:
         score+=SELL_WEIGHTS["cmf_neg_near_high"]; flags.append(f"CMF_dist+{SELL_WEIGHTS['cmf_neg_near_high']}")

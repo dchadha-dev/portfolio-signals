@@ -354,11 +354,12 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         if SELL_SCORER_AVAILABLE:
             try:
                 cl_s  = closes[t].dropna() if t in closes.columns else None
-                if cl_s is None or len(cl_s) < 60:
-                    raise ValueError(f"Insufficient close data for {t}")
-                hi_s  = highs[t].dropna()   if t in highs.columns   else cl_s
-                lo_s  = lows[t].dropna()    if t in lows.columns    else cl_s
-                vol_s = volumes[t].dropna() if t in volumes.columns else cl_s * 0 + 1e6
+                if cl_s is None or len(cl_s) < 20:
+                    raise ValueError(f"No close data for {t}")
+                # Use actual hi/lo/vol if available, else fall back gracefully
+                hi_s  = highs[t].dropna()   if (t in highs.columns   and len(highs[t].dropna())  > 20) else cl_s
+                lo_s  = lows[t].dropna()    if (t in lows.columns    and len(lows[t].dropna())   > 20) else cl_s
+                vol_s = volumes[t].dropna() if (t in volumes.columns and len(volumes[t].dropna())> 20) else pd.Series(1e6, index=cl_s.index)
                 sell_sigs_data = compute_sell_signals(cl_s, hi_s, lo_s, vol_s)
                 sell_score, sell_action, sell_flags, sell_caution = score_ticker(
                     t, sell_sigs_data, sell_market, sell_sectors)
