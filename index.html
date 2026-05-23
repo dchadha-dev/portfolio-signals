@@ -1509,18 +1509,18 @@ function renderBuckets(total) {
 
 // ── Render: Stat bar ───────────────────────────────────────
 function renderStats(total) {
-  document.getElementById('totalVal').textContent = $m(total);
+  if(document.getElementById('totalVal')) document.getElementById('totalVal').textContent = $m(total);
   const bkngP = prices['BKNG']?.price ?? 179.40;
   const bkngTot = bkngP * 475 + 292;
   const bkngPct = (bkngTot / (total + (excludeBKNG ? bkngTot : 0)) * 100).toFixed(1);
-  document.getElementById('bkngVal').textContent = $m(bkngTot);
-  document.getElementById('bkngPct').textContent = excludeBKNG
+  if(document.getElementById('bkngVal')) document.getElementById('bkngVal').textContent = $m(bkngTot);
+  if(document.getElementById('bkngPct')) document.getElementById('bkngPct').textContent = excludeBKNG
     ? `Excluded · 475 shares · ${fmtPrice(bkngP)}/sh`
     : `${bkngPct}% of portfolio · 475 shares · ${fmtPrice(bkngP)}/sh`;
-  document.getElementById('bkngCard').style.opacity = excludeBKNG ? '0.45' : '1';
-  document.getElementById('bkngExcludedBadge').style.display = excludeBKNG ? 'inline' : 'none';
+  if(document.getElementById('bkngCard')) document.getElementById('bkngCard').style.opacity = excludeBKNG ? '0.45' : '1';
+  if(document.getElementById('bkngExcludedBadge')) document.getElementById('bkngExcludedBadge').style.display = excludeBKNG ? 'inline' : 'none';
   const nvdaP = prices['NVDA']?.price ?? 197.61;
-  document.getElementById('nvdaVal').textContent = $m(nvdaP * 160);
+  if(document.getElementById('nvdaVal')) document.getElementById('nvdaVal').textContent = $m(nvdaP * 160);
   document.querySelector('.header-sub').textContent = excludeBKNG
     ? 'Full look-through · All accounts · USD · BKNG excluded'
     : 'Full look-through · All accounts · USD';
