@@ -162,13 +162,25 @@ def fetch_market_signals():
 
 def score_ticker(ticker, sell_sigs, market, sector_states):
     score=0; flags=[]; caution=[]
-    if sell_sigs.get("near_high"):
+    near = sell_sigs.get("near_high", False)
+    cmf  = sell_sigs.get("cmf_neg_near_high", False)
+    atr  = sell_sigs.get("sma_atr_gt35", False)
+    rv2  = sell_sigs.get("rv_z2", False)
+
+    # near_high alone = caution only, no score — must have confluence
+    # Mirrors buy side: Factor alone = watch, Factor+DFV = act
+    if near and (cmf or atr):
         score+=SELL_WEIGHTS["near_high"]; flags.append(f"near_high+{SELL_WEIGHTS['near_high']}")
-    if sell_sigs.get("cmf_neg_near_high"):
+    elif near:
+        caution.append("near_high(no confluence — watch only)")
+
+    if cmf:
         score+=SELL_WEIGHTS["cmf_neg_near_high"]; flags.append(f"CMF_dist+{SELL_WEIGHTS['cmf_neg_near_high']}")
-    if sell_sigs.get("sma_atr_gt35"):
+    if atr and near:   # ATR extension only meaningful when also near high
         score+=SELL_WEIGHTS["sma_atr_gt35"]; flags.append(f"ATR_ext+{SELL_WEIGHTS['sma_atr_gt35']}")
-    if sell_sigs.get("rv_z2"):
+    elif atr:
+        caution.append("ATR_ext(not near high)")
+    if rv2:
         score+=SELL_WEIGHTS["rv_z2"]; flags.append(f"RVz>2_short+{SELL_WEIGHTS['rv_z2']}")
     if sell_sigs.get("wrsi_80"):   caution.append("wRSI>80(buy_cont)")
     elif sell_sigs.get("wrsi_75"): caution.append("wRSI>75(buy_cont)")

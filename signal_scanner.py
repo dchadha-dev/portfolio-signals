@@ -354,14 +354,16 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         if SELL_SCORER_AVAILABLE:
             try:
                 cl_s  = closes[t].dropna() if t in closes.columns else None
-                hi_s  = highs[t].dropna()  if t in highs.columns  else cl_s
-                lo_s  = lows[t].dropna()   if t in lows.columns   else cl_s
-                vol_s = volumes[t].dropna() if t in volumes.columns else pd.Series(dtype=float)
+                if cl_s is None or len(cl_s) < 60:
+                    raise ValueError(f"Insufficient close data for {t}")
+                hi_s  = highs[t].dropna()   if t in highs.columns   else cl_s
+                lo_s  = lows[t].dropna()    if t in lows.columns    else cl_s
+                vol_s = volumes[t].dropna() if t in volumes.columns else cl_s * 0 + 1e6
                 sell_sigs_data = compute_sell_signals(cl_s, hi_s, lo_s, vol_s)
                 sell_score, sell_action, sell_flags, sell_caution = score_ticker(
                     t, sell_sigs_data, sell_market, sell_sectors)
-            except:
-                pass
+            except Exception as sell_err:
+                sell_caution = f'err:{str(sell_err)[:40]}'
 
         # ── SIGNAL CLASSIFICATION ─────────────────────────────────────
         fw_blocks_buy = fs is not None and fs < 70  # raised FW minimum from 55 to 70
@@ -439,7 +441,8 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
                 sell_sigs_data = compute_sell_signals(cl_s, hi_s, lo_s, vol_s)
                 sell_score, sell_action, sell_flags, sell_caution = score_ticker(
                     fund, sell_sigs_data, sell_market, sell_sectors)
-            except: pass
+            except Exception as sell_err:
+                sell_caution = f'err:{str(sell_err)[:40]}'
 
         fw_blocks_buy2 = fs is not None and fs < 55
         if sell_score >= EXIT_T: signal = 'SELL'
