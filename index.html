@@ -2267,10 +2267,15 @@ function renderRankings() {
 
   function sellBadge(action, score) {
     if (!action || action === 'HOLD') {
-      if (score != null && score > 0) {
-        return `<span style="color:var(--text3);font-size:10px;font-family:'DM Mono',monospace">${score}</span>`;
+      if (score == null) {
+        return '<span style="color:var(--border);font-size:10px" title="No sell data">—</span>';
       }
-      return '<span style="color:var(--text3);font-size:10px">—</span>';
+      if (score === 0) {
+        return '<span style="color:var(--text3);font-size:10px;font-family:\'DM Mono\',monospace" title="No sell signals active">0</span>';
+      }
+      // HOLD but non-zero score — below TRIM threshold, show in grey
+      const greyShade = score >= 25 ? 'var(--amber)' : 'var(--text3)';
+      return `<span style="color:${greyShade};font-size:10px;font-family:'DM Mono',monospace" title="Below TRIM threshold (35)">${score}</span>`;
     }
     const c = action==='EXIT' ? '#8b0000' : action==='REDUCE' ? 'var(--red)' : 'var(--amber)';
     return `<span style="background:${c};color:#fff;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:700;font-family:'DM Mono',monospace">${action} ${score}</span>`;
