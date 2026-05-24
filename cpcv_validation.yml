@@ -1,0 +1,40 @@
+name: CPCV Model Validation
+
+on:
+  workflow_dispatch:    # manual trigger only — do not run on schedule
+  # Uncomment below to run monthly on first Monday:
+  # schedule:
+  #   - cron: '0 2 * * 1'  # 2am UTC Monday
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75   # CPCV over 277 tickers takes ~40-50 min
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install yfinance pandas numpy scipy requests
+
+      - name: Run CPCV validation
+        run: python signal_scanner_validation_cpcv.py
+
+      - name: Commit validation outputs
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add validation_cpcv_report.html validation_cpcv_results.json
+          git diff --staged --quiet || git commit -m "chore: CPCV validation $(date -u '+%Y-%m-%d') UTC"
+          git push
+
+      - name: Trigger Netlify deploy
+        run: |
+          curl -s -X POST "${{ secrets.NETLIFY_DEPLOY_HOOK }}"
+          echo "Netlify deploy triggered — report available on dashboard"
