@@ -860,7 +860,19 @@ def main():
     with open('validation_cpcv_report.html', 'w') as f:
         f.write(html)
     with open('validation_cpcv_results.json', 'w') as f:
-        json.dump(json_out, f, indent=2, default=str)
+        # Replace NaN/Inf with null for valid JSON (Python json.dump writes bare NaN which is invalid)
+        import math
+        def sanitize(obj):
+            if isinstance(obj, float):
+                if math.isnan(obj) or math.isinf(obj):
+                    return None
+                return obj
+            if isinstance(obj, dict):
+                return {k: sanitize(v) for k, v in obj.items()}
+            if isinstance(obj, list):
+                return [sanitize(v) for v in obj]
+            return obj
+        json.dump(sanitize(json_out), f, indent=2, default=str)
 
     print('\n✓ validation_cpcv_report.html written')
     print('✓ validation_cpcv_results.json written')
