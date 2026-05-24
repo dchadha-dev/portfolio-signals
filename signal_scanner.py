@@ -584,16 +584,22 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         })
 
     signals_list.sort(key=lambda x: -x['buy_score'])
-    if SELL_SCORER_AVAILABLE:
-        signals_list = apply_portfolio_cap(signals_list)
 
-    # ── BUY CAP: CNN-aware (mirrors dashboard renderBuysFromPayload logic) ──
+    cnn = sell_market.get('cnn_score', 50)
+    n_held = len([r for r in signals_list if r.get('is_holding')])
+
+    if SELL_SCORER_AVAILABLE:
+        signals_list = apply_portfolio_cap(signals_list, cnn_score=cnn, held_count=n_held)
+
+    # CNN-aware sell cap % (for payload/dashboard display only)
+    sell_cap_pct = 0.20 if cnn > 80 else 0.15 if cnn > 60 else 0.10 if cnn > 40 else 0.08 if cnn > 20 else 0.05
+    sell_cap = max(1, round(n_held * sell_cap_pct))
+
+    # ── BUY CAP: CNN-aware ────────────────────────────────────────────
     # Extreme Fear (<20): 6+6 | Fear (20-40): 4+5 | Neutral (40-60): 3+3
     # Greed (60-80): 2+2  | Extreme Greed (>80): 1+1
-    cnn = sell_market.get('cnn_score', 50)
     strong_cap  = 6 if cnn < 20 else 4 if cnn < 40 else 3 if cnn < 60 else 2 if cnn < 80 else 1
     regular_cap = 6 if cnn < 20 else 5 if cnn < 40 else 3 if cnn < 60 else 2 if cnn < 80 else 1
-    sell_cap    = 6 if cnn > 80 else 4 if cnn > 60 else 3 if cnn > 40 else 2 if cnn > 20 else 1
 
     strong_buy_count = 0; regular_buy_count = 0
     for row in signals_list:

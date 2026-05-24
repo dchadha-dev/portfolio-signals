@@ -27,7 +27,7 @@ SELL_WEIGHTS = {
     "buffett_extended":   10,
     "sector_ext":         10,
 }
-TRIM_T = 35; REDUCE_T = 55; EXIT_T = 70
+TRIM_T = 52; REDUCE_T = 65; EXIT_T = 78
 PORTFOLIO_CAP_PCT = 0.10
 
 SECTOR_ETFS = {
@@ -267,22 +267,22 @@ def score_ticker(ticker, sell_sigs, market, sector_states, framework_score=None)
 
     score = min(100, round(score * cnn_mult + sector_boost, 1))
 
-    # ── Framework score damping — high-quality businesses get sell threshold raised ─
-    # FW ≥85: need much stronger technical signal to act — multiply thresholds up
-    # FW 70-84: mild resistance to selling — slight threshold raise
-    # FW <70: no protection — sell signals fire at standard thresholds
-    # Implementation: dampen the raw score rather than raise thresholds
-    # so the displayed score still reflects technical pressure but action is suppressed
-    fw = framework_score  # passed in from scanner
-    if fw is not None:
-        if fw >= 85:
-            fw_damp = 0.60   # FW≥85: score × 0.6 — need EXIT-level signal to TRIM
-            caution.append(f"FW{fw}(high_conviction×0.60)")
-        elif fw >= 70:
-            fw_damp = 0.80   # FW 70-84: score × 0.8 — mild resistance
-            caution.append(f"FW{fw}(quality×0.80)")
-        else:
-            fw_damp = 1.0    # FW <70: no damping
+    # ── Framework score damping — continuous curve, no threshold cliffs ─
+    # fw_damp ranges from 1.0 (FW=0, no protection) to 0.50 (FW=100, max protection)
+    # Formula: damp = 1.0 - 0.5 * (fw/100)^1.5
+    # Shape: convex — damping accelerates at high FW values
+    # FW=0:  ×1.00 (no damping)
+    # FW=50: ×0.82
+    # FW=68: ×0.72
+    # FW=70: ×0.71  ← barely different from 68, as it should be
+    # FW=80: ×0.64
+    # FW=90: ×0.57
+    # FW=100:×0.50
+    fw = framework_score
+    if fw is not None and fw > 0:
+        fw_damp = round(1.0 - 0.50 * ((fw / 100) ** 1.5), 3)
+        if fw >= 70:
+            caution.append(f"FW{fw}(×{fw_damp:.2f})")
     else:
         fw_damp = 1.0
 
@@ -330,15 +330,47 @@ def score_all(universe_rows, market, sector_states):
         row["near_high"]       = sigs.get("near_high", False)
     return universe_rows
 
-def apply_portfolio_cap(rows):
-    total=len(rows); max_flag=max(1,int(total*PORTFOLIO_CAP_PCT))
-    flagged=[r for r in rows if r.get("sell_action")!="HOLD"]
-    if len(flagged)>max_flag:
-        keep={r["ticker"] for r in sorted(flagged,key=lambda x:-x["sell_score"])[:max_flag]}
-        for r in rows:
-            if r.get("sell_action")!="HOLD" and r["ticker"] not in keep:
-                r["sell_action"]="HOLD"; r["sell_capped"]=True
-        print(f"Portfolio cap: {len(flagged)} → {max_flag} ({PORTFOLIO_CAP_PCT*100:.0f}% of {total})")
+def apply_portfolio_cap(rows, cnn_score=50, held_count=None):
+    """
+    Cap sell signals based on held positions only, CNN-aware.
+    Cap is a % of held positions, not universe size:
+      Extreme Fear  (<20):  5% of held
+      Fear          (20-40): 8% of held
+      Neutral       (40-60): 10% of held
+      Greed         (60-80): 15% of held
+      Extreme Greed (>80):  20% of held
+
+    Only held positions can generate actionable signals.
+    Candidates are scored but never capped into actionable signals.
+    """
+    held_rows = [r for r in rows if r.get("is_holding")]
+    n_held = held_count or len(held_rows)
+
+    # CNN-aware cap percentage
+    if cnn_score > 80:   cap_pct = 0.20
+    elif cnn_score > 60: cap_pct = 0.15
+    elif cnn_score > 40: cap_pct = 0.10
+    elif cnn_score > 20: cap_pct = 0.08
+    else:                cap_pct = 0.05
+
+    max_signals = max(1, round(n_held * cap_pct))
+
+    # Only held positions can be flagged — candidates keep score but get HOLD action
+    for r in rows:
+        if not r.get("is_holding") and r.get("sell_action") != "HOLD":
+            r["sell_action"] = "HOLD"
+            r["sell_capped"] = True
+
+    # Among held, keep only top max_signals by sell_score
+    held_flagged = [r for r in held_rows if r.get("sell_action") != "HOLD"]
+    if len(held_flagged) > max_signals:
+        keep = {r["ticker"] for r in sorted(held_flagged, key=lambda x: -x["sell_score"])[:max_signals]}
+        for r in held_flagged:
+            if r["ticker"] not in keep:
+                r["sell_action"] = "HOLD"
+                r["sell_capped"] = True
+        print(f"Sell cap: {len(held_flagged)} held signals → {max_signals} (CNN={cnn_score:.0f}, {cap_pct*100:.0f}% of {n_held} held)")
     else:
-        print(f"Portfolio cap: {len(flagged)}/{total} flagged — within limit")
+        print(f"Sell cap: {len(held_flagged)}/{max_signals} held signals (CNN={cnn_score:.0f}, {cap_pct*100:.0f}% of {n_held} held)")
+
     return rows
