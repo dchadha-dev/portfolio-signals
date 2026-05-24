@@ -5,6 +5,13 @@ on:
     - cron: '0 23 * * *'   # 6am Bangkok (UTC+7)
     - cron: '0 11 * * *'   # 6pm Bangkok (UTC+7)
   workflow_dispatch:        # manual trigger
+  push:
+    branches:
+      - main
+    paths:
+      - 'signal_scanner.py'
+      - 'sell_side_scorer.py'
+      - 'validated_params.json'
 
 jobs:
   scan:
