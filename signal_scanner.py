@@ -33,7 +33,7 @@ MY_HOLDINGS = [
     'NVDA','AVGO','TSLA','MELI','AMAT','MSFT','AAPL','AMZN','META','GOOG',
     'NFLX','BKNG','SHOP','RACE','AMD','CRWV','ASML','ANET','DDOG','CRDO',
     'NBIS','TSM','TM','MU','INTU','CPRT','PGR','TTD','UNH','FISV','O','TEAM',
-    'BRKB','NVO','RELX',
+    'BRKB','NVO','RELX','DELL',
     # European stocks
     'RMS.PA','MC.PA','ITX.MC',
     # US ETFs
@@ -57,7 +57,7 @@ CANDIDATES = [
     'FICO','APP','HOOD','RKLB','ARM',
     # Full screener universe (all 179 new tickers)
     'QBTS','RGTI','APLD','QUBT','IONQ','ASTS',
-    'QUCY','SERV','VRT','DELL','ALAB','LRCX',
+    'QUCY','SERV','VRT','ALAB','LRCX',
     'CDNS','SNPS','KLAC','QCOM','MRVL','ADI',
     'TXN','TSEM','COHR','GLW','RMBS','NVTS',
     'WDC','STX','HIMX','LSCC','CRM','CRWD',
