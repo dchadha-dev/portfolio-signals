@@ -1,0 +1,112 @@
+{
+  "meta": {
+    "timestamp": "2026-05-24 16:18 UTC",
+    "n_tickers": 121,
+    "n_paths_theoretical": 66,
+    "n_blocks": 12,
+    "k_holdout": 2,
+    "n_seeds": 2,
+    "purge_days": 20,
+    "fwd_days": 252,
+    "p_threshold": 0.05
+  },
+  "model_results": {
+    "current": {
+      "n_obs": 50668,
+      "n_paths": 1960,
+      "n_tickers": 119,
+      "mean_exc_252": 71.61,
+      "raw_sharpe": 6.634,
+      "dsr": 127.365,
+      "t_stat": 94.062,
+      "p_value": 0.0,
+      "pbo": 0.496,
+      "hit_rate": 61.8,
+      "max_dd": -100.0,
+      "signal_vs_nosignal_spread": -25.41,
+      "passes_p05": "True",
+      "passes_dsr": true,
+      "passes_pbo30": false
+    },
+    "proposed": {
+      "n_obs": 93600,
+      "n_paths": 3696,
+      "n_tickers": 119,
+      "mean_exc_252": 70.57,
+      "raw_sharpe": 5.338,
+      "dsr": 140.838,
+      "t_stat": 102.868,
+      "p_value": 0.0,
+      "pbo": 0.5,
+      "hit_rate": 64.4,
+      "max_dd": -100.0,
+      "signal_vs_nosignal_spread": 8.05,
+      "passes_p05": "True",
+      "passes_dsr": true,
+      "passes_pbo30": false
+    }
+  },
+  "signal_stats": {
+    "factor_gate_current": {
+      "n": 756,
+      "mean_exc": 29.15,
+      "ann_exc": 29.2,
+      "t_stat": 9.935,
+      "p_val": 0.0,
+      "dsr": 13.677,
+      "valid": "True"
+    },
+    "dfv3_current": {
+      "n": 254,
+      "mean_exc": 38.49,
+      "ann_exc": 38.5,
+      "t_stat": 6.511,
+      "p_val": 0.0,
+      "dsr": 8.842,
+      "valid": "True"
+    },
+    "pfd_current": {
+      "n": 9913,
+      "mean_exc": 11.3,
+      "ann_exc": 11.3,
+      "t_stat": 27.223,
+      "p_val": 0.0,
+      "dsr": 33.591,
+      "valid": "True"
+    },
+    "triple_current": {
+      "n": 8732,
+      "mean_exc": 18.58,
+      "ann_exc": 18.6,
+      "t_stat": 30.866,
+      "p_val": 0.0,
+      "dsr": 42.113,
+      "valid": "True"
+    },
+    "factor_gate_proposed": {
+      "n": 1722,
+      "mean_exc": 33.31,
+      "ann_exc": 33.3,
+      "t_stat": 17.597,
+      "p_val": 0.0,
+      "dsr": 23.737,
+      "valid": "True"
+    },
+    "dfv3_tiebreaker": {
+      "n": 0,
+      "mean": NaN,
+      "t": NaN,
+      "p": NaN,
+      "dsr": NaN
+    },
+    "triple_proposed": {
+      "n": 8732,
+      "mean_exc": 18.58,
+      "ann_exc": 18.6,
+      "t_stat": 30.866,
+      "p_val": 0.0,
+      "dsr": 42.113,
+      "valid": "True"
+    }
+  }
+}

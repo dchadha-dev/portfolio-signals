@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>CPCV Validation Report — Current vs Proposed</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         background:#0f0f0f; color:#e2e8f0; margin:0; padding:24px; }
+  h1   { color:#f8fafc; font-size:20px; margin-bottom:4px }
+  h2   { color:#94a3b8; font-size:14px; font-weight:600; margin:24px 0 10px;
+          text-transform:uppercase; letter-spacing:.08em }
+  .meta { color:#64748b; font-size:12px; font-family:monospace; margin-bottom:20px }
+  table { border-collapse:collapse; width:100%; background:#1e1e2e; border-radius:8px;
+           overflow:hidden; margin-bottom:24px }
+  th   { background:#2a2a3e; color:#94a3b8; font-size:10px; font-weight:700;
+          text-transform:uppercase; letter-spacing:.08em; padding:10px 12px; text-align:left }
+  tr:nth-child(even) { background:#1a1a2e }
+  .warn { background:#451a03!important }
+  .pass { background:#052e16!important }
+  .card { background:#1e1e2e; border-radius:8px; padding:16px; margin-bottom:16px }
+  .verdict { font-size:16px; font-weight:800; padding:12px 20px; border-radius:6px;
+              display:inline-block; margin-right:16px }
+</style></head>
+<body>
+<h1>CPCV Validation Report — Current vs Proposed Model</h1>
+<div class="meta">
+  Run: 2026-05-24 16:18 UTC · Universe: 121 tickers · 
+  Blocks: 12 · Holdout: 2 · 
+  Paths: C(12,2)=66 × 2 seeds · 
+  Purge: 20d · Fwd: 252d · p threshold: 0.05
+</div>
+
+<div style="background:#fef2f2;border:1px solid #dc2626;border-radius:8px;padding:16px;margin:20px 0">
+        <b style="color:#dc2626">⚠ RECOMMENDATION: HOLD — DO NOT DEPLOY PROPOSED MODEL</b><br>
+        <span style="font-size:13px">Proposed model does not match current on one or more key metrics 
+        (annualised excess, DSR, or PBO). Keep current model in production. Revisit quality proxy 
+        construction before re-testing.</span></div>
+
+<div style="display:flex;gap:16px;margin-bottom:20px">
+  <div class="card" style="flex:1">
+    <div style="font-size:11px;color:#64748b;margin-bottom:4px">CURRENT MODEL</div>
+    <span class="verdict" style="color:#16a34a">✓ PASSES</span>
+    <span style="font-size:12px;color:#94a3b8">p=0.0 · DSR=127.365 · PBO=0.496</span>
+  </div>
+  <div class="card" style="flex:1">
+    <div style="font-size:11px;color:#64748b;margin-bottom:4px">PROPOSED MODEL</div>
+    <span class="verdict" style="color:#16a34a">✓ PASSES</span>
+    <span style="font-size:12px;color:#94a3b8">p=0.0 · DSR=140.838 · PBO=0.5</span>
+  </div>
+</div>
+
+<h2>Head-to-Head Comparison</h2>
+<table>
+  <thead><tr>
+    <th>Metric</th>
+    <th>Current Model</th>
+    <th>Proposed Model</th>
+    <th>Delta</th>
+  </tr></thead>
+  <tbody>
+        <tr>
+          <td style="padding:8px 12px;font-size:12px">Annualised excess vs VOO (%)</td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-weight:700">71.61</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-weight:700">70.57</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#dc2626;font-size:11px">▼1.04</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;font-size:12px">Raw Sharpe Ratio</td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-weight:700">6.634</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-weight:700">5.338</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#dc2626;font-size:11px">▼1.30</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;font-size:12px">Deflated Sharpe Ratio (DSR)</td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-weight:700">127.365</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-weight:700">140.838</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-size:11px">▲13.47</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;font-size:12px">t-statistic</td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-weight:700">94.062</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-weight:700">102.868</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-size:11px">▲8.81</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;font-size:12px">p-value</td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-weight:700">0.0</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-weight:700">0.0</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-size:11px">▼0.00</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;font-size:12px">PBO (lower = better)</td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#dc2626;font-weight:700">0.496</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#dc2626;font-weight:700">0.5</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#dc2626;font-size:11px">▲0.00</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;font-size:12px">Hit rate (%)</td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-weight:700">61.8</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-weight:700">64.4</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-size:11px">▲2.60</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;font-size:12px">Max drawdown (%)</td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-weight:700">-100.0</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-weight:700">-100.0</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-size:11px">▼0.00</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;font-size:12px">Signal vs no-signal spread (%)</td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#dc2626;font-weight:700">-25.41</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-weight:700">8.05</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-size:11px">▲33.46</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;font-size:12px">CPCV paths run</td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-weight:700">1960</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-weight:700">3696</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-size:11px">▲1736.00</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;font-size:12px">Signal observations</td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-weight:700">50668</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-weight:700">93600</span></td>
+          <td style="padding:8px 12px;text-align:center"><span style="color:#16a34a;font-size:11px">▲42932.00</span></td>
+        </tr></tbody>
+</table>
+
+<h2>Individual Signal Validation (CPCV, p &lt; 0.05, DSR &gt; 0)</h2>
+<table>
+  <thead><tr>
+    <th>Signal</th><th>Obs</th><th>Ann. Excess (%)</th>
+    <th>t-stat</th><th>p-value</th><th>DSR</th><th>Verdict</th>
+  </tr></thead>
+  <tbody>
+        <tr>
+          <td style="padding:7px 10px;font-size:11px;font-family:monospace">factor_gate_current</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">756</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">29.2</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">9.935</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">0.0</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">13.677</td>
+          <td style="padding:7px 10px;text-align:center"><span style="color:#16a34a;font-weight:700">✓ VALID</span></td>
+        </tr>
+        <tr>
+          <td style="padding:7px 10px;font-size:11px;font-family:monospace">dfv3_current</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">254</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">38.5</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">6.511</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">0.0</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">8.842</td>
+          <td style="padding:7px 10px;text-align:center"><span style="color:#16a34a;font-weight:700">✓ VALID</span></td>
+        </tr>
+        <tr>
+          <td style="padding:7px 10px;font-size:11px;font-family:monospace">pfd_current</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">9913</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">11.3</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">27.223</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">0.0</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">33.591</td>
+          <td style="padding:7px 10px;text-align:center"><span style="color:#16a34a;font-weight:700">✓ VALID</span></td>
+        </tr>
+        <tr>
+          <td style="padding:7px 10px;font-size:11px;font-family:monospace">triple_current</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">8732</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">18.6</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">30.866</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">0.0</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">42.113</td>
+          <td style="padding:7px 10px;text-align:center"><span style="color:#16a34a;font-weight:700">✓ VALID</span></td>
+        </tr>
+        <tr>
+          <td style="padding:7px 10px;font-size:11px;font-family:monospace">factor_gate_proposed</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">1722</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">33.3</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">17.597</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">0.0</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">23.737</td>
+          <td style="padding:7px 10px;text-align:center"><span style="color:#16a34a;font-weight:700">✓ VALID</span></td>
+        </tr>
+        <tr>
+          <td style="padding:7px 10px;font-size:11px;font-family:monospace">dfv3_tiebreaker</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">0</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px"></td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px"></td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px"></td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">nan</td>
+          <td style="padding:7px 10px;text-align:center"><span style="color:#dc2626;font-weight:700">✗ REJECT</span></td>
+        </tr>
+        <tr>
+          <td style="padding:7px 10px;font-size:11px;font-family:monospace">triple_proposed</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">8732</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">18.6</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">30.866</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">0.0</td>
+          <td style="padding:7px 10px;text-align:center;font-size:11px">42.113</td>
+          <td style="padding:7px 10px;text-align:center"><span style="color:#16a34a;font-weight:700">✓ VALID</span></td>
+        </tr></tbody>
+</table>
+
+<h2>Methodology Notes</h2>
+<div class="card" style="font-size:12px;color:#94a3b8;line-height:1.8">
+  <b>CPCV (López de Prado 2018):</b> C(N,k) combinatorial splits from N=12 non-overlapping blocks, 
+  k=2 held out per path → C(12,2)=66 paths × 2 seeds = 
+  132 total paths. Purge gap: 20 trading days on each test boundary.<br><br>
+  <b>Deflated Sharpe (Bailey &amp; López de Prado 2014):</b> Adjusts raw Sharpe for selection bias from 
+  testing ~250 strategy variants. DSR &gt; 0 means strategy likely survives multiple-testing.<br><br>
+  <b>PBO (Bailey-Borwein-LdP-Zhu 2017):</b> Probability of Backtest Overfitting. PBO &lt; 0.10 = low overfitting risk. 
+  PBO &gt; 0.30 = strategy likely overfit to historical data.<br><br>
+  <b>Signal inclusion threshold:</b> p &lt; 0.05 (Harvey-Liu-Zhu 2016 recommend p &lt; 0.003 for academic publication; 
+  p &lt; 0.05 is a practical compromise for live trading systems).<br><br>
+  <b>Current model changes tested:</b> Quality gate (Sharpe-proxy → gross-profitability proxy), 
+  Signal 4 PFD removed (p=0.112 original), DFV V3 demoted from 25pts → 10pts tie-breaker.
+</div>
+
+</body></html>
