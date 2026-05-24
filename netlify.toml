@@ -3,7 +3,7 @@
 [build]
   publish = "."
   command = "echo 'No build needed'"
-  ignore = "exit 0"
+  ignore = "exit 1"
 
 [build.environment]
   PYTHON_VERSION = "3.12"
