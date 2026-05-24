@@ -2,8 +2,8 @@
 # Python runs on GitHub Actions only, not here.
 [build]
   publish = "."
-  command = ""
-  ignore = "exit 0"
+  command = "echo 'No build needed'"
+  ignore = "exit 1"
 
 [build.environment]
   PYTHON_VERSION = "3.12"
