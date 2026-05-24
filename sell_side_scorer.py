@@ -167,45 +167,99 @@ def fetch_market_signals():
     return result
 
 def score_ticker(ticker, sell_sigs, market, sector_states):
-    score=0; flags=[]; caution=[]
-    near = sell_sigs.get("near_high", False)
-    cmf  = sell_sigs.get("cmf_neg_near_high", False)
-    atr  = sell_sigs.get("sma_atr_gt35", False)
-    rv2  = sell_sigs.get("rv_z2", False)
+    """
+    Continuous sell scoring — no flat clusters.
+    Each signal contributes a smooth 0-to-max score based on magnitude,
+    not a binary on/off weight. Total is then adjusted by market context.
 
-    # near_high alone = low score (15pts), below TRIM threshold (35)
-    # near_high + confluence = full weight (35pts)
-    # This ensures all tickers show a sell score — no blank cells
-    if near and (cmf or atr):
-        score+=SELL_WEIGHTS["near_high"]; flags.append(f"near_high+{SELL_WEIGHTS['near_high']}")
-    elif near:
-        score+=15  # watch-only score — below TRIM threshold but shows in rankings
-        caution.append("near_high — watch only (no CMF/ATR confluence)")
+    Validated signal weights (unchanged from backtest):
+      near_high:          35pts max  (-15.8% at 252d)
+      cmf_neg_near_high:  30pts max  (-9.1% at 252d)
+      sma_atr_gt35:       20pts max  (-13.4% at 252d)
+      rv_z2:              10pts max  (-1.4% at 30d)
+    """
+    score = 0.0; flags = []; caution = []
 
-    if cmf:
-        score+=SELL_WEIGHTS["cmf_neg_near_high"]; flags.append(f"CMF_dist+{SELL_WEIGHTS['cmf_neg_near_high']}")
-    if atr and near:   # ATR extension only meaningful when also near high
-        score+=SELL_WEIGHTS["sma_atr_gt35"]; flags.append(f"ATR_ext+{SELL_WEIGHTS['sma_atr_gt35']}")
-    elif atr:
+    # ── Signal 1: Distance from 252d high — continuous 0→35 ──────────
+    # dist is negative (e.g. -0.02 = 2% below high, -0.25 = 25% below)
+    # Score peaks at 0% (at high) and fades linearly to 0 at -10% and beyond
+    dist = sell_sigs.get("dist")  # float, e.g. -2.5 means 2.5% below high
+    near_high = sell_sigs.get("near_high", False)
+    if dist is not None:
+        # dist is already *100 (percentage points) from compute_sell_signals
+        dist_pct = dist  # e.g. -2.5
+        if dist_pct > -10:  # within 10% of high
+            # Linear: 0% below = 35pts, 10% below = 0pts
+            near_score = max(0, 35 * (1 + dist_pct / 10))
+            score += near_score
+            if near_score >= 20:
+                flags.append(f"near_high({dist_pct:+.1f}%)+{near_score:.0f}")
+            elif near_score >= 5:
+                caution.append(f"approaching_high({dist_pct:+.1f}%)")
+
+    # ── Signal 2: CMF — continuous 0→30 ──────────────────────────────
+    # cmf_20 ranges roughly -1 to +1; negative = distribution; only counts near high
+    cmf_val = sell_sigs.get("cmf_20")
+    if cmf_val is not None and near_high:
+        if cmf_val < 0:
+            # Linear: cmf=-1.0 = 30pts, cmf=0 = 0pts
+            cmf_score = min(30, abs(cmf_val) * 30)
+            score += cmf_score
+            if cmf_score >= 5:
+                flags.append(f"CMF_dist({cmf_val:+.3f})+{cmf_score:.0f}")
+
+    # ── Signal 3: ATR extension — continuous 0→20 ────────────────────
+    # sma_atr_dist: how many ATRs above 200d MA; 3.5+ = overextended
+    # Only meaningful when also near high
+    atr_dist = sell_sigs.get("sma_atr_dist")
+    if atr_dist is not None and near_high:
+        if atr_dist > 2.0:
+            # Linear: 2.0 ATRs = 0pts, 5.0+ ATRs = 20pts
+            atr_score = min(20, max(0, (atr_dist - 2.0) / 3.0 * 20))
+            score += atr_score
+            if atr_score >= 3:
+                flags.append(f"ATR_ext({atr_dist:.1f})+{atr_score:.0f}")
+    elif sell_sigs.get("sma_atr_gt35") and not near_high:
         caution.append("ATR_ext(not near high)")
-    if rv2:
-        score+=SELL_WEIGHTS["rv_z2"]; flags.append(f"RVz>2_short+{SELL_WEIGHTS['rv_z2']}")
-    if sell_sigs.get("wrsi_80"):   caution.append("wRSI>80(buy_cont)")
-    elif sell_sigs.get("wrsi_75"): caution.append("wRSI>75(buy_cont)")
+
+    # ── Signal 4: RV Z-score — continuous 0→10 ───────────────────────
+    # rv_z: z-score of 20d realised vol vs 3yr mean; >2 = elevated
+    rv_z = sell_sigs.get("rv_z")
+    if rv_z is not None and rv_z > 1.0:
+        rv_score = min(10, max(0, (rv_z - 1.0) / 2.0 * 10))
+        score += rv_score
+        if rv_score >= 2:
+            flags.append(f"RVz({rv_z:.1f})+{rv_score:.0f}")
+
+    # ── Caution flags (buy continuation signals — reduce urgency) ─────
+    if sell_sigs.get("wrsi_80"):   caution.append("wRSI>80(momentum)")
+    elif sell_sigs.get("wrsi_75"): caution.append("wRSI>75(momentum)")
     if sell_sigs.get("rv_z3"):     caution.append("RVz>3(buy_cont)")
-    for sector in TICKER_SECTORS.get(ticker,[]):
+
+    # ── Market context multiplier (not additive — avoids flat clusters) ─
+    # CNN greed boosts score proportionally; sector extension adds small boost
+    cnn = market.get("cnn_score", 50)
+    cnn_mult = 1.0 + max(0, (cnn - 50) / 50) * 0.4  # 1.0x at CNN=50, 1.4x at CNN=100
+    if cnn > 75:
+        flags.append(f"CNN{cnn:.0f}×{cnn_mult:.2f}")
+
+    sector_boost = 0
+    for sector in TICKER_SECTORS.get(ticker, []):
         if sector_states.get(sector):
-            score+=SELL_WEIGHTS["sector_ext"]; flags.append(f"{sector}_ext+{SELL_WEIGHTS['sector_ext']}"); break
-    cnn = market.get("cnn_score",50)
-    if cnn>90:       score+=SELL_WEIGHTS["cnn_greed_90"]; flags.append(f"CNN>90+{SELL_WEIGHTS['cnn_greed_90']}")
-    elif cnn>75:     score+=SELL_WEIGHTS["cnn_greed_75"]; flags.append(f"CNN>75+{SELL_WEIGHTS['cnn_greed_75']}")
-    if market.get("sp500_extended"):  score+=SELL_WEIGHTS["sp500_extended"];  flags.append(f"SP500+{SELL_WEIGHTS['sp500_extended']}")
-    if market.get("buffett_extended"): score+=SELL_WEIGHTS["buffett_extended"]; flags.append(f"Buffett+{SELL_WEIGHTS['buffett_extended']}")
-    score = min(100, score)
-    if   score>=EXIT_T:   action="EXIT"
-    elif score>=REDUCE_T: action="REDUCE"
-    elif score>=TRIM_T:   action="TRIM"
-    else:                 action="HOLD"
+            sector_boost = 5; flags.append(f"{sector}_ext+5"); break
+
+    if market.get("sp500_extended"):
+        sector_boost += 5; flags.append("SP500_ext+5")
+    if market.get("buffett_extended"):
+        sector_boost += 5; flags.append("Buffett_ext+5")
+
+    score = min(100, round(score * cnn_mult + sector_boost, 1))
+
+    if   score >= EXIT_T:   action = "EXIT"
+    elif score >= REDUCE_T: action = "REDUCE"
+    elif score >= TRIM_T:   action = "TRIM"
+    else:                   action = "HOLD"
+
     return score, action, " | ".join(flags) or "—", " | ".join(caution) or "—"
 
 def score_all(universe_rows, market, sector_states):
