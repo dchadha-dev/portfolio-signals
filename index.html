@@ -674,6 +674,15 @@ th.sort-desc::after { content: ' ↓'; color: var(--text); }
 .eye-btn:hover { background: var(--bg); }
 .eye-btn.hiding { background: var(--bg); color: var(--text3); border-style: dashed; }
 
+/* Sticky thead */
+.table-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
 body.hide-amounts .amt {
   filter: blur(4px);
   user-select: none;
@@ -731,56 +740,26 @@ body .amt { transition: filter 0.18s ease; }
     <div class="tab" onclick="switchTab('tools', this)">Tools</div>
   </div>
   <!-- Column headers — shown based on active tab, always sticky -->
-  <div class="col-header-wrap" id="col-all" style="display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
-    <table style="width:100%;min-width:700px;border-collapse:collapse;">
-      <tr>
-        <th style="width:32px;"></th>
-        <th class="sortable" data-col="ticker" onclick="handleSort('all','ticker',()=>renderAll(lastTotal))">Asset</th>
-        <th class="r sortable" data-col="livePrice" onclick="handleSort('all','livePrice',()=>renderAll(lastTotal))">Price</th>
-        <th class="r sortable" data-col="chg" onclick="handleSort('all','chg',()=>renderAll(lastTotal))">Day %</th>
-        <th class="r sortable" data-col="dayImpact" onclick="handleSort('all','dayImpact',()=>renderAll(lastTotal))">Day $</th>
-        <th class="r sortable" data-col="direct" onclick="handleSort('all','direct',()=>renderAll(lastTotal))">Direct</th>
-        <th class="r" style="color:var(--text3);font-style:italic;">Fund ℹ</th>
-        <th class="r sortable" data-col="tot" onclick="handleSort('all','tot',()=>renderAll(lastTotal))">Total</th>
-        <th class="r sortable" data-col="pct" onclick="handleSort('all','pct',()=>renderAll(lastTotal))">Weight</th>
-        <th></th>
-      </tr>
-    </table>
-  </div>
-  <div class="col-header-wrap" id="col-stocks" style="display:none;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
-    <table style="width:100%;min-width:700px;border-collapse:collapse;">
-      <tr>
-        <th class="sortable" data-col="ticker" onclick="handleSort('stocks','ticker',()=>renderStocks(lastTotal))">Ticker</th>
-        <th class="sortable" data-col="name" onclick="handleSort('stocks','name',()=>renderStocks(lastTotal))">Company</th>
-        <th>Account</th>
-        <th class="r sortable" data-col="shares" onclick="handleSort('stocks','shares',()=>renderStocks(lastTotal))">Shares</th>
-        <th class="r sortable" data-col="lp" onclick="handleSort('stocks','lp',()=>renderStocks(lastTotal))">Price</th>
-        <th class="r sortable" data-col="chg" onclick="handleSort('stocks','chg',()=>renderStocks(lastTotal))">Day %</th>
-        <th class="r sortable" data-col="dayImpact" onclick="handleSort('stocks','dayImpact',()=>renderStocks(lastTotal))">Day $</th>
-        <th class="r sortable" data-col="val" onclick="handleSort('stocks','val',()=>renderStocks(lastTotal))">Value</th>
-        <th class="r sortable" data-col="pct" onclick="handleSort('stocks','pct',()=>renderStocks(lastTotal))">Weight</th>
-      </tr>
-    </table>
-  </div>
-  <div class="col-header-wrap" id="col-funds" style="display:none;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
-    <table style="width:100%;min-width:700px;border-collapse:collapse;">
-      <tr>
-        <th class="sortable" data-col="t" onclick="handleSort('funds','t',()=>renderFunds(lastTotal))">Fund</th>
-        <th class="sortable" data-col="name" onclick="handleSort('funds','name',()=>renderFunds(lastTotal))">Name</th>
-        <th>Broker</th>
-        <th>Underlying / NAV</th>
-        <th class="r sortable" data-col="chg" onclick="handleSort('funds','chg',()=>renderFunds(lastTotal))">Day %</th>
-        <th class="r sortable" data-col="dayImpact" onclick="handleSort('funds','dayImpact',()=>renderFunds(lastTotal))">Day $</th>
-        <th class="r sortable" data-col="val" onclick="handleSort('funds','val',()=>renderFunds(lastTotal))">Est. Value</th>
-        <th class="r sortable" data-col="pct" onclick="handleSort('funds','pct',()=>renderFunds(lastTotal))">Weight</th>
-      </tr>
-    </table>
-  </div>
+  <!-- col-header-wrap removed: headers are now sticky <thead> inside each table -->
   </div>
   <div class="tab-panel active" id="tab-all">
     <div class="card">
       <div class="table-scroll">
       <table id="all" >
+        <thead>
+          <tr>
+            <th style="width:32px;"></th>
+            <th class="sortable" data-col="ticker" onclick="handleSort('all','ticker',()=>renderAll(lastTotal))">Asset</th>
+            <th class="r sortable" data-col="livePrice" onclick="handleSort('all','livePrice',()=>renderAll(lastTotal))">Price</th>
+            <th class="r sortable" data-col="chg" onclick="handleSort('all','chg',()=>renderAll(lastTotal))">Day %</th>
+            <th class="r sortable" data-col="dayImpact" onclick="handleSort('all','dayImpact',()=>renderAll(lastTotal))">Day $</th>
+            <th class="r sortable" data-col="direct" onclick="handleSort('all','direct',()=>renderAll(lastTotal))">Direct</th>
+            <th class="r" style="color:var(--text3);font-style:italic;">Fund ℹ</th>
+            <th class="r sortable" data-col="tot" onclick="handleSort('all','tot',()=>renderAll(lastTotal))">Total</th>
+            <th class="r sortable" data-col="pct" onclick="handleSort('all','pct',()=>renderAll(lastTotal))">Weight</th>
+            <th></th>
+          </tr>
+        </thead>
         <tbody id="allBody">
           <tr><td colspan="9"><div class="placeholder">Click "Refresh prices" to load live data</div></td></tr>
         </tbody>
@@ -794,6 +773,19 @@ body .amt { transition: filter 0.18s ease; }
     <div class="card">
       <div class="table-scroll">
       <table id="stocks" >
+        <thead>
+          <tr>
+            <th class="sortable" data-col="ticker" onclick="handleSort('stocks','ticker',()=>renderStocks(lastTotal))">Ticker</th>
+            <th class="sortable" data-col="name" onclick="handleSort('stocks','name',()=>renderStocks(lastTotal))">Company</th>
+            <th>Account</th>
+            <th class="r sortable" data-col="shares" onclick="handleSort('stocks','shares',()=>renderStocks(lastTotal))">Shares</th>
+            <th class="r sortable" data-col="lp" onclick="handleSort('stocks','lp',()=>renderStocks(lastTotal))">Price</th>
+            <th class="r sortable" data-col="chg" onclick="handleSort('stocks','chg',()=>renderStocks(lastTotal))">Day %</th>
+            <th class="r sortable" data-col="dayImpact" onclick="handleSort('stocks','dayImpact',()=>renderStocks(lastTotal))">Day $</th>
+            <th class="r sortable" data-col="val" onclick="handleSort('stocks','val',()=>renderStocks(lastTotal))">Value</th>
+            <th class="r sortable" data-col="pct" onclick="handleSort('stocks','pct',()=>renderStocks(lastTotal))">Weight</th>
+          </tr>
+        </thead>
         <tbody id="stocksBody">
           <tr><td colspan="8"><div class="placeholder">Click "Refresh prices" to load live data</div></td></tr>
         </tbody>
@@ -807,6 +799,18 @@ body .amt { transition: filter 0.18s ease; }
     <div class="card">
       <div class="table-scroll">
       <table id="funds" >
+        <thead>
+          <tr>
+            <th class="sortable" data-col="t" onclick="handleSort('funds','t',()=>renderFunds(lastTotal))">Fund</th>
+            <th class="sortable" data-col="name" onclick="handleSort('funds','name',()=>renderFunds(lastTotal))">Name</th>
+            <th>Broker</th>
+            <th>Underlying / NAV</th>
+            <th class="r sortable" data-col="chg" onclick="handleSort('funds','chg',()=>renderFunds(lastTotal))">Day %</th>
+            <th class="r sortable" data-col="dayImpact" onclick="handleSort('funds','dayImpact',()=>renderFunds(lastTotal))">Day $</th>
+            <th class="r sortable" data-col="val" onclick="handleSort('funds','val',()=>renderFunds(lastTotal))">Est. Value</th>
+            <th class="r sortable" data-col="pct" onclick="handleSort('funds','pct',()=>renderFunds(lastTotal))">Weight</th>
+          </tr>
+        </thead>
         <tbody id="fundsBody"></tbody>
       </table>
       </div>
@@ -1227,9 +1231,9 @@ function sortRows(rows, col, dir) {
 }
 
 function setSortHeader(tableId, col) {
-  const colBar = document.getElementById('col-' + tableId);
-  if (!colBar) return;
-  colBar.querySelectorAll('th.sortable').forEach(th => {
+  const tbl = document.getElementById(tableId === 'all' ? 'all' : tableId === 'stocks' ? 'stocks' : 'funds');
+  if (!tbl) return;
+  tbl.querySelectorAll('thead th.sortable').forEach(th => {
     th.classList.remove('sort-asc', 'sort-desc');
     if (th.dataset.col === col) {
       th.classList.add(sortState[tableId].dir === 1 ? 'sort-asc' : 'sort-desc');
@@ -1572,11 +1576,6 @@ function renderEverything() {
   renderBuckets(total);
   setTimeout(addRowClickHandlers, 50);
   setTimeout(updateStickyOffsets, 80);
-  setTimeout(() => {
-    syncScroll('col-all',    'tab-all');
-    syncScroll('col-stocks', 'tab-stocks');
-    syncScroll('col-funds',  'tab-funds');
-  }, 120);
 }
 
 // ── BKNG toggle ───────────────────────────────────────────
@@ -3082,7 +3081,7 @@ async function runAnalytics() {
         renderRankings();
         const genAt = payload.run_date || payload.generated_at || '';
         document.getElementById('anaUpdated').textContent =
-          'Signals from Colab: ' + genAt + ' · ' + new Date().toLocaleTimeString();
+          'Signals from GitHub Actions: ' + genAt;
         btn.disabled = false;
         spin.classList.remove('on');
         lbl.textContent = 'Run Live Analysis';
@@ -4091,32 +4090,7 @@ setTimeout(addRowClickHandlers, 200);
 document.getElementById('lastUpdated').textContent = 'Showing May 5 prices · tap Refresh for live';
 restartTimer();
 
-// ── Sync horizontal scroll between col-headers and table body ──
-function syncScroll(headerId, tabId) {
-  const headerWrap = document.getElementById(headerId);
-  const panel = document.getElementById(tabId);
-  if (!headerWrap || !panel) return;
-  const tableScroll = panel.querySelector('.table-scroll');
-  if (!tableScroll) return;
-  let syncing = false;
-  tableScroll.addEventListener('scroll', () => {
-    if (syncing) return;
-    syncing = true;
-    headerWrap.scrollLeft = tableScroll.scrollLeft;
-    requestAnimationFrame(() => { syncing = false; });
-  }, { passive: true });
-  headerWrap.addEventListener('scroll', () => {
-    if (syncing) return;
-    syncing = true;
-    tableScroll.scrollLeft = headerWrap.scrollLeft;
-    requestAnimationFrame(() => { syncing = false; });
-  }, { passive: true });
-}
-setTimeout(() => {
-  syncScroll('col-all',    'tab-all');
-  syncScroll('col-stocks', 'tab-stocks');
-  syncScroll('col-funds',  'tab-funds');
-}, 400);
+// syncScroll removed — headers are now sticky thead inside each table
 
 // Set tabs and content offset dynamically based on actual rendered heights
 function updateStickyOffsets() {
