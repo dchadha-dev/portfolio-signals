@@ -1894,7 +1894,7 @@ async function loadCPCVReport() {
       : '<span style="color:var(--red);font-weight:700">✗ FAILS</span>';
 
     const recommend = (prop.mean_exc_252 >= (cur.mean_exc_252||0)*0.90 &&
-                       (prop.dsr||−999) >= (cur.dsr||−999) &&
+                       (prop.dsr||-999) >= (cur.dsr||-999) &&
                        (prop.pbo||1) <= (cur.pbo||1))
       ? `<div style="background:rgba(22,163,74,0.1);border:1px solid var(--green);border-radius:6px;padding:12px;margin-bottom:16px">
            <b style="color:var(--green)">✓ DEPLOY PROPOSED MODEL</b> — passes all three gates (p &lt; 0.05, DSR &gt; 0, PBO &lt; 0.30)
