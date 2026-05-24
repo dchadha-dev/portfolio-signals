@@ -178,7 +178,7 @@ def fetch_market_signals():
     except: pass
     return result
 
-def score_ticker(ticker, sell_sigs, market, sector_states):
+def score_ticker(ticker, sell_sigs, market, sector_states, framework_score=None):
     """
     Continuous sell scoring — no flat clusters.
     Each signal contributes a smooth 0-to-max score based on magnitude,
@@ -266,6 +266,27 @@ def score_ticker(ticker, sell_sigs, market, sector_states):
         sector_boost += 5; flags.append("Buffett_ext+5")
 
     score = min(100, round(score * cnn_mult + sector_boost, 1))
+
+    # ── Framework score damping — high-quality businesses get sell threshold raised ─
+    # FW ≥85: need much stronger technical signal to act — multiply thresholds up
+    # FW 70-84: mild resistance to selling — slight threshold raise
+    # FW <70: no protection — sell signals fire at standard thresholds
+    # Implementation: dampen the raw score rather than raise thresholds
+    # so the displayed score still reflects technical pressure but action is suppressed
+    fw = framework_score  # passed in from scanner
+    if fw is not None:
+        if fw >= 85:
+            fw_damp = 0.60   # FW≥85: score × 0.6 — need EXIT-level signal to TRIM
+            caution.append(f"FW{fw}(high_conviction×0.60)")
+        elif fw >= 70:
+            fw_damp = 0.80   # FW 70-84: score × 0.8 — mild resistance
+            caution.append(f"FW{fw}(quality×0.80)")
+        else:
+            fw_damp = 1.0    # FW <70: no damping
+    else:
+        fw_damp = 1.0
+
+    score = min(100, round(score * fw_damp, 1))
 
     if   score >= EXIT_T:   action = "EXIT"
     elif score >= REDUCE_T: action = "REDUCE"

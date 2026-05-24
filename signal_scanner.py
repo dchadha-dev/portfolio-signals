@@ -434,7 +434,7 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
                 vol_s = volumes[t].dropna() if (t in volumes.columns and len(volumes[t].dropna())> 20) else pd.Series(1e6, index=cl_s.index)
                 sell_sigs_data = compute_sell_signals(cl_s, hi_s, lo_s, vol_s)
                 sell_score, sell_action, sell_flags, sell_caution = score_ticker(
-                    t, sell_sigs_data, sell_market, sell_sectors)
+                    t, sell_sigs_data, sell_market, sell_sectors, fs)
             except Exception as sell_err:
                 sell_caution = f'err:{str(sell_err)[:40]}'
 
@@ -515,7 +515,7 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
                 vol_s = volumes[proxy].dropna() if proxy in volumes.columns else pd.Series(dtype=float)
                 sell_sigs_data = compute_sell_signals(cl_s, hi_s, lo_s, vol_s)
                 sell_score, sell_action, sell_flags, sell_caution = score_ticker(
-                    fund, sell_sigs_data, sell_market, sell_sectors)
+                    fund, sell_sigs_data, sell_market, sell_sectors, fs)
             except Exception as sell_err:
                 sell_caution = f'err:{str(sell_err)[:40]}'
 
