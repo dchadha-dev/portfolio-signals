@@ -2376,20 +2376,20 @@ function renderRankings() {
       </div>
 
       <!-- Table -->
-      <div style="overflow-x:auto;border-radius:8px;border:1px solid var(--border)">
+      <div style="overflow-x:auto;overflow-y:auto;max-height:65vh;border-radius:8px;border:1px solid var(--border)">
         <table style="border-collapse:collapse;width:100%;font-size:11px">
           <thead>
-            <tr style="background:var(--s2);border-bottom:1px solid var(--border)">
-              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);white-space:nowrap">TICKER</th>
-              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer" ${thClick('buy_score')}>BUY SCORE ${sortIcon('buy_score')}</th>
-              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer" ${thClick('sell_score')}>SELL ${sortIcon('sell_score')}</th>
-              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer" ${thClick('framework_score')}>FW ${sortIcon('framework_score')}</th>
-              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3)">SIGNALS</th>
-              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer" ${thClick('dist_252h')}>DIST 252H ${sortIcon('dist_252h')}</th>
-              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer" ${thClick('price')}>PRICE ${sortIcon('price')}</th>
-              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer" ${thClick('change_pct')}>DAY ${sortIcon('change_pct')}</th>
-              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3)">DFV LIFT</th>
-              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3)">TYPE</th>
+            <tr style="background:var(--bg);border-bottom:1px solid var(--border)">
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);white-space:nowrap;position:sticky;top:0;z-index:2;background:var(--bg)">TICKER</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer;position:sticky;top:0;z-index:2;background:var(--bg)" ${thClick('buy_score')}>BUY SCORE ${sortIcon('buy_score')}</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer;position:sticky;top:0;z-index:2;background:var(--bg)" ${thClick('sell_score')}>SELL ${sortIcon('sell_score')}</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer;position:sticky;top:0;z-index:2;background:var(--bg)" ${thClick('framework_score')}>FW ${sortIcon('framework_score')}</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);position:sticky;top:0;z-index:2;background:var(--bg)">SIGNALS</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer;position:sticky;top:0;z-index:2;background:var(--bg)" ${thClick('dist_252h')}>DIST 252H ${sortIcon('dist_252h')}</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer;position:sticky;top:0;z-index:2;background:var(--bg)" ${thClick('price')}>PRICE ${sortIcon('price')}</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer;position:sticky;top:0;z-index:2;background:var(--bg)" ${thClick('change_pct')}>DAY ${sortIcon('change_pct')}</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);position:sticky;top:0;z-index:2;background:var(--bg)">DFV LIFT</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);position:sticky;top:0;z-index:2;background:var(--bg)">TYPE</th>
             </tr>
           </thead>
           <tbody>

@@ -118,6 +118,9 @@ TICKER_PROXY_MAP = {
 
 # Proxy tickers to fetch for Thai funds
 PROXY_TICKERS = list(set(TICKER_PROXY_MAP.values()))
+# Tickers kept in holdings but excluded from signal computation
+# (LSE-listed or insufficient yfinance history — shown as NO_DATA with reason)
+SKIP_SIGNAL = {'AIQG', 'QNTM.L'}
 # Full universe for signal computation — direct tickers only (Thai funds use proxy)
 DIRECT_HOLDINGS = [t for t in MY_HOLDINGS if t not in TICKER_PROXY_MAP]
 UNIVERSE  = list(dict.fromkeys(DIRECT_HOLDINGS + CANDIDATES + PROXY_TICKERS))
@@ -236,14 +239,26 @@ def compute_signals(cl):
     )
     return df.dropna(subset=['dist', 'hm_lift'])
 
+# ── TICKER ALIASES — yfinance uses different symbols for some tickers ──
+TICKER_ALIASES = {
+    'BRKB': 'BRK-B',   # Berkshire B — yfinance requires hyphen
+}
+ALIAS_REVERSE = {v: k for k, v in TICKER_ALIASES.items()}
+
 # ── FETCH DATA ────────────────────────────────────────────────────────
 def fetch_history():
     end   = datetime.today()
     start = end - timedelta(days=YEARS*365 + 60)
+
+    # Apply aliases for batch fetch
     all_t = list(dict.fromkeys([BENCHMARK] + UNIVERSE))
-    print(f'Fetching {len(all_t)} tickers ({YEARS}yr daily)...')
-    raw = yf.download(all_t, start=start, end=end, interval='1d',
+    fetch_t = [TICKER_ALIASES.get(t, t) for t in all_t]
+    fetch_t = list(dict.fromkeys(fetch_t))  # dedupe after alias
+
+    print(f'Fetching {len(fetch_t)} tickers ({YEARS}yr daily)...')
+    raw = yf.download(fetch_t, start=start, end=end, interval='1d',
                       auto_adjust=True, progress=False, threads=True)
+
     if isinstance(raw.columns, pd.MultiIndex):
         closes = raw['Close'].dropna(how='all')
         try:
@@ -253,11 +268,42 @@ def fetch_history():
         except:
             highs = lows = volumes = closes
     else:
-        closes = raw[['Close']]; closes.columns = [all_t[0]]
+        closes = raw[['Close']]; closes.columns = [fetch_t[0]]
         highs = lows = volumes = closes
+
+    # Rename aliased columns back to canonical ticker names
+    closes  = closes.rename(columns=ALIAS_REVERSE)
+    highs   = highs.rename(columns=ALIAS_REVERSE)
+    lows    = lows.rename(columns=ALIAS_REVERSE)
+    volumes = volumes.rename(columns=ALIAS_REVERSE)
+
+    ok_batch = [t for t in all_t if t in closes.columns and closes[t].notna().sum() > 100]
+    fail_batch = [t for t in all_t if t not in ok_batch]
+
+    # ── Retry failed tickers individually (handles 403 batch blocks) ──
+    if fail_batch:
+        print(f'Retrying {len(fail_batch)} failed tickers individually...')
+        for t in fail_batch:
+            fetch_sym = TICKER_ALIASES.get(t, t)
+            try:
+                time.sleep(0.5)  # avoid rate limiting
+                single = yf.download(fetch_sym, start=start, end=end, interval='1d',
+                                     auto_adjust=True, progress=False)
+                if len(single) > 100:
+                    cl = single['Close'] if 'Close' in single.columns else single.iloc[:, 0]
+                    closes[t]  = cl
+                    highs[t]   = single['High']  if 'High'   in single.columns else cl
+                    lows[t]    = single['Low']   if 'Low'    in single.columns else cl
+                    volumes[t] = single['Volume'] if 'Volume' in single.columns else pd.Series(1e6, index=cl.index)
+                    print(f'  ✓ {t} recovered ({len(single)} rows)')
+                else:
+                    print(f'  ✗ {t} still failed ({len(single)} rows)')
+            except Exception as e:
+                print(f'  ✗ {t} retry error: {str(e)[:60]}')
+
     ok   = [t for t in all_t if t in closes.columns and closes[t].notna().sum() > 100]
     fail = [t for t in all_t if t not in ok]
-    print(f'✓ {len(ok)} ok | ✗ {fail}')
+    print(f'✓ {len(ok)} ok | ✗ {len(fail)} failed: {fail[:10]}')
     return closes, highs, lows, volumes, ok
 
 # ── HISTORICAL ALPHA ──────────────────────────────────────────────────
@@ -596,7 +642,7 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         },
         'failed_tickers': failed_tickers,
         'failed_count':   len(failed_tickers),
-        'held_failed':    [t for t in failed_tickers if t in MY_HOLDINGS],
+        'held_failed':    [t for t in failed_tickers if t in MY_HOLDINGS and failed_tickers[t] != 'lse_no_signal'],
     }
 
 # ── MAIN ──────────────────────────────────────────────────────────────
@@ -625,7 +671,9 @@ def main():
     all_universe = list(dict.fromkeys([BENCHMARK] + UNIVERSE))
     for t in all_universe:
         if t == BENCHMARK: continue
-        if t not in ok:
+        if t in SKIP_SIGNAL:
+            failed_tickers[t] = 'lse_no_signal'  # expected — LSE/non-yfinance tickers
+        elif t not in ok:
             failed_tickers[t] = 'fetch_failed'
 
     # Failure mode 2: fetched but stale (last bar >5 days before latest date in dataset)
