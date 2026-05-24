@@ -321,8 +321,9 @@ def build_guidance(t, last, ta, fs):
 
 # ── SCORE + BUILD PAYLOAD ─────────────────────────────────────────────
 def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, volumes,
-                  sell_market, sell_sectors):
+                  sell_market, sell_sectors, failed_tickers=None):
     signals_list = []; buy_ideas = []; sell_guidance = []
+    if failed_tickers is None: failed_tickers = {}
 
     for t, sig in all_signals.items():
         if len(sig) == 0: continue
@@ -478,27 +479,61 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         if signal == 'BUY' or buy >= 30:                          buy_ideas.append(row)
         if signal == 'SELL' or (sell_score >= 40):                sell_guidance.append(row)
 
+    # ── Add stub rows for failed tickers so they appear in Rankings ──
+    for t, reason in (failed_tickers or {}).items():
+        is_holding = t in MY_HOLDINGS
+        signals_list.append({
+            'ticker':          t,
+            'price':           None,
+            'change_pct':      0.0,
+            'signal':          'NO_DATA',
+            'guidance':        f'Data unavailable: {reason}',
+            'buy_score':       0,
+            'sell_score':      0,
+            'sell_action':     'HOLD',
+            'sell_flags':      '—',
+            'sell_caution':    reason,
+            'is_holding':      is_holding,
+            'data_error':      reason,
+            'dist_252h':       None,
+            'vs_200ma':        None,
+            'dfv_lift':        None,
+            'factor':          False,
+            'dfv3':            False,
+            'fdfv3':           False,
+            'pfd':             False,
+            'triple':          False,
+            'banker_weak':     False,
+            'factor_sep':      None,
+            'framework_score': FRAMEWORK_SCORES.get(t),
+        })
+
     signals_list.sort(key=lambda x: -x['buy_score'])
     if SELL_SCORER_AVAILABLE:
         signals_list = apply_portfolio_cap(signals_list)
 
-    # ── BUY CAP: max 3 strong buy + 3 regular buy ──────────────────────
-    # Strong buy = fdfv3 (Factor+DFV V3) with buy_score >= 95
-    # Regular buy = BUY signal, score 80-94
+    # ── BUY CAP: CNN-aware (mirrors dashboard renderBuysFromPayload logic) ──
+    # Extreme Fear (<20): 6+6 | Fear (20-40): 4+5 | Neutral (40-60): 3+3
+    # Greed (60-80): 2+2  | Extreme Greed (>80): 1+1
+    cnn = sell_market.get('cnn_score', 50)
+    strong_cap  = 6 if cnn < 20 else 4 if cnn < 40 else 3 if cnn < 60 else 2 if cnn < 80 else 1
+    regular_cap = 6 if cnn < 20 else 5 if cnn < 40 else 3 if cnn < 60 else 2 if cnn < 80 else 1
+    sell_cap    = 6 if cnn > 80 else 4 if cnn > 60 else 3 if cnn > 40 else 2 if cnn > 20 else 1
+
     strong_buy_count = 0; regular_buy_count = 0
     for row in signals_list:
         if row['signal'] == 'BUY':
             if row.get('fdfv3') and row['buy_score'] >= 95:
-                if strong_buy_count >= 3:
+                if strong_buy_count >= strong_cap:
                     row['signal'] = 'WATCH'; row['buy_capped'] = True
                 else:
                     row['signal_tier'] = 'STRONG'; strong_buy_count += 1
             else:
-                if regular_buy_count >= 3:
+                if regular_buy_count >= regular_cap:
                     row['signal'] = 'WATCH'; row['buy_capped'] = True
                 else:
                     row['signal_tier'] = 'BUY'; regular_buy_count += 1
-    print(f"Buy cap: {strong_buy_count} strong buy + {regular_buy_count} regular buy flagged")
+    print(f"CNN {cnn:.0f} → buy cap: {strong_buy_count}/{strong_cap} strong + {regular_buy_count}/{regular_cap} regular | sell cap: {sell_cap}")
     buy_ideas.sort(key=lambda x: -x['buy_score'])
     sell_guidance.sort(key=lambda x: -x['sell_score'])
 
@@ -511,6 +546,9 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
             'cnn_label':       sell_market.get('cnn_label', 'Neutral'),
             'sp500_extended':  sell_market.get('sp500_extended', False),
             'buffett_extended':sell_market.get('buffett_extended', False),
+            'strong_cap':      strong_cap,
+            'regular_cap':     regular_cap,
+            'sell_cap':        sell_cap,
         },
         'summary': {
             'strong_buy':  sum(1 for s in signals_list if s['fdfv3']),
@@ -526,7 +564,10 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
             'signals':       signals_list,
             'buy_ideas':     buy_ideas[:20],
             'sell_guidance': sell_guidance[:15],
-        }
+        },
+        'failed_tickers': failed_tickers,
+        'failed_count':   len(failed_tickers),
+        'held_failed':    [t for t in failed_tickers if t in MY_HOLDINGS],
     }
 
 # ── MAIN ──────────────────────────────────────────────────────────────
@@ -549,14 +590,41 @@ def main():
 
     print('Computing signals...')
     all_signals = {}
+    failed_tickers = {}  # ticker -> reason string
+
+    # Failure mode 1: yfinance never returned data
+    all_universe = list(dict.fromkeys([BENCHMARK] + UNIVERSE))
+    for t in all_universe:
+        if t == BENCHMARK: continue
+        if t not in ok:
+            failed_tickers[t] = 'fetch_failed'
+
+    # Failure mode 2: fetched but stale (last bar >5 days before latest date in dataset)
+    latest_date = closes.index[-1]
+    stale_threshold = latest_date - pd.Timedelta(days=5)
     for t in ok:
         if t == BENCHMARK: continue
+        series = closes[t].dropna()
+        if len(series) > 0 and series.index[-1] < stale_threshold:
+            failed_tickers[t] = f"stale:{series.index[-1].strftime('%Y-%m-%d')}"
+
+    # Failure mode 3: fetched but compute_signals failed or insufficient history
+    for t in ok:
+        if t == BENCHMARK: continue
+        if t in failed_tickers: continue
         try:
             sig = compute_signals(closes[t])
             if len(sig) >= 50:
                 all_signals[t] = sig
-        except: pass
-    print(f'Signals ready: {len(all_signals)} tickers')
+            else:
+                failed_tickers[t] = f"thin_history:{len(sig)}rows"
+        except Exception as e:
+            failed_tickers[t] = f"signal_error:{str(e)[:60]}"
+
+    held_fails = [t for t in failed_tickers if t in MY_HOLDINGS]
+    if failed_tickers:
+        print(f"Warning: {len(failed_tickers)} tickers failed ({len(held_fails)} held): {list(failed_tickers.keys())[:20]}")
+    print(f"Signals ready: {len(all_signals)} tickers")
 
     print('Computing historical alpha...')
     ticker_alpha = compute_ticker_alpha(all_signals, closes, voo)
@@ -565,7 +633,8 @@ def main():
 
     payload = build_payload(all_signals, ticker_alpha, live_prices,
                             closes, highs, lows, volumes,
-                            sell_market, sell_sectors)
+                            sell_market, sell_sectors,
+                            failed_tickers)
 
     out = 'signals_payload.json'
     with open(out, 'w') as f:

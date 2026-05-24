@@ -208,6 +208,41 @@ def score_ticker(ticker, sell_sigs, market, sector_states):
     else:                 action="HOLD"
     return score, action, " | ".join(flags) or "—", " | ".join(caution) or "—"
 
+def score_all(universe_rows, market, sector_states):
+    """
+    Score every ticker in the universe for sell signals.
+    universe_rows: list of dicts, each must have keys:
+        ticker (str), cl (pd.Series), hi (pd.Series|None), lo (pd.Series|None), vol (pd.Series|None)
+    Returns same list with sell_score, sell_action, sell_flags, sell_caution added to each row.
+
+    Usage in signal_scanner.py (replace per-ticker sell scoring loop with):
+        from sell_side_scorer import score_all, fetch_market_signals, fetch_sector_signals
+        market = fetch_market_signals()
+        sectors = fetch_sector_signals()
+        rows = score_all(universe_rows, market, sectors)
+        rows = apply_portfolio_cap(rows)
+    """
+    for row in universe_rows:
+        try:
+            sigs = compute_sell_signals(
+                row.get("cl"), row.get("hi"), row.get("lo"), row.get("vol")
+            )
+        except Exception as e:
+            print(f"  sell signals failed for {row.get('ticker','?')}: {e}")
+            sigs = {}
+        sc, action, flags, caution = score_ticker(row.get("ticker",""), sigs, market, sector_states)
+        row["sell_score"]   = sc
+        row["sell_action"]  = action
+        row["sell_flags"]   = flags
+        row["sell_caution"] = caution
+        # Pass through raw signal fields for dashboard display
+        row["sell_dist"]       = sigs.get("dist")
+        row["sell_weekly_rsi"] = sigs.get("weekly_rsi")
+        row["sell_cmf"]        = sigs.get("cmf_20")
+        row["sell_rv_z"]       = sigs.get("rv_z")
+        row["near_high"]       = sigs.get("near_high", False)
+    return universe_rows
+
 def apply_portfolio_cap(rows):
     total=len(rows); max_flag=max(1,int(total*PORTFOLIO_CAP_PCT))
     flagged=[r for r in rows if r.get("sell_action")!="HOLD"]
