@@ -63,6 +63,18 @@ TICKER_SECTORS = {
     "VXUS":["international","broad"],"VSS":["international","small_cap"],
     "URTH":["global","broad"],"AIQG":["ai","tech"],"QNTM.L":["quantum","tech"],
     "QTUM":["quantum","tech"],
+    # Thai mutual funds
+    "SCB_SP500":["us_equity","broad"],"SCB_NDQ":["us_equity","tech","growth"],
+    "SCB_SEMI":["semiconductor","ai","tech"],"SCB_WORLD":["global","broad"],
+    "SCB_GOLD":["gold","commodity","macro"],"SCB_NK225":["japan","international"],
+    "SCB_SET50":["us_equity","broad"],"SCB_DJ":["us_equity","broad"],
+    "SCB_AIEM":["international","asia"],"SCB_FINTECH":["fintech","tech"],
+    "SCB_AUTO":["ai","tech","ev"],"SCB_INNOV":["tech","growth"],
+    "SCB_GENO":["healthcare"],"SCB_CHINA":["international","asia"],
+    "SCB_EV":["ev","tech"],"SCB_BUSAA":["us_equity","tech","growth"],
+    "KT_INDIA":["india","international"],"KT_WORLD":["global","broad"],
+    "KT_WTAI":["ai","tech","global"],"KT_BLOCK":["crypto","fintech"],
+    "KT_TECH":["us_equity","tech","growth"],"KT_ESG":["global","broad"],
 }
 
 def _calc_rsi(series, period=14):

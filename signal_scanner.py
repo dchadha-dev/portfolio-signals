@@ -45,7 +45,7 @@ MY_HOLDINGS = [
     # Thai mutual funds (signal via proxy ETF)
     'SCB_SP500','SCB_NDQ','SCB_SEMI','SCB_WORLD','SCB_GOLD','SCB_NK225',
     'SCB_SET50','SCB_DJ','SCB_AIEM','SCB_FINTECH','SCB_AUTO','SCB_INNOV',
-    'SCB_GENO','SCB_CHINA','SCB_EV','SCB_US',
+    'SCB_GENO','SCB_CHINA','SCB_EV','SCB_BUSAA',
     'KT_INDIA','KT_WORLD','KT_WTAI','KT_BLOCK','KT_TECH','KT_ESG',
 ]
 
@@ -90,12 +90,30 @@ CANDIDATES = [
 # ── THAI FUND PROXY MAP ───────────────────────────────────────────────
 # Thai mutual funds are analysed via their underlying ETF proxy
 TICKER_PROXY_MAP = {
-    'SCB_SP500':'VOO','SCB_NDQ':'QQQ','SCB_SEMI':'SMH','SCB_WORLD':'URTH',
-    'SCB_GOLD':'GLD','SCB_NK225':'EWJ','SCB_SET50':'VOO','SCB_DJ':'DIA',
-    'SCB_AIEM':'AAXJ','SCB_FINTECH':'QQQ','SCB_AUTO':'QQQ','SCB_INNOV':'QQQ',
-    'SCB_GENO':'XLV','SCB_CHINA':'QQQ','SCB_EV':'QQQ','SCB_US':'SPY',
-    'KT_INDIA':'INDA','KT_WORLD':'URTH','KT_WTAI':'QQQ','KT_BLOCK':'QQQ',
-    'KT_TECH':'QQQ','KT_ESG':'URTH',
+    # SCB funds — corrected to exact underlying proxies per fund mapping
+    'SCB_SP500':  'IVV',   # iShares S&P 500 (not VOO — IVV is the direct underlying)
+    'SCB_NDQ':    'QQQ',   # Invesco QQQM → QQQ proxy
+    'SCB_SEMI':   'SMH',   # VanEck Semiconductor
+    'SCB_WORLD':  'URTH',  # iShares MSCI World
+    'SCB_GOLD':   'GLD',   # SPDR Gold
+    'SCB_NK225':  'EWJ',   # iShares Nikkei (1329) → EWJ proxy
+    'SCB_SET50':  'SPY',  # Thai SET50 — no liquid ETF proxy; SPY used as directional fallback
+    'SCB_DJ':     'DIA',   # SPDR Dow Jones
+    'SCB_AIEM':   'AAXJ',  # Asian EM blend
+    'SCB_FINTECH':'FINX',  # Global X Fintech — was wrongly QQQ
+    'SCB_AUTO':   'BOTZ',  # Global X Robotics/Autonomous — was wrongly QQQ
+    'SCB_INNOV':  'ARKK',  # ARK Innovation style — was wrongly QQQ
+    'SCB_GENO':   'ARKG',  # ARK Genomic style — was wrongly XLV
+    'SCB_CHINA':  'KWEB',  # KraneShares China Internet — was wrongly QQQ
+    'SCB_EV':     'DRIV',  # Global X EV & Mobility — was wrongly QQQ
+    'SCB_BUSAA':  'IWF',   # SCB US Business (MS US Growth) — was missing
+    # KT funds — corrected proxies
+    'KT_INDIA':   'INDA',  # iShares India
+    'KT_WORLD':   'ACWV',  # AB Low Vol Global → ACWV (not URTH)
+    'KT_WTAI':    'AIQ',   # KTAM World Tech AI → AIQ (not QQQ)
+    'KT_BLOCK':   'BLOK',  # KTAM Blockchain → BLOK (not QQQ)
+    'KT_TECH':    'IWF',   # KTAM Technology (AB American Growth) → IWF (not QQQ)
+    'KT_ESG':     'ACWV',  # KTAM Global ESG → ACWV (not URTH)
 }
 
 # Proxy tickers to fetch for Thai funds
@@ -157,6 +175,13 @@ FRAMEWORK_SCORES = {
     'IREN':48,'ASTS':46,'SOUN':44,'SEDG':44,'SERV':42,'INTC':42,
     'DNN':42,'APLD':42,'AAL':40,'EOSE':38,'MSTR':38,'IONQ':36,
     'NEXT':35,'KEEL':32,'QBTS':28,'RGTI':28,'QUBT':24,'QUCY':20,
+    # Thai mutual funds — same 5-axis framework [Moat/30, Earnings/25, Runway/20, Val/15, Redundancy/10]
+    'SCB_SP500':63, 'SCB_NDQ':61,  'SCB_SEMI':72,  'SCB_WORLD':68, 'SCB_GOLD':65,
+    'SCB_NK225':62, 'SCB_SET50':55, 'SCB_DJ':56,   'SCB_AIEM':64,  'SCB_FINTECH':60,
+    'SCB_AUTO':52,  'SCB_INNOV':47, 'SCB_GENO':48,  'SCB_CHINA':54, 'SCB_EV':58,
+    'SCB_BUSAA':62,
+    'KT_INDIA':70,  'KT_WORLD':65,  'KT_WTAI':68,   'KT_BLOCK':55,
+    'KT_TECH':64,   'KT_ESG':58,
 }
 
 # ── SIGNAL ENGINE ─────────────────────────────────────────────────────
