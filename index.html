@@ -858,12 +858,16 @@ body .amt { transition: filter 0.18s ease; }
     <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;">
       <div class="sub-tab active" id="tools-pine-tab" onclick="switchTools('pine',this)">&#128251; Pine Script</div>
       <div class="sub-tab" id="tools-ref-tab" onclick="switchTools('ref',this)">&#128216; Reference</div>
+      <div class="sub-tab" id="tools-cpcv-tab" onclick="switchTools('cpcv',this)">&#128202; CPCV Validation</div>
     </div>
     <div id="tools-pine-panel" style="max-height:70vh;overflow-y:auto;">
       <div id="pineContent"></div>
     </div>
     <div id="tools-ref-panel" style="display:none;max-height:70vh;overflow-y:auto;">
       <div id="refContent"></div>
+    </div>
+    <div id="tools-cpcv-panel" style="display:none;max-height:70vh;overflow-y:auto;">
+      <div id="cpcvContent"></div>
     </div>
   </div>
 
@@ -1858,10 +1862,125 @@ function switchAnalytics(id, el) {
 function switchTools(id, el) {
   document.getElementById('tools-pine-panel').style.display = id === 'pine' ? '' : 'none';
   document.getElementById('tools-ref-panel').style.display  = id === 'ref'  ? '' : 'none';
+  document.getElementById('tools-cpcv-panel').style.display = id === 'cpcv' ? '' : 'none';
   document.querySelectorAll('#tab-tools .sub-tab').forEach(t => t.classList.remove('active'));
   if (el) el.classList.add('active');
   if (id === 'ref')  loadReference();
   if (id === 'pine') loadPineScript();
+  if (id === 'cpcv') loadCPCVReport();
+}
+
+async function loadCPCVReport() {
+  const el = document.getElementById('cpcvContent');
+  if (el.dataset.loaded) return;
+  el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:20px">Loading CPCV validation report...</div>';
+  try {
+    const res = await fetch('validation_cpcv_results.json?t=' + Date.now());
+    if (!res.ok) throw new Error('not found');
+    const data = await res.json();
+    const cur  = data.model_results?.current  || {};
+    const prop = data.model_results?.proposed || {};
+    const meta = data.meta || {};
+    const sigs = data.signal_stats || {};
+
+    const fmt  = v => v == null ? '—' : typeof v === 'number' ? v.toFixed ? v.toFixed(3) : v : v;
+    const color = (v, good, bad, rev=false) => {
+      if (v == null) return 'var(--text3)';
+      return (rev ? v <= good : v >= good) ? 'var(--green)' : (rev ? v <= bad : v >= bad) ? 'var(--amber)' : 'var(--red)';
+    };
+
+    const verdict = (m) => m.passes_p05 && m.passes_dsr
+      ? '<span style="color:var(--green);font-weight:700">✓ PASSES</span>'
+      : '<span style="color:var(--red);font-weight:700">✗ FAILS</span>';
+
+    const recommend = (prop.mean_exc_252 >= (cur.mean_exc_252||0)*0.90 &&
+                       (prop.dsr||−999) >= (cur.dsr||−999) &&
+                       (prop.pbo||1) <= (cur.pbo||1))
+      ? `<div style="background:rgba(22,163,74,0.1);border:1px solid var(--green);border-radius:6px;padding:12px;margin-bottom:16px">
+           <b style="color:var(--green)">✓ DEPLOY PROPOSED MODEL</b> — passes all three gates (p &lt; 0.05, DSR &gt; 0, PBO &lt; 0.30)
+         </div>`
+      : `<div style="background:rgba(220,38,38,0.1);border:1px solid var(--red);border-radius:6px;padding:12px;margin-bottom:16px">
+           <b style="color:var(--red)">⚠ HOLD — DO NOT DEPLOY</b> — proposed model does not clearly beat current on all gates
+         </div>`;
+
+    const rows = [
+      ['Ann. excess vs VOO (%)', 'mean_exc_252', false, 12, 5],
+      ['Raw Sharpe',             'raw_sharpe',   false, 0.8, 0.4],
+      ['Deflated Sharpe (DSR)', 'dsr',           false, 0.3, 0.0],
+      ['t-statistic',           't_stat',        false, 2.5, 1.65],
+      ['p-value',               'p_value',       true,  0.05, 0.10],
+      ['PBO',                   'pbo',           true,  0.10, 0.30],
+      ['Hit rate (%)',          'hit_rate',      false, 55, 50],
+      ['CPCV paths',            'n_paths',       false, 80, 40],
+    ];
+
+    const tableRows = rows.map(([label, key, rev, good, bad]) => `
+      <tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:7px 10px;font-size:11px">${label}</td>
+        <td style="padding:7px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:${color(cur[key],good,bad,rev)}">${fmt(cur[key])}</td>
+        <td style="padding:7px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:${color(prop[key],good,bad,rev)}">${fmt(prop[key])}</td>
+      </tr>`).join('');
+
+    const sigRows = Object.entries(sigs).map(([name, s]) => `
+      <tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:6px 10px;font-size:10px;font-family:'DM Mono',monospace">${name}</td>
+        <td style="padding:6px 10px;text-align:center;font-size:10px">${s.n||'—'}</td>
+        <td style="padding:6px 10px;text-align:center;font-size:10px;color:${color(s.ann_exc,5,0)}">${s.ann_exc!=null?s.ann_exc+'%':'—'}</td>
+        <td style="padding:6px 10px;text-align:center;font-size:10px">${s.p_val||'—'}</td>
+        <td style="padding:6px 10px;text-align:center;font-size:10px">${s.dsr!=null?s.dsr:'—'}</td>
+        <td style="padding:6px 10px;text-align:center;font-size:10px">${s.valid?'<span style="color:var(--green)">✓</span>':'<span style="color:var(--red)">✗</span>'}</td>
+      </tr>`).join('');
+
+    el.innerHTML = `
+      <div style="font-size:11px;color:var(--text3);margin-bottom:16px;font-family:'DM Mono',monospace">
+        Run: ${meta.timestamp||'—'} · ${meta.n_tickers||'—'} tickers · 
+        C(${meta.n_blocks||12},${meta.k_holdout||2})=${meta.n_paths_theoretical||66} paths × ${meta.n_seeds||2} seeds · 
+        Purge: ${meta.purge_days||20}d · p threshold: ${meta.p_threshold||0.05}
+      </div>
+      ${recommend}
+      <div style="display:flex;gap:12px;margin-bottom:16px">
+        <div style="flex:1;background:var(--s2);border-radius:6px;padding:12px;text-align:center">
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px">CURRENT MODEL</div>
+          ${verdict(cur)}
+        </div>
+        <div style="flex:1;background:var(--s2);border-radius:6px;padding:12px;text-align:center">
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px">PROPOSED MODEL</div>
+          ${verdict(prop)}
+        </div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:11px">
+        <thead><tr style="background:var(--s2)">
+          <th style="padding:8px 10px;text-align:left;font-size:9px;color:var(--text3)">METRIC</th>
+          <th style="padding:8px 10px;text-align:center;font-size:9px;color:var(--text3)">CURRENT</th>
+          <th style="padding:8px 10px;text-align:center;font-size:9px;color:var(--text3)">PROPOSED</th>
+        </tr></thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Individual Signal Validation</div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead><tr style="background:var(--s2)">
+          <th style="padding:7px 10px;text-align:left;font-size:9px;color:var(--text3)">SIGNAL</th>
+          <th style="padding:7px 10px;text-align:center;font-size:9px;color:var(--text3)">OBS</th>
+          <th style="padding:7px 10px;text-align:center;font-size:9px;color:var(--text3)">ANN EXC</th>
+          <th style="padding:7px 10px;text-align:center;font-size:9px;color:var(--text3)">p-VAL</th>
+          <th style="padding:7px 10px;text-align:center;font-size:9px;color:var(--text3)">DSR</th>
+          <th style="padding:7px 10px;text-align:center;font-size:9px;color:var(--text3)">VALID</th>
+        </tr></thead>
+        <tbody>${sigRows}</tbody>
+      </table>
+      <div style="margin-top:16px">
+        <a href="validation_cpcv_report.html" target="_blank" 
+           style="color:var(--green);font-size:11px;text-decoration:none">
+          ↗ Open full HTML report
+        </a>
+      </div>`;
+    el.dataset.loaded = '1';
+  } catch(e) {
+    el.innerHTML = `<div style="color:var(--amber);font-size:12px;padding:20px">
+      No CPCV results found. Run the validation workflow first:<br><br>
+      GitHub → Actions → CPCV Model Validation → Run workflow
+    </div>`;
+  }
 }
 
 async function loadPineScript() {
