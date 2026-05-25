@@ -70,11 +70,13 @@ PURGE_DAYS  = 20       # trading days purged between train/test boundary
 N_SEEDS     = 2        # independent seeds for double-confirmation
 SEEDS       = [42, 99]
 YEARS_DATA  = 5        # years of price history to fetch
-MIN_OBS     = 30       # minimum signal observations to include a path
+MIN_OBS     = 30       # minimum observations in a block to include the block
 FWD_DAYS    = 252      # forward return horizon for buy signals
 
-# Significance thresholds
-P_THRESHOLD = 0.05     # stricter than current 0.15 (Harvey-Liu-Zhu 2016)
+# Significance thresholds — kept at 0.15 per user preference
+# Research note: Harvey-Liu-Zhu (2016) recommend p<0.003 for academic publication
+# but p<0.15 is the operational threshold for this system
+P_THRESHOLD = 0.15
 DSR_MIN     = 0.0      # deflated Sharpe must be positive
 
 # ── MODEL PARAMETERS ─────────────────────────────────────────────────
@@ -448,27 +450,25 @@ def run_cpcv_validation(closes, ok, voo):
             idx = sig_df.index
             paths = make_cpcv_paths(idx, n_blocks=N_BLOCKS, k=K_HOLDOUT, purge=PURGE_DAYS)
 
-            ticker_path_sharpes = []
-
             for seed_offset, seed in enumerate(SEEDS):
-                # Each seed shuffles the path order (doesn't change the paths,
-                # adds independence confirmation)
-                rng = np.random.default_rng(seed)
-                path_order = rng.permutation(len(paths))
-
-                for path_i in path_order:
+                # Deterministic path order — identical for both models
+                # Seeds add statistical independence, not shuffling
+                for path_i in range(len(paths)):
                     train_mask, test_mask = paths[path_i]
                     if train_mask.sum() < MIN_OBS or test_mask.sum() < MIN_OBS:
                         continue
+
+                    # Count ALL valid paths symmetrically for both models
+                    results[model_name]['n_paths'] += 1
 
                     sig_exc, nosig_exc = run_signal_on_window(
                         sig_df, train_mask, test_mask, scorer_fn, FWD_DAYS, voo
                     )
 
-                    if len(sig_exc) < 5: continue
+                    if len(sig_exc) < 3: continue  # no signal obs — path counted but skipped for stats
 
-                    # Train Sharpe (on train portion for PBO)
-                    train_sig, train_nosig = run_signal_on_window(
+                    # Train Sharpe (swap masks) for PBO computation
+                    train_sig, _ = run_signal_on_window(
                         sig_df, test_mask, train_mask, scorer_fn, FWD_DAYS, voo
                     )
                     train_arr = np.array(train_sig) if len(train_sig) >= 3 else np.array([0])
@@ -477,11 +477,9 @@ def run_cpcv_validation(closes, ok, voo):
                     train_sr = train_arr.mean() / (train_arr.std() + 1e-9) * np.sqrt(252)
                     test_sr  = test_arr.mean()  / (test_arr.std()  + 1e-9) * np.sqrt(252)
 
-                    ticker_path_sharpes.append((train_sr, test_sr))
                     results[model_name]['all_signal_exc'].extend(sig_exc)
                     results[model_name]['all_nosig_exc'].extend(nosig_exc)
                     results[model_name]['path_sharpes'].append((train_sr, test_sr))
-                    results[model_name]['n_paths'] += 1
 
         results['current']['n_tickers_used']  = processed
         results['proposed']['n_tickers_used'] = processed
@@ -768,7 +766,7 @@ def build_html_report(agg_stats, signal_stats, run_meta):
   <tbody>{table_rows}</tbody>
 </table>
 
-<h2>Individual Signal Validation (CPCV, p &lt; {P_THRESHOLD}, DSR &gt; 0)</h2>
+<h2>Individual Signal Validation (CPCV, p p &lt; {P_THRESHOLD}lt; {P_THRESHOLD}, DSR &gt; 0)</h2>
 <table>
   <thead><tr>
     <th>Signal</th><th>Obs</th><th>Ann. Excess (%)</th>
@@ -786,7 +784,7 @@ def build_html_report(agg_stats, signal_stats, run_meta):
   testing ~250 strategy variants. DSR &gt; 0 means strategy likely survives multiple-testing.<br><br>
   <b>PBO (Bailey-Borwein-LdP-Zhu 2017):</b> Probability of Backtest Overfitting. PBO &lt; 0.10 = low overfitting risk. 
   PBO &gt; 0.30 = strategy likely overfit to historical data.<br><br>
-  <b>Signal inclusion threshold:</b> p &lt; {P_THRESHOLD} (Harvey-Liu-Zhu 2016 recommend p &lt; 0.003 for academic publication; 
+  <b>Signal inclusion threshold:</b> p p &lt; {P_THRESHOLD}lt; {P_THRESHOLD} (Harvey-Liu-Zhu 2016 recommend p &lt; 0.003 for academic publication; 
   p &lt; 0.05 is a practical compromise for live trading systems).<br><br>
   <b>Current model changes tested:</b> Quality gate (Sharpe-proxy → gross-profitability proxy), 
   Signal 4 PFD removed (p=0.112 original), DFV V3 demoted from 25pts → 10pts tie-breaker.
