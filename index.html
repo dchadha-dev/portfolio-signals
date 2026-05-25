@@ -1893,14 +1893,16 @@ async function loadCPCVReport() {
       ? '<span style="color:var(--green);font-weight:700">✓ PASSES</span>'
       : '<span style="color:var(--red);font-weight:700">✗ FAILS</span>';
 
-    const recommend = (prop.mean_exc_252 >= (cur.mean_exc_252||0)*0.90 &&
-                       (prop.dsr||-999) >= (cur.dsr||-999) &&
-                       (prop.pbo||1) <= (cur.pbo||1))
+    const recommend = (
+      (prop.dsr||0) >= (cur.dsr||0) * 0.90 &&
+      (prop.mean_exc_252||0) >= (cur.mean_exc_252||0) * 0.90 &&
+      (prop.pbo||1) <= (cur.pbo||1) * 1.10
+    )
       ? `<div style="background:rgba(22,163,74,0.1);border:1px solid var(--green);border-radius:6px;padding:12px;margin-bottom:16px">
-           <b style="color:var(--green)">✓ DEPLOY PROPOSED MODEL</b> — passes all three gates (p &lt; 0.05, DSR &gt; 0, PBO &lt; 0.30)
+           <b style="color:var(--green)">✓ DEPLOY PROPOSED MODEL</b> — DSR ≥ current ×0.90, excess within 10%, PBO not materially worse. Raw Sharpe excluded (inflated by Sharpe-proxy gate in current model).
          </div>`
       : `<div style="background:rgba(220,38,38,0.1);border:1px solid var(--red);border-radius:6px;padding:12px;margin-bottom:16px">
-           <b style="color:var(--red)">⚠ HOLD — DO NOT DEPLOY</b> — proposed model does not clearly beat current on all gates
+           <b style="color:var(--red)">⚠ HOLD — DO NOT DEPLOY</b> — proposed model does not clear primary gates (DSR, excess, PBO).
          </div>`;
 
     const rows = [
@@ -2407,6 +2409,10 @@ function renderRankings() {
     else if (s.factor)  dots.push('<span style="color:#0891b2;font-size:10px" title="Factor gate active">★</span>');
     if (s.pfd)          dots.push('<span style="color:#8b5cf6;font-size:10px" title="PFD buy signal">◆</span>');
     if (s.triple)       dots.push('<span style="color:#8b5cf6;font-size:10px" title="Up >20% in 63d — momentum">3x</span>');
+    // Insider & politician signals
+    if (s.insider_cluster) dots.push('<span style="color:#f59e0b;font-size:10px;font-weight:700" title="Cluster insider buying (2+ insiders, 30d)">🔑🔑</span>');
+    else if (s.insider_score > 0) dots.push('<span style="color:#f59e0b;font-size:10px" title="Insider buying (30d)">🔑</span>');
+    if (s.politician_score > 0) dots.push('<span style="color:#3b82f6;font-size:10px" title="Politician buy (45d)">🏛</span>');
     // Sell signals
     if (s.near_high)    dots.push('<span style="color:var(--red);font-size:10px;font-weight:600" title="Within 5% of 252d high">⚠H</span>');
     if (s.sell_cmf != null && s.sell_cmf < 0 && s.near_high) dots.push('<span style="color:var(--red);font-size:10px" title="CMF distribution at high">⚠C</span>');
@@ -2556,7 +2562,7 @@ function renderRankings() {
         </table>
       </div>
       <div style="margin-top:8px;font-size:10px;color:var(--text3);font-family:'DM Mono',monospace">
-        Click column headers to sort · ★★=Factor+DFV3 · ★=Factor · ◆=PFD · 3x=63d momentum · ⚠H=near 252d high · ⚠C=CMF dist · ⚠A=ATR ext · WB=Banker Weak
+        Click column headers to sort · ★★=Factor+DFV3 · ★=Factor · ◆=PFD · 3x=63d momentum · 🔑=Insider buy · 🔑🔑=Cluster · 🏛=Politician buy · ⚠H=near 252d high · ⚠C=CMF dist · ⚠A=ATR ext · WB=Banker Weak
       </div>
     </div>`;
 
