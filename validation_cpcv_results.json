@@ -1,6 +1,6 @@
 {
   "meta": {
-    "timestamp": "2026-05-25 03:30 UTC",
+    "timestamp": "2026-05-25 04:54 UTC",
     "n_tickers": 121,
     "n_paths_theoretical": 66,
     "n_blocks": 12,
@@ -29,18 +29,18 @@
       "passes_pbo30": false
     },
     "proposed": {
-      "n_obs": 95372,
+      "n_obs": 150834,
       "n_paths": 15576,
       "n_tickers": 119,
-      "mean_exc_252": 70.25,
-      "raw_sharpe": 5.328,
-      "dsr": 141.875,
-      "t_stat": 103.656,
+      "mean_exc_252": 61.93,
+      "raw_sharpe": 5.164,
+      "dsr": 171.755,
+      "t_stat": 126.332,
       "p_value": 0.0,
       "pbo": 0.501,
-      "hit_rate": 64.1,
-      "max_dd": -100.0,
-      "signal_vs_nosignal_spread": 11.68,
+      "hit_rate": 64.0,
+      "max_dd": 0.0,
+      "signal_vs_nosignal_spread": 7.54,
       "passes_p05": "True",
       "passes_dsr": true,
       "passes_pbo30": false
@@ -84,20 +84,22 @@
       "valid": "True"
     },
     "factor_gate_proposed": {
-      "n": 1710,
-      "mean_exc": 33.11,
-      "ann_exc": 33.1,
-      "t_stat": 17.425,
+      "n": 2776,
+      "mean_exc": 33.74,
+      "ann_exc": 33.7,
+      "t_stat": 24.437,
       "p_val": 0.0,
-      "dsr": 23.541,
+      "dsr": 32.081,
       "valid": "True"
     },
     "dfv3_tiebreaker": {
       "n": 0,
-      "mean": null,
-      "t": null,
-      "p": null,
-      "dsr": null
+      "mean_exc": null,
+      "ann_exc": null,
+      "t_stat": null,
+      "p_val": null,
+      "dsr": null,
+      "valid": false
     },
     "triple_proposed": {
       "n": 8732,
