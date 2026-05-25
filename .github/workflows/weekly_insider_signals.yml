@@ -51,39 +51,22 @@ jobs:
         run: python insider_signals_fetcher.py
         continue-on-error: true
 
-      - name: Check final status and flag if all attempts failed
+      - name: Write failure marker if no JSON produced
+        if: ${{ !hashFiles('insider_signals.json') }}
         run: |
-          # Read retry_required from output JSON
-          if [ -f insider_signals.json ]; then
-            RETRY=$(python3 -c "import json; d=json.load(open('insider_signals.json')); print(d['health']['retry_required'])")
-            echo "retry_required=$RETRY"
-            if [ "$RETRY" = "True" ]; then
-              echo "::warning::Insider signals fetch incomplete after 3 attempts — manual re-run required"
-              echo "FETCH_INCOMPLETE=true" >> $GITHUB_ENV
-            else
-              echo "FETCH_INCOMPLETE=false" >> $GITHUB_ENV
-            fi
-          else
-            echo "::error::insider_signals.json not written — all fetch attempts failed"
+          python3 -c "import json,datetime; json.dump({'health':{'timestamp':datetime.datetime.now().strftime('%Y-%m-%d %H:%M UTC'),'insider_fetch_ok':False,'politician_fetch_ok':False,'retry_required':True,'retry_reason':['all_attempts_failed'],'n_insider_signals':0,'n_politician_signals':0,'n_combined_signals':0},'signals':{}},open('insider_signals.json','w'),indent=2)"
+          echo "FETCH_INCOMPLETE=true" >> $GITHUB_ENV
+
+      - name: Check retry status from JSON
+        if: hashFiles('insider_signals.json')
+        run: |
+          RETRY=$(python3 -c "import json; d=json.load(open('insider_signals.json')); print(d['health']['retry_required'])")
+          echo "retry_required=$RETRY"
+          if [ "$RETRY" = "True" ]; then
+            echo "::warning::Insider signals fetch incomplete after 3 attempts — manual re-run required"
             echo "FETCH_INCOMPLETE=true" >> $GITHUB_ENV
-            # Write a minimal failure marker so scanner knows data is stale
-            python3 -c "
-import json, datetime
-json.dump({
-  'health': {
-    'timestamp': datetime.datetime.now().strftime('%Y-%m-%d %H:%M UTC'),
-    'insider_fetch_ok': False,
-    'politician_fetch_ok': False,
-    'retry_required': True,
-    'retry_reason': ['all_attempts_failed'],
-    'n_insider_signals': 0,
-    'n_politician_signals': 0,
-    'n_combined_signals': 0,
-  },
-  'signals': {}
-}, open('insider_signals.json','w'), indent=2)
-print('Wrote failure marker to insider_signals.json')
-"
+          else
+            echo "FETCH_INCOMPLETE=false" >> $GITHUB_ENV
           fi
 
       - name: Commit results
@@ -98,14 +81,14 @@ print('Wrote failure marker to insider_signals.json')
           fi
           git push
 
-      - name: Trigger daily scanner to pick up new signals
-        if: env.FETCH_INCOMPLETE == 'false'
+      - name: Trigger Netlify deploy
+        if: env.FETCH_INCOMPLETE != 'true'
         run: |
           curl -s -X POST "${{ secrets.NETLIFY_DEPLOY_HOOK }}"
           echo "Netlify deploy triggered with fresh insider signals"
 
-      - name: Fail job if fetch was incomplete (surfaces in Actions UI as red)
+      - name: Fail job if fetch incomplete
         if: env.FETCH_INCOMPLETE == 'true'
         run: |
-          echo "::error::Insider signals fetch failed after 3 attempts. Go to Actions → Weekly Insider Signals → Re-run jobs"
+          echo "::error::Insider signals fetch failed. Go to Actions → Weekly Insider Signals → Re-run jobs"
           exit 1
