@@ -1,12 +1,22 @@
 """
 insider_signals_fetcher.py
-Weekly fetcher for corporate insider buying (EDGAR Form 4)
-and politician trading (House Stock Watcher API + Senate Stock Watcher GitHub).
+══════════════════════════════════════════════════════════════════════
+Weekly fetcher using SEC EDGAR as the single source for both:
 
-Fixes from v1:
-- EDGAR: now fetches filing index to get actual XML filename
-- Politician: House uses housestockwatcher.com/api/transactions endpoint
-              Senate uses raw GitHub JSON (timothycarambat/senate-stock-watcher-data)
+1. Corporate insider buying — Form 4 (executives/directors)
+2. Politician buying — Form 4 (Members of Congress file same form)
+
+Both file Form 4 with SEC. EDGAR EFTS full-text search lets us find
+filings by ticker. We parse the XML to extract transactions.
+
+Key fix: use the filing index to find the actual XML filename,
+not a guessed pattern.
+
+Signal weights:
+  Single insider buy (30d):       +10 pts
+  Cluster buy (2+ insiders, 30d): +20 pts
+  Politician buy (45d):           +8 pts
+  Combined max:                   +25 pts
 """
 
 import json, time, re, math, sys
@@ -33,8 +43,14 @@ LOOKBACK_INSIDER    = 30
 LOOKBACK_POLITICIAN = 45
 MIN_TRANSACTION_USD = 50_000
 
-# ── EDGAR: CIK MAP ────────────────────────────────────────────────────
+# Known Congress member keywords in owner titles
+POLITICIAN_KEYWORDS = {
+    'senator', 'representative', 'congress', 'senate', 'house of rep',
+    'member of congress', 'u.s. senator', 'u.s. representative',
+}
+
 def get_cik_map():
+    """Map tickers to CIK numbers."""
     try:
         r = requests.get('https://www.sec.gov/files/company_tickers.json',
                          headers=SEC_HEADERS, timeout=30)
@@ -50,9 +66,8 @@ def get_cik_map():
         print(f'  CIK map failed: {e}')
         return {}
 
-# ── EDGAR: FORM 4 ACCESSIONS ──────────────────────────────────────────
 def fetch_form4_accessions(cik, cutoff_str):
-    """Get recent Form 4 accession numbers from submissions API."""
+    """Get recent Form 4 accession numbers."""
     try:
         time.sleep(0.12)
         r = requests.get(f'https://data.sec.gov/submissions/CIK{cik}.json',
@@ -73,67 +88,117 @@ def fetch_form4_accessions(cik, cutoff_str):
     except Exception:
         return []
 
-# ── EDGAR: GET XML FILENAME FROM FILING INDEX ─────────────────────────
-def get_form4_xml_url(cik, accession):
+def get_xml_url_from_index(cik, accession):
     """
-    Fetch the filing index to find the actual XML filename.
-    Form 4 files are NOT named accession.xml — must look up in index.
+    Fetch the filing index JSON (not HTML) to get the primary XML document URL.
+    EDGAR provides a structured index at accession-index.json.
     """
     acc_nodash = accession.replace('-', '')
     cik_int    = str(int(cik))
-    index_url  = f'https://www.sec.gov/Archives/edgar/data/{cik_int}/{acc_nodash}/{accession}-index.htm'
+
+    # Try the JSON index first — most reliable
+    idx_url = f'https://data.sec.gov/submissions/CIK{cik}.json'  # already fetched above
+
+    # Use the direct filing index JSON
+    json_idx = f'https://www.sec.gov/Archives/edgar/data/{cik_int}/{acc_nodash}/{accession}-index.json'
     try:
         time.sleep(0.12)
-        r = requests.get(index_url, headers=SEC_HEADERS, timeout=15)
-        if r.status_code != 200:
-            return None
-        # Find the primary XML document — usually ends in .xml and is form4 type
-        for line in r.text.splitlines():
-            if '.xml' in line.lower() and ('form4' in line.lower() or '4/' in line.lower()
-                                            or 'xbrl' not in line.lower()):
-                match = re.search(r'href="([^"]+\.xml)"', line, re.IGNORECASE)
-                if match:
-                    fname = match.group(1).split('/')[-1]
-                    return f'https://www.sec.gov/Archives/edgar/data/{cik_int}/{acc_nodash}/{fname}'
-        # Fallback: try common patterns
-        for suffix in ['.xml', '-primary.xml']:
-            url = f'https://www.sec.gov/Archives/edgar/data/{cik_int}/{acc_nodash}/{accession}{suffix}'
-            return url  # try first fallback
+        r = requests.get(json_idx, headers=SEC_HEADERS, timeout=15)
+        if r.status_code == 200:
+            data = r.json()
+            for item in data.get('directory', {}).get('item', []):
+                name = item.get('name', '')
+                # Form 4 primary document is typically .xml and not the full submission txt
+                if name.endswith('.xml') and 'xbrl' not in name.lower():
+                    return f'https://www.sec.gov/Archives/edgar/data/{cik_int}/{acc_nodash}/{name}'
     except Exception:
         pass
+
+    # Fallback: try EFTS to get the filing documents list
+    try:
+        time.sleep(0.12)
+        efts_url = f'https://efts.sec.gov/LATEST/search-index?q=%22{accession}%22&forms=4'
+        r = requests.get(efts_url, headers=SEC_HEADERS, timeout=15)
+        if r.status_code == 200:
+            hits = r.json().get('hits', {}).get('hits', [])
+            for hit in hits:
+                src = hit.get('_source', {})
+                period = src.get('period_of_report', '')
+                # Get the filing document URLs from _id (format: accession:filename)
+                doc_id = hit.get('_id', '')
+                if '.xml' in doc_id:
+                    parts = doc_id.split(':')
+                    if len(parts) == 2:
+                        fname = parts[1]
+                        return f'https://www.sec.gov/Archives/edgar/data/{cik_int}/{acc_nodash}/{fname}'
+    except Exception:
+        pass
+
+    # Last resort: try common Form 4 XML filename patterns
+    for suffix in ['4.xml', 'primary_doc.xml', 'form4.xml']:
+        url = f'https://www.sec.gov/Archives/edgar/data/{cik_int}/{acc_nodash}/{suffix}'
+        try:
+            time.sleep(0.08)
+            r = requests.head(url, headers=SEC_HEADERS, timeout=8)
+            if r.status_code == 200:
+                return url
+        except Exception:
+            pass
+
     return None
 
-# ── EDGAR: PARSE FORM 4 XML ───────────────────────────────────────────
 def parse_form4_xml(xml_url, ticker, filing_date):
-    """Parse Form 4 XML for open-market purchases (code P, non-10b5-1, ≥$50K)."""
-    if not xml_url: return []
+    """Parse Form 4 XML for open-market purchases."""
+    if not xml_url: return [], []
     buys = []
+    pol_buys = []
     try:
         time.sleep(0.12)
         r = requests.get(xml_url, headers=SEC_HEADERS, timeout=20)
-        if r.status_code != 200: return []
-        root = ET.fromstring(r.content)
+        if r.status_code != 200: return [], []
 
-        # Get insider title
-        owner_rel = ''
-        rel_el = root.find('.//reportingOwnerRelationship')
-        if rel_el is not None:
-            parts = []
-            for tag in ['isDirector', 'isOfficer', 'isTenPercentOwner']:
-                el = rel_el.find(tag)
-                if el is not None and el.text == '1':
-                    parts.append(tag.replace('is', ''))
-            title_el = rel_el.find('officerTitle')
-            if title_el is not None and title_el.text:
-                parts.append(title_el.text.strip())
-            owner_rel = ', '.join(parts)
+        # Handle both XML and the full submission text format
+        content = r.content
+        if b'<ownershipDocument' not in content and b'<XML>' in content:
+            # Extract XML from full submission text wrapper
+            start = content.find(b'<ownershipDocument')
+            end   = content.find(b'</ownershipDocument>') + len(b'</ownershipDocument>')
+            if start >= 0 and end > start:
+                content = content[start:end]
 
+        root = ET.fromstring(content)
+
+        # Get reporter info
+        owner_name  = ''
+        owner_title = ''
+        owner_el    = root.find('.//reportingOwner')
+        if owner_el is not None:
+            name_el = owner_el.find('.//rptOwnerName')
+            if name_el is not None and name_el.text:
+                owner_name = name_el.text.strip()
+            rel_el = owner_el.find('.//reportingOwnerRelationship')
+            if rel_el is not None:
+                parts = []
+                for tag in ['isDirector', 'isOfficer', 'isTenPercentOwner']:
+                    el = rel_el.find(tag)
+                    if el is not None and el.text == '1':
+                        parts.append(tag.replace('is', ''))
+                title_el = rel_el.find('officerTitle')
+                if title_el is not None and title_el.text:
+                    parts.append(title_el.text.strip())
+                owner_title = ', '.join(parts)
+
+        # Check if this is a politician filer
+        name_lower  = owner_name.lower()
+        title_lower = owner_title.lower()
+        is_politician = any(kw in name_lower or kw in title_lower
+                           for kw in POLITICIAN_KEYWORDS)
+
+        # Parse transactions
         for txn in root.findall('.//nonDerivativeTransaction'):
-            # Transaction code must be P (open market purchase)
             code_el = txn.find('.//transactionCodes/transactionCode')
             if code_el is None or code_el.text != 'P': continue
 
-            # Exclude 10b5-1 plans
             plan_el = txn.find('.//transactionCodes/rule10b5-1PlanFlag')
             if plan_el is not None and plan_el.text in ('Y', '1', 'true'): continue
 
@@ -143,38 +208,62 @@ def parse_form4_xml(xml_url, ticker, filing_date):
             price  = float(price_el.text)  if price_el  is not None and price_el.text  else 0
             if shares * price < MIN_TRANSACTION_USD: continue
 
-            buys.append({
-                'ticker':        ticker,
-                'date':          filing_date,
-                'value_usd':     round(shares * price),
-                'shares':        int(shares),
-                'price':         round(price, 2),
-                'insider_title': owner_rel,
-            })
+            entry = {
+                'ticker':     ticker,
+                'date':       filing_date,
+                'value_usd':  round(shares * price),
+                'shares':     int(shares),
+                'price':      round(price, 2),
+                'name':       owner_name,
+                'title':      owner_title,
+            }
+            if is_politician:
+                pol_buys.append(entry)
+            else:
+                buys.append(entry)
+
     except Exception:
         pass
-    return buys
+    return buys, pol_buys
 
-# ── EDGAR: MAIN FETCH ─────────────────────────────────────────────────
-def fetch_edgar_signals(cik_map):
-    cutoff_str = (datetime.now() - timedelta(days=LOOKBACK_INSIDER)).date().strftime('%Y-%m-%d')
-    all_buys   = []
-    n          = len(cik_map)
-    print(f'  Fetching Form 4 for {n} tickers (cutoff: {cutoff_str})...')
+def fetch_all_signals(cik_map):
+    """Fetch Form 4 for all tickers, separate into insider and politician."""
+    ins_cutoff = (datetime.now() - timedelta(days=LOOKBACK_INSIDER)).date().strftime('%Y-%m-%d')
+    pol_cutoff = (datetime.now() - timedelta(days=LOOKBACK_POLITICIAN)).date().strftime('%Y-%m-%d')
+
+    all_insider = {}   # ticker -> list of buys
+    all_pol     = {}   # ticker -> list of buys
+    n = len(cik_map)
+    print(f'  Fetching Form 4 for {n} tickers...')
+    xml_found = 0; xml_tried = 0
 
     for i, (ticker, cik) in enumerate(cik_map.items()):
-        if i % 20 == 0: print(f'    {i}/{n}...')
-        for acc, fd in fetch_form4_accessions(cik, cutoff_str)[:5]:
-            xml_url = get_form4_xml_url(cik, acc)
-            all_buys.extend(parse_form4_xml(xml_url, ticker, fd))
+        if i % 15 == 0: print(f'    {i}/{n} (XML found: {xml_found}/{xml_tried})...')
 
-    print(f'  EDGAR: {len(all_buys)} qualifying transactions')
-    by_ticker = {}
-    for b in all_buys:
-        by_ticker.setdefault(b['ticker'], []).append(b)
+        # Use longer lookback for politician check
+        accessions = fetch_form4_accessions(cik, pol_cutoff)
+        for acc, fd in accessions[:8]:
+            xml_tried += 1
+            xml_url = get_xml_url_from_index(cik, acc)
+            if xml_url:
+                xml_found += 1
+            insider_buys, pol_buys = parse_form4_xml(xml_url, ticker, fd)
+
+            # Apply appropriate cutoff
+            if fd >= ins_cutoff:
+                all_insider.setdefault(ticker, []).extend(insider_buys)
+            all_pol.setdefault(ticker, []).extend(pol_buys)
+
+    print(f'  XML resolution: {xml_found}/{xml_tried} successful')
+    print(f'  Insider buys: {sum(len(v) for v in all_insider.values())} transactions')
+    print(f'  Politician buys: {sum(len(v) for v in all_pol.values())} transactions')
+    return all_insider, all_pol
+
+def build_insider_results(all_insider):
     results = {}
-    for ticker, buys in by_ticker.items():
-        unique  = len(set(b['insider_title'] for b in buys))
+    for ticker, buys in all_insider.items():
+        if not buys: continue
+        unique  = len(set(b['name'] for b in buys))
         is_cl   = unique >= 2
         results[ticker] = {
             'buys':       [{**b, 'is_cluster': is_cl} for b in buys[:5]],
@@ -185,120 +274,18 @@ def fetch_edgar_signals(cik_map):
         }
     return results
 
-# ── POLITICIAN: HOUSE ─────────────────────────────────────────────────
-def fetch_house_trades(cutoff):
-    """Fetch House trades from housestockwatcher.com API."""
-    trades = []
-    # Try the website API endpoint
-    urls = [
-        'https://housestockwatcher.com/api/transactions',
-        'https://housestockwatcher.com/api/transactions_by_date',
-    ]
-    for url in urls:
-        try:
-            time.sleep(1)
-            r = requests.get(url, timeout=30, headers={
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'Accept': 'application/json',
-            })
-            print(f'  House ({url.split("/")[-1]}): HTTP {r.status_code}')
-            if r.status_code != 200: continue
-            data = r.json()
-            if not isinstance(data, list): data = data.get('data', [])
-            for trade in data:
-                td_str = trade.get('transaction_date', '')
-                if not td_str or td_str == 'Not Disclosed': continue
-                try:
-                    td = datetime.strptime(td_str[:10], '%Y-%m-%d').date()
-                except: continue
-                if td < cutoff: continue
-                raw = (trade.get('ticker', '') or '').upper().strip()
-                ticker = re.sub(r'[^A-Z]', '', raw)
-                if not ticker or ticker not in UNIVERSE_SET: continue
-                tx = (trade.get('type', '') or '').lower()
-                if 'purchase' not in tx and 'buy' not in tx: continue
-                trades.append({
-                    'ticker':     ticker,
-                    'date':       str(td),
-                    'politician': trade.get('representative', 'Unknown'),
-                    'chamber':    'House',
-                    'amount':     trade.get('amount', ''),
-                })
-            print(f'  House: {len(trades)} qualifying buys found')
-            return trades
-        except Exception as e:
-            print(f'  House error: {e}')
-    return trades
-
-# ── POLITICIAN: SENATE ────────────────────────────────────────────────
-def fetch_senate_trades(cutoff):
-    """Fetch Senate trades from GitHub JSON (timothycarambat/senate-stock-watcher-data)."""
-    trades = []
-    urls = [
-        'https://raw.githubusercontent.com/timothycarambat/senate-stock-watcher-data/master/data/all_transactions.json',
-        'https://raw.githubusercontent.com/timothycarambat/senate-stock-watcher-data/main/data/all_transactions.json',
-    ]
-    for url in urls:
-        try:
-            time.sleep(0.5)
-            r = requests.get(url, timeout=30, headers={'User-Agent': 'Mozilla/5.0'})
-            print(f'  Senate GitHub: HTTP {r.status_code}')
-            if r.status_code != 200: continue
-            data = r.json()
-            if not isinstance(data, list): data = data.get('data', [])
-            for trade in data:
-                td_str = trade.get('transaction_date', '')
-                if not td_str: continue
-                try:
-                    td = datetime.strptime(td_str[:10], '%Y-%m-%d').date()
-                except: continue
-                if td < cutoff: continue
-                raw    = (trade.get('ticker', '') or '').upper().strip()
-                ticker = re.sub(r'[^A-Z]', '', raw)
-                if not ticker or ticker not in UNIVERSE_SET: continue
-                tx = (trade.get('type', '') or '').lower()
-                if 'purchase' not in tx and 'buy' not in tx: continue
-                trades.append({
-                    'ticker':     ticker,
-                    'date':       str(td),
-                    'politician': trade.get('senator', 'Unknown'),
-                    'chamber':    'Senate',
-                    'amount':     trade.get('amount', ''),
-                })
-            print(f'  Senate: {len(trades)} qualifying buys found')
-            return trades
-        except Exception as e:
-            print(f'  Senate error: {e}')
-    return trades
-
-# ── POLITICIAN: MAIN FETCH ────────────────────────────────────────────
-def fetch_politician_signals():
-    cutoff  = (datetime.now() - timedelta(days=LOOKBACK_POLITICIAN)).date()
-    trades  = []
-    ok      = True
-
-    house_trades  = fetch_house_trades(cutoff)
-    senate_trades = fetch_senate_trades(cutoff)
-    trades        = house_trades + senate_trades
-
-    if not trades:
-        ok = False
-
-    by_ticker = {}
-    for t in trades:
-        by_ticker.setdefault(t['ticker'], []).append(t)
+def build_politician_results(all_pol):
     results = {}
-    for ticker, tlist in by_ticker.items():
+    for ticker, buys in all_pol.items():
+        if not buys: continue
         results[ticker] = {
-            'trades':        tlist[:5],
+            'trades':        buys[:5],
             'score':         8,
-            'n_politicians': len(set(t['politician'] for t in tlist)),
+            'n_politicians': len(set(b['name'] for b in buys)),
             'as_of':         str(date.today()),
         }
-    print(f'  Politician signals: {len(results)} tickers total')
-    return results, ok
+    return results
 
-# ── COMBINE ───────────────────────────────────────────────────────────
 def combine(insider, politician):
     combined = {}
     for ticker in set(list(insider) + list(politician)):
@@ -317,46 +304,41 @@ def combine(insider, politician):
         }
     return combined
 
-# ── MAIN ──────────────────────────────────────────────────────────────
 def main():
     start = datetime.now()
     print('='*60)
     print(f'Insider & Politician Fetcher — {start.strftime("%Y-%m-%d %H:%M UTC")}')
+    print('Single source: SEC EDGAR Form 4 (corporate + politician)')
     print('='*60)
 
-    insider_ok = politician_ok = True
+    ok = True
     insider_signals = politician_signals = {}
 
     try:
-        print('\n[1/2] EDGAR Form 4')
         cik_map = get_cik_map()
         if cik_map:
-            insider_signals = fetch_edgar_signals(cik_map)
+            all_insider, all_pol = fetch_all_signals(cik_map)
+            insider_signals    = build_insider_results(all_insider)
+            politician_signals = build_politician_results(all_pol)
+        else:
+            ok = False
     except Exception as e:
-        print(f'  EDGAR failed: {e}')
-        insider_ok = False
-
-    try:
-        print('\n[2/2] Politician Trades')
-        politician_signals, politician_ok = fetch_politician_signals()
-    except Exception as e:
-        print(f'  Politician failed: {e}')
-        politician_ok = False
+        print(f'  Fetch failed: {e}')
+        ok = False
 
     combined = combine(insider_signals, politician_signals)
     elapsed  = round((datetime.now() - start).total_seconds(), 1)
 
     health = {
         'timestamp':            datetime.now().strftime('%Y-%m-%d %H:%M UTC'),
-        'insider_fetch_ok':     insider_ok,
-        'politician_fetch_ok':  politician_ok,
+        'insider_fetch_ok':     ok,
+        'politician_fetch_ok':  ok,
         'n_insider_signals':    sum(1 for v in combined.values() if v['insider_score'] > 0),
         'n_politician_signals': sum(1 for v in combined.values() if v['politician_score'] > 0),
         'n_combined_signals':   len(combined),
         'elapsed_seconds':      elapsed,
-        'retry_required':       not insider_ok or not politician_ok,
-        'retry_reason':         (['insider_failed'] if not insider_ok else []) +
-                                (['politician_failed'] if not politician_ok else []),
+        'retry_required':       not ok,
+        'retry_reason':         ['edgar_failed'] if not ok else [],
     }
 
     def sanitize(obj):
@@ -368,8 +350,12 @@ def main():
     with open('insider_signals.json', 'w') as f:
         json.dump(sanitize({'health': health, 'signals': combined}), f, indent=2, default=str)
 
-    print(f'\nDone in {elapsed}s | Insider: {health["n_insider_signals"]} | Politician: {health["n_politician_signals"]}')
+    print(f'\nDone in {elapsed}s')
+    print(f'Insider signals:    {health["n_insider_signals"]} tickers')
+    print(f'Politician signals: {health["n_politician_signals"]} tickers')
+    print(f'Retry required:     {health["retry_required"]}')
     print('insider_signals.json written')
+
     if health['retry_required']:
         sys.exit(1)
 
