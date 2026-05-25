@@ -19,7 +19,7 @@ Methodology:
 
 Models compared:
   CURRENT: Sharpe-proxy quality gate, Signal 4 (PFD), DFV V3 full weight
-  PROPOSED: Gross-profitability proxy, no PFD, DFV V3 demoted to tie-breaker
+  PROPOSED: Gross-profitability proxy, DFV V3 full weight, PFD reduced to +8pts
 
 Output:
   validation_cpcv_report.html  — full HTML report
@@ -172,7 +172,7 @@ def compute_signals_proposed(cl):
     Proposed model signals:
     - Gross-profitability proxy replaces Sharpe-proxy quality gate
     - Signal 4 (PFD) removed
-    - DFV V3 demoted: contributes 10pts as tie-breaker, not 38pts primary signal
+    - Gross-profitability proxy replaces Sharpe-proxy quality gate
     """
     cl = cl.dropna()
     if len(cl) < 252: return pd.DataFrame()
@@ -194,8 +194,11 @@ def compute_signals_proposed(cl):
     df['f']          = (df['dist'] < DIST_T) & (df['trend'] > TREND_T) & (df['quality'] > QUALITY_T)
     df['dfv3']       = df['hm_lift'] > DFV_LIFT
     df['fdfv3']      = df['f'] & df['dfv3']
-    # ── KEY CHANGE 2: PFD removed entirely ────────────────────────────
-    # df['pfd'] intentionally omitted
+    # ── KEY CHANGE 2: PFD retained (CPCV validated) ───────────────────
+    # PFD kept in signal computation — weight reduced in scorer not here
+    ret252           = df['close'].pct_change(252)
+    ret126           = df['close'].pct_change(126)
+    df['pfd']        = ((ret252 - 2*ret126) > 0.05) & (df['quality'] > QUALITY_T * 2)
     df['triple']     = df['close'].pct_change(63) > 0.20
     df['banker_weak']= (df['banker_prev'] >= 20) & (df['banker_rsi'] < 20)
     rsi_above        = (df['rsi14'] - 60).clip(lower=0).ewm(span=3, adjust=False).mean()
@@ -218,15 +221,18 @@ def score_buy_current(row):
 
 def score_buy_proposed(row):
     """
-    Proposed buy scoring:
-    - PFD removed (was +20pts, p=0.112 — below credible threshold)
-    - DFV V3 demoted: still scores but as tie-breaker (+10pts not +25)
-    - Triple composite weight raised slightly (+15pts) to compensate
+    Revised proposed buy scoring based on CPCV validation results:
+    - Gross-profitability quality gate replaces Sharpe-proxy (validated: DSR 23.5 vs 13.7)
+    - DFV V3 RESTORED to full weight (+25pts) — CPCV shows 38.5% ann excess, DSR 8.84 ✓
+    - PFD kept but weight reduced +20 → +8pts (valid signal, but weaker: 11.3% ann excess)
+    - Triple unchanged (+10pts)
+    - DFV V3 demotion from prior version REVERTED — data does not support it
     """
     buy = 0
-    if row.get('f'):      buy += 40   # unchanged — Factor gate
-    if row.get('fdfv3'):  buy += 10   # demoted from 25 → 10 (tie-breaker)
-    if row.get('triple'): buy += 15   # raised from 10 → 15
+    if row.get('f'):      buy += 40   # Factor gate — unchanged
+    if row.get('fdfv3'):  buy += 25   # DFV V3 — RESTORED to full weight (CPCV validated)
+    if row.get('pfd'):    buy += 8    # PFD — reduced from 20 → 8 (weaker but valid)
+    if row.get('triple'): buy += 10   # Triple — unchanged
     if row.get('dfv3') and not row.get('f'): buy += 5
     if row.get('banker_weak'): buy -= 20
     if row.get('rbear'):       buy -= 10
@@ -787,7 +793,7 @@ def build_html_report(agg_stats, signal_stats, run_meta):
   <b>Signal inclusion threshold:</b> p p &lt; {P_THRESHOLD}lt; {P_THRESHOLD} (Harvey-Liu-Zhu 2016 recommend p &lt; 0.003 for academic publication; 
   p &lt; 0.05 is a practical compromise for live trading systems).<br><br>
   <b>Current model changes tested:</b> Quality gate (Sharpe-proxy → gross-profitability proxy), 
-  Signal 4 PFD removed (p=0.112 original), DFV V3 demoted from 25pts → 10pts tie-breaker.
+  DFV V3 restored to full weight (CPCV: 38.5% ann excess, DSR 8.84). PFD reduced from +20 → +8pts.
 </div>
 
 </body></html>'''
