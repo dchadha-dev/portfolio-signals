@@ -732,12 +732,12 @@ def build_html_report(agg_stats, signal_stats, run_meta):
     # Tertiary gate: PBO not materially worse than current
     # Raw Sharpe deliberately excluded — it is inflated by the current model's
     # Sharpe-proxy quality gate and is not a credible comparator here.
-    cur_dsr  = agg.get('current',  {}).get('dsr',  0) or 0
-    prop_dsr = agg.get('proposed', {}).get('dsr',  0) or 0
-    cur_exc  = agg.get('current',  {}).get('mean_exc_252', 0) or 0
-    prop_exc = agg.get('proposed', {}).get('mean_exc_252', 0) or 0
-    cur_pbo  = agg.get('current',  {}).get('pbo',  1) or 1
-    prop_pbo = agg.get('proposed', {}).get('pbo',  1) or 1
+    cur_dsr  = agg_stats.get('current',  {}).get('dsr',  0) or 0
+    prop_dsr = agg_stats.get('proposed', {}).get('dsr',  0) or 0
+    cur_exc  = agg_stats.get('current',  {}).get('mean_exc_252', 0) or 0
+    prop_exc = agg_stats.get('proposed', {}).get('mean_exc_252', 0) or 0
+    cur_pbo  = agg_stats.get('current',  {}).get('pbo',  1) or 1
+    prop_pbo = agg_stats.get('proposed', {}).get('pbo',  1) or 1
 
     deploy = (
         prop_dsr  >= cur_dsr  * 0.90 and   # DSR within 10% of current (primary)
