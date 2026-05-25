@@ -148,7 +148,7 @@ def get_xml_url_from_index(cik, accession):
     return None
 
 def parse_form4_xml(xml_url, ticker, filing_date):
-    """Parse Form 4 XML for open-market purchases."""
+    """Parse Form 4 XML - handles namespaced and non-namespaced formats."""
     if not xml_url: return [], []
     buys = []
     pol_buys = []
@@ -157,16 +157,20 @@ def parse_form4_xml(xml_url, ticker, filing_date):
         r = requests.get(xml_url, headers=SEC_HEADERS, timeout=20)
         if r.status_code != 200: return [], []
 
-        # Handle both XML and the full submission text format
         content = r.content
+
+        # Extract XML from full submission text wrapper if needed
         if b'<ownershipDocument' not in content and b'<XML>' in content:
-            # Extract XML from full submission text wrapper
             start = content.find(b'<ownershipDocument')
             end   = content.find(b'</ownershipDocument>') + len(b'</ownershipDocument>')
             if start >= 0 and end > start:
                 content = content[start:end]
 
-        root = ET.fromstring(content)
+        # Strip XML namespaces — handles both old and new SEC Form 4 schemas
+        text = content.decode('utf-8', errors='replace')
+        text = re.sub(r' xmlns[^=]*="[^"]*"', '', text)
+        text = re.sub(r'<(/?)[\w-]+:', r'<', text)
+        root = ET.fromstring(text.encode('utf-8'))
 
         # Get reporter info
         owner_name  = ''
