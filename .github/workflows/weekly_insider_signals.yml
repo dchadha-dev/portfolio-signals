@@ -1,0 +1,111 @@
+name: Weekly Insider Signals
+
+on:
+  schedule:
+    - cron: '0 1 * * 1'   # Every Monday 1am UTC (8am Bangkok)
+  workflow_dispatch:        # Manual trigger
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch insider & politician signals (attempt 1)
+        id: fetch_attempt_1
+        run: python insider_signals_fetcher.py
+        continue-on-error: true
+
+      - name: Wait and retry if attempt 1 failed
+        if: steps.fetch_attempt_1.outcome == 'failure'
+        run: |
+          echo "Attempt 1 failed — waiting 60s before retry..."
+          sleep 60
+
+      - name: Fetch insider & politician signals (attempt 2)
+        id: fetch_attempt_2
+        if: steps.fetch_attempt_1.outcome == 'failure'
+        run: python insider_signals_fetcher.py
+        continue-on-error: true
+
+      - name: Wait and retry if attempt 2 failed
+        if: steps.fetch_attempt_2.outcome == 'failure'
+        run: |
+          echo "Attempt 2 failed — waiting 120s before final retry..."
+          sleep 120
+
+      - name: Fetch insider & politician signals (attempt 3 — final)
+        id: fetch_attempt_3
+        if: steps.fetch_attempt_2.outcome == 'failure'
+        run: python insider_signals_fetcher.py
+        continue-on-error: true
+
+      - name: Check final status and flag if all attempts failed
+        run: |
+          # Read retry_required from output JSON
+          if [ -f insider_signals.json ]; then
+            RETRY=$(python3 -c "import json; d=json.load(open('insider_signals.json')); print(d['health']['retry_required'])")
+            echo "retry_required=$RETRY"
+            if [ "$RETRY" = "True" ]; then
+              echo "::warning::Insider signals fetch incomplete after 3 attempts — manual re-run required"
+              echo "FETCH_INCOMPLETE=true" >> $GITHUB_ENV
+            else
+              echo "FETCH_INCOMPLETE=false" >> $GITHUB_ENV
+            fi
+          else
+            echo "::error::insider_signals.json not written — all fetch attempts failed"
+            echo "FETCH_INCOMPLETE=true" >> $GITHUB_ENV
+            # Write a minimal failure marker so scanner knows data is stale
+            python3 -c "
+import json, datetime
+json.dump({
+  'health': {
+    'timestamp': datetime.datetime.now().strftime('%Y-%m-%d %H:%M UTC'),
+    'insider_fetch_ok': False,
+    'politician_fetch_ok': False,
+    'retry_required': True,
+    'retry_reason': ['all_attempts_failed'],
+    'n_insider_signals': 0,
+    'n_politician_signals': 0,
+    'n_combined_signals': 0,
+  },
+  'signals': {}
+}, open('insider_signals.json','w'), indent=2)
+print('Wrote failure marker to insider_signals.json')
+"
+          fi
+
+      - name: Commit results
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add insider_signals.json
+          if [ "$FETCH_INCOMPLETE" = "true" ]; then
+            git diff --staged --quiet || git commit -m "warn: insider signals incomplete $(date -u '+%Y-%m-%d') — retry required"
+          else
+            git diff --staged --quiet || git commit -m "chore: insider signals update $(date -u '+%Y-%m-%d') UTC"
+          fi
+          git push
+
+      - name: Trigger daily scanner to pick up new signals
+        if: env.FETCH_INCOMPLETE == 'false'
+        run: |
+          curl -s -X POST "${{ secrets.NETLIFY_DEPLOY_HOOK }}"
+          echo "Netlify deploy triggered with fresh insider signals"
+
+      - name: Fail job if fetch was incomplete (surfaces in Actions UI as red)
+        if: env.FETCH_INCOMPLETE == 'true'
+        run: |
+          echo "::error::Insider signals fetch failed after 3 attempts. Go to Actions → Weekly Insider Signals → Re-run jobs"
+          exit 1
