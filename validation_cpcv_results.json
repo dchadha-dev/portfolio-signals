@@ -1,6 +1,6 @@
 {
   "meta": {
-    "timestamp": "2026-05-24 16:18 UTC",
+    "timestamp": "2026-05-25 00:06 UTC",
     "n_tickers": 121,
     "n_paths_theoretical": 66,
     "n_blocks": 12,
@@ -12,35 +12,35 @@
   },
   "model_results": {
     "current": {
-      "n_obs": 50668,
-      "n_paths": 1960,
+      "n_obs": 50828,
+      "n_paths": 1996,
       "n_tickers": 119,
-      "mean_exc_252": 71.61,
-      "raw_sharpe": 6.634,
-      "dsr": 127.365,
-      "t_stat": 94.062,
+      "mean_exc_252": 71.54,
+      "raw_sharpe": 6.636,
+      "dsr": 127.608,
+      "t_stat": 94.25,
       "p_value": 0.0,
       "pbo": 0.496,
-      "hit_rate": 61.8,
+      "hit_rate": 61.9,
       "max_dd": -100.0,
-      "signal_vs_nosignal_spread": -25.41,
+      "signal_vs_nosignal_spread": -24.87,
       "passes_p05": "True",
       "passes_dsr": true,
       "passes_pbo30": false
     },
     "proposed": {
-      "n_obs": 93600,
-      "n_paths": 3696,
+      "n_obs": 93522,
+      "n_paths": 3718,
       "n_tickers": 119,
-      "mean_exc_252": 70.57,
-      "raw_sharpe": 5.338,
-      "dsr": 140.838,
-      "t_stat": 102.868,
+      "mean_exc_252": 70.45,
+      "raw_sharpe": 5.326,
+      "dsr": 140.426,
+      "t_stat": 102.605,
       "p_value": 0.0,
       "pbo": 0.5,
-      "hit_rate": 64.4,
+      "hit_rate": 64.2,
       "max_dd": -100.0,
-      "signal_vs_nosignal_spread": 8.05,
+      "signal_vs_nosignal_spread": 8.11,
       "passes_p05": "True",
       "passes_dsr": true,
       "passes_pbo30": false
@@ -48,12 +48,12 @@
   },
   "signal_stats": {
     "factor_gate_current": {
-      "n": 756,
-      "mean_exc": 29.15,
+      "n": 755,
+      "mean_exc": 29.25,
       "ann_exc": 29.2,
-      "t_stat": 9.935,
+      "t_stat": 9.96,
       "p_val": 0.0,
-      "dsr": 13.677,
+      "dsr": 13.712,
       "valid": "True"
     },
     "dfv3_current": {
@@ -66,12 +66,12 @@
       "valid": "True"
     },
     "pfd_current": {
-      "n": 9913,
+      "n": 9906,
       "mean_exc": 11.3,
       "ann_exc": 11.3,
-      "t_stat": 27.223,
+      "t_stat": 27.206,
       "p_val": 0.0,
-      "dsr": 33.591,
+      "dsr": 33.561,
       "valid": "True"
     },
     "triple_current": {
@@ -84,20 +84,20 @@
       "valid": "True"
     },
     "factor_gate_proposed": {
-      "n": 1722,
-      "mean_exc": 33.31,
-      "ann_exc": 33.3,
-      "t_stat": 17.597,
+      "n": 1710,
+      "mean_exc": 33.11,
+      "ann_exc": 33.1,
+      "t_stat": 17.425,
       "p_val": 0.0,
-      "dsr": 23.737,
+      "dsr": 23.541,
       "valid": "True"
     },
     "dfv3_tiebreaker": {
       "n": 0,
-      "mean": NaN,
-      "t": NaN,
-      "p": NaN,
-      "dsr": NaN
+      "mean": null,
+      "t": null,
+      "p": null,
+      "dsr": null
     },
     "triple_proposed": {
       "n": 8732,
