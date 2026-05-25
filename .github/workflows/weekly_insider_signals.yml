@@ -79,6 +79,7 @@ jobs:
           else
             git diff --staged --quiet || git commit -m "chore: insider signals update $(date -u '+%Y-%m-%d') UTC"
           fi
+          git pull --rebase origin main
           git push
 
       - name: Trigger Netlify deploy
