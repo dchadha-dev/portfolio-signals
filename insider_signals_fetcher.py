@@ -169,8 +169,13 @@ def parse_form4_xml(xml_url, ticker, filing_date):
         # Strip XML namespaces — handles both old and new SEC Form 4 schemas
         text = content.decode('utf-8', errors='replace')
         text = re.sub(r' xmlns[^=]*="[^"]*"', '', text)
-        text = re.sub(r'<(/?)[\w-]+:', r'<', text)
+        text = re.sub(r'<(/?)[A-Za-z0-9_-]+:', lambda m: '<' + m.group(1), text)
         root = ET.fromstring(text.encode('utf-8'))
+
+        # Debug: count transactions found
+        txn_count = len(root.findall('.//nonDerivativeTransaction'))
+        if txn_count > 0:
+            print(f'    Found {txn_count} transactions in {xml_url.split("/")[-1]}')
 
         # Get reporter info
         owner_name  = ''
@@ -321,6 +326,22 @@ def main():
     try:
         cik_map = get_cik_map()
         if cik_map:
+            # ── Diagnostic: sample one XML to verify parser ──
+            _diag_ticker = list(cik_map.keys())[0]
+            _diag_cik    = cik_map[_diag_ticker]
+            _diag_cutoff = (datetime.now() - timedelta(days=30)).date().strftime("%Y-%m-%d")
+            _diag_accs   = fetch_form4_accessions(_diag_cik, _diag_cutoff)
+            if _diag_accs:
+                _acc, _fd = _diag_accs[0]
+                _url = get_xml_url_from_index(_diag_cik, _acc)
+                print("DIAG: sample ticker=" + _diag_ticker + " acc=" + _acc[:20])
+                if _url:
+                    _r = requests.get(_url, headers=SEC_HEADERS, timeout=15)
+                    if _r.status_code == 200:
+                        _t = _r.content.decode("utf-8", errors="replace")
+                        print("DIAG raw txn count:", _t.count("nonDerivativeTransaction>"))
+                        print("DIAG first 300 chars:", _t[:300].replace("\n"," "))
+            
             all_insider, all_pol = fetch_all_signals(cik_map)
             insider_signals    = build_insider_results(all_insider)
             politician_signals = build_politician_results(all_pol)
