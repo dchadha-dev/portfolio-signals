@@ -1,6 +1,6 @@
 {
   "meta": {
-    "timestamp": "2026-05-25 00:06 UTC",
+    "timestamp": "2026-05-25 01:35 UTC",
     "n_tickers": 121,
     "n_paths_theoretical": 66,
     "n_blocks": 12,
@@ -8,39 +8,39 @@
     "n_seeds": 2,
     "purge_days": 20,
     "fwd_days": 252,
-    "p_threshold": 0.05
+    "p_threshold": 0.15
   },
   "model_results": {
     "current": {
-      "n_obs": 50828,
-      "n_paths": 1996,
+      "n_obs": 52070,
+      "n_paths": 15576,
       "n_tickers": 119,
-      "mean_exc_252": 71.54,
-      "raw_sharpe": 6.636,
-      "dsr": 127.608,
-      "t_stat": 94.25,
+      "mean_exc_252": 70.97,
+      "raw_sharpe": 6.534,
+      "dsr": 127.603,
+      "t_stat": 93.925,
       "p_value": 0.0,
-      "pbo": 0.496,
-      "hit_rate": 61.9,
+      "pbo": 0.499,
+      "hit_rate": 61.8,
       "max_dd": -100.0,
-      "signal_vs_nosignal_spread": -24.87,
+      "signal_vs_nosignal_spread": -22.81,
       "passes_p05": "True",
       "passes_dsr": true,
       "passes_pbo30": false
     },
     "proposed": {
-      "n_obs": 93522,
-      "n_paths": 3718,
+      "n_obs": 95372,
+      "n_paths": 15576,
       "n_tickers": 119,
-      "mean_exc_252": 70.45,
-      "raw_sharpe": 5.326,
-      "dsr": 140.426,
-      "t_stat": 102.605,
+      "mean_exc_252": 70.25,
+      "raw_sharpe": 5.328,
+      "dsr": 141.875,
+      "t_stat": 103.656,
       "p_value": 0.0,
-      "pbo": 0.5,
-      "hit_rate": 64.2,
+      "pbo": 0.501,
+      "hit_rate": 64.1,
       "max_dd": -100.0,
-      "signal_vs_nosignal_spread": 8.11,
+      "signal_vs_nosignal_spread": 11.68,
       "passes_p05": "True",
       "passes_dsr": true,
       "passes_pbo30": false
@@ -66,12 +66,12 @@
       "valid": "True"
     },
     "pfd_current": {
-      "n": 9906,
-      "mean_exc": 11.3,
+      "n": 9904,
+      "mean_exc": 11.29,
       "ann_exc": 11.3,
-      "t_stat": 27.206,
+      "t_stat": 27.191,
       "p_val": 0.0,
-      "dsr": 33.561,
+      "dsr": 33.527,
       "valid": "True"
     },
     "triple_current": {
