@@ -39,9 +39,9 @@ UNIVERSE = [
 ]
 UNIVERSE_SET = set(UNIVERSE)
 SEC_HEADERS  = {'User-Agent': 'portfolio-signals-bot contact@dchadha.dev'}
-LOOKBACK_INSIDER    = 30
+LOOKBACK_INSIDER    = 60   # extended from 30 — open-market purchases are rare
 LOOKBACK_POLITICIAN = 45
-MIN_TRANSACTION_USD = 50_000
+MIN_TRANSACTION_USD = 15_000  # lowered from 50K — catches more signals while filtering trivial transactions
 
 # Known Congress member keywords in owner titles
 POLITICIAN_KEYWORDS = {
@@ -203,20 +203,47 @@ def parse_form4_xml(xml_url, ticker, filing_date):
         is_politician = any(kw in name_lower or kw in title_lower
                            for kw in POLITICIAN_KEYWORDS)
 
-        # Parse transactions
+        # Parse transactions — with rejection counters for debugging
+        n_total = n_not_p = n_10b51 = n_size = n_pass = 0
+        code_counts = {}
         for txn in root.findall('.//nonDerivativeTransaction'):
-            code_el = txn.find('.//transactionCodes/transactionCode')
-            if code_el is None or code_el.text != 'P': continue
+            n_total += 1
+            code = None
+            for path in ['.//transactionCodes/transactionCode',
+                         'transactionCodes/transactionCode',
+                         './/transactionCode']:
+                el = txn.find(path)
+                if el is not None and el.text:
+                    code = el.text.strip()
+                    break
+            code_counts[code] = code_counts.get(code, 0) + 1
 
-            plan_el = txn.find('.//transactionCodes/rule10b5-1PlanFlag')
-            if plan_el is not None and plan_el.text in ('Y', '1', 'true'): continue
+            if code != 'P':
+                n_not_p += 1
+                continue
+
+            # 10b5-1 plan check
+            plan = None
+            for path in ['.//transactionCodes/rule10b5-1PlanFlag',
+                         'transactionCodes/rule10b5-1PlanFlag',
+                         './/rule10b5-1PlanFlag']:
+                el = txn.find(path)
+                if el is not None:
+                    plan = el.text
+                    break
+            if plan in ('Y', '1', 'true'):
+                n_10b51 += 1
+                continue
 
             shares_el = txn.find('.//transactionAmounts/transactionShares/value')
             price_el  = txn.find('.//transactionAmounts/transactionPricePerShare/value')
             shares = float(shares_el.text) if shares_el is not None and shares_el.text else 0
             price  = float(price_el.text)  if price_el  is not None and price_el.text  else 0
-            if shares * price < MIN_TRANSACTION_USD: continue
+            if shares * price < MIN_TRANSACTION_USD:
+                n_size += 1
+                continue
 
+            n_pass += 1
             entry = {
                 'ticker':     ticker,
                 'date':       filing_date,
@@ -231,6 +258,8 @@ def parse_form4_xml(xml_url, ticker, filing_date):
             else:
                 buys.append(entry)
 
+        if n_total > 0 and n_pass == 0:
+            print(f'    FILTERED: {n_total} txns — not_P:{n_not_p} 10b51:{n_10b51} size:{n_size} codes:{code_counts}')
     except Exception:
         pass
     return buys, pol_buys
