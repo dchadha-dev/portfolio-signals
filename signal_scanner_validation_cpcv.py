@@ -298,28 +298,36 @@ def make_cpcv_paths(index, n_blocks=N_BLOCKS, k=K_HOLDOUT, purge=PURGE_DAYS):
 
     return paths
 
-def run_signal_on_window(sig_df, train_mask, test_mask, scorer, fwd_days, voo_cl):
+def run_signal_on_window(sig_df, train_mask, test_mask, scorer, fwd_days, voo_cl,
+                         buy_threshold=80):
     """
-    Run one CPCV path:
-    - Compute buy scores on train set to confirm signal fires
-    - Measure forward returns on test set signal observations
-    - Return excess returns vs VOO for all test-set signal hits
+    Run one CPCV path measuring forward returns at the actual buy threshold.
+
+    buy_threshold=80 matches the live scanner's BUY signal gate — this is critical
+    for testing scoring weight differences between models. At threshold=40 (factor
+    gate only), PFD weight of +8 vs +20 and DFV V3 demotion have zero effect on
+    which observations are counted. At threshold=80, the scoring weights determine
+    which tickers actually generate a BUY recommendation, making the comparison
+    between current and proposed models meaningful.
+
+    Current model reaches 80 via: factor(40) + DFV V3(25) + PFD(20) = 85
+    Proposed model reaches 80 via: factor(40) + DFV V3(25) + PFD(8) + triple(10) = 83
+    These produce different signal sets — exactly what we want to measure.
     """
     if sig_df is None or len(sig_df) < fwd_days + 20:
-        return [], []  # signal obs, non-signal obs
+        return [], []
 
-    close      = sig_df['close']
-    dates      = sig_df.index
-    n          = len(sig_df)
-
-    signal_exc  = []
+    close        = sig_df['close']
+    dates        = sig_df.index
+    n            = len(sig_df)
+    signal_exc   = []
     nosignal_exc = []
 
     for i in range(n - fwd_days):
         if not test_mask[i]: continue
-        row   = sig_df.iloc[i].to_dict()
-        score = scorer(row)
-        signal_fired = score >= 40  # factor gate minimum
+        row          = sig_df.iloc[i].to_dict()
+        score        = scorer(row)
+        signal_fired = score >= buy_threshold  # actual BUY gate — scores weights now matter
 
         t0 = dates[i]
         t1_idx = min(i + fwd_days, n - 1)
@@ -455,15 +463,22 @@ def run_cpcv_validation(closes, ok, voo):
 
     total_tickers = len(ok)
     processed = 0
+    start_time = time.time()
+    MAX_SECONDS = 55 * 60  # 55 min hard limit — leaves 10 min for signal validation + commit
 
     for t in ok:
         if t == BENCHMARK: continue
+        # Wall-clock guard — stop gracefully before GitHub Actions kills the job
+        if time.time() - start_time > MAX_SECONDS:
+            print(f'Wall-clock limit reached after {processed} tickers — stopping CPCV loop')
+            break
         cl_raw = closes[t].dropna()
         if len(cl_raw) < 504: continue  # need at least 2yr for meaningful blocks
 
         processed += 1
-        if processed % 20 == 0:
-            print(f'  Progress: {processed}/{total_tickers} tickers...')
+        if processed % 10 == 0:
+            elapsed = (time.time() - start_time) / 60
+            print(f'  Progress: {processed}/{total_tickers} tickers — {elapsed:.1f} min elapsed')
 
         for model_name, (sig_fn, scorer_fn, _) in models.items():
             sig_df = sig_fn(cl_raw)
@@ -516,21 +531,25 @@ def validate_individual_signals(closes, ok, voo):
     Reports mean excess return, t-stat, p-value, and DSR for each.
     """
     signals_to_test = {
-        # Current model signals
-        'factor_gate_current': lambda row: bool(row.get('f')),
-        'dfv3_current':        lambda row: bool(row.get('f')) and bool(row.get('dfv3')),
-        'pfd_current':         lambda row: bool(row.get('pfd')),
-        'triple_current':      lambda row: bool(row.get('triple')),
-        # Proposed model signals
-        'factor_gate_proposed':lambda row: bool(row.get('f')),  # same gate, different quality
-        'dfv3_tiebreaker':     lambda row: bool(row.get('f')) and bool(row.get('dfv3')),
-        'triple_proposed':     lambda row: bool(row.get('triple')),
+        # Current model — test at actual buy score threshold (score >= 80)
+        # This measures what the model actually recommends, not just which gates fire
+        'buy_current':         lambda row: score_buy_current(row) >= 80,
+        'strong_buy_current':  lambda row: score_buy_current(row) >= 80 and row.get('fdfv3'),
+        'factor_only_current': lambda row: score_buy_current(row) >= 40 and not row.get('fdfv3'),
+        # Proposed model — same thresholds for apples-to-apples comparison
+        'buy_proposed':        lambda row: score_buy_proposed(row) >= 80,
+        'strong_buy_proposed': lambda row: score_buy_proposed(row) >= 80 and row.get('fdfv3'),
+        'factor_only_proposed':lambda row: score_buy_proposed(row) >= 40 and not row.get('fdfv3'),
+        # Individual signal components (binary, for diagnostic purposes)
+        'dfv3_fires':          lambda row: bool(row.get('fdfv3')),
+        'pfd_fires':           lambda row: bool(row.get('pfd')),
+        'triple_fires':        lambda row: bool(row.get('triple')),
     }
 
     # Run current + proposed on random sample of tickers for signal-level stats
     signal_results = {k: {'exc': [], 'n_obs': 0} for k in signals_to_test}
 
-    sample = [t for t in ok if t != BENCHMARK][:80]  # sample 80 for speed
+    sample = [t for t in ok if t != BENCHMARK][:40]  # sample 40 for speed
 
     for t in sample:
         cl_raw = closes[t].dropna()
@@ -539,7 +558,14 @@ def validate_individual_signals(closes, ok, voo):
         sig_curr = compute_signals_current(cl_raw)
         sig_prop = compute_signals_proposed(cl_raw)
 
-        for sig_df, model_prefix in [(sig_curr, 'current'), (sig_prop, 'proposed')]:
+        # Route each signal to the correct model's signal dataframe
+        # current/proposed signals use their respective sig_df
+        # component signals (dfv3, pfd, triple) use current sig_df for diagnostic
+        for sig_df, sig_name_filter in [
+            (sig_curr, ['buy_current', 'strong_buy_current', 'factor_only_current',
+                        'dfv3_fires', 'pfd_fires', 'triple_fires']),
+            (sig_prop, ['buy_proposed', 'strong_buy_proposed', 'factor_only_proposed']),
+        ]:
             if sig_df is None or len(sig_df) < 300: continue
             close  = sig_df['close']
             dates  = sig_df.index
@@ -558,8 +584,9 @@ def validate_individual_signals(closes, ok, voo):
                 except:
                     continue
 
-                for sig_name, sig_fn in signals_to_test.items():
-                    if model_prefix not in sig_name: continue
+                for sig_name in sig_name_filter:
+                    sig_fn = signals_to_test.get(sig_name)
+                    if sig_fn is None: continue
                     try:
                         if sig_fn(row):
                             signal_results[sig_name]['exc'].append(exc)
