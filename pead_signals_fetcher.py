@@ -39,7 +39,7 @@ UNIVERSE = [
 UNIVERSE_SET = set(UNIVERSE)
 
 # ── CONFIG ────────────────────────────────────────────────────────────
-CALENDAR_LOOKBACK_DAYS = 7      # how far back to look for recent earnings
+CALENDAR_LOOKBACK_DAYS = 14     # extended from 7 — Finnhub calendar has gaps on free tier
 HISTORY_QUARTERS       = 8      # quarters of EPS history for SUE std_dev
 SUE_THRESHOLD          = 1.5    # absolute SUE trigger
 STD_DEV_FLOOR          = 0.02   # minimum std_dev to prevent zero-division
@@ -60,42 +60,90 @@ def get_finnhub_token():
 
 def fetch_recent_reporters(token):
     """
-    Use Finnhub earnings calendar to find universe tickers
-    that reported in the last CALENDAR_LOOKBACK_DAYS days.
-    Returns list of (ticker, announce_date) tuples.
+    Find universe tickers that reported in the last CALENDAR_LOOKBACK_DAYS days.
+
+    Two-pass approach to handle Finnhub free-tier calendar gaps:
+    Pass 1: Finnhub earnings calendar endpoint (fast, broad)
+    Pass 2: Direct EPS history check for all universe tickers not found in Pass 1
+            — checks if most recent quarter date falls within lookback window.
+    This ensures tickers like CRM, DELL, COST aren't missed due to calendar gaps.
     """
     end_date   = date.today()
     start_date = end_date - timedelta(days=CALENDAR_LOOKBACK_DAYS)
-    url = 'https://finnhub.io/api/v1/calendar/earnings'
-    params = {
-        'from':  start_date.strftime('%Y-%m-%d'),
-        'to':    end_date.strftime('%Y-%m-%d'),
-        'token': token,
-    }
-    print(f'  Fetching earnings calendar {start_date} → {end_date}...')
+    start_str  = start_date.strftime('%Y-%m-%d')
+    end_str    = end_date.strftime('%Y-%m-%d')
+
+    # ── Pass 1: Finnhub earnings calendar ────────────────────────────
+    print(f'  Pass 1: Finnhub calendar {start_str} → {end_str}...')
+    calendar_tickers = set()
+    reporters = []
     try:
         time.sleep(RATE_LIMIT_SLEEP)
-        r = requests.get(url, params=params, timeout=20)
-        if r.status_code != 200:
-            print(f'  Calendar fetch failed: HTTP {r.status_code}')
-            return []
-        data     = r.json()
-        earnings = data.get('earningsCalendar', [])
-        reporters = []
-        for item in earnings:
-            ticker = (item.get('symbol') or '').upper().strip()
-            if ticker not in UNIVERSE_SET:
-                continue
-            announce_date = item.get('date', '')
-            if not announce_date:
-                continue
-            reporters.append((ticker, announce_date))
-        print(f'  Found {len(reporters)} universe tickers with recent earnings: '
-              f'{[t for t, _ in reporters]}')
-        return reporters
+        r = requests.get(
+            'https://finnhub.io/api/v1/calendar/earnings',
+            params={'from': start_str, 'to': end_str, 'token': token},
+            timeout=20,
+        )
+        if r.status_code == 200:
+            for item in r.json().get('earningsCalendar', []):
+                ticker = (item.get('symbol') or '').upper().strip()
+                if ticker not in UNIVERSE_SET:
+                    continue
+                announce_date = item.get('date', '')
+                if not announce_date:
+                    continue
+                calendar_tickers.add(ticker)
+                reporters.append((ticker, announce_date))
+            print(f'  Pass 1: {len(reporters)} universe tickers from calendar')
+        else:
+            print(f'  Pass 1: HTTP {r.status_code}')
     except Exception as e:
-        print(f'  Calendar fetch error: {e}')
-        return []
+        print(f'  Pass 1 error: {e}')
+
+    # ── Pass 2: Direct EPS check for tickers not in calendar ─────────
+    # For each universe ticker not already found, fetch EPS history
+    # and check if the most recent quarter is within the lookback window.
+    us_tickers_remaining = [
+        t for t in UNIVERSE if '.' not in t and t not in calendar_tickers
+    ]
+    print(f'  Pass 2: Direct EPS check for {len(us_tickers_remaining)} remaining tickers...')
+    pass2_found = 0
+    for ticker in us_tickers_remaining:
+        try:
+            time.sleep(RATE_LIMIT_SLEEP)
+            r = requests.get(
+                'https://finnhub.io/api/v1/stock/earnings',
+                params={'symbol': ticker, 'token': token},
+                timeout=15,
+            )
+            if r.status_code != 200:
+                continue
+            data = r.json()
+            if not isinstance(data, list) or not data:
+                continue
+            # Most recent quarter
+            latest = data[0]
+            period = latest.get('period', '')
+            if not period:
+                continue
+            # Check if period date is within lookback window
+            try:
+                period_date = datetime.strptime(period[:10], '%Y-%m-%d').date()
+            except:
+                continue
+            if start_date <= period_date <= end_date:
+                # Verify it has actual EPS (not just an estimate)
+                if latest.get('actual') is not None:
+                    reporters.append((ticker, period[:10]))
+                    calendar_tickers.add(ticker)
+                    pass2_found += 1
+        except Exception:
+            continue
+
+    print(f'  Pass 2: {pass2_found} additional tickers found')
+    print(f'  Total: {len(reporters)} universe tickers with recent earnings: '
+          f'{[t for t, _ in reporters]}')
+    return reporters
 
 
 # ── STEP 2: HISTORICAL EPS — compute SUE for active tickers ──────────
