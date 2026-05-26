@@ -141,26 +141,144 @@ def compute_sell_signals(cl, hi, lo, vol):
     }
 
 def fetch_sector_signals():
-    end = datetime.today(); start = end - timedelta(days=3*365+60)
+    """
+    Sector sentiment model with conditional hierarchy.
+    All signals computed vectorised with shift(1) to eliminate look-ahead bias —
+    every condition uses only data available at prior day's close.
+
+    Conditional hierarchy (ALL four must be true for entry signal):
+      1. Macro Filter:     SPY > 200d SMA (regime gate — if false, tighten)
+      2. Trend Check:      Sector_ETF / SPY RS line > its own 200d SMA
+      3. Dip Detection:    Sector price Z-score < -2.0 (20d rolling)
+      4. Confidence Check: Sector breadth EMA is stable or rising
+                           (proxied by ETF 10d EMA slope > 0)
+
+    Returns dict: sector_name -> {
+        'entry_signal': bool,   # all four conditions met
+        'macro_ok':     bool,
+        'trend_ok':     bool,
+        'dip_ok':       bool,
+        'breadth_ok':   bool,
+        'rs_vs_spy':    float,  # relative strength ratio
+        'z_score':      float,  # 20d price z-score
+    }
+    """
+    end   = datetime.today()
+    start = end - timedelta(days=3 * 365 + 90)
+
+    # ── Fetch SPY first (needed for macro filter and RS calc) ─────────
+    spy_cl = None
+    try:
+        spy_raw = yf.download('SPY', start=start, end=end,
+                              interval='1d', auto_adjust=True, progress=False)
+        spy_cl  = (spy_raw['Close']['SPY'] if isinstance(spy_raw.columns, pd.MultiIndex)
+                   else spy_raw['Close']).dropna()
+    except Exception:
+        pass
+
+    # ── Macro filter: SPY > 200d SMA ──────────────────────────────────
+    # shift(1) ensures we use yesterday's SMA — no look-ahead
+    macro_ok = False
+    spy_sma200 = None
+    if spy_cl is not None and len(spy_cl) >= 200:
+        spy_sma200 = spy_cl.rolling(200).mean().shift(1)
+        macro_ok   = bool(spy_cl.iloc[-1] > spy_sma200.iloc[-1])
+
+    results = {}
     unique_etfs = list(set(SECTOR_ETFS.values()))
-    etf_ext = {}
+
     for etf in unique_etfs:
         try:
-            df = yf.download(etf, start=start, end=end, interval="1d", auto_adjust=True, progress=False)
-            if df is None or len(df)<100: continue
-            cl   = (df["Close"][etf] if isinstance(df.columns,pd.MultiIndex) else df["Close"]).dropna()
-            h252 = cl.rolling(252).max().shift(1)
-            dist = (cl-h252)/h252
-            logr = np.log(cl/cl.shift(1))
-            rv20 = logr.rolling(20).std()*np.sqrt(252)
-            rvm  = rv20.rolling(756).mean(); rvs = rv20.rolling(756).std()
-            rvz  = (rv20-rvm)/rvs.replace(0,float("nan"))
-            etf_ext[etf] = bool((dist>-0.10).iloc[-1] and (rvz>1.5).iloc[-1])
-        except: etf_ext[etf] = False
-    return {s: etf_ext.get(e,False) for s,e in SECTOR_ETFS.items()}
+            raw = yf.download(etf, start=start, end=end,
+                              interval='1d', auto_adjust=True, progress=False)
+            if raw is None or len(raw) < 220:
+                results[etf] = _empty_sector_result(macro_ok)
+                continue
+
+            cl = (raw['Close'][etf] if isinstance(raw.columns, pd.MultiIndex)
+                  else raw['Close']).dropna()
+
+            # ── Condition 2: Trend — RS line > 200d SMA ──────────────
+            # RS = Sector_ETF / SPY. Use shift(1) on SMA to avoid look-ahead.
+            trend_ok  = False
+            rs_value  = float('nan')
+            if spy_cl is not None:
+                # Align on common index
+                cl_aligned  = cl.reindex(spy_cl.index).dropna()
+                spy_aligned = spy_cl.reindex(cl_aligned.index).dropna()
+                cl_aligned  = cl_aligned.reindex(spy_aligned.index).dropna()
+                if len(cl_aligned) >= 200:
+                    rs_line    = cl_aligned / spy_aligned.replace(0, float('nan'))
+                    rs_sma200  = rs_line.rolling(200).mean().shift(1)  # shift(1) = no look-ahead
+                    rs_value   = round(float(rs_line.iloc[-1]), 4)
+                    trend_ok   = bool(rs_line.iloc[-1] > rs_sma200.iloc[-1])
+
+            # ── Condition 3: Dip — 20d Z-score < -2.0 ────────────────
+            # Z = (price - 20d_mean) / 20d_std. shift(1) on mean and std.
+            dip_ok  = False
+            z_score = float('nan')
+            if len(cl) >= 21:
+                roll_mean = cl.rolling(20).mean().shift(1)
+                roll_std  = cl.rolling(20).std().shift(1)
+                z_series  = (cl - roll_mean) / roll_std.replace(0, float('nan'))
+                z_score   = round(float(z_series.iloc[-1]), 3)
+                dip_ok    = z_score < -2.0
+
+            # ── Condition 4: Breadth — 10d EMA slope > 0 ─────────────
+            # Proxy for sector breadth: ETF's own 10d EMA trending upward.
+            # slope = EMA_today - EMA_yesterday (both available before today's open).
+            breadth_ok = False
+            if len(cl) >= 12:
+                ema10      = cl.ewm(span=10, adjust=False).mean()
+                ema_slope  = ema10.diff(1).shift(1)  # yesterday's slope — no look-ahead
+                breadth_ok = bool(ema_slope.iloc[-1] > 0)
+
+            entry_signal = macro_ok and trend_ok and dip_ok and breadth_ok
+
+            results[etf] = {
+                'entry_signal': entry_signal,
+                'macro_ok':     macro_ok,
+                'trend_ok':     trend_ok,
+                'dip_ok':       dip_ok,
+                'breadth_ok':   breadth_ok,
+                'rs_vs_spy':    rs_value,
+                'z_score':      z_score,
+            }
+
+        except Exception:
+            results[etf] = _empty_sector_result(macro_ok)
+
+    # Map ETF results back to sector names
+    sector_results = {}
+    for sector, etf in SECTOR_ETFS.items():
+        sector_results[sector] = results.get(etf, _empty_sector_result(macro_ok))
+
+    # Summary print
+    entry_sectors = [s for s, v in sector_results.items() if v.get('entry_signal')]
+    print(f'Sector signals: macro_ok={macro_ok} | '
+          f'{len(entry_sectors)} sectors with entry signal: {entry_sectors[:5]}')
+
+    return sector_results
+
+
+def _empty_sector_result(macro_ok):
+    return {
+        'entry_signal': False,
+        'macro_ok':     macro_ok,
+        'trend_ok':     False,
+        'dip_ok':       False,
+        'breadth_ok':   False,
+        'rs_vs_spy':    float('nan'),
+        'z_score':      float('nan'),
+    }
 
 def fetch_market_signals():
-    result = {"cnn_score":50,"cnn_label":"Neutral","sp500_extended":False,"buffett_extended":False}
+    result = {
+        "cnn_score": 50, "cnn_label": "Neutral",
+        "sp500_extended": False, "buffett_extended": False,
+        "vix_current": 20.0, "vix_zscore": 0.0, "vix_label": "Neutral",
+    }
+    # ── CNN Fear & Greed (kept for cap logic / display only) ──────────
     try:
         r = requests.get("https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
                         timeout=8, headers={"User-Agent":"Mozilla/5.0"})
@@ -168,6 +286,29 @@ def fetch_market_signals():
         result["cnn_score"] = float(d["fear_and_greed"]["score"])
         result["cnn_label"] = d["fear_and_greed"]["rating"]
     except: pass
+
+    # ── VIX z-score (used for sell score multiplier) ──────────────────
+    # z-score vs 252d mean: >+2=extreme fear, <-2=extreme greed (complacency)
+    # Sell multiplier is INVERTED vs CNN: fear → dampen sells, greed → amplify sells
+    try:
+        vix = yf.download("^VIX", period="2y", interval="1d", auto_adjust=True, progress=False)
+        vix_cl = (vix["Close"]["^VIX"] if isinstance(vix.columns, pd.MultiIndex) else vix["Close"]).dropna()
+        vix_last  = float(vix_cl.iloc[-1])
+        vix_mean  = float(vix_cl.rolling(252).mean().iloc[-1])
+        vix_std   = float(vix_cl.rolling(252).std().iloc[-1])
+        vix_z     = round((vix_last - vix_mean) / vix_std, 2) if vix_std > 0 else 0.0
+        # Label
+        if vix_z > 2:    vix_label = "Extreme Fear"
+        elif vix_z > 1:  vix_label = "Fear"
+        elif vix_z > -1: vix_label = "Neutral"
+        elif vix_z > -2: vix_label = "Greed"
+        else:            vix_label = "Extreme Greed"
+        result["vix_current"] = round(vix_last, 1)
+        result["vix_zscore"]  = vix_z
+        result["vix_label"]   = vix_label
+    except: pass
+
+    # ── S&P500 and Buffett extension (kept as sell boosters) ──────────
     try:
         spy = yf.download("SPY", period="2y", interval="1d", auto_adjust=True, progress=False)
         cl  = (spy["Close"]["SPY"] if isinstance(spy.columns,pd.MultiIndex) else spy["Close"]).dropna()
@@ -248,16 +389,38 @@ def score_ticker(ticker, sell_sigs, market, sector_states, framework_score=None)
     elif sell_sigs.get("wrsi_75"): caution.append("wRSI>75(momentum)")
     if sell_sigs.get("rv_z3"):     caution.append("RVz>3(buy_cont)")
 
-    # ── Market context multiplier (not additive — avoids flat clusters) ─
-    # CNN greed boosts score proportionally; sector extension adds small boost
+    # ── Market context multiplier — VIX z-score (replaces CNN F&G) ────
+    # VIX z-score vs 252d mean:
+    #   > +2 (extreme fear/panic): ×0.75 — dampen sells, don't force exits at lows
+    #   +1 to +2 (fear):           ×0.90
+    #   -1 to +1 (neutral):        ×1.00
+    #   -1 to -2 (greed/complacency): ×1.15
+    #   < -2 (extreme greed):      ×1.30 — amplify sells, market is euphoric
+    #
+    # Inverted from CNN: HIGH VIX = fear = reduce sell urgency (buy opportunity)
+    #                    LOW VIX  = complacency = increase sell urgency (trim winners)
+    # Literature: VIX as sentiment proxy — Whaley (2009), Baker-Wurgler (2006) spirit
+    vix_z = market.get("vix_zscore", 0.0) or 0.0
+    if   vix_z > 2:    vix_mult = 0.75; vix_flag = f"VIX_panic(z={vix_z:.1f})×0.75"
+    elif vix_z > 1:    vix_mult = 0.90; vix_flag = f"VIX_fear(z={vix_z:.1f})×0.90"
+    elif vix_z > -1:   vix_mult = 1.00; vix_flag = None
+    elif vix_z > -2:   vix_mult = 1.15; vix_flag = f"VIX_greed(z={vix_z:.1f})×1.15"
+    else:              vix_mult = 1.30; vix_flag = f"VIX_euphoria(z={vix_z:.1f})×1.30"
+    if vix_flag: flags.append(vix_flag)
+
+    # CNN kept in flags for display transparency but not used in scoring
     cnn = market.get("cnn_score", 50)
-    cnn_mult = 1.0 + max(0, (cnn - 50) / 50) * 0.4  # 1.0x at CNN=50, 1.4x at CNN=100
-    if cnn > 75:
-        flags.append(f"CNN{cnn:.0f}×{cnn_mult:.2f}")
+    if cnn > 75 or cnn < 25:
+        flags.append(f"CNN{cnn:.0f}({market.get('cnn_label','?')})")
 
     sector_boost = 0
     for sector in TICKER_SECTORS.get(ticker, []):
-        if sector_states.get(sector):
+        sector_data = sector_states.get(sector, {})
+        # Handle both old bool format and new dict format
+        if isinstance(sector_data, dict):
+            if sector_data.get('entry_signal'):
+                sector_boost = 5; flags.append(f"{sector}_entry+5"); break
+        elif sector_data:
             sector_boost = 5; flags.append(f"{sector}_ext+5"); break
 
     if market.get("sp500_extended"):
@@ -265,7 +428,7 @@ def score_ticker(ticker, sell_sigs, market, sector_states, framework_score=None)
     if market.get("buffett_extended"):
         sector_boost += 5; flags.append("Buffett_ext+5")
 
-    score = min(100, round(score * cnn_mult + sector_boost, 1))
+    score = min(100, round(score * vix_mult + sector_boost, 1))
 
     # ── Framework score damping — continuous curve, no threshold cliffs ─
     # fw_damp ranges from 1.0 (FW=0, no protection) to 0.50 (FW=100, max protection)

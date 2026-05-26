@@ -27,28 +27,22 @@ except ImportError:
 
 # ── INSIDER & POLITICIAN SIGNALS ──────────────────────────────────────
 def load_insider_signals():
-    """
-    Load pre-fetched insider/politician signals from weekly job output.
-    Returns dict: ticker -> {buy_score_boost, insider_score, politician_score, ...}
-    Gracefully returns empty dict if file missing or stale (>8 days old).
-    """
+    """Load pre-fetched insider/politician signals. Gracefully returns {} if missing/stale."""
     try:
         with open('insider_signals.json') as f:
             data = json.load(f)
         health = data.get('health', {})
-        # Check staleness — warn if older than 8 days
         ts_str = health.get('timestamp', '')
         if ts_str:
             try:
-                ts = datetime.strptime(ts_str[:16], '%Y-%m-%d %H:%M')
-                age_days = (datetime.now() - ts).days
+                age_days = (datetime.now() - datetime.strptime(ts_str[:16], '%Y-%m-%d %H:%M')).days
                 if age_days > 8:
-                    print(f'Warning: insider_signals.json is {age_days} days old — run weekly workflow')
+                    print(f'Warning: insider_signals.json is {age_days} days old')
                 elif health.get('retry_required'):
-                    print(f'Warning: insider_signals.json marked retry_required — data may be incomplete')
+                    print('Warning: insider_signals.json marked retry_required')
                 else:
                     n = health.get('n_combined_signals', 0)
-                    print(f'Insider signals loaded: {n} tickers with boosts (age: {age_days}d)')
+                    print(f'Insider signals loaded: {n} tickers (age: {age_days}d)')
             except: pass
         return data.get('signals', {})
     except FileNotFoundError:
@@ -56,6 +50,26 @@ def load_insider_signals():
         return {}
     except Exception as e:
         print(f'insider_signals.json load error: {e}')
+        return {}
+
+
+def load_pead_signals():
+    """Load PEAD signals, filtering out expired ones."""
+    try:
+        with open('pead_signals.json') as f:
+            data = json.load(f)
+        today   = str(date.today()) if hasattr(date, 'today') else \
+                  datetime.now().strftime('%Y-%m-%d')
+        signals = data.get('signals', {})
+        active  = {t: s for t, s in signals.items()
+                   if s.get('expires_at', '2000-01-01') >= today}
+        if active:
+            print(f'PEAD signals loaded: {len(active)} active signals')
+        return active
+    except FileNotFoundError:
+        return {}
+    except Exception as e:
+        print(f'pead_signals.json load error: {e}')
         return {}
 
 # ── CONFIGURATION ─────────────────────────────────────────────────────
@@ -474,8 +488,9 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
     signals_list = []; buy_ideas = []; sell_guidance = []
     if failed_tickers is None: failed_tickers = {}
 
-    # Load weekly insider/politician signals
+    # Load weekly alternative data signals
     insider_signals = load_insider_signals()
+    pead_signals    = load_pead_signals()
 
     for t, sig in all_signals.items():
         if len(sig) == 0: continue
@@ -505,13 +520,41 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         if last['rbear']:       buy -= 10
 
         # ── INSIDER / POLITICIAN BOOST ────────────────────────────────
-        ins_data      = insider_signals.get(t, {})
-        insider_boost = ins_data.get('buy_score_boost', 0)
-        insider_score = ins_data.get('insider_score', 0)
-        pol_score     = ins_data.get('politician_score', 0)
+        ins_data        = insider_signals.get(t, {})
+        insider_boost   = ins_data.get('buy_score_boost', 0)
+        insider_score   = ins_data.get('insider_score', 0)
+        pol_score       = ins_data.get('politician_score', 0)
         insider_cluster = ins_data.get('insider_cluster', False)
+        pol_cluster     = ins_data.get('politician_cluster', False)
+        reporting_lag   = ins_data.get('reporting_lag_days', None)
         if insider_boost > 0:
             buy += insider_boost
+
+        # ── PEAD BOOST ────────────────────────────────────────────────
+        pead_data  = pead_signals.get(t, {})
+        pead_boost = pead_data.get('buy_score_boost', 0)
+        pead_sue   = pead_data.get('sue', None)
+        if pead_boost > 0:
+            buy += pead_boost
+
+        # ── SECTOR SENTIMENT BOOST ────────────────────────────────────
+        # Uses the four-condition hierarchy from fetch_sector_signals():
+        # macro_ok + trend_ok + dip_ok + breadth_ok → entry_signal
+        # entry_signal (all 4): +8pts — high-confidence sector tailwind
+        # trend_ok only: +3pts — sector outperforming SPY, mild tailwind
+        sector_buy_boost = 0
+        ticker_sectors   = TICKER_SECTORS.get(t, [])
+        for sector in ticker_sectors:
+            sector_data = sell_sectors.get(sector, {})
+            if not isinstance(sector_data, dict):
+                continue
+            if sector_data.get('entry_signal'):
+                sector_buy_boost = 8   # all four conditions — strong tailwind
+                break
+            elif sector_data.get('trend_ok') and sector_data.get('macro_ok'):
+                sector_buy_boost = max(sector_buy_boost, 3)  # trend only — mild
+        if sector_buy_boost > 0:
+            buy += sector_buy_boost
 
         buy = max(0, min(100, buy))
 
@@ -574,10 +617,19 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
             'factor_sep':      None if not fa_valid else round(float(fa)*100, 1),
             'framework_score': fs,
             # Insider & politician signals
-            'insider_boost':   insider_boost,
-            'insider_score':   insider_score,
-            'politician_score':pol_score,
-            'insider_cluster': insider_cluster,
+            'insider_boost':     insider_boost,
+            'insider_score':     insider_score,
+            'politician_score':  pol_score,
+            'insider_cluster':   insider_cluster,
+            'politician_cluster':pol_cluster,
+            'reporting_lag_days':reporting_lag,
+            # PEAD signals
+            'pead_boost':        pead_boost,
+            'pead_sue':          pead_sue,
+            'pead_expires':      pead_data.get('expires_at', None),
+            # Sector sentiment
+            'sector_boost':      sector_buy_boost,
+            'macro_ok':          macro_ok,
         }
 
         signals_list.append(row)
@@ -686,21 +738,38 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
 
     signals_list.sort(key=lambda x: -x['buy_score'])
 
-    cnn = sell_market.get('cnn_score', 50)
+    cnn   = sell_market.get('cnn_score', 50)
+    vix_z = sell_market.get('vix_zscore', 0.0) or 0.0
     n_held = len([r for r in signals_list if r.get('is_holding')])
 
     if SELL_SCORER_AVAILABLE:
         signals_list = apply_portfolio_cap(signals_list, cnn_score=cnn, held_count=n_held)
 
-    # CNN-aware sell cap % (for payload/dashboard display only)
+    # Sell cap: CNN-aware (display/count only — actual score uses VIX multiplier)
     sell_cap_pct = 0.20 if cnn > 80 else 0.15 if cnn > 60 else 0.10 if cnn > 40 else 0.08 if cnn > 20 else 0.05
-    sell_cap = max(1, round(n_held * sell_cap_pct))
+    sell_cap     = max(1, round(n_held * sell_cap_pct))
 
-    # ── BUY CAP: CNN-aware ────────────────────────────────────────────
-    # Extreme Fear (<20): 6+6 | Fear (20-40): 4+5 | Neutral (40-60): 3+3
-    # Greed (60-80): 2+2  | Extreme Greed (>80): 1+1
-    strong_cap  = 6 if cnn < 20 else 4 if cnn < 40 else 3 if cnn < 60 else 2 if cnn < 80 else 1
-    regular_cap = 6 if cnn < 20 else 5 if cnn < 40 else 3 if cnn < 60 else 2 if cnn < 80 else 1
+    # ── BUY CAP: VIX z-score aware ────────────────────────────────────
+    # HIGH VIX (fear/panic) → expand buys (stocks are cheap, more signals warranted)
+    # LOW VIX (complacency) → tighten buys (market extended, be selective)
+    # Mirrored from sell logic: VIX panic = more buys, VIX greed = fewer buys
+    if   vix_z > 2:   strong_cap = 6; regular_cap = 6   # extreme fear — expand
+    elif vix_z > 1:   strong_cap = 4; regular_cap = 5   # fear
+    elif vix_z > -1:  strong_cap = 3; regular_cap = 3   # neutral
+    elif vix_z > -2:  strong_cap = 2; regular_cap = 2   # greed
+    else:             strong_cap = 1; regular_cap = 1   # extreme greed — tighten
+
+    # Macro filter: tighten caps if SPY below 200d SMA
+    # Pull macro_ok from any sector's data (it's market-wide, same for all)
+    macro_ok = True
+    for sector_data in sell_sectors.values():
+        if isinstance(sector_data, dict) and 'macro_ok' in sector_data:
+            macro_ok = sector_data['macro_ok']
+            break
+    if not macro_ok:
+        strong_cap  = max(1, strong_cap - 1)
+        regular_cap = max(1, regular_cap - 1)
+        print(f'Macro filter: SPY below 200d SMA — buy caps tightened to {strong_cap}/{regular_cap}')
 
     strong_buy_count = 0; regular_buy_count = 0
     for row in signals_list:
@@ -715,7 +784,8 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
                     row['signal'] = 'WATCH'; row['buy_capped'] = True
                 else:
                     row['signal_tier'] = 'BUY'; regular_buy_count += 1
-    print(f"CNN {cnn:.0f} → buy cap: {strong_buy_count}/{strong_cap} strong + {regular_buy_count}/{regular_cap} regular | sell cap: {sell_cap}")
+
+    print(f"VIX z={vix_z:.1f} → buy cap: {strong_buy_count}/{strong_cap} strong + {regular_buy_count}/{regular_cap} regular | CNN {cnn:.0f} → sell cap: {sell_cap}")
     buy_ideas.sort(key=lambda x: -x['buy_score'])
     sell_guidance.sort(key=lambda x: -x['sell_score'])
 
@@ -726,6 +796,9 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         'market': {
             'cnn_score':       sell_market.get('cnn_score', 50),
             'cnn_label':       sell_market.get('cnn_label', 'Neutral'),
+            'vix_current':     sell_market.get('vix_current', 20.0),
+            'vix_zscore':      sell_market.get('vix_zscore', 0.0),
+            'vix_label':       sell_market.get('vix_label', 'Neutral'),
             'sp500_extended':  sell_market.get('sp500_extended', False),
             'buffett_extended':sell_market.get('buffett_extended', False),
             'strong_cap':      strong_cap,
