@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-05-26 00:05 UTC",
-    "tickers_checked": 3,
-    "new_signals": 1,
-    "total_signals": 1,
-    "expired_removed": 0,
+    "timestamp": "2026-05-26 00:39 UTC",
+    "tickers_checked": 10,
+    "new_signals": 4,
+    "total_signals": 4,
+    "expired_removed": 1,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 5.0
+    "elapsed_seconds": 111.8
   },
   "signals": {
     "NVDA": {
@@ -20,6 +20,48 @@
       "estimate_eps": 1.7922,
       "std_dev": 0.02,
       "std_dev_floored": true,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-05-26"
+    },
+    "AMAT": {
+      "ticker": "AMAT",
+      "announce_date": "2026-05-14",
+      "expires_at": "2026-07-13",
+      "sue": 2.915,
+      "surprise": 0.1424,
+      "actual_eps": 2.86,
+      "estimate_eps": 2.7176,
+      "std_dev": 0.0489,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-05-26"
+    },
+    "NBIS": {
+      "ticker": "NBIS",
+      "announce_date": "2026-05-13",
+      "expires_at": "2026-07-12",
+      "sue": 2.301,
+      "surprise": 0.4631,
+      "actual_eps": -0.32,
+      "estimate_eps": -0.7831,
+      "std_dev": 0.2013,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-05-26"
+    },
+    "TSEM": {
+      "ticker": "TSEM",
+      "announce_date": "2026-05-13",
+      "expires_at": "2026-07-12",
+      "sue": 1.893,
+      "surprise": 0.0768,
+      "actual_eps": 0.65,
+      "estimate_eps": 0.5732,
+      "std_dev": 0.0406,
+      "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
       "as_of": "2026-05-26"
