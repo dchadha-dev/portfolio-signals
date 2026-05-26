@@ -22,8 +22,17 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
+      - name: Fetch PEAD signals
+        id: fetch_pead
+        env:
+          FINNHUB_TOKEN: ${{ secrets.FINNHUB_TOKEN }}
+        run: python pead_signals_fetcher.py
+        continue-on-error: true  # PEAD failure doesn't block insider signals
+
       - name: Fetch insider & politician signals (attempt 1)
         id: fetch_attempt_1
+        env:
+          FINNHUB_TOKEN: ${{ secrets.FINNHUB_TOKEN }}
         run: python insider_signals_fetcher.py
         continue-on-error: true
 
@@ -36,6 +45,8 @@ jobs:
       - name: Fetch insider & politician signals (attempt 2)
         id: fetch_attempt_2
         if: steps.fetch_attempt_1.outcome == 'failure'
+        env:
+          FINNHUB_TOKEN: ${{ secrets.FINNHUB_TOKEN }}
         run: python insider_signals_fetcher.py
         continue-on-error: true
 
@@ -48,6 +59,8 @@ jobs:
       - name: Fetch insider & politician signals (attempt 3 — final)
         id: fetch_attempt_3
         if: steps.fetch_attempt_2.outcome == 'failure'
+        env:
+          FINNHUB_TOKEN: ${{ secrets.FINNHUB_TOKEN }}
         run: python insider_signals_fetcher.py
         continue-on-error: true
 
@@ -73,7 +86,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add insider_signals.json
+          git add insider_signals.json pead_signals.json
           if [ "$FETCH_INCOMPLETE" = "true" ]; then
             git diff --staged --quiet || git commit -m "warn: insider signals incomplete $(date -u '+%Y-%m-%d') — retry required"
           else
