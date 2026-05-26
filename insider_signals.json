@@ -1,16 +1,14 @@
 {
   "health": {
-    "timestamp": "2026-05-26 02:07 UTC",
-    "insider_fetch_ok": false,
+    "timestamp": "2026-05-26 02:18 UTC",
+    "insider_fetch_ok": true,
     "politician_fetch_ok": true,
     "n_insider_signals": 0,
     "n_politician_signals": 0,
     "n_combined_signals": 0,
-    "elapsed_seconds": 23.9,
-    "retry_required": true,
-    "retry_reason": [
-      "edgar_failed"
-    ]
+    "elapsed_seconds": 210.8,
+    "retry_required": false,
+    "retry_reason": []
   },
   "signals": {}
 }
