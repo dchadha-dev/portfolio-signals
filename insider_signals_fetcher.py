@@ -90,52 +90,55 @@ def fetch_form4_accessions(cik, cutoff_str):
 # ── XML URL ───────────────────────────────────────────────────────────
 def get_xml_url(cik, accession, primary_doc=''):
     """
-    Get primary Form 4 XML URL.
-    Strategy 1: use primaryDocument field from submissions API (passed in directly).
-    Strategy 2: HEAD requests for common Form 4 XML filenames.
-    NOTE: Do NOT fetch the -index.htm page — it returns HTML, not XML.
+    Get primary Form 4 XML URL using primaryDocument from submissions API.
+    Skip HEAD checks — EDGAR returns 200 for HTML error pages too.
+    Instead, try GET and verify content is actually XML.
     """
     acc_nodash = accession.replace('-', '')
     cik_int    = str(int(cik))
     base       = f'https://www.sec.gov/Archives/edgar/data/{cik_int}/{acc_nodash}'
 
-    # Strategy 1: primaryDocument from submissions API
-    if primary_doc and primary_doc.lower().endswith('.xml'):
-        url = f'{base}/{primary_doc}'
-        try:
-            time.sleep(0.08)
-            if requests.head(url, headers=SEC_HEADERS, timeout=8).status_code == 200:
-                return url
-        except Exception:
-            pass
+    candidates = []
+    if primary_doc:
+        candidates.append(primary_doc)
+    candidates += ['4.xml', 'ownership.xml', 'primary_doc.xml']
 
-    # Strategy 2: common filename patterns
-    for suffix in ['4.xml', 'ownership.xml', 'primary_doc.xml']:
-        url = f'{base}/{suffix}'
+    for fname in candidates:
+        url = f'{base}/{fname}'
         try:
-            time.sleep(0.08)
-            if requests.head(url, headers=SEC_HEADERS, timeout=8).status_code == 200:
-                return url
+            time.sleep(0.12)
+            r = requests.get(url, headers=SEC_HEADERS, timeout=20)
+            if r.status_code != 200:
+                continue
+            # Verify it's actually XML not an HTML error page
+            content = r.content[:50].strip()
+            if content.startswith(b'<ownershipDocument') or \
+               content.startswith(b'<?xml') or \
+               content.startswith(b'<XML>') or \
+               (content.startswith(b'<') and b'DOCTYPE' not in content[:100]):
+                return url, r.content  # return content too — avoid double fetch
         except Exception:
-            pass
+            continue
 
-    return None
+    return None, None
 
 
 # ── PARSE FORM 4 XML ─────────────────────────────────────────────────
-def parse_form4_xml(xml_url, ticker, filing_date):
-    """Parse Form 4 XML for open-market purchases (code P, non-10b5-1, >=MIN)."""
-    if not xml_url:
+def parse_form4_xml(xml_url, ticker, filing_date, prefetched_content=None):
+    """Parse Form 4 XML for open-market purchases."""
+    if not xml_url and prefetched_content is None:
         return [], {}
     buys       = []
     code_tally = {}
     try:
-        time.sleep(0.12)
-        r = requests.get(xml_url, headers=SEC_HEADERS, timeout=20)
-        if r.status_code != 200:
-            return [], {}
-
-        content = r.content
+        if prefetched_content is not None:
+            content = prefetched_content
+        else:
+            time.sleep(0.12)
+            r = requests.get(xml_url, headers=SEC_HEADERS, timeout=20)
+            if r.status_code != 200:
+                return [], {}
+            content = r.content
 
         # Extract from SGML wrapper if needed
         if b'<ownershipDocument' not in content and b'<XML>' in content:
@@ -240,10 +243,10 @@ def fetch_edgar_signals(cik_map):
             print(f'    {i}/{n} (XML found: {xml_found}/{xml_tried})...')
         for acc, fd, pdoc in fetch_form4_accessions(cik, cutoff)[:8]:
             xml_tried += 1
-            xml_url = get_xml_url(cik, acc, pdoc)
+            xml_url, content = get_xml_url(cik, acc, pdoc)
             if xml_url:
                 xml_found += 1
-            ins_b, codes = parse_form4_xml(xml_url, ticker, fd)
+            ins_b, codes = parse_form4_xml(xml_url, ticker, fd, content)
             for c, count in codes.items():
                 global_codes[c] = global_codes.get(c, 0) + count
             all_insider.setdefault(ticker, []).extend(ins_b)
