@@ -1,0 +1,28 @@
+{
+  "health": {
+    "timestamp": "2026-05-26 00:05 UTC",
+    "tickers_checked": 3,
+    "new_signals": 1,
+    "total_signals": 1,
+    "expired_removed": 0,
+    "sue_threshold": 1.5,
+    "hold_days": 60,
+    "elapsed_seconds": 5.0
+  },
+  "signals": {
+    "NVDA": {
+      "ticker": "NVDA",
+      "announce_date": "2026-05-20",
+      "expires_at": "2026-07-19",
+      "sue": 3.89,
+      "surprise": 0.0778,
+      "actual_eps": 1.87,
+      "estimate_eps": 1.7922,
+      "std_dev": 0.02,
+      "std_dev_floored": true,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-05-26"
+    }
+  }
+}
