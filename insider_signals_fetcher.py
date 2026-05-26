@@ -195,6 +195,15 @@ def parse_form4_xml(xml_url, ticker, filing_date):
         text = content.decode('utf-8', errors='replace')
         text = re.sub(r' xmlns[^=]*="[^"]*"', '', text)
         text = re.sub(r'<(/?)[A-Za-z0-9_-]+:', lambda m: '<' + m.group(1), text)
+
+        # One-time diagnostic — print structure of first file processed
+        if not hasattr(parse_form4_xml, '_diagnosed'):
+            parse_form4_xml._diagnosed = True
+            preview = text[:400].replace('\n', ' ')
+            print(f'  XML DIAG first 400 chars: {preview}')
+            raw_txn_count = text.count('nonDerivativeTransaction')
+            print(f'  XML DIAG raw nonDerivativeTransaction occurrences: {raw_txn_count}')
+
         root = ET.fromstring(text.encode('utf-8'))
 
         # Owner info
