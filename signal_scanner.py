@@ -493,6 +493,13 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
     insider_signals = load_insider_signals()
     pead_signals    = load_pead_signals()
 
+    # Extract macro_ok once before the ticker loop — it's market-wide
+    macro_ok = True
+    for sector_data in sell_sectors.values():
+        if isinstance(sector_data, dict) and 'macro_ok' in sector_data:
+            macro_ok = sector_data['macro_ok']
+            break
+
     for t, sig in all_signals.items():
         if len(sig) == 0: continue
         last     = sig.iloc[-1]
@@ -761,12 +768,6 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
     else:             strong_cap = 1; regular_cap = 1   # extreme greed — tighten
 
     # Macro filter: tighten caps if SPY below 200d SMA
-    # Pull macro_ok from any sector's data (it's market-wide, same for all)
-    macro_ok = True
-    for sector_data in sell_sectors.values():
-        if isinstance(sector_data, dict) and 'macro_ok' in sector_data:
-            macro_ok = sector_data['macro_ok']
-            break
     if not macro_ok:
         strong_cap  = max(1, strong_cap - 1)
         regular_cap = max(1, regular_cap - 1)
