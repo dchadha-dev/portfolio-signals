@@ -108,58 +108,55 @@ def fetch_form4_accessions(cik, cutoff_str):
 
 def get_xml_url(cik, accession):
     """
-    Get the primary Form 4 XML URL from the EDGAR filing index.
-    Uses -index.htm which always exists for every EDGAR filing.
+    Get primary Form 4 XML URL using EDGAR submissions API primaryDocument field.
+    This is the most reliable method — directly returns the primary document name.
+    Falls back to index HTML parsing and common patterns.
     """
     acc_nodash = accession.replace('-', '')
     cik_int    = str(int(cik))
     base       = f'https://www.sec.gov/Archives/edgar/data/{cik_int}/{acc_nodash}'
 
-    # Strategy 1: Parse the filing index HTML — most reliable
-    # The index page lists all documents; find the primary .xml that isn't XBRL
+    # Strategy 1: Use submissions API primaryDocument field (most reliable)
+    # Already fetched in fetch_form4_accessions but not stored — refetch
     try:
         time.sleep(0.12)
+        r = requests.get(
+            f'https://data.sec.gov/submissions/CIK{cik}.json',
+            headers=SEC_HEADERS, timeout=15
+        )
+        if r.status_code == 200:
+            recent  = r.json().get('filings', {}).get('recent', {})
+            accnums = recent.get('accessionNumber', [])
+            docs    = recent.get('primaryDocument', [])
+            for i, acc in enumerate(accnums):
+                if acc == accession and i < len(docs):
+                    primary = docs[i]
+                    if primary and primary.lower().endswith('.xml'):
+                        return f'{base}/{primary}'
+                    break
+    except Exception:
+        pass
+
+    # Strategy 2: Parse index HTML — look for absolute /Archives paths only
+    try:
+        time.sleep(0.08)
         r = requests.get(f'{base}/{accession}-index.htm',
                          headers=SEC_HEADERS, timeout=15)
         if r.status_code == 200:
-            # EDGAR index HTML uses both relative and absolute href patterns
-            # Pattern A: href="filename.xml" (relative)
-            # Pattern B: href="/Archives/edgar/data/.../filename.xml" (absolute)
-            for pattern in [
-                r'href="([^"]+\.xml)"',
-                r"href='([^']+\.xml)'",
-            ]:
-                for match in re.findall(pattern, r.text, re.IGNORECASE):
-                    fname = match.split('/')[-1]
-                    if 'xbrl' not in fname.lower() and 'cal' not in fname.lower():
-                        # Build full URL
-                        if match.startswith('/'):
-                            return f'https://www.sec.gov{match}'
-                        elif match.startswith('http'):
-                            return match
-                        else:
-                            return f'{base}/{fname}'
+            matches = re.findall(
+                r'href="(/Archives/edgar/data/[^"]+\.xml)"',
+                r.text, re.IGNORECASE
+            )
+            for m in matches:
+                fname = m.split('/')[-1].lower()
+                if not any(x in fname for x in ['xbrl','cal.xml','lab.xml',
+                                                  'def.xml','pre.xml']):
+                    return f'https://www.sec.gov{m}'
     except Exception:
         pass
 
-    # Strategy 2: JSON filing index
-    try:
-        time.sleep(0.08)
-        r = requests.get(f'{base}/{accession}-index.json',
-                         headers=SEC_HEADERS, timeout=12)
-        if r.status_code == 200:
-            data  = r.json()
-            items = (data.get('directory', {}).get('item', []) or
-                     data.get('files', []))
-            for item in items:
-                name = item.get('name', item.get('filename', ''))
-                if name.endswith('.xml') and 'xbrl' not in name.lower():
-                    return f'{base}/{name}'
-    except Exception:
-        pass
-
-    # Strategy 3: Common filename patterns via HEAD request
-    for suffix in ['4.xml', 'ownership.xml', 'primary_doc.xml', 'form4.xml']:
+    # Strategy 3: Common Form 4 XML filename patterns
+    for suffix in ['4.xml', 'ownership.xml', 'primary_doc.xml']:
         url = f'{base}/{suffix}'
         try:
             time.sleep(0.08)
@@ -170,7 +167,6 @@ def get_xml_url(cik, accession):
 
     return None
 
-def parse_form4_xml(xml_url, ticker, filing_date):
     """Parse Form 4 XML — handles namespaced and non-namespaced schemas."""
     if not xml_url:
         return [], []
@@ -184,6 +180,11 @@ def parse_form4_xml(xml_url, ticker, filing_date):
             return [], []
 
         content = r.content
+
+        # Reject HTML — EDGAR returns HTML viewer pages for some .xml URLs
+        if content[:200].lstrip().startswith(b'<!DOCTYPE') or b'<html' in content[:300].lower():
+            return [], {}
+
         # Extract from SGML wrapper if needed
         if b'<ownershipDocument' not in content and b'<XML>' in content:
             s = content.find(b'<ownershipDocument')
