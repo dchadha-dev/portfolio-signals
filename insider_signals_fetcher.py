@@ -215,14 +215,15 @@ def parse_form4_xml(xml_url, ticker, filing_date):
             owner_title = ', '.join(parts)
 
         n_pass = 0
+        code_tally = {}
         for txn in root.findall('.//nonDerivativeTransaction'):
-            # Code P = open market purchase
             code = None
             for path in ['.//transactionCodes/transactionCode',
                          'transactionCodes/transactionCode']:
                 e2 = txn.find(path)
                 if e2 is not None and e2.text:
                     code = e2.text.strip(); break
+            code_tally[code] = code_tally.get(code, 0) + 1
             if code != 'P':
                 continue
             # Skip 10b5-1 plans
@@ -233,7 +234,6 @@ def parse_form4_xml(xml_url, ticker, filing_date):
                     code = None; break
             if code is None:
                 continue
-            # Amounts
             shares = price = 0.0
             for path in ['.//transactionAmounts/transactionShares/value',
                          './/transactionShares/value']:
@@ -261,9 +261,10 @@ def parse_form4_xml(xml_url, ticker, filing_date):
             })
         if n_pass > 0:
             print(f'    + {ticker}: {n_pass} buy(s) — {owner_name[:25]}')
+
     except Exception:
-        pass
-    return buys, pol_buys
+        code_tally = {}
+    return buys, code_tally
 
 
 def fetch_edgar_signals(cik_map):
@@ -271,6 +272,7 @@ def fetch_edgar_signals(cik_map):
     all_insider = {}
     n = len(cik_map)
     xml_found = xml_tried = 0
+    global_codes = {}  # tally all transaction codes seen across all filings
     print(f'  Fetching Form 4 for {n} tickers (cutoff {cutoff})...')
     for i, (ticker, cik) in enumerate(cik_map.items()):
         if i % 15 == 0:
@@ -280,10 +282,13 @@ def fetch_edgar_signals(cik_map):
             xml_url = get_xml_url(cik, acc)
             if xml_url:
                 xml_found += 1
-            ins_b, _ = parse_form4_xml(xml_url, ticker, fd)
+            ins_b, codes = parse_form4_xml(xml_url, ticker, fd)
+            for c, count in codes.items():
+                global_codes[c] = global_codes.get(c, 0) + count
             all_insider.setdefault(ticker, []).extend(ins_b)
     print(f'  XML resolution: {xml_found}/{xml_tried} successful')
-    print(f'  Insider buys: {sum(len(v) for v in all_insider.values())} transactions')
+    print(f'  Transaction codes seen: {dict(sorted(global_codes.items(), key=lambda x: -x[1])[:8])}')
+    print(f'  Insider buys (code P, ≥${MIN_TRANSACTION_USD:,}): {sum(len(v) for v in all_insider.values())} transactions')
     return all_insider
 
 
@@ -355,89 +360,14 @@ def _politician_score(trades_for_ticker):
 
 def fetch_capitol_trades(universe_set):
     """
-    Fetch from Capitol Trades public API endpoint.
-    No API key required — this is the same endpoint their frontend uses.
+    Capitol Trades api.capitoltrades.com DNS fails from GitHub Actions.
+    No accessible free alternative exists as of 2026-05.
+    Returns empty dict — politician signals disabled pending paid source.
+    Backlog: Quiver Quantitative ($25/mo) covers both chambers with clean JSON.
     """
-    cutoff = (datetime.now() - timedelta(days=LOOKBACK_POLITICIAN)).date()
-    results = {}
-    page    = 1
-    total_fetched = 0
-
-    print(f'  Capitol Trades API (cutoff {cutoff})...')
-    while page <= 15:
-        try:
-            time.sleep(0.8)
-            r = requests.get(
-                'https://api.capitoltrades.com/trades',
-                params={
-                    'page':     page,
-                    'pageSize': 100,
-                    'txType':   'buy',
-                    'assetType':'stock',
-                },
-                headers={
-                    'User-Agent': 'Mozilla/5.0',
-                    'Accept':     'application/json',
-                    'Referer':    'https://www.capitoltrades.com/',
-                },
-                timeout=20,
-            )
-            if r.status_code != 200:
-                print(f'  Capitol Trades page {page}: HTTP {r.status_code}')
-                break
-
-            data   = r.json()
-            trades = data.get('data', [])
-            meta   = data.get('meta', {})
-            if not trades:
-                break
-
-            for trade in trades:
-                # Transaction date
-                txn_date_str  = trade.get('txDate', '') or ''
-                disc_date_str = trade.get('pubDate', trade.get('filingDate', '')) or ''
-                if not txn_date_str:
-                    continue
-                try:
-                    txn_date = datetime.strptime(txn_date_str[:10], '%Y-%m-%d').date()
-                except:
-                    continue
-                if txn_date < cutoff:
-                    # Trades are sorted newest-first; once past cutoff, stop
-                    return results
-                # Ticker
-                ticker = ''
-                asset  = trade.get('asset', {}) or {}
-                ticker = (asset.get('ticker') or trade.get('ticker') or '').upper().strip()
-                ticker = re.sub(r'[^A-Z]', '', ticker)
-                if not ticker or ticker not in universe_set:
-                    continue
-
-                total_fetched += 1
-                results.setdefault(ticker, []).append({
-                    'ticker':           ticker,
-                    'transaction_date': txn_date_str[:10],
-                    'disclosure_date':  disc_date_str[:10] if disc_date_str else txn_date_str[:10],
-                    'politician':       (trade.get('politician', {}) or {}).get('name', 'Unknown'),
-                    'chamber':          (trade.get('politician', {}) or {}).get('chamber', ''),
-                    'party':            (trade.get('politician', {}) or {}).get('party', ''),
-                    'tx_type':          'buy',
-                    'amount_minimum':   trade.get('txAmount', 0) or 0,
-                })
-
-            page += 1
-            # Check if more pages
-            total_pages = meta.get('pageCount', meta.get('totalPages', page))
-            if page > total_pages:
-                break
-
-        except Exception as e:
-            print(f'  Capitol Trades page {page} error: {e}')
-            break
-
-    print(f'  Capitol Trades: {total_fetched} buys across {len(results)} tickers')
-    return results
-
+    print("  Capitol Trades: api.capitoltrades.com not accessible from GitHub Actions")
+    print("  Politician signals via Capitol Trades disabled — see backlog")
+    return {}
 
 def fetch_finnhub_congressional(finnhub_token, universe_set):
     """Finnhub fallback for congressional trading."""
