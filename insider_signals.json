@@ -1,14 +1,293 @@
 {
   "health": {
-    "timestamp": "2026-05-27 05:35 UTC",
+    "timestamp": "2026-05-27 05:48 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
-    "n_insider_signals": 0,
+    "n_insider_signals": 7,
     "n_politician_signals": 0,
-    "n_combined_signals": 0,
-    "elapsed_seconds": 215.7,
+    "n_combined_signals": 7,
+    "elapsed_seconds": 260.3,
     "retry_required": false,
     "retry_reason": []
   },
-  "signals": {}
+  "signals": {
+    "SOFI": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "SOFI",
+          "date": "2026-05-11",
+          "value_usd": 248781,
+          "shares": 15545,
+          "price": 16.0,
+          "name": "Noto Anthony",
+          "title": "Director, Officer, Chief Executive Officer",
+          "is_cluster": false
+        },
+        {
+          "ticker": "SOFI",
+          "date": "2026-05-08",
+          "value_usd": 249769,
+          "shares": 15878,
+          "price": 15.73,
+          "name": "Noto Anthony",
+          "title": "Director, Officer, Chief Executive Officer",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-05-27"
+    },
+    "SPGI": {
+      "buy_score_boost": 20,
+      "insider_score": 20,
+      "politician_score": 0,
+      "insider_n": 3,
+      "insider_cluster": true,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "SPGI",
+          "date": "2026-05-04",
+          "value_usd": 500001,
+          "shares": 1151,
+          "price": 434.03,
+          "name": "Moritz Robert Edward Jr.",
+          "title": "Director",
+          "is_cluster": true
+        },
+        {
+          "ticker": "SPGI",
+          "date": "2026-05-04",
+          "value_usd": 1078475,
+          "shares": 2500,
+          "price": 431.39,
+          "name": "Clay Catherine R",
+          "title": "Officer, CEO, S&P Dow Jones Indices",
+          "is_cluster": true
+        },
+        {
+          "ticker": "SPGI",
+          "date": "2026-05-01",
+          "value_usd": 998297,
+          "shares": 2322,
+          "price": 429.93,
+          "name": "CHEUNG MARTINA",
+          "title": "Director, Officer, CEO & President",
+          "is_cluster": true
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-05-27"
+    },
+    "ENPH": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "ENPH",
+          "date": "2026-05-26",
+          "value_usd": 296450,
+          "shares": 4400,
+          "price": 67.37,
+          "name": "Kothandaraman Badrinarayanan",
+          "title": "Director, Officer, President & CEO",
+          "is_cluster": false
+        },
+        {
+          "ticker": "ENPH",
+          "date": "2026-05-26",
+          "value_usd": 41032,
+          "shares": 600,
+          "price": 68.39,
+          "name": "Kothandaraman Badrinarayanan",
+          "title": "Director, Officer, President & CEO",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-05-27"
+    },
+    "INTU": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "INTU",
+          "date": "2026-05-26",
+          "value_usd": 386808,
+          "shares": 1250,
+          "price": 309.45,
+          "name": "PRABHU VASANT M",
+          "title": "Director",
+          "is_cluster": false
+        },
+        {
+          "ticker": "INTU",
+          "date": "2026-05-26",
+          "value_usd": 154858,
+          "shares": 500,
+          "price": 309.71,
+          "name": "PRABHU VASANT M",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-05-27"
+    },
+    "MELI": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "MELI",
+          "date": "2026-05-26",
+          "value_usd": 157226,
+          "shares": 95,
+          "price": 1655.01,
+          "name": "Aguzin Alejandro Nicolas",
+          "title": "Director",
+          "is_cluster": false
+        },
+        {
+          "ticker": "MELI",
+          "date": "2026-05-26",
+          "value_usd": 836330,
+          "shares": 505,
+          "price": 1656.1,
+          "name": "Aguzin Alejandro Nicolas",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-05-27"
+    },
+    "TSM": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "TSM",
+          "date": "2026-05-19",
+          "value_usd": 69980,
+          "shares": 1000,
+          "price": 69.98,
+          "name": "Tien Bor-Zen",
+          "title": "Officer, VP",
+          "is_cluster": false
+        },
+        {
+          "ticker": "TSM",
+          "date": "2026-05-19",
+          "value_usd": 69830,
+          "shares": 1000,
+          "price": 69.83,
+          "name": "Tien Bor-Zen",
+          "title": "Officer, VP",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-05-27"
+    },
+    "MSCI": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "MSCI",
+          "date": "2026-05-18",
+          "value_usd": 67128,
+          "shares": 120,
+          "price": 559.4,
+          "name": "Fernandez Henry A",
+          "title": "Director, Officer, Chairman and CEO",
+          "is_cluster": false
+        },
+        {
+          "ticker": "MSCI",
+          "date": "2026-05-18",
+          "value_usd": 134467,
+          "shares": 240,
+          "price": 560.28,
+          "name": "Fernandez Henry A",
+          "title": "Director, Officer, Chairman and CEO",
+          "is_cluster": false
+        },
+        {
+          "ticker": "MSCI",
+          "date": "2026-05-18",
+          "value_usd": 695211,
+          "shares": 1238,
+          "price": 561.56,
+          "name": "Fernandez Henry A",
+          "title": "Director, Officer, Chairman and CEO",
+          "is_cluster": false
+        },
+        {
+          "ticker": "MSCI",
+          "date": "2026-05-18",
+          "value_usd": 631091,
+          "shares": 1122,
+          "price": 562.47,
+          "name": "Fernandez Henry A",
+          "title": "Director, Officer, Chairman and CEO",
+          "is_cluster": false
+        },
+        {
+          "ticker": "MSCI",
+          "date": "2026-05-18",
+          "value_usd": 450712,
+          "shares": 800,
+          "price": 563.39,
+          "name": "Fernandez Henry A",
+          "title": "Director, Officer, Chairman and CEO",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-05-27"
+    }
+  }
 }
