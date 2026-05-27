@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-05-26 12:45 UTC",
-    "tickers_checked": 10,
-    "new_signals": 4,
-    "total_signals": 4,
+    "timestamp": "2026-05-27 05:32 UTC",
+    "tickers_checked": 11,
+    "new_signals": 5,
+    "total_signals": 5,
     "expired_removed": 4,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 120.8
+    "elapsed_seconds": 119.5
   },
   "signals": {
     "NVDA": {
@@ -22,7 +22,7 @@
       "std_dev_floored": true,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-05-26"
+      "as_of": "2026-05-27"
     },
     "AMAT": {
       "ticker": "AMAT",
@@ -36,7 +36,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-05-26"
+      "as_of": "2026-05-27"
     },
     "NBIS": {
       "ticker": "NBIS",
@@ -50,7 +50,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-05-26"
+      "as_of": "2026-05-27"
     },
     "TSEM": {
       "ticker": "TSEM",
@@ -64,7 +64,21 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-05-26"
+      "as_of": "2026-05-27"
+    },
+    "CRM": {
+      "ticker": "CRM",
+      "announce_date": "2026-05-27",
+      "expires_at": "2026-07-26",
+      "sue": 4.013,
+      "surprise": 0.7348,
+      "actual_eps": 3.81,
+      "estimate_eps": 3.0752,
+      "std_dev": 0.1831,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-05-27"
     }
   }
 }

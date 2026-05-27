@@ -1,12 +1,12 @@
 {
   "health": {
-    "timestamp": "2026-05-26 12:53 UTC",
+    "timestamp": "2026-05-27 05:35 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
     "n_insider_signals": 0,
     "n_politician_signals": 0,
     "n_combined_signals": 0,
-    "elapsed_seconds": 484.1,
+    "elapsed_seconds": 215.7,
     "retry_required": false,
     "retry_reason": []
   },
