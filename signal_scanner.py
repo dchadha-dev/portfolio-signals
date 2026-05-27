@@ -80,12 +80,13 @@ MY_HOLDINGS = [
     # Direct US stocks
     'NVDA','AVGO','TSLA','MELI','AMAT','MSFT','AAPL','AMZN','META','GOOG',
     'NFLX','BKNG','SHOP','RACE','AMD','CRWV','ASML','ANET','DDOG','CRDO',
-    'NBIS','TSM','TM','MU','INTU','CPRT','PGR','TTD','UNH','FISV','O','TEAM',
+    'NBIS','TSM','TM','MU','INTU','CPRT','PGR','O','TEAM',
     'BRKB','NVO','RELX','DELL','BABA',
+    'NOW','IREN',
     # European stocks
     'RMS.PA','MC.PA','ITX.MC',
     # US ETFs
-    'VOO','VTI','QQQ','TQQQ','SCHD','JEPI','VXUS','VSS','IEV','URTH','GLD','XLG',
+    'VOO','VTI','QQQ','TQQQ','JEPI','VXUS','VSS','IEV','URTH','GLD','XLG',
     # Thematic ETFs
     'AIQG','QNTM.L','QTUM','FLAX',
     # Crypto
@@ -99,7 +100,7 @@ MY_HOLDINGS = [
 
 CANDIDATES = [
     # Original candidates
-    'NOW','PANW','ORCL','COIN','AXON','CEG','CELH','DECK','ENPH','HIMS',
+    'PANW','ORCL','COIN','AXON','CEG','CELH','DECK','ENPH','HIMS',
     'IDXX','KNSL','LULU','MPWR','NET','PLNT','RCL','SPOT','UBER',
     'ULTA','VEEV','SMCI','CAVA','SNOW','MEDP','PODD','HEI','ACLS',
     'FICO','APP','HOOD','RKLB','ARM',
@@ -128,7 +129,7 @@ CANDIDATES = [
     'VZ','WMT','IBM','CSCO','INTC','ON',
     'INFY','SONY','HDB','HSBC','AER','CB',
     'HPE','SOUN','FIVN','ONDS','CBRS','NXT',
-    'BULL','SOLS','RDDT','IREN','KEEL','SEDG',
+    'BULL','SOLS','RDDT','KEEL','SEDG',
     'SNDK','SYM','FORM','VICR','RIO','FCX',
     'GOLD','BEP','DNN','MSTR','AAL','OWL',
     'PI','ALGN',

@@ -90,17 +90,20 @@ def fetch_form4_accessions(cik, cutoff_str):
 # ── XML URL ───────────────────────────────────────────────────────────
 def get_xml_url(cik, accession, primary_doc=''):
     """
-    Get primary Form 4 XML URL using primaryDocument from submissions API.
-    Skip HEAD checks — EDGAR returns 200 for HTML error pages too.
-    Instead, try GET and verify content is actually XML.
+    Get primary Form 4 XML content.
+    Strategy 1: primaryDocument if .xml
+    Strategy 2: Full submission .txt file (always exists, contains XML inside <XML> tags)
+    Strategy 3: Common .xml filename patterns
     """
     acc_nodash = accession.replace('-', '')
     cik_int    = str(int(cik))
     base       = f'https://www.sec.gov/Archives/edgar/data/{cik_int}/{acc_nodash}'
 
     candidates = []
-    if primary_doc:
+    if primary_doc and primary_doc.lower().endswith('.xml'):
         candidates.append(primary_doc)
+    # Full submission text always exists and contains embedded XML
+    candidates.append(f'{accession}.txt')
     candidates += ['4.xml', 'ownership.xml', 'primary_doc.xml']
 
     for fname in candidates:
@@ -110,13 +113,9 @@ def get_xml_url(cik, accession, primary_doc=''):
             r = requests.get(url, headers=SEC_HEADERS, timeout=20)
             if r.status_code != 200:
                 continue
-            # Verify it's actually XML not an HTML error page
-            content = r.content[:50].strip()
-            if content.startswith(b'<ownershipDocument') or \
-               content.startswith(b'<?xml') or \
-               content.startswith(b'<XML>') or \
-               (content.startswith(b'<') and b'DOCTYPE' not in content[:100]):
-                return url, r.content  # return content too — avoid double fetch
+            content = r.content
+            if b'<ownershipDocument' in content or b'<XML>' in content:
+                return url, content
         except Exception:
             continue
 
@@ -178,9 +177,17 @@ def parse_form4_xml(xml_url, ticker, filing_date, prefetched_content=None):
 
         n_pass = 0
         for txn in root.findall('.//nonDerivativeTransaction'):
+            # X0609 schema: <transactionCoding><transactionCode>P</transactionCode>
+            # Older schema: <transactionCodes><transactionCode>P</transactionCode>
+            # Try all known paths
             code = None
-            for path in ['.//transactionCodes/transactionCode',
-                         'transactionCodes/transactionCode']:
+            for path in [
+                './/transactionCoding/transactionCode',   # X0609 schema
+                'transactionCoding/transactionCode',
+                './/transactionCodes/transactionCode',    # older schema
+                'transactionCodes/transactionCode',
+                './/transactionCode',                     # fallback
+            ]:
                 e2 = txn.find(path)
                 if e2 is not None and e2.text:
                     code = e2.text.strip()
@@ -188,24 +195,38 @@ def parse_form4_xml(xml_url, ticker, filing_date, prefetched_content=None):
             code_tally[code] = code_tally.get(code, 0) + 1
             if code != 'P':
                 continue
-            # Skip 10b5-1
-            for path in ['.//transactionCodes/rule10b5-1PlanFlag',
-                         'transactionCodes/rule10b5-1PlanFlag']:
+            # Skip 10b5-1 plans — X0609 uses equitiesSwapInvolved, older uses rule10b5-1PlanFlag
+            plan = None
+            for path in [
+                './/transactionCoding/equitiesSwapInvolved',
+                'transactionCoding/equitiesSwapInvolved',
+                './/transactionCodes/rule10b5-1PlanFlag',
+                'transactionCodes/rule10b5-1PlanFlag',
+            ]:
                 e2 = txn.find(path)
-                if e2 is not None and e2.text in ('Y', '1', 'true'):
-                    code = None
+                if e2 is not None:
+                    plan = e2.text
                     break
-            if code is None:
+            if plan in ('Y', '1', 'true', '1'):
                 continue
-            shares = price = 0.0
-            for path in ['.//transactionAmounts/transactionShares/value',
-                         './/transactionShares/value']:
+            # Shares
+            shares = 0.0
+            for path in [
+                './/transactionAmounts/transactionShares/value',
+                'transactionAmounts/transactionShares/value',
+                './/transactionShares/value',
+            ]:
                 e2 = txn.find(path)
                 if e2 is not None and e2.text:
                     try: shares = float(e2.text); break
                     except: pass
-            for path in ['.//transactionAmounts/transactionPricePerShare/value',
-                         './/transactionPricePerShare/value']:
+            # Price
+            price = 0.0
+            for path in [
+                './/transactionAmounts/transactionPricePerShare/value',
+                'transactionAmounts/transactionPricePerShare/value',
+                './/transactionPricePerShare/value',
+            ]:
                 e2 = txn.find(path)
                 if e2 is not None and e2.text:
                     try: price = float(e2.text); break
@@ -225,7 +246,7 @@ def parse_form4_xml(xml_url, ticker, filing_date, prefetched_content=None):
         if n_pass > 0:
             print(f'    + {ticker}: {n_pass} buy(s) — {owner_name[:30]}')
     except Exception as e:
-        pass
+        print(f'    parse error {ticker}: {type(e).__name__}: {e}')
     return buys, code_tally
 
 
