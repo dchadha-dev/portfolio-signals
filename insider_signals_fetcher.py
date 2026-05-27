@@ -139,12 +139,18 @@ def parse_form4_xml(xml_url, ticker, filing_date, prefetched_content=None):
                 return [], {}
             content = r.content
 
-        # Extract from SGML wrapper if needed
-        if b'<ownershipDocument' not in content and b'<XML>' in content:
-            s = content.find(b'<ownershipDocument')
-            e = content.find(b'</ownershipDocument>') + len(b'</ownershipDocument>')
-            if s >= 0 and e > s:
-                content = content[s:e]
+        # Extract Form 4 XML from SGML submission wrapper
+        # .txt files are SGML with multiple <DOCUMENT> sections.
+        # The Form 4 XML is inside <XML>...</XML> tags.
+        # Must extract this before attempting ET.fromstring.
+        if b'<XML>' in content:
+            # Find the XML block containing ownershipDocument
+            xml_start = content.find(b'<XML>')
+            xml_end   = content.find(b'</XML>', xml_start)
+            if xml_start >= 0 and xml_end > xml_start:
+                content = content[xml_start + 5 : xml_end].strip()
+        elif b'<ownershipDocument' not in content:
+            return [], {}
 
         # One-time diagnostic
         if not getattr(parse_form4_xml, '_diagnosed', False):
