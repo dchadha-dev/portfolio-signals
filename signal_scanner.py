@@ -59,8 +59,7 @@ def load_pead_signals():
     try:
         with open('pead_signals.json') as f:
             data = json.load(f)
-        today   = str(date.today()) if hasattr(date, 'today') else \
-                  datetime.now().strftime('%Y-%m-%d')
+        today   = datetime.now().strftime('%Y-%m-%d')
         signals = data.get('signals', {})
         active  = {t: s for t, s in signals.items()
                    if s.get('expires_at', '2000-01-01') >= today}
