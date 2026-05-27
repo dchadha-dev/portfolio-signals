@@ -1,0 +1,49 @@
+name: Daily Signal Scanner
+
+on:
+  schedule:
+    - cron: '0 23 * * *'   # 6am Bangkok (UTC+7)
+    - cron: '0 11 * * *'   # 6pm Bangkok (UTC+7)
+  workflow_dispatch:        # manual trigger
+  push:
+    branches:
+      - main
+    paths:
+      - 'signal_scanner.py'
+      - 'sell_side_scorer.py'
+      - 'validated_params.json'
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install yfinance pandas numpy scipy requests
+
+      - name: Run signal scanner
+        env:
+          FINNHUB_TOKEN: ${{ secrets.FINNHUB_TOKEN }}
+        run: python signal_scanner.py
+
+      - name: Commit updated payload
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add signals_payload.json
+          git diff --staged --quiet || git commit -m "chore: signals update $(date -u '+%Y-%m-%d %H:%M') UTC"
+          git pull --rebase origin main
+          git push
+
+      # NOTE: No Netlify deploy hook — dashboard fetches JSON directly from GitHub API.
+      # Netlify only needs to redeploy when index.html changes.
+      # This saves ~900 credits/month (60 deploys × 15 credits each).

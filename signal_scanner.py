@@ -903,11 +903,6 @@ def main():
     print(f"Summary: {payload['summary']}")
     print(f"Sell signals: {sum(1 for s in payload['analytics']['signals'] if s.get('sell_action') not in ['HOLD','—'])}")
 
-    # Force Netlify redeploy — updates timestamp so Netlify sees changed content
-    with open('_netlify_trigger.txt', 'w') as f:
-        f.write(datetime.now(BANGKOK).strftime('%Y-%m-%d %H:%M:%S Bangkok'))
-    print("Netlify trigger updated.")
-
     for b in payload['analytics']['buy_ideas'][:5]:
         star = '★' if b['fdfv3'] else '↑' if b['factor'] else '·'
         print(f"  {star} {b['ticker']:<8} buy={b['buy_score']} {'(held)' if b['is_holding'] else ''}")

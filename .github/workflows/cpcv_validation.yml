@@ -35,7 +35,4 @@ jobs:
           git pull --rebase origin main
           git push
 
-      - name: Trigger Netlify deploy
-        run: |
-          curl -s -X POST "${{ secrets.NETLIFY_DEPLOY_HOOK }}"
-          echo "Netlify deploy triggered — report available on dashboard"
+      # NOTE: No Netlify deploy hook — dashboard fetches JSON directly from GitHub API.
