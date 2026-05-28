@@ -1,6 +1,6 @@
 {
   "meta": {
-    "timestamp": "2026-05-25 06:10 UTC",
+    "timestamp": "2026-05-28 00:12 UTC",
     "n_tickers": 121,
     "n_paths_theoretical": 66,
     "n_blocks": 12,
@@ -12,18 +12,18 @@
   },
   "model_results": {
     "current": {
-      "n_obs": 6950,
+      "n_obs": 7014,
       "n_paths": 15576,
       "n_tickers": 119,
-      "mean_exc_252": 69.72,
-      "raw_sharpe": 7.814,
-      "dsr": 52.66,
-      "t_stat": 41.038,
+      "mean_exc_252": 70.77,
+      "raw_sharpe": 7.943,
+      "dsr": 53.404,
+      "t_stat": 41.905,
       "p_value": 0.0,
-      "pbo": 0.491,
-      "hit_rate": 62.9,
+      "pbo": 0.49,
+      "hit_rate": 63.5,
       "max_dd": -100.0,
-      "signal_vs_nosignal_spread": -17.21,
+      "signal_vs_nosignal_spread": -18.16,
       "passes_p05": "True",
       "passes_dsr": true,
       "passes_pbo30": false
@@ -40,7 +40,7 @@
       "pbo": 0.494,
       "hit_rate": 44.7,
       "max_dd": -100.0,
-      "signal_vs_nosignal_spread": -23.61,
+      "signal_vs_nosignal_spread": -23.47,
       "passes_p05": "True",
       "passes_dsr": true,
       "passes_pbo30": false
@@ -48,30 +48,30 @@
   },
   "signal_stats": {
     "buy_current": {
-      "n": 104,
-      "mean_exc": 50.68,
-      "ann_exc": 50.7,
-      "t_stat": 4.571,
+      "n": 108,
+      "mean_exc": 52.78,
+      "ann_exc": 52.8,
+      "t_stat": 4.812,
       "p_val": 0.0,
-      "dsr": 6.042,
+      "dsr": 6.293,
       "valid": "True"
     },
     "strong_buy_current": {
-      "n": 104,
-      "mean_exc": 50.68,
-      "ann_exc": 50.7,
-      "t_stat": 4.571,
+      "n": 108,
+      "mean_exc": 52.78,
+      "ann_exc": 52.8,
+      "t_stat": 4.812,
       "p_val": 0.0,
-      "dsr": 6.042,
+      "dsr": 6.293,
       "valid": "True"
     },
     "factor_only_current": {
-      "n": 415,
-      "mean_exc": 23.38,
-      "ann_exc": 23.4,
-      "t_stat": 6.055,
+      "n": 413,
+      "mean_exc": 23.47,
+      "ann_exc": 23.5,
+      "t_stat": 6.051,
       "p_val": 0.0,
-      "dsr": 7.935,
+      "dsr": 7.937,
       "valid": "True"
     },
     "buy_proposed": {
@@ -93,39 +93,39 @@
       "valid": "False"
     },
     "factor_only_proposed": {
-      "n": 1179,
-      "mean_exc": 37.01,
-      "ann_exc": 37.0,
-      "t_stat": 17.668,
+      "n": 1178,
+      "mean_exc": 37.11,
+      "ann_exc": 37.1,
+      "t_stat": 17.701,
       "p_val": 0.0,
-      "dsr": 22.233,
+      "dsr": 22.251,
       "valid": "True"
     },
     "dfv3_fires": {
-      "n": 210,
-      "mean_exc": 41.22,
-      "ann_exc": 41.2,
-      "t_stat": 5.794,
+      "n": 214,
+      "mean_exc": 42.57,
+      "ann_exc": 42.6,
+      "t_stat": 5.998,
       "p_val": 0.0,
-      "dsr": 7.896,
+      "dsr": 8.136,
       "valid": "True"
     },
     "pfd_fires": {
-      "n": 5801,
-      "mean_exc": 14.16,
+      "n": 5785,
+      "mean_exc": 14.2,
       "ann_exc": 14.2,
-      "t_stat": 21.774,
+      "t_stat": 21.695,
       "p_val": 0.0,
-      "dsr": 27.87,
+      "dsr": 27.723,
       "valid": "True"
     },
     "triple_fires": {
-      "n": 5842,
-      "mean_exc": 23.5,
+      "n": 5843,
+      "mean_exc": 23.48,
       "ann_exc": 23.5,
-      "t_stat": 27.811,
+      "t_stat": 27.786,
       "p_val": 0.0,
-      "dsr": 38.31,
+      "dsr": 38.276,
       "valid": "True"
     }
   }
