@@ -1,16 +1,60 @@
 {
   "health": {
-    "timestamp": "2026-05-28 00:11 UTC",
+    "timestamp": "2026-05-28 05:13 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
     "n_insider_signals": 7,
     "n_politician_signals": 0,
     "n_combined_signals": 7,
-    "elapsed_seconds": 282.0,
+    "elapsed_seconds": 204.6,
     "retry_required": false,
     "retry_reason": []
   },
   "signals": {
+    "SPGI": {
+      "buy_score_boost": 20,
+      "insider_score": 20,
+      "politician_score": 0,
+      "insider_n": 3,
+      "insider_cluster": true,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "SPGI",
+          "date": "2026-05-04",
+          "value_usd": 500001,
+          "shares": 1151,
+          "price": 434.03,
+          "name": "Moritz Robert Edward Jr.",
+          "title": "Director",
+          "is_cluster": true
+        },
+        {
+          "ticker": "SPGI",
+          "date": "2026-05-04",
+          "value_usd": 1078475,
+          "shares": 2500,
+          "price": 431.39,
+          "name": "Clay Catherine R",
+          "title": "Officer, CEO, S&P Dow Jones Indices",
+          "is_cluster": true
+        },
+        {
+          "ticker": "SPGI",
+          "date": "2026-05-01",
+          "value_usd": 998297,
+          "shares": 2322,
+          "price": 429.93,
+          "name": "CHEUNG MARTINA",
+          "title": "Director, Officer, CEO & President",
+          "is_cluster": true
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-05-28"
+    },
     "INTU": {
       "buy_score_boost": 10,
       "insider_score": 10,
@@ -39,6 +83,40 @@
           "price": 309.71,
           "name": "PRABHU VASANT M",
           "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-05-28"
+    },
+    "SOFI": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "SOFI",
+          "date": "2026-05-11",
+          "value_usd": 248781,
+          "shares": 15545,
+          "price": 16.0,
+          "name": "Noto Anthony",
+          "title": "Director, Officer, Chief Executive Officer",
+          "is_cluster": false
+        },
+        {
+          "ticker": "SOFI",
+          "date": "2026-05-08",
+          "value_usd": 249769,
+          "shares": 15878,
+          "price": 15.73,
+          "name": "Noto Anthony",
+          "title": "Director, Officer, Chief Executive Officer",
           "is_cluster": false
         }
       ],
@@ -113,40 +191,6 @@
       "politician_trades": [],
       "as_of": "2026-05-28"
     },
-    "SOFI": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "SOFI",
-          "date": "2026-05-11",
-          "value_usd": 248781,
-          "shares": 15545,
-          "price": 16.0,
-          "name": "Noto Anthony",
-          "title": "Director, Officer, Chief Executive Officer",
-          "is_cluster": false
-        },
-        {
-          "ticker": "SOFI",
-          "date": "2026-05-08",
-          "value_usd": 249769,
-          "shares": 15878,
-          "price": 15.73,
-          "name": "Noto Anthony",
-          "title": "Director, Officer, Chief Executive Officer",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-05-28"
-    },
     "MELI": {
       "buy_score_boost": 10,
       "insider_score": 10,
@@ -176,50 +220,6 @@
           "name": "Aguzin Alejandro Nicolas",
           "title": "Director",
           "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-05-28"
-    },
-    "SPGI": {
-      "buy_score_boost": 20,
-      "insider_score": 20,
-      "politician_score": 0,
-      "insider_n": 3,
-      "insider_cluster": true,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "SPGI",
-          "date": "2026-05-04",
-          "value_usd": 500001,
-          "shares": 1151,
-          "price": 434.03,
-          "name": "Moritz Robert Edward Jr.",
-          "title": "Director",
-          "is_cluster": true
-        },
-        {
-          "ticker": "SPGI",
-          "date": "2026-05-04",
-          "value_usd": 1078475,
-          "shares": 2500,
-          "price": 431.39,
-          "name": "Clay Catherine R",
-          "title": "Officer, CEO, S&P Dow Jones Indices",
-          "is_cluster": true
-        },
-        {
-          "ticker": "SPGI",
-          "date": "2026-05-01",
-          "value_usd": 998297,
-          "shares": 2322,
-          "price": 429.93,
-          "name": "CHEUNG MARTINA",
-          "title": "Director, Officer, CEO & President",
-          "is_cluster": true
         }
       ],
       "politician_trades": [],
