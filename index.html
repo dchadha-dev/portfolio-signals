@@ -2427,7 +2427,10 @@ function renderRankings() {
     if (s.insider_cluster) dots.push('<span style="color:#f59e0b;font-size:10px;font-weight:700" title="Cluster insider buying (2+ insiders, 60d)">🔑🔑</span>');
     else if (s.insider_score > 0) dots.push('<span style="color:#f59e0b;font-size:10px" title="Insider buying (60d)">🔑</span>');
     if (s.politician_cluster) dots.push('<span style="color:#3b82f6;font-size:10px;font-weight:700" title="Cluster politician buy (2+ within 7d)">🏛🏛</span>');
-    else if (s.politician_score > 0) dots.push('<span style="color:#3b82f6;font-size:10px" title="Politician buy (45d)">🏛</span>');
+    else if (s.politician_score > 0) {
+      const lag = s.reporting_lag_days != null ? ` lag=${s.reporting_lag_days}d` : '';
+      dots.push(`<span style="color:#3b82f6;font-size:10px" title="Politician buy (45d)${lag}">🏛</span>`);
+    }
     if (s.pead_boost > 0) dots.push(`<span style="color:#a855f7;font-size:10px;font-weight:700" title="PEAD: SUE=${(s.pead_sue||0).toFixed(2)} expires ${s.pead_expires||'?'}">⚡</span>`);
     if (s.sector_boost >= 8) dots.push('<span style="color:#10b981;font-size:10px;font-weight:700" title="Sector entry signal: all 4 conditions met">📡</span>');
     else if (s.sector_boost > 0) dots.push('<span style="color:#6ee7b7;font-size:10px" title="Sector trend: outperforming SPY">📡</span>');
