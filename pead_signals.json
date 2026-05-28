@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-05-27 05:44 UTC",
-    "tickers_checked": 11,
+    "timestamp": "2026-05-28 00:06 UTC",
+    "tickers_checked": 8,
     "new_signals": 5,
-    "total_signals": 5,
-    "expired_removed": 5,
+    "total_signals": 7,
+    "expired_removed": 3,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 121.4
+    "elapsed_seconds": 119.9
   },
   "signals": {
     "NVDA": {
@@ -22,7 +22,7 @@
       "std_dev_floored": true,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-05-27"
+      "as_of": "2026-05-28"
     },
     "AMAT": {
       "ticker": "AMAT",
@@ -36,7 +36,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-05-27"
+      "as_of": "2026-05-28"
     },
     "NBIS": {
       "ticker": "NBIS",
@@ -70,15 +70,43 @@
       "ticker": "CRM",
       "announce_date": "2026-05-27",
       "expires_at": "2026-07-26",
-      "sue": 4.013,
-      "surprise": 0.7348,
-      "actual_eps": 3.81,
-      "estimate_eps": 3.0752,
-      "std_dev": 0.1831,
+      "sue": 2.309,
+      "surprise": 0.7317,
+      "actual_eps": 3.88,
+      "estimate_eps": 3.1483,
+      "std_dev": 0.3169,
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-05-27"
+      "as_of": "2026-05-28"
+    },
+    "DELL": {
+      "ticker": "DELL",
+      "announce_date": "2026-05-28",
+      "expires_at": "2026-07-27",
+      "sue": 2.416,
+      "surprise": 0.2918,
+      "actual_eps": 3.89,
+      "estimate_eps": 3.5982,
+      "std_dev": 0.1208,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-05-28"
+    },
+    "SNOW": {
+      "ticker": "SNOW",
+      "announce_date": "2026-05-27",
+      "expires_at": "2026-07-26",
+      "sue": 2.727,
+      "surprise": 0.0654,
+      "actual_eps": 0.39,
+      "estimate_eps": 0.3246,
+      "std_dev": 0.024,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-05-28"
     }
   }
 }
