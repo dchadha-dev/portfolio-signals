@@ -1222,6 +1222,25 @@ let timer, timerSecs = 3600;
 let excludeBKNG = false;
 let lastTotal = 440097;
 
+// ── Load cached prices from localStorage (survives reload if <2hrs old) ──
+(function loadCachedPrices() {
+  try {
+    const ts    = parseInt(localStorage.getItem('prices_cache_ts') || '0');
+    const age   = Date.now() - ts;
+    const TWO_HOURS = 2 * 60 * 60 * 1000;
+    if (age < TWO_HOURS) {
+      const cached = JSON.parse(localStorage.getItem('prices_cache') || 'null');
+      if (cached && typeof cached === 'object') {
+        prices = cached;
+        const ageMin = Math.round(age / 60000);
+        // Render will happen once DOM is ready — flag for deferred render
+        window._cachedPricesAge = ageMin;
+        console.log(`Loaded cached prices (${ageMin}m old)`);
+      }
+    }
+  } catch(e) {}
+})();
+
 // ── Sort state ─────────────────────────────────────────────
 const sortState = { all: { col: 'tot', dir: -1 }, stocks: { col: 'val', dir: -1 }, funds: { col: 'val', dir: -1 } };
 
@@ -1808,19 +1827,24 @@ async function refreshPrices() {
     renderEverything();
 
     if (prices._allStale) {
-      err.textContent = '⚠ Finnhub unreachable — showing May 5 fallback prices. Check network or API key.';
+      err.textContent = '⚠ Price fetch failed — showing last cached prices. Tap Refresh to retry.';
       err.style.cssText = 'display:block;background:#fdf8ee;border-color:#edd9a0;color:#8a5c00;border-radius:8px;padding:10px 16px;font-size:12px;margin-bottom:16px;';
-      document.getElementById('lastUpdated').textContent = 'Fallback prices (May 5, 2026)';
+      document.getElementById('lastUpdated').textContent = 'Showing cached fallback prices';
     } else {
       const staleCount = Object.values(prices).filter(p => p.stale).length;
       const liveCount  = Object.values(prices).filter(p => !p.stale && !p._allStale).length;
       if (staleCount > 0) {
-        err.textContent = `ℹ ${liveCount} tickers live · ${staleCount} using May 5 fallback`;
+        err.textContent = `ℹ ${liveCount} tickers live · ${staleCount} using fallback`;
         err.style.cssText = 'display:block;background:#f0f5fc;border-color:#c5d9f0;color:#1a5fa8;border-radius:8px;padding:10px 16px;font-size:12px;margin-bottom:16px;';
       } else {
         err.style.display = 'none';
       }
       document.getElementById('lastUpdated').textContent = `Live · ${liveCount} tickers · ${new Date().toLocaleTimeString()}`;
+      // Persist to localStorage — survives page reloads for 2 hours
+      try {
+        localStorage.setItem('prices_cache', JSON.stringify(prices));
+        localStorage.setItem('prices_cache_ts', Date.now().toString());
+      } catch(e) {}
     }
 
     timerSecs = 3600;
@@ -4199,7 +4223,7 @@ renderFunds(TOTAL);
 renderBuckets(TOTAL);
 renderEverything();
 setTimeout(addRowClickHandlers, 200);
-document.getElementById('lastUpdated').textContent = 'Showing May 5 prices · tap Refresh for live';
+document.getElementById('lastUpdated').textContent = 'Loading prices…';
 restartTimer();
 
 // syncScroll removed — headers are now sticky thead inside each table
@@ -4215,8 +4239,91 @@ function updateStickyOffsets() {
   document.querySelector('.page').style.paddingTop = (headerH + tabsH + 12) + 'px';
 }
 window.addEventListener('resize', updateStickyOffsets);
-// Run after render so th elements exist
 setTimeout(updateStickyOffsets, 200);
+
+// ── SMART PRICE INIT ─────────────────────────────────────────────────
+// Priority: 1) localStorage cache < 1hr → use immediately
+//           2) localStorage cache 1-4hr → use + fetch GitHub in background
+//           3) No/stale cache → fetch GitHub live_prices.json (committed by scanner)
+//           4) GitHub fails → fall back to Finnhub (refreshPrices button)
+// Dashboard never needs to be open for prices to update — scanner runs
+// 2x daily and commits live_prices.json to the repo automatically.
+setTimeout(async () => {
+  const GH_OWNER   = 'dchadha-dev';
+  const GH_REPO    = 'portfolio-signals';
+  const GH_PAT     = localStorage.getItem('gh_pat') || '';
+  const PRICES_RAW = `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/live_prices.json`;
+  const PRICES_API = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/live_prices.json`;
+
+  const ts      = parseInt(localStorage.getItem('prices_cache_ts') || '0');
+  const ageMs   = Date.now() - ts;
+  const ageMin  = Math.round(ageMs / 60000);
+  const ONE_HR  = 60 * 60 * 1000;
+  const FOUR_HR = 4 * 60 * 60 * 1000;
+  const lu      = document.getElementById('lastUpdated');
+
+  const cached = ts > 0 ? JSON.parse(localStorage.getItem('prices_cache') || 'null') : null;
+
+  // Helper: fetch live_prices.json from GitHub and apply to dashboard
+  async function fetchGitHubPrices() {
+    try {
+      let data = null;
+      // Try raw first (faster), then API
+      try {
+        const h = GH_PAT ? {'Authorization': 'token ' + GH_PAT} : {};
+        const r = await fetch(PRICES_RAW + '?t=' + Date.now(), {headers: h});
+        if (r.ok) data = await r.json();
+      } catch(e) {}
+      if (!data) {
+        const h = {'Accept': 'application/vnd.github.raw+json'};
+        if (GH_PAT) h['Authorization'] = 'Bearer ' + GH_PAT;
+        const r = await fetch(PRICES_API, {headers: h});
+        if (r.ok) data = await r.json();
+      }
+      if (data && data.prices) {
+        // Merge scanner prices into dashboard prices object
+        Object.entries(data.prices).forEach(([t, v]) => {
+          if (v.price) prices[t] = {price: v.price, change: v.change_pct || 0};
+        });
+        // Cache to localStorage
+        localStorage.setItem('prices_cache', JSON.stringify(prices));
+        localStorage.setItem('prices_cache_ts', Date.now().toString());
+        renderEverything();
+        const ts2 = data.timestamp || data.run_date || 'recently';
+        if (lu) lu.textContent = `Prices as of ${ts2} · auto-updates 2x daily`;
+        timerSecs = 3600;
+        restartTimer();
+        return true;
+      }
+    } catch(e) {}
+    return false;
+  }
+
+  if (cached && ageMs < ONE_HR) {
+    // Fresh cache — use immediately
+    prices = {...FALLBACK, ...cached};
+    renderEverything();
+    if (lu) lu.textContent = `Prices from ${ageMin}m ago · next update in ${Math.round((ONE_HR - ageMs)/60000)}m`;
+    timerSecs = Math.max(60, 3600 - ageMin * 60);
+    restartTimer();
+
+  } else if (cached && ageMs < FOUR_HR) {
+    // Slightly stale — show cached, fetch GitHub in background
+    prices = {...FALLBACK, ...cached};
+    renderEverything();
+    if (lu) lu.textContent = `Prices from ${ageMin}m ago · updating…`;
+    fetchGitHubPrices();
+
+  } else {
+    // No cache or >4hrs — fetch GitHub immediately
+    if (lu) lu.textContent = 'Fetching prices from scanner…';
+    const ok = await fetchGitHubPrices();
+    if (!ok) {
+      // GitHub failed — fall back to Finnhub
+      if (lu) lu.textContent = 'GitHub unavailable · tap Refresh for live prices';
+    }
+  }
+}, 300);
 
 // ── AUTO-LOAD signals_payload.json on page open ───────────────────
 // Silently fetches from GitHub (raw → API → Netlify) and populates

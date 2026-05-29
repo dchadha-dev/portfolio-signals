@@ -899,6 +899,18 @@ def main():
     with open(out, 'w') as f:
         json.dump(payload, f, indent=2, default=str)
 
+    # Write live_prices.json — committed to repo so dashboard reads
+    # prices from GitHub on open without needing to call Finnhub itself
+    prices_out = {
+        'timestamp':   datetime.now().strftime('%Y-%m-%d %H:%M UTC'),
+        'run_date':    payload.get('run_date', ''),
+        'prices':      {t: {'price': v.get('price'), 'change_pct': v.get('change_pct')}
+                        for t, v in live_prices.items() if v.get('price')},
+    }
+    with open('live_prices.json', 'w') as f:
+        json.dump(prices_out, f, indent=2, default=str)
+    print(f'Written: live_prices.json ({len(prices_out["prices"])} tickers)')
+
     print(f'Written: {out} ({os.path.getsize(out):,} bytes)')
     print(f"Summary: {payload['summary']}")
     print(f"Sell signals: {sum(1 for s in payload['analytics']['signals'] if s.get('sell_action') not in ['HOLD','—'])}")
