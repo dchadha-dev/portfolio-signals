@@ -2002,246 +2002,131 @@ async function loadPineScript() {
   const el = document.getElementById('pineContent');
   if (el.dataset.loaded) return;
 
-  const pine = `// ============================================================
-// Portfolio Signal Model — Validated Buy & Sell Signals
-// Last updated: 2026-05-29
-// Dashboard: https://portfolio-signals1.netlify.app
-//
-// BUY SIGNALS (CPCV validated, 132 paths per ticker):
-//   Factor gate           +40pts  +29.2% ann  DSR 13.7
-//   Factor + DFV V3       +25pts  +38.5% ann  DSR 8.84  ← strongest
-//   PFD Buy               +8pts   +11.3% ann  DSR 33.5
-//   Triple (63d >20%)     +10pts  +18.6% ann  DSR 42.1
-//   DFV V3 alone          +5pts   tie-breaker only
-//   Insider single        +10pts  alternative data
-//   Insider cluster       +20pts  alternative data
-//   Politician single     +5pts   alternative data
-//   Politician cluster    +10pts  alternative data
-//   PEAD (SUE >1.5)       +10pts  alternative data
-//   Sector entry (4-cond) +8pts   sector sentiment
-//   Sector trend only     +3pts   sector sentiment
-//   Banker Weak           -20pts  penalty
-//   RBear                 -10pts  penalty
-//
-// SELL SIGNALS (validated negative separation vs VOO):
-//   near_high     -15.8% at 252d  p=0.000  weight=35
-//   CMF dist@high -9.1%  at 252d  p=0.000  weight=30
-//   ATR ext >2    -13.4% at 252d  p=0.001  weight=20
-//   RV z-score    -1.4%  at 30d   p=0.000  weight=10
-//
-// Thresholds: BUY≥80 | WATCH≥60 | TRIM≥52 | REDUCE≥65 | EXIT≥78
-// Buy cap: VIX z-score gated (not CNN)
-// ============================================================
-
-//@version=5
+  const pine = `//@version=5
 indicator("Portfolio Signal Model v2", overlay=true, max_labels_count=500)
 
-// ── INPUTS ────────────────────────────────────────────────────────────
-dist_t      = input.float(-0.20,  "Factor DIST_T",      step=0.01, tooltip="Max distance below 252d high. Validated: -0.20")
-dfv_lift    = input.float(2.5,    "DFV Lift Threshold", step=0.5,  tooltip="Min hm_rsi floor lift. Validated: 2.5")
-quality_t   = input.float(0.20,   "Quality Threshold",  step=0.05, tooltip="Min Sharpe-proxy. Validated: 0.20")
-atr_thresh  = input.float(2.0,    "ATR Ext Threshold",  step=0.5,  tooltip="ATR units above 200d SMA. Validated: 2.0")
-buy_thresh  = input.int(80,       "BUY threshold",      minval=60, maxval=100, tooltip="Score needed for BUY signal. Live model: 80")
-show_buy    = input.bool(true,    "Show Buy Signals")
-show_sell   = input.bool(true,    "Show Sell Signals")
-show_scores = input.bool(true,    "Show Score Labels")
-show_zones  = input.bool(true,    "Show Background Zones")
+// -- INPUTS --
+dist_t     = input.float(-0.20, "Factor DIST_T",      step=0.01)
+dfv_lift   = input.float(2.5,   "DFV Lift Threshold", step=0.5)
+quality_t  = input.float(0.20,  "Quality Threshold",  step=0.05)
+atr_thresh = input.float(2.0,   "ATR Ext Threshold",  step=0.5)
+buy_thresh = input.int(80,      "BUY threshold",      minval=60, maxval=100)
+show_buy   = input.bool(true,   "Show Buy Signals")
+show_sell  = input.bool(true,   "Show Sell Signals")
+show_zones = input.bool(true,   "Show Background Zones")
 
-// ── RSI HELPER ────────────────────────────────────────────────────────
+// -- RSI HELPER --
 rsi_val(src, len) =>
-    delta = ta.change(src)
-    gain  = ta.ema(math.max(delta, 0), len)
-    loss  = ta.ema(math.max(-delta, 0), len)
-    rs    = gain / loss
-    100 - 100 / (1 + rs)
+    _d = ta.change(src)
+    _g = ta.ema(math.max(_d, 0), len)
+    _l = ta.ema(math.max(-_d, 0), len)
+    100 - 100 / (1 + _g / _l)
 
-// ── CORE INDICATORS ───────────────────────────────────────────────────
 rsi14 = rsi_val(close, 14)
 rsi40 = rsi_val(close, 40)
 rsi47 = rsi_val(close, 47)
 
-// ── HOT MONEY RSI (DFV V3) ────────────────────────────────────────────
-// sensitivity=0.7, base=30, period=40
+// -- HOT MONEY RSI (DFV V3) --
 hm_rsi     = math.max(math.min((rsi40 - 30) * 0.7, 20), 0)
 hm_floor10 = ta.lowest(hm_rsi, 10)[1]
 hm_lift    = hm_rsi - hm_floor10
 dfv3       = hm_lift > dfv_lift
 
-// ── BANKER RSI (Weak = penalty) ───────────────────────────────────────
-// sensitivity=1.5, base=51, period=47
+// -- BANKER RSI --
 banker_rsi  = math.max(math.min((rsi47 - 51) * 1.5, 20), 0)
 banker_prev = banker_rsi[1]
 banker_weak = banker_prev >= 20 and banker_rsi < 20
 
-// ── RBEAR (price new high, RSI not confirming) ────────────────────────
-rsi_above  = math.max(rsi14 - 60, 0)
-rsi_pk     = ta.highest(rsi_above, 20)[1]
-price_pk   = ta.highest(close, 20)[1]
-rbear      = close > price_pk * 1.01 and rsi_above < rsi_pk * 0.85 and rsi_above > 0
+// -- RBEAR --
+rsi_above = math.max(rsi14 - 60, 0)
+rsi_pk    = ta.highest(rsi_above, 20)[1]
+price_pk  = ta.highest(close, 20)[1]
+rbear     = close > price_pk * 1.01 and rsi_above < rsi_pk * 0.85 and rsi_above > 0
 
-// ── FACTOR GATE ───────────────────────────────────────────────────────
-high252  = ta.highest(high, 252)[1]
-dist     = (close - high252) / high252
-ma200    = ta.sma(close, 200)
-trend    = (close - ma200) / ma200
-
-// Quality: Sharpe-proxy — 252d return / annualised vol / 3
-log_ret  = math.log(close / close[1])
-ret252   = (close - close[252]) / close[252]
-vol252   = ta.stdev(log_ret, 252) * math.sqrt(252)
-quality  = vol252 > 0 ? math.max(math.min(ret252 / vol252 / 3, 1), 0) : 0
-
+// -- FACTOR GATE --
+high252     = ta.highest(high, 252)[1]
+dist        = (close - high252) / high252
+ma200       = ta.sma(close, 200)
+trend       = (close - ma200) / ma200
+log_ret     = math.log(close / close[1])
+ret252      = (close - close[252]) / close[252]
+vol252      = ta.stdev(log_ret, 252) * math.sqrt(252)
+quality     = vol252 > 0 ? math.max(math.min(ret252 / vol252 / 3, 1), 0) : 0
 factor_gate = dist < dist_t and trend > 0 and quality > quality_t
 
-// ── BUY SIGNALS ───────────────────────────────────────────────────────
-// Combined factor+DFV V3 (★★ — strongest validated signal)
-fdfv3 = factor_gate and dfv3
-
-// PFD — price compressed vs own trend
+// -- BUY SIGNALS --
+fdfv3  = factor_gate and dfv3
 ret126 = (close - close[126]) / close[126]
 pfd    = (ret252 - 2 * ret126) > 0.05 and quality > quality_t * 2
-
-// Triple — 63d momentum
 triple = (close - close[63]) / close[63] > 0.20
 
-// ── BUY SCORE (0-100) — matches live scanner exactly ─────────────────
-buy_score = 0
-buy_score := factor_gate   ? buy_score + 40 : buy_score
-buy_score := fdfv3         ? buy_score + 25 : buy_score  // +25, not +38 (see header)
-buy_score := pfd           ? buy_score + 8  : buy_score
-buy_score := triple        ? buy_score + 10 : buy_score
-buy_score := dfv3 and not factor_gate ? buy_score + 5 : buy_score
-buy_score := banker_weak   ? buy_score - 20 : buy_score  // penalty
-buy_score := rbear         ? buy_score - 10 : buy_score  // penalty
-// Note: insider +10/+20, PEAD +10, sector +3/+8 added by scanner (not chartable)
-buy_score  = math.max(0, math.min(100, buy_score))
+// -- BUY SCORE (single expression — avoids line continuation error) --
+var float buy_score = 0
+buy_score := math.max(0, math.min(100, (factor_gate ? 40 : 0) + (fdfv3 ? 25 : 0) + (pfd ? 8 : 0) + (triple ? 10 : 0) + (dfv3 and not factor_gate ? 5 : 0) + (banker_weak ? -20 : 0) + (rbear ? -10 : 0)))
 
-// ── SELL SIGNALS ──────────────────────────────────────────────────────
-// near_high — primary (validated: -15.8% at 252d, p=0.000)
-near_high  = dist > -0.10
+// -- SELL SIGNALS --
+near_high = dist > -0.10
+tr_val    = math.max(high - low, math.abs(high - close[1]), math.abs(low - close[1]))
+atr14     = ta.sma(tr_val, 14)
+sma_atr   = atr14 > 0 ? (close - ma200) / atr14 : 0
+atr_ext   = sma_atr > atr_thresh
+hl_range  = high - low
+mfm       = hl_range > 0 ? ((close - low) - (high - close)) / hl_range : 0
+cmf20     = ta.sma(mfm * volume, 20) / ta.sma(volume, 20)
+cmf_dist  = cmf20 < 0 and near_high
+rv20      = ta.stdev(log_ret, 20) * math.sqrt(252)
+rv_mean   = ta.sma(rv20, 252)
+rv_std    = ta.stdev(rv20, 252)
+rv_z      = rv_std > 0 ? (rv20 - rv_mean) / rv_std : 0
+rv_z2     = rv_z > 1.0
 
-// ATR overextension (validated: -13.4% at 252d, p=0.001)
-tr_val     = math.max(high - low, math.abs(high - close[1]), math.abs(low - close[1]))
-atr14      = ta.sma(tr_val, 14)
-sma_atr    = atr14 > 0 ? (close - ma200) / atr14 : 0
-atr_ext    = sma_atr > atr_thresh
+// -- SELL SCORE (single expression) --
+near_high_pts = near_high ? math.round(math.min(35.0, (1.0 + dist / 0.10) * 35.0)) : 0
+var float sell_score = 0
+sell_score := math.max(0, math.min(100, float(near_high_pts) + (cmf_dist ? 30.0 : 0.0) + (atr_ext ? 20.0 : 0.0) + (rv_z2 ? 10.0 : 0.0)))
 
-// CMF distribution at high (validated: -9.1% at 252d, p=0.000)
-hl_range   = high - low
-mfm        = hl_range > 0 ? ((close - low) - (high - close)) / hl_range : 0
-cmf20      = ta.sma(mfm * volume, 20) / ta.sma(volume, 20)
-cmf_dist   = cmf20 < 0 and near_high
-
-// RV z-score elevated (validated: -1.4% at 30d, p=0.000)
-rv20       = ta.stdev(log_ret, 20) * math.sqrt(252)
-rv_mean    = ta.sma(rv20, 252)
-rv_std     = ta.stdev(rv20, 252)
-rv_z       = rv_std > 0 ? (rv20 - rv_mean) / rv_std : 0
-rv_z2      = rv_z > 1.0
-
-// ── SELL SCORE (0-100, FW-damped in scanner) ──────────────────────────
-sell_score = 0
-sell_score := near_high  ? sell_score + int(math.min(35, (1 + dist / 0.10) * 35)) : sell_score
-sell_score := cmf_dist   ? sell_score + 30 : sell_score
-sell_score := atr_ext    ? sell_score + 20 : sell_score
-sell_score := rv_z2      ? sell_score + 10 : sell_score
-sell_score  = math.max(0, math.min(100, sell_score))
-
-// ── SIGNAL CONDITIONS ─────────────────────────────────────────────────
+// -- CONDITIONS --
 strong_buy  = fdfv3 and buy_score >= buy_thresh
 factor_only = factor_gate and not dfv3 and buy_score >= 40
 pfd_signal  = pfd and not factor_gate
-
 sell_trim   = sell_score >= 52 and sell_score < 65
 sell_reduce = sell_score >= 65 and sell_score < 78
 sell_exit   = sell_score >= 78
 
-// ── BACKGROUND ZONES ──────────────────────────────────────────────────
-if show_zones
-    bgcolor(factor_gate and not fdfv3 ? color.new(color.blue, 92) : na,
-            title="Factor zone (waiting for DFV V3)")
-    bgcolor(fdfv3 ? color.new(color.green, 88) : na,
-            title="★★ Factor+DFV V3 active")
-    bgcolor(near_high ? color.new(color.red, 92) : na,
-            title="Near 252d high (sell zone)")
+// -- BACKGROUNDS (must be global scope in Pine v5, not inside if block) --
+bgcolor(show_zones and factor_gate and not fdfv3 ? color.new(color.blue, 92) : na, title="Factor zone")
+bgcolor(show_zones and fdfv3 ? color.new(color.green, 88) : na, title="Factor+DFV V3")
+bgcolor(show_zones and near_high ? color.new(color.red, 92) : na, title="Near 252d high")
 
-// ── REFERENCE LINES ───────────────────────────────────────────────────
-plot(ma200,   "200d MA",   color=color.new(color.gray,   40), linewidth=1)
-plot(high252, "252d High", color=color.new(color.orange, 50),
-     style=plot.style_stepline, linewidth=1)
+// -- REFERENCE LINES --
+plot(ma200,   "200d MA",   color=color.new(color.gray, 40),   linewidth=1)
+plot(high252, "252d High", color=color.new(color.orange, 50), style=plot.style_stepline, linewidth=1)
 
-// ── BUY LABELS ────────────────────────────────────────────────────────
+// -- BUY LABELS --
 if show_buy
     if strong_buy
-        label.new(bar_index, low,
-            "★★ F+DFV3\n" + str.tostring(buy_score),
-            style=label.style_label_up,
-            color=color.new(color.green, 0),
-            textcolor=color.white, size=size.small)
+        label.new(bar_index, low, "F+DFV3\\n" + str.tostring(buy_score), style=label.style_label_up, color=color.new(color.green, 0), textcolor=color.white, size=size.small)
     else if factor_only
-        label.new(bar_index, low,
-            "★ FACTOR\n" + str.tostring(buy_score),
-            style=label.style_label_up,
-            color=color.new(color.teal, 20),
-            textcolor=color.white, size=size.tiny)
+        label.new(bar_index, low, "FACTOR\\n" + str.tostring(buy_score), style=label.style_label_up, color=color.new(color.teal, 20), textcolor=color.white, size=size.tiny)
     else if pfd_signal
-        label.new(bar_index, low,
-            "◆ PFD\n" + str.tostring(buy_score),
-            style=label.style_label_up,
-            color=color.new(color.blue, 20),
-            textcolor=color.white, size=size.tiny)
+        label.new(bar_index, low, "PFD\\n" + str.tostring(buy_score), style=label.style_label_up, color=color.new(color.blue, 20), textcolor=color.white, size=size.tiny)
 
-// ── SELL LABELS ───────────────────────────────────────────────────────
+// -- SELL LABELS --
 if show_sell
     if sell_exit
-        label.new(bar_index, high,
-            "EXIT\n" + str.tostring(sell_score),
-            style=label.style_label_down,
-            color=color.new(color.maroon, 0),
-            textcolor=color.white, size=size.small)
+        label.new(bar_index, high, "EXIT\\n" + str.tostring(sell_score), style=label.style_label_down, color=color.new(color.maroon, 0), textcolor=color.white, size=size.small)
     else if sell_reduce
-        label.new(bar_index, high,
-            "REDUCE\n" + str.tostring(sell_score),
-            style=label.style_label_down,
-            color=color.new(color.red, 20),
-            textcolor=color.white, size=size.tiny)
+        label.new(bar_index, high, "REDUCE\\n" + str.tostring(sell_score), style=label.style_label_down, color=color.new(color.red, 20), textcolor=color.white, size=size.tiny)
     else if sell_trim
-        label.new(bar_index, high,
-            "TRIM\n" + str.tostring(sell_score),
-            style=label.style_label_down,
-            color=color.new(color.orange, 20),
-            textcolor=color.white, size=size.tiny)
+        label.new(bar_index, high, "TRIM\\n" + str.tostring(sell_score), style=label.style_label_down, color=color.new(color.orange, 20), textcolor=color.white, size=size.tiny)
 
-// ── OPTIONAL INDICATOR PANE ───────────────────────────────────────────
-// Uncomment below and add as separate indicator:
-// hline(0, "Zero", color=color.gray)
-// plot(hm_rsi,    "Hot Money RSI",  color=color.green,  linewidth=2)
-// plot(hm_lift,   "HM Lift",        color=color.teal)
-// plot(banker_rsi,"Banker RSI",     color=color.orange)
-// plot(cmf20 * 20,"CMF x20",        color=color.purple)
-// plot(rv_z,      "RV Z-score",     color=color.red)
-// hline(dfv_lift, "DFV Lift threshold", color=color.green, linestyle=hline.style_dashed)
-// hline(2.0,      "RV Z2",          color=color.red,   linestyle=hline.style_dashed)
-
-// ── ALERTS ────────────────────────────────────────────────────────────
-alertcondition(fdfv3 and buy_score >= buy_thresh,
-    "★★ Factor+DFV V3 BUY",
-    "Factor+DFV V3 buy signal — strongest validated entry (score " + str.tostring(buy_score) + ")")
-alertcondition(factor_gate and not dfv3,
-    "★ Factor gate active",
-    "Factor gate open — waiting for DFV V3 confirmation")
-alertcondition(sell_exit,
-    "EXIT signal",
-    "Sell score ≥78 — EXIT (score " + str.tostring(sell_score) + ")")
-alertcondition(sell_reduce,
-    "REDUCE signal",
-    "Sell score 65-77 — REDUCE (score " + str.tostring(sell_score) + ")")
-alertcondition(sell_trim,
-    "TRIM signal",
-    "Sell score 52-64 — TRIM (score " + str.tostring(sell_score) + ")")
-alertcondition(banker_weak,
-    "Banker Weak — caution",
-    "Institutional RSI dropping — reduce position risk")
+// -- ALERTS --
+alertcondition(strong_buy,               "BUY: Factor+DFV V3",  "Factor+DFV V3 buy signal fired")
+alertcondition(factor_gate and not dfv3, "WATCH: Factor gate",   "Factor gate open, waiting for DFV V3")
+alertcondition(sell_exit,                "EXIT signal",          "Sell score >=78")
+alertcondition(sell_reduce,              "REDUCE signal",        "Sell score 65-77")
+alertcondition(sell_trim,                "TRIM signal",          "Sell score 52-64")
+alertcondition(banker_weak,              "Banker Weak",          "Institutional RSI dropping")
 `;
 
   el.innerHTML = `<div style="padding:16px 0 40px">
@@ -2265,7 +2150,7 @@ alertcondition(banker_weak,
     </div>
     <div style="position:relative">
       <button onclick="copyPine()" style="position:absolute;top:8px;right:8px;background:var(--blue);color:#fff;border:none;padding:5px 12px;border-radius:4px;font-size:11px;cursor:pointer;font-family:'Space Grotesk',sans-serif">Copy to clipboard</button>
-      <pre id="pine-code" style="background:#1e1e2e;color:#cdd6f4;padding:20px 16px;border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;overflow-x:auto;white-space:pre;line-height:1.5;max-height:50vh;overflow-y:auto">\${pine}</pre>
+      <pre id="pine-code" style="background:#1e1e2e;color:#cdd6f4;padding:20px 16px;border-radius:8px;font-size:10px;font-family:'DM Mono',monospace;overflow-x:auto;white-space:pre;line-height:1.5;max-height:50vh;overflow-y:auto">${pine}</pre>
     </div>
   </div>`;
 
