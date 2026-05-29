@@ -1622,7 +1622,7 @@ function switchTab(id, el) {
   const panel = document.getElementById('tab-' + id);
   if (panel) panel.classList.add('active');
   if (el) el.classList.add('active');
-  if (id === 'rankings' && window._lastPayload) renderRankings();
+  if (id === 'rankings') renderRankings();
   if (id === 'tools') loadPineScript();
 }
 
@@ -2322,7 +2322,12 @@ function renderRankings() {
   const el = document.getElementById('rankContent');
   if (!el) return;
   if (!window._lastPayload) {
-    el.innerHTML = '<div class="placeholder">Run Live Analysis first to load signal data.</div>';
+    el.innerHTML = '<div class="placeholder" style="color:var(--text3);font-size:12px;padding:20px">' +
+      'Loading signal data from GitHub…<br><br>' +
+      'If this persists, click "Run Live Analysis" on the Analytics tab.' +
+      '</div>';
+    // Retry after 2s in case auto-load is still in progress
+    setTimeout(() => { if (window._lastPayload) renderRankings(); }, 2000);
     return;
   }
 
