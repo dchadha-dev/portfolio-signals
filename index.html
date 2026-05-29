@@ -4358,6 +4358,74 @@ function updateStickyOffsets() {
 window.addEventListener('resize', updateStickyOffsets);
 // Run after render so th elements exist
 setTimeout(updateStickyOffsets, 200);
+
+// ── AUTO-LOAD signals_payload.json on page open ───────────────────
+// Silently fetches from GitHub (raw → API → Netlify) and populates
+// the dashboard without requiring user interaction.
+(async function autoLoadSignals() {
+  const GH_OWNER = 'dchadha-dev';
+  const GH_REPO  = 'portfolio-signals';
+  const GH_RAW   = `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/signals_payload.json`;
+  const GH_API   = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/signals_payload.json`;
+  const GH_PAT   = localStorage.getItem('gh_pat') || '';
+
+  const updEl = document.getElementById('anaUpdated');
+  if (updEl) updEl.textContent = 'Loading signals…';
+
+  let payload = null;
+
+  // Try 1: GitHub raw
+  try {
+    const headers = GH_PAT ? {'Authorization': 'token ' + GH_PAT} : {};
+    const res = await fetch(GH_RAW + '?t=' + Date.now(), {headers});
+    if (res.ok) { payload = await res.json(); }
+  } catch(e) {}
+
+  // Try 2: GitHub API
+  if (!payload?.analytics) {
+    try {
+      const headers = {'Accept': 'application/vnd.github.raw+json'};
+      if (GH_PAT) headers['Authorization'] = 'Bearer ' + GH_PAT;
+      const res = await fetch(GH_API, {headers});
+      if (res.ok) { payload = await res.json(); }
+    } catch(e) {}
+  }
+
+  // Try 3: Netlify relative (stale fallback)
+  if (!payload?.analytics) {
+    try {
+      const res = await fetch('signals_payload.json?t=' + Date.now());
+      if (res.ok) { payload = await res.json(); }
+    } catch(e) {}
+  }
+
+  if (payload?.analytics) {
+    window._lastPayload = payload;
+    renderSignalsFromPayload(payload);
+    renderBuysFromPayload(payload);
+    renderSellsFromPayload(payload);
+    renderRankings();
+    const genAt = payload.run_date || payload.generated_at || '';
+    if (updEl) updEl.textContent = 'Auto-loaded · ' + genAt;
+    document.getElementById('anaBtn').disabled = false;
+    return;
+  }
+
+  // All sources failed — show helpful message
+  if (updEl) {
+    const hasPat = !!GH_PAT;
+    if (!hasPat) {
+      updEl.innerHTML = '⚠ Could not load signals. Private repo — set PAT: ' +
+        '<a href="#" style="color:var(--blue)" onclick="' +
+        'const t=prompt(\'Enter GitHub read-only PAT (ghp_xxxxx):\');' +
+        'if(t){localStorage.setItem(\'gh_pat\',t);location.reload();}' +
+        'return false;">Set token</a> · or make repo public';
+    } else {
+      updEl.textContent = '⚠ Signals unavailable — GitHub fetch failed. Click Run Live Analysis to use AI fallback.';
+    }
+  }
+})();
+
 </script>
 </body>
 </html>
