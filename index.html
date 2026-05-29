@@ -907,7 +907,7 @@ const stocks = [
   { t:'TM',   n:'Toyota Motor',         acct:'GTN US',              shares:14,   direct:2328,  fund:101,  currency:'USD' },
   { t:'AMD',  n:'Advanced Micro Dev.',  acct:'Dime',                shares:10,   direct:2002,  fund:298,  currency:'USD' },
   { t:'AMAT', n:'Applied Materials',    acct:'US Stock Account',    shares:9,    direct:1665,  fund:238,  currency:'USD' },
-  { t:'ANET', n:'Arista Networks',      acct:'Dime',                shares:10,   direct:1600,  fund:0,    currency:'USD' },
+  { t:'ANET', n:'Arista Networks',      acct:'Dime',                shares:7.47, direct:1160,  fund:0,    currency:'USD' },
   { t:'CRDO', n:'Credo Technology',     acct:'Dime',                shares:13,   direct:1500,  fund:0,    currency:'USD' },
   { t:'NFLX', n:'Netflix',              acct:'Dime',                shares:4,    direct:1500,  fund:0,    currency:'USD' },
   { t:'DDOG', n:'Datadog',              acct:'US Stock Account',    shares:10,   direct:1130,  fund:0,    currency:'USD' },
@@ -917,11 +917,11 @@ const stocks = [
   { t:'BRKB', n:'Berkshire Hathaway B', acct:'Dime',                shares:3,    direct:1487,  fund:0,    currency:'USD' },
   { t:'CPRT', n:'Copart',               acct:'Dime',                shares:25,   direct:950,   fund:0,    currency:'USD' },
   { t:'PGR',  n:'Progressive Corp',     acct:'Dime',                shares:5,    direct:1142,  fund:0,    currency:'USD' },
-  { t:'TTD',  n:'The Trade Desk',       acct:'Dime',                shares:15,   direct:378,   fund:0,    currency:'USD' },
-  { t:'FISV', n:'Fiserv',               acct:'Dime',                shares:6,    direct:386,   fund:0,    currency:'USD' },
   { t:'NEXT', n:'NextDecade Corp',      acct:'GTN EU',              shares:152,  direct:1441,  fund:0,    currency:'USD' },
   { t:'RELX', n:'RELX PLC',             acct:'GTN EU',              shares:19,   direct:786,   fund:0,    currency:'USD' },
-  { t:'UNH',  n:'UnitedHealth',         acct:'GTN EU + Dime',       shares:5,    direct:1460,  fund:0,    currency:'USD' },
+  { t:'DELL', n:'Dell Technologies',    acct:'Dime',                shares:11.3, direct:1154,  fund:0,    currency:'USD' },
+  { t:'NOW',  n:'ServiceNow',           acct:'Dime',                shares:17.75,direct:1810,  fund:0,    currency:'USD' },
+  { t:'IREN', n:'IREN Limited',         acct:'Dime',                shares:19.3, direct:1160,  fund:0,    currency:'USD' },
   { t:'CRWV', n:'CoreWeave',            acct:'US Stock Account',    shares:8,    direct:880,   fund:0,    currency:'USD' },
   { t:'TEAM', n:'Atlassian',            acct:'GTN EU',              shares:4,    direct:384,   fund:0,    currency:'USD' },
   { t:'ADBE', n:'Adobe Inc',            acct:'US Stock Account',    shares:1,    direct:254,   fund:0,    currency:'USD' },
@@ -931,14 +931,13 @@ const stocks = [
   { t:'VTI',  n:'Vanguard Total Market',acct:'GTN US',              shares:14,   direct:3654,  fund:0,    currency:'USD' },
   { t:'QQQ',  n:'Invesco Nasdaq 100',   acct:'GTN US',              shares:3,    direct:1440,  fund:0,    currency:'USD' },
   { t:'TQQQ', n:'ProShares UltraPro QQQ',acct:'US Stock Account',  shares:30,   direct:1860,  fund:0,    currency:'USD' },
-  { t:'SCHD', n:'Schwab US Dividend ETF',acct:'US Stock + Dime',   shares:95,   direct:3009,  fund:0,    currency:'USD' },
   { t:'VXUS', n:'Vanguard Total Intl',  acct:'US Stock Account',    shares:25,   direct:2050,  fund:0,    currency:'USD' },
   // FDN sold 05/04/26 @ $270 — removed
-  { t:'GLD',  n:'SPDR Gold Shares',     acct:'GTN US',              shares:10,   direct:3060,  fund:0,    currency:'USD' },
+  { t:'GLD',  n:'SPDR Gold Shares',     acct:'GTN US',              shares:4,    direct:1660,  fund:0,    currency:'USD' },
   { t:'IEV',  n:'iShares Europe ETF',   acct:'GTN US',              shares:52,   direct:2770,  fund:0,    currency:'USD' },
   { t:'VSS',  n:'Vanguard Intl SmallCap',acct:'GTN US',             shares:20,   direct:3168,  fund:0,    currency:'USD' },
   { t:'URTH', n:'iShares MSCI World',   acct:'GTN US',              shares:15,   direct:2955,  fund:0,    currency:'USD' },
-  { t:'FLAX', n:'Franklin FTSE Asia xJP',acct:'GTN US',             shares:107,  direct:3186,  fund:0,    currency:'USD' },
+  { t:'FLAX', n:'Franklin FTSE Asia xJP',acct:'GTN UK (GBP)',        shares:50,   direct:1200,  fund:0,    currency:'USD' },
   { t:'XLG',  n:'Invesco S&P 500 Top 50',acct:'Dime',              shares:24,   direct:1389,  fund:0,    currency:'USD' },
   { t:'QTUM', n:'Defiance Quantum ETF', acct:'Dime',                shares:14,   direct:1624,  fund:0,    currency:'USD' },
   { t:'JEPI', n:'JPMorgan Equity Prem.',acct:'GTN US',              shares:86,   direct:4859,  fund:0,    currency:'USD' },
@@ -2340,6 +2339,10 @@ function renderRankings() {
   const cnnScore = market.cnn_score || 50;
   const cnnLabel = market.cnn_label || 'Neutral';
   const cnnColor = cnnScore > 75 ? 'var(--red)' : cnnScore > 50 ? 'var(--amber)' : 'var(--green)';
+  const vixCur2  = market.vix_current || 0;
+  const vixZ2    = market.vix_zscore  || 0;
+  const vixLbl2  = vixZ2 > 2 ? 'Extreme Fear' : vixZ2 > 1 ? 'Fear' : vixZ2 > -1 ? 'Neutral' : vixZ2 > -2 ? 'Greed' : 'Extreme Greed';
+  const vixColor2= vixZ2 > 1 ? 'var(--green)' : vixZ2 > -1 ? 'var(--text3)' : 'var(--red)';
 
   // Sort controls state
   const sortKey  = el.dataset.sortKey  || 'buy_score';
