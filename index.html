@@ -3316,7 +3316,6 @@ async function runAnalytics() {
         lbl.textContent = 'Run Live Analysis';
         return; // done — skip API and rule-based fallbacks
       }
-    }
   } catch(e) {
     console.log('signals_payload.json not found — trying API...', e.message);
   }
