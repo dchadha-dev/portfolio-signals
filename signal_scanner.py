@@ -130,7 +130,7 @@ CANDIDATES = [
     'HPE','SOUN','FIVN','ONDS','CBRS','NXT',
     'BULL','SOLS','RDDT','KEEL','SEDG',
     'SNDK','SYM','FORM','VICR','RIO','FCX',
-    'GOLD','BEP','DNN','MSTR','AAL','OWL',
+    'GDX','SLV','BEP','DNN','MSTR','AAL','OWL',
     'PI','ALGN',
 ]
 
@@ -217,7 +217,7 @@ FRAMEWORK_SCORES = {
     'ADBE':61,'STX':60,'BIIB':60,'DKNG':60,'HIMS':60,'EQT':60,
     'BKR':60,'BEP':60,'RIO':60,'FCX':60,'COIN':58,'WDC':58,
     'PFE':58,'CVNA':58,'PLNT':58,'HAL':58,'FORM':58,'HSBC':58,
-    'SNDK':58,'VICR':58,'GOLD':58,'TSLA':56,'RDDT':56,'BP':56,
+    'SNDK':58,'VICR':58,'GDX':58,'SLV':55,'TSLA':56,'RDDT':56,'BP':56,
     'MMM':56,'JD':56,'FUTU':55,
     # <55 Weak / sell candidates
     'SOFI':54,'ENPH':54,'BIDU':54,'NVTS':52,'HPE':52,'HOOD':52,
