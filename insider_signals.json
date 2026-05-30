@@ -1,12 +1,12 @@
 {
   "health": {
-    "timestamp": "2026-05-30 03:31 UTC",
+    "timestamp": "2026-05-30 03:44 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
     "n_insider_signals": 7,
     "n_politician_signals": 0,
     "n_combined_signals": 7,
-    "elapsed_seconds": 281.5,
+    "elapsed_seconds": 204.8,
     "retry_required": false,
     "retry_reason": []
   },
@@ -39,40 +39,6 @@
           "price": 68.39,
           "name": "Kothandaraman Badrinarayanan",
           "title": "Director, Officer, President & CEO",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-05-30"
-    },
-    "INTU": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "INTU",
-          "date": "2026-05-26",
-          "value_usd": 386808,
-          "shares": 1250,
-          "price": 309.45,
-          "name": "PRABHU VASANT M",
-          "title": "Director",
-          "is_cluster": false
-        },
-        {
-          "ticker": "INTU",
-          "date": "2026-05-26",
-          "value_usd": 154858,
-          "shares": 500,
-          "price": 309.71,
-          "name": "PRABHU VASANT M",
-          "title": "Director",
           "is_cluster": false
         }
       ],
@@ -143,40 +109,6 @@
       "politician_trades": [],
       "as_of": "2026-05-30"
     },
-    "TSM": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "TSM",
-          "date": "2026-05-19",
-          "value_usd": 69980,
-          "shares": 1000,
-          "price": 69.98,
-          "name": "Tien Bor-Zen",
-          "title": "Officer, VP",
-          "is_cluster": false
-        },
-        {
-          "ticker": "TSM",
-          "date": "2026-05-19",
-          "value_usd": 69830,
-          "shares": 1000,
-          "price": 69.83,
-          "name": "Tien Bor-Zen",
-          "title": "Officer, VP",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-05-30"
-    },
     "SPGI": {
       "buy_score_boost": 20,
       "insider_score": 20,
@@ -221,7 +153,7 @@
       "politician_trades": [],
       "as_of": "2026-05-30"
     },
-    "SOFI": {
+    "INTU": {
       "buy_score_boost": 10,
       "insider_score": 10,
       "politician_score": 0,
@@ -232,23 +164,57 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "SOFI",
-          "date": "2026-05-11",
-          "value_usd": 248781,
-          "shares": 15545,
-          "price": 16.0,
-          "name": "Noto Anthony",
-          "title": "Director, Officer, Chief Executive Officer",
+          "ticker": "INTU",
+          "date": "2026-05-26",
+          "value_usd": 386808,
+          "shares": 1250,
+          "price": 309.45,
+          "name": "PRABHU VASANT M",
+          "title": "Director",
           "is_cluster": false
         },
         {
-          "ticker": "SOFI",
-          "date": "2026-05-08",
-          "value_usd": 249769,
-          "shares": 15878,
-          "price": 15.73,
-          "name": "Noto Anthony",
-          "title": "Director, Officer, Chief Executive Officer",
+          "ticker": "INTU",
+          "date": "2026-05-26",
+          "value_usd": 154858,
+          "shares": 500,
+          "price": 309.71,
+          "name": "PRABHU VASANT M",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-05-30"
+    },
+    "TSM": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "TSM",
+          "date": "2026-05-19",
+          "value_usd": 69980,
+          "shares": 1000,
+          "price": 69.98,
+          "name": "Tien Bor-Zen",
+          "title": "Officer, VP",
+          "is_cluster": false
+        },
+        {
+          "ticker": "TSM",
+          "date": "2026-05-19",
+          "value_usd": 69830,
+          "shares": 1000,
+          "price": 69.83,
+          "name": "Tien Bor-Zen",
+          "title": "Officer, VP",
           "is_cluster": false
         }
       ],
@@ -283,6 +249,40 @@
           "price": 1656.1,
           "name": "Aguzin Alejandro Nicolas",
           "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-05-30"
+    },
+    "SOFI": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "SOFI",
+          "date": "2026-05-11",
+          "value_usd": 248781,
+          "shares": 15545,
+          "price": 16.0,
+          "name": "Noto Anthony",
+          "title": "Director, Officer, Chief Executive Officer",
+          "is_cluster": false
+        },
+        {
+          "ticker": "SOFI",
+          "date": "2026-05-08",
+          "value_usd": 249769,
+          "shares": 15878,
+          "price": 15.73,
+          "name": "Noto Anthony",
+          "title": "Director, Officer, Chief Executive Officer",
           "is_cluster": false
         }
       ],
