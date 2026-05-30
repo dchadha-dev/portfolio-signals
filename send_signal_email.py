@@ -15,8 +15,9 @@ Environment variables (GitHub Secrets):
     GMAIL_TO            recipient address
 """
 
-import json, os, sys, smtplib, argparse
+import json, os, sys, smtplib, argparse, re
 from datetime import datetime, date
+from email.message import EmailMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -415,16 +416,17 @@ ul.bl .hi{color:#60a5fa}.hi-p{color:#a78bfa}.hi-y{color:#fbbf24}.hi-g{color:#34d
 """
 
 def html_wrap(body_content, title='Portfolio Signals'):
-    return f"""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+    return f"""<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<meta name="supported-color-schemes" content="dark">
 <title>{title}</title>
 <style type="text/css">{BASE_CSS}</style>
 </head>
-<body style="margin:0;padding:0;background:#080c14;">
-<style type="text/css">{BASE_CSS}</style>
+<body style="margin:0;padding:0;background:#080c14;color:#c8d3e0;">
 <div class="wrap">{body_content}</div>
 </body>
 </html>"""
@@ -869,32 +871,28 @@ def send_email(subject, html_body):
         print('ERROR: GMAIL_FROM, GMAIL_APP_PASSWORD, GMAIL_TO must all be set')
         sys.exit(1)
 
-    # Remove @import rules — email clients block external CSS fetches.
-    # Fonts fall back to system-ui/monospace which renders fine.
-    import re
+    # Strip @import — blocked by all email clients
     html_body = re.sub(r'@import\s+url\([^)]+\);?\s*', '', html_body)
 
-    # Always include a plain text fallback — without it some clients
-    # show raw HTML instead of rendering it.
-    plain = re.sub(r'<[^>]+>', '', html_body)
+    # Plain text fallback (required by RFC 2822 for HTML emails)
+    plain = re.sub(r'<[^>]+>', ' ', html_body)
+    plain = re.sub(r'[ \t]+', ' ', plain)
     plain = re.sub(r'\n{3,}', '\n\n', plain).strip()
 
-    msg = MIMEMultipart('alternative')
+    # Use EmailMessage — handles encoding and MIME boundaries correctly.
+    # set_content() → text/plain, add_alternative() → text/html
+    # This is the modern Python 3.6+ approach that Gmail renders correctly.
+    msg = EmailMessage()
     msg['Subject'] = subject
     msg['From']    = GMAIL_FROM
     msg['To']      = GMAIL_TO
-    msg['MIME-Version'] = '1.0'
-
-    # Plain text MUST be attached first, HTML second.
-    # Email clients render the last part they can handle — HTML clients
-    # use the HTML part, plain text clients use the text part.
-    msg.attach(MIMEText(plain,     'plain', 'utf-8'))
-    msg.attach(MIMEText(html_body, 'html',  'utf-8'))
+    msg.set_content(plain)
+    msg.add_alternative(html_body, subtype='html')
 
     try:
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
             server.login(GMAIL_FROM, GMAIL_PASS)
-            server.sendmail(GMAIL_FROM, GMAIL_TO, msg.as_string())
+            server.send_message(msg)
         print(f'Email sent: {subject}')
     except Exception as e:
         print(f'Email failed: {e}')
