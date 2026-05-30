@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-05-30 13:46 UTC",
+    "timestamp": "2026-05-30 14:06 UTC",
     "tickers_checked": 6,
     "new_signals": 4,
     "total_signals": 7,
     "expired_removed": 4,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 118.5
+    "elapsed_seconds": 138.0
   },
   "signals": {
     "NVDA": {
