@@ -47,3 +47,11 @@ jobs:
       # NOTE: No Netlify deploy hook — dashboard fetches JSON directly from GitHub API.
       # Netlify only needs to redeploy when index.html changes.
       # This saves ~900 credits/month (60 deploys × 15 credits each).
+
+      - name: Send daily signal email
+        env:
+          GMAIL_FROM:         ${{ secrets.GMAIL_FROM }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_TO:           ${{ secrets.GMAIL_TO }}
+        run: python send_signal_email.py --mode daily
+        continue-on-error: true  # email failure should not block the run

@@ -98,6 +98,14 @@ jobs:
       # NOTE: No Netlify deploy hook — dashboard fetches JSON directly from GitHub API.
       # Netlify only needs to redeploy when index.html changes.
 
+      - name: Send weekly signal email
+        env:
+          GMAIL_FROM:         ${{ secrets.GMAIL_FROM }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_TO:           ${{ secrets.GMAIL_TO }}
+        run: python send_signal_email.py --mode weekly
+        continue-on-error: true  # email failure should not block the run
+
       - name: Fail job if fetch incomplete
         if: env.FETCH_INCOMPLETE == 'true'
         run: |
