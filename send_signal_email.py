@@ -55,8 +55,6 @@ NAVY_HDR = 'background:linear-gradient(135deg,#1e3a5f,#1e40af)'
 NAVY_STRIP = 'background:#1e3a8a'
 
 BASE_CSS = """
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
-
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 
   body{
@@ -417,14 +415,18 @@ ul.bl .hi{color:#60a5fa}.hi-p{color:#a78bfa}.hi-y{color:#fbbf24}.hi-g{color:#34d
 """
 
 def html_wrap(body_content, title='Portfolio Signals'):
-    return f"""<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+    return f"""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>{title}</title>
-<style>{BASE_CSS}</style>
+<style type="text/css">{BASE_CSS}</style>
 </head>
-<body><div class="wrap">{body_content}</div></body>
+<body style="margin:0;padding:0;background:#080c14;">
+<style type="text/css">{BASE_CSS}</style>
+<div class="wrap">{body_content}</div>
+</body>
 </html>"""
 
 # ── SIGNAL ROW BUILDER ────────────────────────────────────────────────
@@ -867,11 +869,27 @@ def send_email(subject, html_body):
         print('ERROR: GMAIL_FROM, GMAIL_APP_PASSWORD, GMAIL_TO must all be set')
         sys.exit(1)
 
+    # Remove @import rules — email clients block external CSS fetches.
+    # Fonts fall back to system-ui/monospace which renders fine.
+    import re
+    html_body = re.sub(r'@import\s+url\([^)]+\);?\s*', '', html_body)
+
+    # Always include a plain text fallback — without it some clients
+    # show raw HTML instead of rendering it.
+    plain = re.sub(r'<[^>]+>', '', html_body)
+    plain = re.sub(r'\n{3,}', '\n\n', plain).strip()
+
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
     msg['From']    = GMAIL_FROM
     msg['To']      = GMAIL_TO
-    msg.attach(MIMEText(html_body, 'html'))
+    msg['MIME-Version'] = '1.0'
+
+    # Plain text MUST be attached first, HTML second.
+    # Email clients render the last part they can handle — HTML clients
+    # use the HTML part, plain text clients use the text part.
+    msg.attach(MIMEText(plain,     'plain', 'utf-8'))
+    msg.attach(MIMEText(html_body, 'html',  'utf-8'))
 
     try:
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
