@@ -34,6 +34,9 @@ def load_json(path):
         print(f'Warning: could not load {path}: {e}')
         return {}
 
+def load_payload():
+    return load_json('signals_payload.json')
+
 def load_weekly_log():
     try:
         with open('weekly_signals_log.json') as f:
