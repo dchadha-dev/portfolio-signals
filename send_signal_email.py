@@ -874,25 +874,49 @@ def send_email(subject, html_body):
     # Strip @import — blocked by all email clients
     html_body = re.sub(r'@import\s+url\([^)]+\);?\s*', '', html_body)
 
-    # Plain text fallback (required by RFC 2822 for HTML emails)
-    plain = re.sub(r'<[^>]+>', ' ', html_body)
-    plain = re.sub(r'[ \t]+', ' ', plain)
-    plain = re.sub(r'\n{3,}', '\n\n', plain).strip()
+    # Build a raw RFC 2822 message with explicit base64 encoding.
+    # This is the most reliable method for Gmail — avoids all MIME library
+    # quirks that cause plain-text fallback rendering.
+    import base64
+    from email.utils import formatdate, make_msgid
 
-    # Use EmailMessage — handles encoding and MIME boundaries correctly.
-    # set_content() → text/plain, add_alternative() → text/html
-    # This is the modern Python 3.6+ approach that Gmail renders correctly.
-    msg = EmailMessage()
-    msg['Subject'] = subject
-    msg['From']    = GMAIL_FROM
-    msg['To']      = GMAIL_TO
-    msg.set_content(plain)
-    msg.add_alternative(html_body, subtype='html')
+    html_b64  = base64.b64encode(html_body.encode('utf-8')).decode('ascii')
+
+    # Chunk base64 into 76-char lines (RFC 2045 requirement)
+    html_b64_lines = '\r\n'.join(
+        html_b64[i:i+76] for i in range(0, len(html_b64), 76)
+    )
+
+    boundary = 'signal_boundary_' + base64.b64encode(os.urandom(12)).decode('ascii').replace('=','')
+
+    raw = '\r\n'.join([
+        f'From: Portfolio Signals <{GMAIL_FROM}>',
+        f'To: {GMAIL_TO}',
+        f'Subject: {subject}',
+        f'Date: {formatdate(localtime=True)}',
+        f'Message-ID: {make_msgid()}',
+        'MIME-Version: 1.0',
+        f'Content-Type: multipart/alternative; boundary="{boundary}"',
+        '',
+        f'--{boundary}',
+        'Content-Type: text/plain; charset=utf-8',
+        'Content-Transfer-Encoding: quoted-printable',
+        '',
+        'Portfolio Signals digest. Please view in an HTML-capable email client.',
+        '',
+        f'--{boundary}',
+        'Content-Type: text/html; charset=utf-8',
+        'Content-Transfer-Encoding: base64',
+        '',
+        html_b64_lines,
+        '',
+        f'--{boundary}--',
+    ])
 
     try:
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
             server.login(GMAIL_FROM, GMAIL_PASS)
-            server.send_message(msg)
+            server.sendmail(GMAIL_FROM, [GMAIL_TO], raw.encode('utf-8'))
         print(f'Email sent: {subject}')
     except Exception as e:
         print(f'Email failed: {e}')
