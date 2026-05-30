@@ -130,7 +130,7 @@ CANDIDATES = [
     'HPE','SOUN','FIVN','ONDS','CBRS','NXT',
     'BULL','SOLS','RDDT','KEEL','SEDG',
     'SNDK','SYM','FORM','VICR','RIO','FCX',
-    'GDX','SLV','BEP','DNN','MSTR','AAL','OWL',
+    'GDX','SLV','LIT','BEP','DNN','MSTR','AAL','OWL',
     'PI','ALGN',
 ]
 
@@ -217,7 +217,7 @@ FRAMEWORK_SCORES = {
     'ADBE':61,'STX':60,'BIIB':60,'DKNG':60,'HIMS':60,'EQT':60,
     'BKR':60,'BEP':60,'RIO':60,'FCX':60,'COIN':58,'WDC':58,
     'PFE':58,'CVNA':58,'PLNT':58,'HAL':58,'FORM':58,'HSBC':58,
-    'SNDK':58,'VICR':58,'GDX':58,'SLV':55,'TSLA':56,'RDDT':56,'BP':56,
+    'SNDK':58,'VICR':58,'GDX':58,'SLV':55,'LIT':60,'TSLA':56,'RDDT':56,'BP':56,
     'MMM':56,'JD':56,'FUTU':55,
     # <55 Weak / sell candidates
     'SOFI':54,'ENPH':54,'BIDU':54,'NVTS':52,'HPE':52,'HOOD':52,
@@ -484,6 +484,148 @@ def build_guidance(t, last, ta, fs):
     return " ".join(parts) if parts else "No active signal. Monitoring."
 
 # ── SCORE + BUILD PAYLOAD ─────────────────────────────────────────────
+def update_weekly_signal_log(payload):
+    """
+    Append new buy/watch/sell signals from this run to weekly_signals_log.json.
+    Prunes entries older than 7 days. Each entry records:
+      - ticker, signal type, score, timestamp, price, dist_252h, key flags
+    On the next run, existing entries are cross-checked against current signals
+    to determine if the signal is still active or has expired (and why).
+    """
+    log_path = 'weekly_signals_log.json'
+    now      = datetime.now()
+    cutoff   = now - timedelta(days=7)
+
+    # Load existing log
+    try:
+        with open(log_path) as f:
+            log = json.load(f)
+    except FileNotFoundError:
+        log = {'entries': []}
+    except Exception:
+        log = {'entries': []}
+
+    entries = log.get('entries', [])
+
+    # Prune entries older than 7 days
+    entries = [e for e in entries
+               if datetime.strptime(e['timestamp'][:16], '%Y-%m-%d %H:%M') > cutoff]
+
+    # Current signal state for cross-referencing
+    current_signals = {s['ticker']: s for s in payload.get('analytics', {}).get('signals', [])}
+
+    # Update existing entries — mark expired ones with reason
+    for entry in entries:
+        if entry.get('status') != 'active':
+            continue
+        t   = entry['ticker']
+        cur = current_signals.get(t, {})
+        if not cur:
+            entry['status']       = 'expired'
+            entry['expired_at']   = now.strftime('%Y-%m-%d %H:%M')
+            entry['expire_reason'] = 'ticker_missing'
+            continue
+
+        was_buy   = entry.get('signal_type') in ('BUY', 'WATCH')
+        was_sell  = entry.get('signal_type') == 'SELL'
+        cur_score = cur.get('buy_score', 0)
+        cur_sell  = cur.get('sell_score', 0)
+        cur_dist  = cur.get('dist_252h', 0)
+        cur_fdfv3 = cur.get('fdfv3', False)
+        cur_sig   = cur.get('signal', '')
+
+        if was_buy:
+            if cur_sig == 'BUY':
+                entry['current_score'] = cur_score
+                entry['current_price'] = cur.get('price')
+                # stays active
+            elif cur_score < entry.get('score', 80) - 10:
+                # Score dropped significantly
+                if cur_dist and cur_dist > -0.20:
+                    entry['status']       = 'expired'
+                    entry['expired_at']   = now.strftime('%Y-%m-%d %H:%M')
+                    entry['expire_reason'] = 'price_recovered'
+                    entry['expire_detail'] = f'dist now {cur_dist:+.1f}% — gate closed'
+                elif not cur_fdfv3:
+                    entry['status']       = 'expired'
+                    entry['expired_at']   = now.strftime('%Y-%m-%d %H:%M')
+                    entry['expire_reason'] = 'dfv3_faded'
+                    entry['expire_detail'] = f'DFV V3 lift dropped · score {cur_score}'
+                elif cur.get('banker_weak') or cur.get('rbear'):
+                    entry['status']       = 'expired'
+                    entry['expired_at']   = now.strftime('%Y-%m-%d %H:%M')
+                    entry['expire_reason'] = 'penalty_active'
+                    entry['expire_detail'] = 'Banker Weak or RBear penalty overriding'
+                else:
+                    entry['current_score'] = cur_score
+                    entry['current_price'] = cur.get('price')
+            else:
+                entry['current_score'] = cur_score
+                entry['current_price'] = cur.get('price')
+
+        elif was_sell:
+            if cur_sell < 30:
+                entry['status']       = 'expired'
+                entry['expired_at']   = now.strftime('%Y-%m-%d %H:%M')
+                entry['expire_reason'] = 'sell_cleared'
+                entry['expire_detail'] = f'sell score dropped to {cur_sell:.0f}'
+
+    # Add new signals from this run (if not already logged today)
+    logged_today = {e['ticker'] for e in entries
+                    if e['timestamp'][:10] == now.strftime('%Y-%m-%d')}
+
+    for s in payload.get('analytics', {}).get('signals', []):
+        t      = s.get('ticker', '')
+        sig    = s.get('signal', '')
+        buy_sc = s.get('buy_score', 0)
+        sell_sc= s.get('sell_score', 0)
+
+        # Log BUY, WATCH (score ≥ 60), and SELL signals
+        is_notable_buy  = sig in ('BUY',) or (buy_sc >= 60 and s.get('fdfv3'))
+        is_notable_sell = sig == 'SELL' or sell_sc >= 65
+
+        if not (is_notable_buy or is_notable_sell):
+            continue
+        if t in logged_today:
+            continue
+        # Don't re-log if already active from a previous day
+        already_active = any(e['ticker'] == t and e.get('status') == 'active'
+                             and e.get('signal_type') == ('BUY' if is_notable_buy else 'SELL')
+                             for e in entries)
+        if already_active:
+            continue
+
+        entry = {
+            'ticker':        t,
+            'signal_type':   'BUY' if sig == 'BUY' else 'WATCH' if is_notable_buy else 'SELL',
+            'score':         buy_sc if is_notable_buy else sell_sc,
+            'sell_score':    sell_sc,
+            'timestamp':     now.strftime('%Y-%m-%d %H:%M'),
+            'price':         s.get('price'),
+            'dist_252h':     s.get('dist_252h'),
+            'framework_score': s.get('framework_score'),
+            'fdfv3':         s.get('fdfv3', False),
+            'is_holding':    s.get('is_holding', False),
+            'status':        'active',
+            'current_score': buy_sc if is_notable_buy else sell_sc,
+            'current_price': s.get('price'),
+            'expire_reason': None,
+            'expire_detail': None,
+            'expired_at':    None,
+        }
+        entries.append(entry)
+        print(f'  Signal log: +{t} ({entry["signal_type"]} {entry["score"]})')
+
+    log = {
+        'last_updated': now.strftime('%Y-%m-%d %H:%M UTC'),
+        'entries': entries,
+    }
+    with open(log_path, 'w') as f:
+        json.dump(log, f, indent=2, default=str)
+    active = sum(1 for e in entries if e.get('status') == 'active')
+    print(f'Weekly signal log: {len(entries)} entries ({active} active) → weekly_signals_log.json')
+
+
 def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, volumes,
                   sell_market, sell_sectors, failed_tickers=None):
     signals_list = []; buy_ideas = []; sell_guidance = []
@@ -910,6 +1052,12 @@ def main():
     with open('live_prices.json', 'w') as f:
         json.dump(prices_out, f, indent=2, default=str)
     print(f'Written: live_prices.json ({len(prices_out["prices"])} tickers)')
+
+    # ── Write weekly_signals_log.json ────────────────────────────────
+    # Appends any NEW signals from this run to a rolling 7-day log.
+    # Used by the weekly email to show "signals that fired this week"
+    # with freshness status (still active vs expired + reason).
+    update_weekly_signal_log(payload)
 
     print(f'Written: {out} ({os.path.getsize(out):,} bytes)')
     print(f"Summary: {payload['summary']}")

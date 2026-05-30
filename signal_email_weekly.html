@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Portfolio Signals — Weekly</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+  body{
+    background:#080c14;color:#c8d3e0;
+    font-family:'DM Sans',system-ui,sans-serif;
+    font-size:14px;line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .shell{max-width:560px;margin:0 auto;background:#080c14}
+
+  .topbar{padding:20px 32px 0;display:flex;justify-content:space-between;align-items:center}
+  .topbar-brand{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;
+                letter-spacing:.14em;text-transform:uppercase;color:#3a4a5c}
+  .topbar-date{font-family:'DM Mono',monospace;font-size:10px;color:#3a4a5c}
+
+  .hero{padding:40px 32px 32px;border-bottom:1px solid #111827}
+  .hero-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;
+                text-transform:uppercase;color:#7c3aed;margin-bottom:12px}
+  .hero h1{font-size:26px;font-weight:300;color:#f0f4f8;line-height:1.2;
+           letter-spacing:-.02em;margin-bottom:8px}
+  .hero h1 strong{font-weight:600}
+  .hero-sub{font-size:13px;color:#4a5568;font-weight:300}
+
+  .market{padding:16px 32px;background:#0b1120;display:flex;gap:0;border-bottom:1px solid #111827}
+  .mkt-cell{flex:1;padding:0 16px 0 0;border-right:1px solid #1a2232}
+  .mkt-cell:first-child{padding-left:0}
+  .mkt-cell:last-child{border-right:none}
+  .mkt-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;
+             text-transform:uppercase;color:#2d3f52;margin-bottom:3px}
+  .mkt-value{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:#c8d3e0}
+  .mkt-value.pos{color:#34d399}.mkt-value.neu{color:#60a5fa}
+
+  .section{padding:28px 32px;border-bottom:1px solid #111827}
+  .section:last-of-type{border-bottom:none}
+
+  .section-label{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;
+                 letter-spacing:.16em;text-transform:uppercase;color:#7c3aed;
+                 margin-bottom:20px;display:flex;align-items:center;gap:8px}
+  .section-label::after{content:'';flex:1;height:1px;background:#111827}
+
+  /* Stats grid */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+  .stat{background:#0d1520;border:1px solid #151f2e;border-radius:8px;padding:16px;text-align:center}
+  .stat-v{font-family:'DM Mono',monospace;font-size:24px;font-weight:500;line-height:1;margin-bottom:4px}
+  .stat-l{font-size:10px;color:#3a4a5c;text-transform:uppercase;letter-spacing:.08em}
+  .v-ins{color:#fbbf24}.v-pead{color:#a78bfa}
+  .v-ok {color:#34d399}.v-neu{color:#2d3f52}.v-w{color:#60a5fa}
+
+  /* Cards */
+  .card{background:#0d1520;border:1px solid #151f2e;border-radius:10px;
+        padding:18px 20px;margin-bottom:10px}
+  .card:last-child{margin-bottom:0}
+  .card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+  .card-left{display:flex;align-items:baseline;gap:10px}
+  .card-ticker{font-size:15px;font-weight:600;color:#f0f4f8;letter-spacing:-.01em}
+  .card-sub{font-size:11px;color:#3a4a5c;font-family:'DM Mono',monospace}
+
+  .badge{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;
+         letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;
+         border-radius:4px;white-space:nowrap}
+  .badge-ins {background:#1a1200;color:#fbbf24;border:1px solid #3a2a00}
+  .badge-pead{background:#12082a;color:#a78bfa;border:1px solid #2a1560}
+  .badge-w   {background:#0c1a3a;color:#60a5fa;border:1px solid #1d3a6a}
+  .badge-hold{background:#0d1520;color:#4a5568;border:1px solid #1a2232}
+  .badge-ok  {background:#041a0f;color:#34d399;border:1px solid #0a3a20}
+
+  ul.bl{list-style:none;padding:0}
+  ul.bl li{font-size:12px;color:#5a6878;line-height:1.55;padding:3px 0 3px 14px;position:relative}
+  ul.bl li::before{content:'—';position:absolute;left:0;color:#1d3a5c;font-size:11px}
+  ul.bl li strong{color:#c8d3e0}
+  ul.bl li .hi{color:#60a5fa}.hi-p{color:#a78bfa}.hi-y{color:#fbbf24}.hi-g{color:#34d399}
+
+  .card-action{margin-top:12px;padding-top:12px;border-top:1px solid #111827;
+               font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;
+               display:flex;align-items:center;gap:6px}
+  .dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+  .d-w{background:#60a5fa}.d-h{background:#4a5568}
+  .d-y{background:#fbbf24}.d-g{background:#34d399}
+  .c-w{color:#60a5fa}.c-h{color:#4a5568}.c-y{color:#fbbf24}.c-g{color:#34d399}
+
+  /* Position table */
+  .pos-table{width:100%;border-collapse:collapse;font-size:12px;font-family:'DM Mono',monospace}
+  .pos-table th{text-align:left;font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+                color:#2d3f52;padding:8px 10px;border-bottom:1px solid #151f2e;font-weight:500}
+  .pos-table td{padding:10px 10px;border-bottom:1px solid #0f1720;color:#5a6878;vertical-align:middle}
+  .pos-table tr:last-child td{border-bottom:none}
+  .pos-table .tk{color:#c8d3e0;font-weight:500}
+  .pos-table .hold{color:#34d399}.pos-table .trim{color:#fbbf24}
+  .pos-table .red{color:#f87171}.pos-table .dim{color:#2d3f52}
+
+  .note{padding:14px 32px;background:#0b1120;border-top:1px solid #111827;
+        border-bottom:1px solid #111827;font-family:'DM Mono',monospace;
+        font-size:10px;color:#1d3a5c;letter-spacing:.04em}
+
+  .foot{padding:24px 32px;display:flex;justify-content:space-between;align-items:center}
+  .foot-l{font-family:'DM Mono',monospace;font-size:9px;color:#1d2d3d;line-height:1.8}
+  .foot-r{font-family:'DM Mono',monospace;font-size:9px;color:#1d2d3d;text-align:right;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="topbar">
+    <span class="topbar-brand">Portfolio · Signals · Weekly</span>
+    <span class="topbar-date">Mon 1 Jun 2026</span>
+  </div>
+
+  <div class="hero">
+    <div class="hero-eyebrow">Weekly Summary · Week of 26–30 May</div>
+    <h1>Zero exits.<br><strong>Seven insider signals. Three PEAD running.</strong></h1>
+    <div class="hero-sub">VIX neutral all week &nbsp;·&nbsp; SPY above 200d MA &nbsp;·&nbsp; Buy caps open</div>
+  </div>
+
+  <div class="market">
+    <div class="mkt-cell">
+      <div class="mkt-label">VIX range</div>
+      <div class="mkt-value neu">z −0.7 to −1.0</div>
+    </div>
+    <div class="mkt-cell" style="padding-left:16px">
+      <div class="mkt-label">SPY 200d</div>
+      <div class="mkt-value pos">Above all week ✓</div>
+    </div>
+    <div class="mkt-cell" style="padding-left:16px">
+      <div class="mkt-label">Buy caps</div>
+      <div class="mkt-value">3/3 available</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="section">
+    <div class="section-label">Week in Numbers</div>
+    <div class="stats">
+      <div class="stat"><div class="stat-v v-ins">7</div><div class="stat-l">Insider Signals</div></div>
+      <div class="stat"><div class="stat-v v-pead">3</div><div class="stat-l">PEAD Active</div></div>
+      <div class="stat"><div class="stat-v v-ok">0</div><div class="stat-l">EXIT / REDUCE</div></div>
+      <div class="stat"><div class="stat-v v-neu">0</div><div class="stat-l">New Buys</div></div>
+      <div class="stat"><div class="stat-v v-w">75</div><div class="stat-l">Top Watch</div></div>
+      <div class="stat"><div class="stat-v v-ok">HOLD</div><div class="stat-l">All Held Positions</div></div>
+    </div>
+  </div>
+
+  <!-- INSIDER -->
+  <div class="section">
+    <div class="section-label">Insider Buying This Week</div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-left">
+          <span class="card-ticker">SPGI</span>
+          <span class="card-sub">S&P Global · FW 85</span>
+        </div>
+        <span class="badge badge-ins">CLUSTER · +20 PTS</span>
+      </div>
+      <ul class="bl">
+        <li><strong>CEO</strong> — $998K on May 1</li>
+        <li><strong>CFO (S&P DJ Indices)</strong> — $1.08M on May 4</li>
+        <li><strong>Director</strong> — $500K on May 4</li>
+        <li>Three executives, same week — <span class="hi-g">strongest signal type in the model</span></li>
+      </ul>
+      <div class="card-action">
+        <span class="dot d-w"></span>
+        <span class="c-w">WATCH FOR TREND RECOVERY · FACTOR GATE NOT YET OPEN</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-left">
+          <span class="card-ticker">MSCI &nbsp;·&nbsp; SOFI &nbsp;·&nbsp; TSM</span>
+        </div>
+        <span class="badge badge-ins">SINGLE · +10 PTS</span>
+      </div>
+      <ul class="bl">
+        <li><strong>MSCI</strong> — Chairman/CEO Fernandez · <span class="hi-y">$1.97M</span> across 5 tranches · May 18</li>
+        <li><strong>SOFI</strong> — CEO Noto · <span class="hi-y">$498K</span> at $15.73–$16.00 · May 8–11</li>
+        <li><strong>TSM</strong> — VP Tien Bor-Zen · $140K · May 19</li>
+        <li>INTU · MELI · ENPH also filed open-market purchases this week</li>
+      </ul>
+      <div class="card-action">
+        <span class="dot d-h"></span>
+        <span class="c-h">CEO-LEVEL BUYS CARRY MOST WEIGHT · MONITOR</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PEAD -->
+  <div class="section">
+    <div class="section-label">PEAD — Active Signals</div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-left">
+          <span class="card-ticker">NVDA</span>
+          <span class="card-sub">Held · +10pts active</span>
+        </div>
+        <span class="badge badge-pead">SUE 3.89 · EXP JUL 19</span>
+      </div>
+      <ul class="bl">
+        <li>Largest earnings surprise in the universe this week — <span class="hi-p">top 1%</span></li>
+        <li>PEAD drift expected to continue to <strong>Jul 19</strong></li>
+        <li>No sell flags active · hold with confidence</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-left">
+          <span class="card-ticker">AMAT &nbsp;·&nbsp; SNOW</span>
+        </div>
+        <span class="badge badge-pead">SUE 2.92 · 2.73</span>
+      </div>
+      <ul class="bl">
+        <li><strong>AMAT</strong> (HELD) — expires Jul 13 · near 252d high · FW 82 holds sell score at 32</li>
+        <li><strong>SNOW</strong> (not held) — expires Jul 26 · elevated vol RV z 3.5 · watch only</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- HELD TABLE -->
+  <div class="section">
+    <div class="section-label">Held Positions — Weekly Review</div>
+    <table class="pos-table">
+      <thead>
+        <tr>
+          <th>Ticker</th>
+          <th>Buy</th>
+          <th>Sell</th>
+          <th>Action</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="tk">CRDO</td>
+          <td>26</td>
+          <td class="trim">41</td>
+          <td class="hold">HOLD</td>
+          <td>New 252d high · FW 93 suppresses sell ✓</td>
+        </tr>
+        <tr>
+          <td class="tk">AMAT</td>
+          <td>31</td>
+          <td class="trim">32</td>
+          <td class="hold">HOLD</td>
+          <td>PEAD active · FW 82 damping</td>
+        </tr>
+        <tr>
+          <td class="tk">IREN</td>
+          <td>23</td>
+          <td class="dim">0</td>
+          <td class="hold">HOLD</td>
+          <td>Alpha +101.7% · NVDA AI contract</td>
+        </tr>
+        <tr>
+          <td class="tk">NVDA</td>
+          <td>—</td>
+          <td class="dim">—</td>
+          <td class="hold">HOLD</td>
+          <td>PEAD SUE 3.89 active · no flags</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="margin-top:12px">
+      <ul class="bl">
+        <li><span class="hi-g">No held position reached TRIM (52), REDUCE (65), or EXIT (78) this week</span></li>
+      </ul>
+    </div>
+  </div>
+
+
+  <!-- SIGNALS THAT FIRED THIS WEEK -->
+  <div class="section">
+    <div class="section-label">Signals That Fired This Week</div>
+
+    <!-- ACTIVE signal — still actionable -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-left">
+          <span class="card-ticker">ORCL</span>
+          <span class="card-sub">Fired Thu 29 May · FW 78</span>
+        </div>
+        <span class="badge badge-watch">ACTIVE · Score 75</span>
+      </div>
+      <ul class="bl">
+        <li>Signal: <strong>WATCH</strong> · Score at fire: <strong>75</strong> · Dist −30.7%</li>
+        <li>Price movement: <span style="color:#34d399">+2.1% since signal</span></li>
+      </ul>
+      <div class="card-action">
+        <span class="dot d-w"></span>
+        <span class="c-w">STILL IN WATCH ZONE — 5pts from trigger</span>
+      </div>
+    </div>
+
+    <!-- EXPIRED: price recovered — DO NOT CHASE -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-left">
+          <span class="card-ticker">IREN</span>
+          <span class="card-sub">Fired Mon 26 May · FW 48 · HELD</span>
+        </div>
+        <span class="badge badge-hold">EXPIRED · 26 May</span>
+      </div>
+      <ul class="bl">
+        <li>Signal: <strong>WATCH</strong> · Score at fire: <strong>68</strong> · Dist −22.4%</li>
+        <li>Price movement: <span style="color:#34d399">+8.3% since signal</span></li>
+        <li><span style="color:#fbbf24">dist now −14.1% — factor gate closed, price recovered</span></li>
+      </ul>
+      <div class="card-action">
+        <span class="dot d-h"></span>
+        <span class="c-h">DO NOT CHASE — price recovered, opportunity closed</span>
+      </div>
+    </div>
+
+    <!-- EXPIRED: DFV faded — wait for fresh confirmation -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-left">
+          <span class="card-ticker">ANET</span>
+          <span class="card-sub">Fired Tue 27 May · FW 91 · HELD</span>
+        </div>
+        <span class="badge badge-hold">EXPIRED · 28 May</span>
+      </div>
+      <ul class="bl">
+        <li>Signal: <strong>WATCH</strong> · Score at fire: <strong>63</strong> · Dist −24.2%</li>
+        <li>Price movement: <span style="color:#f87171">−1.4% since signal</span></li>
+        <li><span style="color:#fbbf24">DFV V3 lift dropped · score fell to 42</span></li>
+      </ul>
+      <div class="card-action">
+        <span class="dot d-y"></span>
+        <span class="c-y">WAIT — factor gate still open but momentum faded, need fresh DFV confirmation</span>
+      </div>
+    </div>
+
+    <!-- EXPIRED: penalty overriding -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-left">
+          <span class="card-ticker">TSLA</span>
+          <span class="card-sub">Fired Wed 28 May · FW 56 · HELD</span>
+        </div>
+        <span class="badge badge-sell">EXPIRED · 29 May</span>
+      </div>
+      <ul class="bl">
+        <li>Signal: <strong>WATCH</strong> · Score at fire: <strong>62</strong> · Dist −28.1%</li>
+        <li>Price movement: <span style="color:#f87171">−3.2% since signal</span></li>
+        <li><span style="color:#f87171">Banker Weak or RBear penalty overriding</span></li>
+      </ul>
+      <div class="card-action">
+        <span class="dot" style="background:#f87171"></span>
+        <span style="color:#f87171">AVOID — signal overridden by penalty, institutional momentum lost</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- WATCH NEXT WEEK -->
+  <div class="section">
+    <div class="section-label">Priority Watch — Coming Week</div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-left">
+          <span class="card-ticker">ORCL</span>
+          <span class="card-sub">FW 78 · Score 75</span>
+        </div>
+        <span class="badge badge-w">5 PTS FROM TRIGGER</span>
+      </div>
+      <ul class="bl">
+        <li>Down <strong>30.7%</strong> from high · DFV lift <span class="hi">4.5</span> · highest-quality watch</li>
+        <li>One DFV confirmation bar pushes above 80 · earnings catalyst possible</li>
+        <li>Primary entry candidate if signal triggers</li>
+      </ul>
+      <div class="card-action">
+        <span class="dot d-w"></span>
+        <span class="c-w">PRIMARY WATCHLIST ENTRY FOR NEXT WEEK</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-left">
+          <span class="card-ticker">SPGI</span>
+          <span class="card-sub">Insider cluster · FW 85</span>
+        </div>
+        <span class="badge badge-ins">QUALITY + CONVICTION</span>
+      </div>
+      <ul class="bl">
+        <li>Below 200d MA — trend gate still closed</li>
+        <li>Watch for both SPY and SPGI recovering above their respective 200d MAs</li>
+        <li>When gate opens: base 25 + insider 20 = <strong class="hi">45pts immediately</strong></li>
+      </ul>
+      <div class="card-action">
+        <span class="dot d-h"></span>
+        <span class="c-h">HOLD WATCH — INSIDER + QUALITY COMBO</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    📊 &nbsp; Daily digest sent 18:00 Bangkok &nbsp;·&nbsp; Next weekly summary: Mon 8 Jun
+  </div>
+
+  <div class="foot">
+    <div class="foot-l">
+      portfolio-signals<br>
+      Weekly · Monday 07:00 BKK
+    </div>
+    <div class="foot-r">
+      Buy ≥80 · TRIM ≥52<br>
+      REDUCE ≥65 · EXIT ≥78
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
