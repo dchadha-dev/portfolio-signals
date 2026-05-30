@@ -1,868 +1,491 @@
 """
-send_signal_email.py
-════════════════════════════════════════════════════════════
-Sends portfolio signal digest emails via Gmail SMTP.
-
-Daily (called from daily_scanner.yml after scanner runs):
-    python send_signal_email.py --mode daily
-
-Weekly (called from weekly_insider_signals.yml on Monday):
-    python send_signal_email.py --mode weekly
-
-Environment variables (GitHub Secrets):
-    GMAIL_FROM          sender address  e.g. signals.bot@gmail.com
-    GMAIL_APP_PASSWORD  16-char Gmail app password
-    GMAIL_TO            recipient address
+send_signal_email.py — Portfolio signal digest via Gmail SMTP
+Daily:  python send_signal_email.py --mode daily
+Weekly: python send_signal_email.py --mode weekly
+Secrets: GMAIL_FROM, GMAIL_APP_PASSWORD, GMAIL_TO
 """
-
-import json, os, sys, smtplib, argparse, re
+import json, os, sys, smtplib, argparse, re, base64
 from datetime import datetime, date
-from email.message import EmailMessage
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+from email.utils import formatdate, make_msgid
 
-# ── CONFIG ────────────────────────────────────────────────────────────
 GMAIL_FROM = os.environ.get('GMAIL_FROM', '')
 GMAIL_PASS = os.environ.get('GMAIL_APP_PASSWORD', '')
 GMAIL_TO   = os.environ.get('GMAIL_TO', '')
 
-# ── LOAD DATA ─────────────────────────────────────────────────────────
+# ── INLINE STYLE CONSTANTS ───────────────────────────────────────────
+BG      = '#080c14'
+BG2     = '#0d1520'
+BG3     = '#0b1120'
+BORDER  = '1px solid #151f2e'
+BORDER2 = '1px solid #111827'
+TXT     = '#c8d3e0'
+TXT2    = '#5a6878'
+TXT3    = '#3a4a5c'
+BLUE    = '#60a5fa'
+GREEN   = '#34d399'
+AMBER   = '#fbbf24'
+PURPLE  = '#a78bfa'
+RED     = '#f87171'
+NAVY    = '#1e3a5f'
+FONT    = "font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;"
+MONO    = "font-family:'Courier New',Courier,monospace;"
+
+def s(**kw):
+    """Build inline style string from kwargs."""
+    return ';'.join(f"{k.replace('_','-')}:{v}" for k,v in kw.items())
+
+# ── LOAD DATA ────────────────────────────────────────────────────────
 def load_json(path):
     try:
-        with open(path) as f:
-            return json.load(f)
-    except Exception as e:
-        print(f'Warning: could not load {path}: {e}')
-        return {}
+        with open(path) as f: return json.load(f)
+    except: return {}
 
-def load_payload():
-    return load_json('signals_payload.json')
+def load_payload():    return load_json('signals_payload.json')
+def load_weekly_log(): return load_json('weekly_signals_log.json')
+def load_insider():    return load_json('insider_signals.json')
+def load_pead():       return load_json('pead_signals.json')
 
-def load_weekly_log():
-    try:
-        with open('weekly_signals_log.json') as f:
-            return json.load(f)
-    except Exception:
-        return {'entries': []}
-
-def load_insider():
-    return load_json('insider_signals.json')
-
-def load_pead():
-    return load_json('pead_signals.json')
-
-# ── HTML HELPERS ──────────────────────────────────────────────────────
-NAVY_HDR = 'background:linear-gradient(135deg,#1e3a5f,#1e40af)'
-NAVY_STRIP = 'background:#1e3a8a'
-
-BASE_CSS = """
-  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-
-  body{
-    background:#080c14;
-    color:#c8d3e0;
-    font-family:'DM Sans',system-ui,sans-serif;
-    font-size:14px;
-    line-height:1.6;
-    -webkit-font-smoothing:antialiased;
-  }
-
-  .shell{
-    max-width:560px;
-    margin:0 auto;
-    background:#080c14;
-  }
-
-  /* ── TOP BAR ── */
-  .topbar{
-    padding:20px 32px 0;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-  }
-  .topbar-brand{
-    font-family:'DM Mono',monospace;
-    font-size:10px;
-    font-weight:500;
-    letter-spacing:.14em;
-    text-transform:uppercase;
-    color:#3a4a5c;
-  }
-  .topbar-date{
-    font-family:'DM Mono',monospace;
-    font-size:10px;
-    color:#3a4a5c;
-  }
-
-  /* ── HERO ── */
-  .hero{
-    padding:40px 32px 32px;
-    border-bottom:1px solid #111827;
-  }
-  .hero-eyebrow{
-    font-family:'DM Mono',monospace;
-    font-size:10px;
-    letter-spacing:.12em;
-    text-transform:uppercase;
-    color:#1d4ed8;
-    margin-bottom:12px;
-  }
-  .hero h1{
-    font-size:28px;
-    font-weight:300;
-    color:#f0f4f8;
-    line-height:1.2;
-    letter-spacing:-.02em;
-    margin-bottom:8px;
-  }
-  .hero h1 strong{
-    font-weight:600;
-  }
-  .hero-sub{
-    font-size:13px;
-    color:#4a5568;
-    font-weight:300;
-  }
-
-  /* ── MARKET STRIP ── */
-  .market{
-    padding:16px 32px;
-    background:#0b1120;
-    display:flex;
-    gap:0;
-    border-bottom:1px solid #111827;
-  }
-  .mkt-cell{
-    flex:1;
-    padding:0 16px 0 0;
-    border-right:1px solid #1a2232;
-  }
-  .mkt-cell:first-child{padding-left:0}
-  .mkt-cell:last-child{border-right:none}
-  .mkt-label{
-    font-family:'DM Mono',monospace;
-    font-size:9px;
-    letter-spacing:.1em;
-    text-transform:uppercase;
-    color:#2d3f52;
-    margin-bottom:3px;
-  }
-  .mkt-value{
-    font-family:'DM Mono',monospace;
-    font-size:12px;
-    font-weight:500;
-    color:#c8d3e0;
-  }
-  .mkt-value.pos{color:#34d399}
-  .mkt-value.neg{color:#f87171}
-  .mkt-value.neu{color:#60a5fa}
-
-  /* ── SECTION ── */
-  .section{
-    padding:28px 32px;
-    border-bottom:1px solid #111827;
-  }
-  .section:last-of-type{border-bottom:none}
-
-  .section-label{
-    font-family:'DM Mono',monospace;
-    font-size:9px;
-    font-weight:500;
-    letter-spacing:.16em;
-    text-transform:uppercase;
-    color:#1d4ed8;
-    margin-bottom:20px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-  }
-  .section-label::after{
-    content:'';
-    flex:1;
-    height:1px;
-    background:#111827;
-  }
-
-  /* ── SIGNAL CARD ── */
-  .card{
-    background:#0d1520;
-    border:1px solid #151f2e;
-    border-radius:10px;
-    padding:18px 20px;
-    margin-bottom:10px;
-  }
-  .card:last-child{margin-bottom:0}
-
-  .card-head{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    margin-bottom:12px;
-  }
-  .card-left{display:flex;align-items:baseline;gap:10px}
-  .card-ticker{
-    font-size:16px;
-    font-weight:600;
-    color:#f0f4f8;
-    letter-spacing:-.01em;
-  }
-  .card-price{
-    font-family:'DM Mono',monospace;
-    font-size:11px;
-    color:#3a4a5c;
-  }
-  .card-price .up{color:#34d399}
-  .card-price .dn{color:#f87171}
-
-  /* Signal badge */
-  .badge{
-    font-family:'DM Mono',monospace;
-    font-size:9px;
-    font-weight:500;
-    letter-spacing:.1em;
-    text-transform:uppercase;
-    padding:3px 9px;
-    border-radius:4px;
-    white-space:nowrap;
-  }
-  .badge-watch  {background:#0c1a3a;color:#60a5fa;border:1px solid #1d3a6a}
-  .badge-hold   {background:#0d1520;color:#4a5568;border:1px solid #1a2232}
-  .badge-sell   {background:#1a0a0a;color:#f87171;border:1px solid #3a1515}
-  .badge-insider{background:#1a1200;color:#fbbf24;border:1px solid #3a2a00}
-  .badge-pead   {background:#12082a;color:#a78bfa;border:1px solid #2a1560}
-  .badge-buy    {background:#041a0f;color:#34d399;border:1px solid #0a3a20}
-
-  /* Bullets */
-  .card-bullets{
-    list-style:none;
-    padding:0;
-  }
-  .card-bullets li{
-    font-size:12px;
-    color:#5a6878;
-    line-height:1.55;
-    padding:3px 0 3px 14px;
-    position:relative;
-  }
-  .card-bullets li::before{
-    content:'—';
-    position:absolute;
-    left:0;
-    color:#1d3a5c;
-    font-size:11px;
-  }
-  .card-bullets li strong{color:#c8d3e0}
-  .card-bullets li .hi{color:#60a5fa}
-  .card-bullets li .warn{color:#fbbf24}
-  .card-bullets li .good{color:#34d399}
-  .card-bullets li .bad{color:#f87171}
-
-  /* Action line */
-  .card-action{
-    margin-top:12px;
-    padding-top:12px;
-    border-top:1px solid #111827;
-    font-family:'DM Mono',monospace;
-    font-size:10px;
-    letter-spacing:.06em;
-    display:flex;
-    align-items:center;
-    gap:6px;
-  }
-  .action-dot{
-    width:5px;height:5px;border-radius:50%;flex-shrink:0;
-  }
-  .action-dot.buy    {background:#34d399}
-  .action-dot.hold   {background:#4a5568}
-  .action-dot.watch  {background:#60a5fa}
-  .action-dot.trim   {background:#fbbf24}
-  .action-dot.exit   {background:#f87171}
-  .action-text-buy   {color:#34d399}
-  .action-text-hold  {color:#4a5568}
-  .action-text-watch {color:#60a5fa}
-  .action-text-trim  {color:#fbbf24}
-  .action-text-exit  {color:#f87171}
-
-  /* ── SCORES ROW ── */
-  .scores{
-    display:flex;
-    gap:6px;
-    flex-wrap:wrap;
-    margin-top:10px;
-  }
-  .sc{
-    font-family:'DM Mono',monospace;
-    font-size:9px;
-    padding:2px 8px;
-    border-radius:3px;
-    border:1px solid #151f2e;
-    color:#3a4a5c;
-    background:#0b1120;
-  }
-  .sc.hi {color:#60a5fa;border-color:#1d3a6a;background:#0c1a3a}
-  .sc.ok {color:#34d399;border-color:#0a3a20;background:#041a0f}
-  .sc.wa {color:#fbbf24;border-color:#3a2a00;background:#1a1200}
-  .sc.er {color:#f87171;border-color:#3a1515;background:#1a0a0a}
-
-  /* ── SUMMARY GRID ── */
-  .sum-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr 1fr;
-    gap:8px;
-    margin-bottom:20px;
-  }
-  .sum-cell{
-    background:#0d1520;
-    border:1px solid #151f2e;
-    border-radius:8px;
-    padding:14px;
-    text-align:center;
-  }
-  .sum-cell .sv{
-    font-family:'DM Mono',monospace;
-    font-size:22px;
-    font-weight:500;
-    line-height:1;
-    margin-bottom:4px;
-  }
-  .sum-cell .sl{
-    font-size:10px;
-    color:#3a4a5c;
-    text-transform:uppercase;
-    letter-spacing:.08em;
-  }
-  .sv-0   {color:#2d3f52}
-  .sv-buy {color:#34d399}
-  .sv-w   {color:#60a5fa}
-  .sv-s   {color:#fbbf24}
-  .sv-p   {color:#a78bfa}
-
-  /* ── DIVIDER ── */
-  .note{
-    padding:14px 32px;
-    background:#0b1120;
-    border-top:1px solid #111827;
-    border-bottom:1px solid #111827;
-    font-family:'DM Mono',monospace;
-    font-size:10px;
-    color:#1d3a5c;
-    letter-spacing:.04em;
-  }
-
-  /* ── FOOTER ── */
-  .foot{
-    padding:24px 32px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-  }
-  .foot-left{
-    font-family:'DM Mono',monospace;
-    font-size:9px;
-    color:#1d2d3d;
-    line-height:1.8;
-  }
-  .foot-right{
-    font-family:'DM Mono',monospace;
-    font-size:9px;
-    color:#1d2d3d;
-    text-align:right;
-    line-height:1.8;
-  }
-.card{background:#0d1520;border:1px solid #151f2e;border-radius:10px;padding:18px 20px;margin-bottom:10px}
-.card:last-child{margin-bottom:0}
-.card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
-.card-left{display:flex;align-items:baseline;gap:10px}
-.card-ticker{font-size:15px;font-weight:600;color:#f0f4f8;letter-spacing:-.01em}
-.card-sub{font-family:'DM Mono',monospace;font-size:11px;color:#3a4a5c}
-.card-price{font-family:'DM Mono',monospace;font-size:11px;color:#3a4a5c}
-.card-price .up{color:#34d399}.card-price .dn{color:#f87171}
-.badge{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:4px;white-space:nowrap}
-.badge-watch{background:#0c1a3a;color:#60a5fa;border:1px solid #1d3a6a}
-.badge-hold{background:#0d1520;color:#4a5568;border:1px solid #1a2232}
-.badge-sell{background:#1a0a0a;color:#f87171;border:1px solid #3a1515}
-.badge-insider{background:#1a1200;color:#fbbf24;border:1px solid #3a2a00}
-.badge-pead{background:#12082a;color:#a78bfa;border:1px solid #2a1560}
-.badge-buy{background:#041a0f;color:#34d399;border:1px solid #0a3a20}
-ul.bl{list-style:none;padding:0}
-ul.bl li{font-size:12px;color:#5a6878;line-height:1.55;padding:3px 0 3px 14px;position:relative}
-ul.bl li::before{content:'—';position:absolute;left:0;color:#1d3a5c;font-size:11px}
-ul.bl li strong{color:#c8d3e0}
-ul.bl .hi{color:#60a5fa}.hi-p{color:#a78bfa}.hi-y{color:#fbbf24}.hi-g{color:#34d399}.bad{color:#f87171}
-.card-action{margin-top:12px;padding-top:12px;border-top:1px solid #111827;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;display:flex;align-items:center;gap:6px}
-.dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-.d-w{background:#60a5fa}.d-h{background:#4a5568}.d-y{background:#fbbf24}.d-g{background:#34d399}.d-r{background:#f87171}
-.c-w{color:#60a5fa}.c-h{color:#4a5568}.c-y{color:#fbbf24}.c-g{color:#34d399}.c-r{color:#f87171}
-.sum-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px}
-.sum-cell{background:#0d1520;border:1px solid #151f2e;border-radius:8px;padding:14px;text-align:center}
-.sum-cell .sv{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;line-height:1;margin-bottom:4px}
-.sum-cell .sl{font-size:10px;color:#3a4a5c;text-transform:uppercase;letter-spacing:.08em}
-.sv-0{color:#2d3f52}.sv-buy{color:#34d399}.sv-w{color:#60a5fa}.sv-s{color:#fbbf24}.sv-p{color:#a78bfa}
-.scores{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
-.sc{font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;border-radius:3px;border:1px solid #151f2e;color:#3a4a5c;background:#0b1120}
-.sc.hi{color:#60a5fa;border-color:#1d3a6a;background:#0c1a3a}.sc.ok{color:#34d399;border-color:#0a3a20;background:#041a0f}.sc.wa{color:#fbbf24;border-color:#3a2a00;background:#1a1200}.sc.er{color:#f87171;border-color:#3a1515;background:#1a0a0a}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
-.gcell{background:#1e293b;border-radius:8px;padding:10px 12px}
-.gcell .gl{font-size:10px;color:#475569;margin-bottom:3px}
-.gcell .gv{font-size:13px;font-weight:600;color:#e2e8f0}
-.pos-table{width:100%;border-collapse:collapse;font-size:12px;font-family:'DM Mono',monospace}
-.pos-table th{text-align:left;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#2d3f52;padding:8px 10px;border-bottom:1px solid #151f2e;font-weight:500}
-.pos-table td{padding:10px 10px;border-bottom:1px solid #0f1720;color:#5a6878;vertical-align:middle}
-.pos-table tr:last-child td{border-bottom:none}
-.pos-table .tk{color:#c8d3e0;font-weight:500}
-.pos-table .hold{color:#34d399}.pos-table .trim{color:#fbbf24}.pos-table .red{color:#f87171}.pos-table .dim{color:#2d3f52}
-.note-bar{padding:14px 32px;background:#0b1120;border-top:1px solid #111827}
-.note-bar p{font-family:'DM Mono',monospace;font-size:10px;color:#1d3a5c;letter-spacing:.04em}
-"""
-
-def html_wrap(body_content, title='Portfolio Signals'):
+# ── HTML PRIMITIVES ──────────────────────────────────────────────────
+def wrap(content, title='Portfolio Signals'):
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<meta name="color-scheme" content="dark">
-<meta name="supported-color-schemes" content="dark">
 <title>{title}</title>
-<style type="text/css">{BASE_CSS}</style>
 </head>
-<body style="margin:0;padding:0;background:#080c14;color:#c8d3e0;">
-<div class="wrap">{body_content}</div>
+<body style="{FONT}margin:0;padding:20px 0;background:{BG};color:{TXT};">
+<div style="max-width:560px;margin:0 auto;background:{BG};">
+{content}
+</div>
 </body>
 </html>"""
 
-# ── SIGNAL ROW BUILDER ────────────────────────────────────────────────
-def sig_row(icon_html, icon_cls, ticker, price_html, tag_html, bullets, action_html=''):
-    bullets_li = ''.join(f'<li>{b}</li>' for b in bullets)
+def header(eyebrow, headline, subline):
     return f"""
-<div class="row">
-  <div class="icon {icon_cls}">{icon_html}</div>
-  <div class="body">
-    <div class="row-top">
-      <span class="ticker">{ticker}</span>
-      {price_html}
-      {tag_html}
-    </div>
-    <ul class="notes">{bullets_li}</ul>
-    {action_html}
-  </div>
+<div style="background:linear-gradient(135deg,#1e3a5f,#1e40af);padding:28px 28px 24px;">
+  <div style="{MONO}font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:10px;">{eyebrow}</div>
+  <div style="{FONT}font-size:22px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:6px;">{headline}</div>
+  <div style="{FONT}font-size:12px;color:rgba(255,255,255,.55);">{subline}</div>
 </div>"""
 
-def action(text, style=''):
-    return f'<span class="action {style}">{text}</span>'
+def mkt_strip(cells):
+    """cells = list of (label, value, color)"""
+    items = ''
+    for label, value, color in cells:
+        items += f"""<td style="padding:0 20px 0 0;border-right:1px solid #1a2232;vertical-align:top;">
+  <div style="{MONO}font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#2d3f52;margin-bottom:3px;">{label}</div>
+  <div style="{MONO}font-size:12px;font-weight:500;color:{color};">{value}</div>
+</td>"""
+    return f"""
+<table width="100%" style="background:{BG3};border-collapse:collapse;" cellpadding="0" cellspacing="0">
+<tr><td style="padding:14px 28px;">
+  <table cellpadding="0" cellspacing="0"><tr>{items}</tr></table>
+</td></tr></table>"""
 
-def price_html(price, chg=None):
-    if price is None: return ''
-    chg_html = ''
-    if chg is not None and chg != 0:
-        cls = 'g' if chg > 0 else 'r'
-        chg_html = f' <span class="{cls}">{chg:+.2f}%</span>'
-    return f'<span class="price">${price:,.2f}{chg_html}</span>'
+def section(label, content):
+    return f"""
+<div style="padding:24px 28px;border-bottom:{BORDER2};">
+  <div style="{MONO}font-size:9px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:{BLUE};margin-bottom:18px;">{label}</div>
+  {content}
+</div>"""
 
-# ── DAILY EMAIL ───────────────────────────────────────────────────────
+def card(ticker, subtitle, badge_txt, badge_color, badge_bg, bullets, action_txt, action_color):
+    bullets_html = ''.join(
+        f'<tr><td style="padding:2px 0 2px 14px;{FONT}font-size:12px;color:{TXT2};line-height:1.55;vertical-align:top;">'
+        f'<span style="margin-left:-14px;color:#1d3a5c;margin-right:6px;">—</span>{b}</td></tr>'
+        for b in bullets
+    )
+    return f"""
+<table width="100%" cellpadding="0" cellspacing="0" style="background:{BG2};border:{BORDER};border-radius:10px;margin-bottom:10px;">
+<tr><td style="padding:18px 20px;">
+  <!-- card head -->
+  <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:12px;">
+  <tr>
+    <td style="{FONT}font-size:15px;font-weight:700;color:#f0f4f8;vertical-align:middle;">
+      {ticker}
+      <span style="{MONO}font-size:11px;font-weight:400;color:{TXT3};margin-left:8px;">{subtitle}</span>
+    </td>
+    <td align="right" style="vertical-align:middle;">
+      <span style="{MONO}font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:4px;background:{badge_bg};color:{badge_color};border:1px solid {badge_color}33;">{badge_txt}</span>
+    </td>
+  </tr>
+  </table>
+  <!-- bullets -->
+  <table cellpadding="0" cellspacing="0" width="100%">{bullets_html}</table>
+  <!-- action -->
+  <div style="margin-top:12px;padding-top:12px;border-top:{BORDER2};{MONO}font-size:10px;letter-spacing:.06em;color:{action_color};">
+    <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:{action_color};vertical-align:middle;margin-right:6px;"></span>
+    {action_txt}
+  </div>
+</td></tr>
+</table>"""
+
+def stat_grid(stats):
+    """stats = list of (value, label, color)"""
+    cells = ''
+    for val, lbl, color in stats:
+        cells += f"""<td style="width:33%;padding:0 4px 0 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:{BG2};border:{BORDER};border-radius:8px;">
+  <tr><td style="padding:14px;text-align:center;">
+    <div style="{MONO}font-size:22px;font-weight:500;color:{color};line-height:1;margin-bottom:4px;">{val}</div>
+    <div style="{FONT}font-size:10px;color:{TXT3};text-transform:uppercase;letter-spacing:.08em;">{lbl}</div>
+  </td></tr>
+  </table>
+</td>"""
+    return f'<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;"><tr>{cells}</tr></table>'
+
+def bullet_list(items):
+    rows = ''.join(
+        f'<li style="{FONT}font-size:12px;color:{TXT2};line-height:1.6;margin-bottom:3px;">{i}</li>'
+        for i in items
+    )
+    return f'<ul style="margin:0;padding:0 0 0 18px;">{rows}</ul>'
+
+def note_bar(text):
+    return f"""
+<div style="padding:12px 28px;background:{NAVY};border-top:{BORDER2};">
+  <span style="{MONO}font-size:10px;color:{BLUE};letter-spacing:.04em;">{text}</span>
+</div>"""
+
+def footer(left, right):
+    return f"""
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0f1e;padding:18px 28px;">
+<tr>
+  <td style="{MONO}font-size:9px;color:#1d2d3d;line-height:1.8;">{left}</td>
+  <td align="right" style="{MONO}font-size:9px;color:#1d2d3d;line-height:1.8;">{right}</td>
+</tr>
+</table>"""
+
+def b(text): return f'<strong style="color:{TXT};">{text}</strong>'
+def hi(text, color=BLUE): return f'<span style="color:{color};">{text}</span>'
+
+# ── DAILY EMAIL ──────────────────────────────────────────────────────
 def build_daily(payload, insider_data, pead_data):
-    market  = payload.get('market', {})
-    summary = payload.get('summary', {})
-    signals = payload.get('analytics', {}).get('signals', [])
+    market   = payload.get('market', {})
+    summary  = payload.get('summary', {})
+    signals  = payload.get('analytics', {}).get('signals', [])
     run_date = payload.get('run_date', str(date.today()))
 
     vix_z   = market.get('vix_zscore', 0)
     vix_cur = market.get('vix_current', 20)
     vix_lbl = 'Fear' if vix_z > 1 else 'Greed' if vix_z < -1 else 'Neutral'
-    vix_cls = 'g' if vix_z > 1 else 'a' if vix_z < -1 else 'n'
-    spy_ok  = market.get('sp500_extended', False) is False
+    vix_col = GREEN if vix_z > 1 else AMBER if vix_z < -1 else BLUE
+    spy_ok  = not market.get('sp500_extended', False)
     s_cap   = market.get('strong_cap', 3)
     r_cap   = market.get('regular_cap', 3)
+    n_strong= summary.get('strong_buy', 0)
+    n_watch = summary.get('watch', 0)
+    n_factor= summary.get('factor_zone', 0)
+    n_sell  = market.get('sell_cap', 0)
+    n_pead  = len(pead_data.get('signals', {})) if pead_data else 0
+    n_ins   = len(insider_data.get('signals', {})) if insider_data else 0
 
-    n_strong = summary.get('strong_buy', 0)
-    n_watch  = summary.get('watch', 0)
-    n_factor = summary.get('factor_zone', 0)
-    n_sell   = market.get('sell_cap', 0)
-    n_insider = len(insider_data.get('signals', {})) if insider_data else 0
-    n_pead    = len(pead_data.get('signals', {})) if pead_data else 0
+    headline = (f'{n_strong} new buy{"s" if n_strong!=1 else ""} · {n_watch} watch · Market {vix_lbl.lower()}'
+                if n_strong else f'No new buys · {n_watch} watch · {n_factor} factor zone · Market {vix_lbl.lower()}')
+    subline  = f'Buy cap {s_cap} strong · {r_cap} regular · {n_ins} insider · {n_pead} PEAD active'
 
-    headline = (
-        f'{"★★ " + str(n_strong) + " new buy" + ("s" if n_strong != 1 else "") + " · " if n_strong else "No new buys · "}'
-        f'{n_watch} watch · {n_factor} factor zone · Market {vix_lbl.lower()}'
+    html  = header(f'Daily Digest · {run_date}', headline, subline)
+    html += mkt_strip([
+        ('VIX', f'{vix_cur:.1f} z={vix_z:+.2f} ({vix_lbl})', vix_col),
+        ('SPY 200d', 'Above ✓' if spy_ok else 'Below ⚠', GREEN if spy_ok else RED),
+        ('Buy Cap', f'{s_cap} · {r_cap}', TXT),
+        ('Regime', vix_lbl, vix_col),
+    ])
+
+    # Summary
+    top_watch = sorted([s for s in signals if s.get('fdfv3') and s.get('buy_score',0) < 80],
+                       key=lambda x: (-x.get('buy_score',0), -(x.get('framework_score') or 0)))
+    sum_bullets = []
+    if n_strong == 0:
+        sum_bullets.append(f'No signals cleared the {b("80-point buy threshold")} today')
+    if top_watch:
+        tw = top_watch[0]
+        sum_bullets.append(f'Highest quality watch: {b(tw["ticker"])} score {tw["buy_score"]} · FW {tw.get("framework_score","?")}')
+    no_action = not any(s.get('sell_score',0) >= 52 and s.get('is_holding') for s in signals)
+    if no_action:
+        sum_bullets.append(f'{hi("No action required", GREEN)} on any held position today')
+
+    html += section('Summary',
+        stat_grid([
+            (n_strong or '0', 'Strong Buys', GREEN if n_strong else TXT3),
+            (n_watch,  'Watch Zone', BLUE),
+            (n_sell,   'Sell Flags', AMBER if n_sell else TXT3),
+        ]) + bullet_list(sum_bullets)
     )
 
-    # ── Header
-    html = f"""
-<div class="hdr">
-  <div class="hdr-meta">
-    <span class="hdr-label">Portfolio Signals · Daily</span>
-    <span class="hdr-date">{run_date}</span>
-  </div>
-  <h1>{headline}</h1>
-  <p>Buy cap {s_cap} strong · {r_cap} regular · {n_insider} insider signals · {n_pead} PEAD active</p>
-</div>
-<div class="mkt">
-  <div><div class="lbl">VIX</div><div class="val {vix_cls}">{vix_cur:.1f} z={vix_z:+.2f} ({vix_lbl})</div></div>
-  <div><div class="lbl">SPY</div><div class="val {'g' if spy_ok else 'r'}">{'Above 200d MA ✓' if spy_ok else 'Below 200d MA ⚠'}</div></div>
-  <div><div class="lbl">Buy Cap</div><div class="val n">{s_cap} strong · {r_cap} regular</div></div>
-</div>"""
-
-    # ── Summary pills
-    html += '<div class="sec"><div class="sec-title">Today\'s Summary</div><div class="pills">'
-    html += f'<span class="pill p-{"navy" if n_strong else "gray"}">★★ {n_strong} Strong Buy{"s" if n_strong != 1 else ""}</span>'
-    html += f'<span class="pill p-navy">↑ {n_watch} Watch</span>'
-    html += f'<span class="pill p-gray">⊙ {n_factor} Factor Zone</span>'
-    if n_sell: html += f'<span class="pill p-amber">⚠ {n_sell} Sell Flags</span>'
-    if n_pead: html += f'<span class="pill p-purple">⚡ {n_pead} PEAD</span>'
-    html += '</div>'
-
-    # Summary bullets
-    no_action = not any(s.get('signal') in ('BUY','SELL') for s in signals if s.get('is_holding'))
-    html += '<ul class="notes">'
-    if n_strong == 0: html += '<li>No signals cleared the <strong>80-point buy threshold</strong> today</li>'
-    else:
-        buys = [s for s in signals if s.get('signal') == 'BUY'][:3]
-        for b in buys:
-            html += f'<li><strong>★★ {b["ticker"]}</strong> — buy score {b["buy_score"]} · FW {b.get("framework_score","?")}</li>'
-    top_watch = [s for s in signals if s.get('fdfv3') and not s.get('signal') == 'BUY'][:1]
-    if top_watch:
-        w = top_watch[0]
-        html += f'<li>Highest quality watch: <strong>{w["ticker"]}</strong> score {w["buy_score"]} · FW {w.get("framework_score","?")}</li>'
-    if no_action: html += '<li><strong>No action required</strong> on any held position today</li>'
-    html += '</ul></div>'
-
-    # ── Watch signals (Factor+DFV V3, score ≥60, not already BUY)
-    watches = [s for s in signals if s.get('fdfv3') and s.get('buy_score',0) >= 60
-               and s.get('signal') != 'BUY'][:5]
+    # Watch list
+    watches = top_watch[:4]
     if watches:
-        html += '<div class="sec"><div class="sec-title">★★ Watch — Factor+DFV V3 Active</div>'
+        cards = ''
         for s in watches:
             dist = s.get('dist_252h', 0)
-            dfv  = s.get('dfv_lift', 0)
             fw   = s.get('framework_score', '?')
             gap  = 80 - s.get('buy_score', 0)
-            bullets = [
-                f'Down <strong>{abs(dist):.1f}%</strong> from 252d high · DFV lift {dfv:.1f} · FW {fw}',
-                f'Needs <strong>{gap} more points</strong> to trigger buy signal',
+            dfv  = s.get('dfv_lift', 0) or 0
+            bs   = [
+                f'Down {b(f"{abs(dist):.1f}%")} from 252d high · DFV lift {hi(f"{dfv:.1f}")} · FW {fw}',
+                f'{hi(f"{gap} more points", AMBER)} needed to trigger buy signal',
             ]
-            if fw and isinstance(fw, int) and fw < 50:
-                bullets.append(f'<strong>Caution: FW {fw} — speculative.</strong> Size small if entering')
-            html += sig_row('★★', 'ic-w', s['ticker'],
-                            price_html(s.get('price'), s.get('change_pct')),
-                            f'<span class="tag t-w">WATCH · {s["buy_score"]}</span>',
-                            bullets,
-                            action('Monitor — close to trigger') if gap <= 10 else action('Monitor', 'hold'))
-        html += '</div>'
+            if isinstance(fw, int) and fw < 50:
+                bs.append(f'{hi("Caution: FW " + str(fw) + " — speculative", AMBER)} · size small if entering')
+            cards += card(s['ticker'], '', f'WATCH · {s["buy_score"]}', BLUE, '#0c1a3a', bs,
+                         'MONITOR — CLOSE TO TRIGGER' if gap <= 8 else 'MONITOR', BLUE)
+        html += section('★★ Watch — Factor+DFV V3 Active', cards)
 
-    # ── Strong buys (if any)
+    # Strong buys
     strong_buys = [s for s in signals if s.get('signal') == 'BUY' and s.get('fdfv3')]
     if strong_buys:
-        html += '<div class="sec"><div class="sec-title">★★ New Buy Signals</div>'
+        cards = ''
         for s in strong_buys:
             dist = s.get('dist_252h', 0)
             fw   = s.get('framework_score', '?')
-            html += sig_row('★★', 'ic-w', s['ticker'],
-                            price_html(s.get('price'), s.get('change_pct')),
-                            f'<span class="tag t-g">BUY · {s["buy_score"]}</span>',
-                            [
-                                f'Factor+DFV V3 · down <strong>{abs(dist):.1f}%</strong> from 252d high · FW {fw}',
-                                s.get('guidance', '')[:120],
-                            ],
-                            action('★★ Consider entry'))
-        html += '</div>'
+            cards += card(s['ticker'], f'${s.get("price",0):,.2f}', f'BUY · {s["buy_score"]}', GREEN, '#041a0f',
+                         [f'Factor+DFV V3 · down {b(f"{abs(dist):.1f}%")} from 252d high · FW {fw}',
+                          s.get('guidance','')[:120]],
+                         '★★ CONSIDER ENTRY', GREEN)
+        html += section('★★ New Buy Signals', cards)
 
-    # ── Insider signals
-    ins_signals = insider_data.get('signals', {}) if insider_data else {}
-    if ins_signals:
-        html += '<div class="sec"><div class="sec-title">🔑 Active Insider Signals</div>'
-        for ticker, ins in list(ins_signals.items())[:4]:
+    # Insider signals
+    ins_sigs = insider_data.get('signals', {}) if insider_data else {}
+    if ins_sigs:
+        cards = ''
+        for ticker, ins in list(ins_sigs.items())[:4]:
             is_cluster = ins.get('insider_cluster', False)
             buys = ins.get('insider_buys', [])
-            n_ins = ins.get('insider_n', 1)
-            bullets = []
+            bs = []
             if is_cluster:
-                bullets.append(f'<strong>Cluster buy</strong> — {n_ins} insiders, same ticker, 60-day window')
-            for b in buys[:2]:
-                bullets.append(f'{b.get("title","").split(",")[0]} bought ${b.get("value_usd",0):,.0f} on {b.get("date","")}')
-            bullets.append(f'Buy score boost: +{ins.get("insider_score",0)}pts · FW {ins.get("framework_score", "?") if "framework_score" in ins else "—"}')
-            html += sig_row('🔑🔑' if is_cluster else '🔑', 'ic-i', ticker, '', 
-                            f'<span class="tag t-i">{"CLUSTER" if is_cluster else "INSIDER"} · +{ins.get("insider_score",0)}pts</span>',
-                            bullets,
-                            action('Watch for factor gate opening', 'hold'))
-        html += '</div>'
+                bs.append(f'{b("Cluster buy")} — {ins.get("insider_n",2)}+ insiders, same 60-day window')
+            for bv in buys[:2]:
+                title = (bv.get('title') or '').split(',')[0]
+                val   = bv.get('value_usd', 0)
+                dt    = bv.get('date', '')
+                bs.append(f'{title} bought {hi(f"${val:,.0f}", AMBER)} on {dt}')
+            ins_sc = ins.get('insider_score', 0)
+            bs.append(f'Buy score boost: {hi(f"+{ins_sc}pts", AMBER)} · Watch for factor gate opening')
+            ins_lbl = 'CLUSTER' if is_cluster else 'INSIDER'
+            cards += card(ticker, 'INSIDER', f'{ins_lbl} · +{ins_sc}pts',
+                         AMBER, '#1a1200', bs, 'WATCH FOR FACTOR GATE OPENING', AMBER)
+        html += section('🔑 Active Insider Signals', cards)
 
-    # ── PEAD signals
-    pead_signals = pead_data.get('signals', {}) if pead_data else {}
-    held_pead = {t: v for t, v in pead_signals.items()
-                 if any(s.get('ticker') == t and s.get('is_holding') for s in signals)}
-    all_pead = {**held_pead, **{t: v for t, v in pead_signals.items() if t not in held_pead}}
-    if all_pead:
-        html += '<div class="sec"><div class="sec-title">⚡ Active PEAD Signals</div>'
-        for ticker, ps in list(all_pead.items())[:3]:
+    # PEAD signals
+    pead_sigs = pead_data.get('signals', {}) if pead_data else {}
+    if pead_sigs:
+        cards = ''
+        for ticker, ps in list(pead_sigs.items())[:3]:
             sue     = ps.get('sue', 0)
             expires = ps.get('expires_at', '?')
-            is_held = ticker in held_pead
-            sig_row_data = next((s for s in signals if s.get('ticker') == ticker), {})
-            sell_score = sig_row_data.get('sell_score', 0)
-            bullets = [
-                f'SUE <strong>{sue:.2f}</strong> — top-quintile earnings surprise · expires {expires}',
-                f'PEAD drift expected for up to 60 days post-earnings',
+            is_held = any(s.get('ticker') == ticker and s.get('is_holding') for s in signals)
+            sig_    = next((s for s in signals if s.get('ticker') == ticker), {})
+            sell_sc = sig_.get('sell_score', 0)
+            bs = [
+                f'SUE {b(f"{sue:.2f}")} — top-quintile earnings surprise · expires {expires}',
+                'PEAD drift expected for up to 60 days post-earnings',
             ]
             if is_held:
-                bullets.append(f'<strong>HELD</strong> · sell score {sell_score:.0f} — FW damping {"holding sell below TRIM" if sell_score < 52 else "approaching TRIM"}')
+                bs.append(f'{hi("HELD", GREEN)} · sell score {sell_sc:.0f} — FW damping holding sell below TRIM')
             else:
-                bullets.append('Not a held position')
-            html += sig_row('⚡', 'ic-p', ticker, price_html(sig_row_data.get('price')),
-                            f'<span class="tag t-p">SUE {sue:.2f} · {expires}</span>',
-                            bullets,
-                            action('Hold — PEAD active' if is_held else 'Watch only', 'hold' if not is_held else ''))
-        html += '</div>'
+                bs.append('Not a held position')
+            cards += card(ticker, f'SUE {sue:.2f}', f'PEAD · EXP {expires}', PURPLE, '#12082a',
+                         bs, 'HOLD — PEAD ACTIVE' if is_held else 'WATCH ONLY',
+                         BLUE if is_held else TXT3)
+        html += section('⚡ Active PEAD Signals', cards)
 
-    # ── Held positions with sell flags
-    sell_held = [s for s in signals if s.get('is_holding') and s.get('sell_score', 0) >= 30]
-    sell_held.sort(key=lambda x: x.get('sell_score', 0), reverse=True)
+    # Held sell monitor
+    sell_held = sorted([s for s in signals if s.get('is_holding') and s.get('sell_score',0) >= 30],
+                       key=lambda x: -x.get('sell_score', 0))
     if sell_held:
-        html += '<div class="sec"><div class="sec-title">📊 Held Positions — Sell Monitor</div>'
+        cards = ''
         for s in sell_held[:4]:
-            sell_score = s.get('sell_score', 0)
+            sc   = s.get('sell_score', 0)
             fw   = s.get('framework_score', '?')
             dist = s.get('dist_252h', 0)
-            action_str = ('EXIT' if sell_score >= 78 else
-                          'REDUCE' if sell_score >= 65 else
-                          'TRIM' if sell_score >= 52 else 'HOLD')
-            act_style = 'red' if sell_score >= 78 else 'warn' if sell_score >= 52 else 'hold'
-            flags = s.get('sell_flags', '—')
-            bullets = [
-                f'Sell score <strong>{sell_score:.0f}</strong> · Action: <strong>{action_str}</strong> · FW {fw}',
-                f'Dist from 252d high: {dist:+.1f}% · Flags: {flags}',
+            act  = 'EXIT' if sc>=78 else 'REDUCE' if sc>=65 else 'TRIM' if sc>=52 else 'HOLD'
+            acol = RED if act=='EXIT' else AMBER if act in ('REDUCE','TRIM') else TXT3
+            bs   = [
+                f'Sell score {b(f"{sc:.0f}")} · Action: {hi(act, acol)} · FW {fw}',
+                f'Dist from 252d high: {dist:+.1f}%',
             ]
-            if sell_score < 52:
-                bullets.append('FW damping keeps score below TRIM threshold — hold')
-            html += sig_row('⚠' if sell_score >= 52 else '📊',
-                            'ic-s' if sell_score >= 52 else 'ic-h',
-                            s['ticker'], price_html(s.get('price'), s.get('change_pct')),
-                            f'<span class="tag t-{"s" if sell_score>=52 else "h"}">{action_str} · {sell_score:.0f}</span>',
-                            bullets,
-                            action(action_str, act_style if action_str != 'HOLD' else 'hold'))
-        html += '</div>'
+            if sc < 52:
+                bs.append(f'{hi("FW damping keeps score below TRIM — hold", GREEN)}')
+            cards += card(s['ticker'], f'${s.get("price",0):,.2f}',
+                         f'{act} · {sc:.0f}', acol, '#1a0a0a' if sc>=78 else '#1a1200' if sc>=52 else BG2,
+                         bs, act, acol)
+        html += section('📊 Held Positions — Sell Monitor', cards)
 
-    # ── Footer note + footer
-    html += '''<div class="note-bar">
-  <p>📋 <strong>Weekly summary</strong> — sent every Monday morning with insider signals, PEAD activations, regime review and watchlist for the week ahead.</p>
-</div>'''
-    html += f'''<div class="footer">
-  <p>Auto-generated · portfolio-signals · {run_date} · 2× daily 06:00 + 18:00 Bangkok · Buy ≥80 · TRIM ≥52 · REDUCE ≥65 · EXIT ≥78</p>
-</div>'''
-
-    return html_wrap(html, f'Portfolio Signals · {run_date}')
+    html += note_bar('📋 Weekly summary sent every Monday — insider signals, PEAD, regime review, watchlist')
+    html += footer(f'portfolio-signals · {run_date}<br>2× daily · 06:00 + 18:00 BKK',
+                   'Buy ≥80 · TRIM ≥52<br>REDUCE ≥65 · EXIT ≥78')
+    return wrap(html, f'Portfolio Signals · {run_date}')
 
 
-# ── WEEKLY EMAIL ──────────────────────────────────────────────────────
+# ── WEEKLY EMAIL ─────────────────────────────────────────────────────
 def build_weekly(payload, insider_data, pead_data):
     market   = payload.get('market', {})
     signals  = payload.get('analytics', {}).get('signals', [])
     run_date = payload.get('run_date', str(date.today()))
-    weekly_log = load_weekly_log()
+    log      = load_weekly_log()
+    entries  = log.get('entries', [])
 
     vix_z   = market.get('vix_zscore', 0)
     vix_cur = market.get('vix_current', 20)
     vix_lbl = 'Neutral' if abs(vix_z) < 1 else ('Fear' if vix_z > 1 else 'Greed')
     spy_ok  = not market.get('sp500_extended', False)
+    ins_sigs = insider_data.get('signals', {}) if insider_data else {}
+    pead_sigs= pead_data.get('signals', {}) if pead_data else {}
+    held     = [s for s in signals if s.get('is_holding')]
+    exits    = sum(1 for s in held if s.get('sell_score',0) >= 78)
+    reduces  = sum(1 for s in held if 65 <= s.get('sell_score',0) < 78)
+    new_buys = sum(1 for s in signals if s.get('signal') == 'BUY')
+    top_score= max((s.get('buy_score',0) for s in signals if s.get('fdfv3')), default=0)
 
-    ins_signals  = insider_data.get('signals', {}) if insider_data else {}
-    pead_signals = pead_data.get('signals', {}) if pead_data else {}
-    n_ins  = len(ins_signals)
-    n_pead = len(pead_signals)
+    headline = f'{exits} exits · {reduces} reduces · {len(ins_sigs)} insider signals · {len(pead_sigs)} PEAD active'
+    subline  = f'Regime: {vix_lbl} all week · SPY {"above" if spy_ok else "below"} 200d MA'
 
-    held = [s for s in signals if s.get('is_holding')]
-    exit_count   = sum(1 for s in held if s.get('sell_score', 0) >= 78)
-    reduce_count = sum(1 for s in held if 65 <= s.get('sell_score', 0) < 78)
-    top_watch    = sorted([s for s in signals if s.get('fdfv3')],
-                           key=lambda x: (-x.get('buy_score',0), -x.get('framework_score',0)))[:2]
+    html  = header(f'Weekly Summary · Week ending {run_date}', headline, subline)
+    html += mkt_strip([
+        ('VIX Range', f'{vix_cur:.1f} z={vix_z:+.2f} · {vix_lbl}', BLUE),
+        ('SPY 200d',  'Above all week ✓' if spy_ok else 'Below ⚠', GREEN if spy_ok else RED),
+        ('Buy Caps',  f'{market.get("strong_cap",3)}/{market.get("regular_cap",3)} available', TXT),
+    ])
 
-    week_label = f'Week ending {run_date}'
+    # Stats grid
+    html += section('Week in Numbers',
+        stat_grid([
+            (len(ins_sigs),  'Insider Signals', AMBER),
+            (len(pead_sigs), 'PEAD Active',     PURPLE),
+            (exits or '0',   'EXIT / REDUCE',   GREEN if exits==0 else RED),
+            (new_buys or '0','New Buys',         GREEN if new_buys else TXT3),
+            (top_score or '—','Top Watch Score', BLUE),
+            ('HOLD' if exits==0 and reduces==0 else 'ACT', 'Held Status', GREEN if exits==0 and reduces==0 else RED),
+        ])
+    )
 
-    html = f"""
-<div class="hdr">
-  <div class="hdr-meta">
-    <span class="hdr-label">Portfolio Signals · Weekly Summary</span>
-    <span class="hdr-date">{week_label}</span>
-  </div>
-  <h1>{exit_count} exits · {reduce_count} reduces · {n_ins} insider signals · {n_pead} PEAD active</h1>
-  <p>Regime: {vix_lbl} all week · SPY {'above' if spy_ok else 'below'} 200d MA</p>
-</div>
-<div class="mkt">
-  <div><div class="lbl">VIX</div><div class="val n">{vix_cur:.1f} z={vix_z:+.2f} · {vix_lbl}</div></div>
-  <div><div class="lbl">SPY 200d</div><div class="val {'g' if spy_ok else 'r'}">{'Clear ✓' if spy_ok else 'Broken ⚠'}</div></div>
-  <div><div class="lbl">Buy Cap</div><div class="val n">{market.get('strong_cap',3)}/{market.get('regular_cap',3)} available</div></div>
-</div>"""
+    # Signals fired this week
+    if entries:
+        EXPIRY_LABELS = {
+            'price_recovered': ('DO NOT CHASE', TXT3, 'Price recovered — gate closed'),
+            'dfv3_faded':      ('WAIT FOR CONFIRMATION', AMBER, 'Factor gate open but DFV momentum faded'),
+            'penalty_active':  ('AVOID', RED, 'Signal overridden by penalty'),
+            'sell_cleared':    ('SELL SIGNAL CLEARED', BLUE, 'No longer flagged — reassess hold'),
+        }
+        cards = ''
+        seen = set()
+        for e in entries:
+            tk = e.get('ticker','')
+            if tk in seen: continue
+            seen.add(tk)
+            sig_type   = e.get('signal_type', 'WATCH')
+            fired_date = e.get('timestamp', '')[:10]
+            score_fire = e.get('score_at_fire', 0)
+            expired    = e.get('expired', False)
+            reason     = e.get('expire_reason', '')
+            price_chg  = e.get('price_change_pct', 0) or 0
+            is_held    = e.get('is_holding', False)
+            fw         = e.get('framework_score', '?')
 
-    # Week in numbers grid
-    html += '<div class="sec"><div class="sec-title">📊 Week in Numbers</div><div class="grid2">'
-    for label, value, color in [
-        ('Insider Signals', n_ins, '#1d1d1f'),
-        ('PEAD Active', n_pead, '#7e22ce'),
-        ('EXIT Signals', exit_count, '#15803d' if exit_count == 0 else '#b91c1c'),
-        ('REDUCE Signals', reduce_count, '#15803d' if reduce_count == 0 else '#d97706'),
-        ('New BUY Signals', sum(1 for s in signals if s.get('signal')=='BUY'), '#94a3b8'),
-        ('Top Watch Score', max((s.get('buy_score',0) for s in signals if s.get('fdfv3')), default=0), '#1d1d1f'),
-    ]:
-        html += f'<div class="gcell"><div class="gl">{label}</div><div class="gv" style="color:{color}">{value}</div></div>'
-    html += '</div></div>'
+            if expired:
+                lbl, acol, desc = EXPIRY_LABELS.get(reason, ('EXPIRED', TXT3, reason))
+                badge_txt = f'EXPIRED · {fired_date}'
+                badge_col = acol
+                badge_bg  = '#1a1200' if acol==AMBER else '#1a0a0a' if acol==RED else BG2
+            else:
+                lbl, acol, desc = 'ACTIVE', BLUE, 'Still in signal zone'
+                badge_txt = f'ACTIVE · {sig_type}'
+                badge_col = BLUE
+                badge_bg  = '#0c1a3a'
 
-    # ── Insider signals
-    if ins_signals:
-        html += '<div class="sec"><div class="sec-title">🔑 Insider Buying This Week</div>'
-        for ticker, ins in list(ins_signals.items())[:6]:
+            pchg_col  = GREEN if price_chg > 0 else RED if price_chg < 0 else TXT3
+            bs = [
+                f'Signal: {b(sig_type)} · Score at fire: {b(str(score_fire))} · FW {fw}{"  · HELD" if is_held else ""}',
+                f'Price since signal: {hi(f"{price_chg:+.1f}%", pchg_col)}',
+                hi(desc, acol),
+            ]
+            cards += card(tk, f'Fired {fired_date}', badge_txt, badge_col, badge_bg, bs, lbl, acol)
+        html += section('📅 Signals That Fired This Week', cards)
+
+    # Insider signals
+    if ins_sigs:
+        cards = ''
+        for ticker, ins in list(ins_sigs.items())[:5]:
             is_cluster = ins.get('insider_cluster', False)
             buys = ins.get('insider_buys', [])
-            bullets = []
+            bs = []
             if is_cluster:
-                bullets.append(f'<strong>Cluster buy</strong> — {ins.get("insider_n",2)}+ insiders, same 60-day window')
-            for b in buys[:2]:
-                title = (b.get('title') or '').split(',')[0]
-                val   = b.get('value_usd', 0)
-                dt    = b.get('date', '')
-                bullets.append(f'{title} bought <strong>${val:,.0f}</strong> on {dt}')
-            html += sig_row('🔑🔑' if is_cluster else '🔑', 'ic-i', ticker, '',
-                            f'<span class="tag t-i">{"CLUSTER" if is_cluster else "INSIDER"} · +{ins.get("insider_score",0)}pts</span>',
-                            bullets)
-        html += '</div>'
+                bs.append(f'{b("Cluster buy")} — {ins.get("insider_n",2)}+ insiders, same 60-day window')
+            for bv in buys[:2]:
+                title = (bv.get('title') or '').split(',')[0]
+                val   = bv.get('value_usd', 0)
+                dt    = bv.get('date', '')
+                bs.append(f'{title} bought {hi(f"${val:,.0f}", AMBER)} on {dt}')
+            ins_sc  = ins.get('insider_score', 0)
+            ins_lbl = 'CLUSTER' if is_cluster else 'INSIDER'
+            cards += card(ticker, '', f'{ins_lbl} · +{ins_sc}pts',
+                         AMBER, '#1a1200', bs, 'WATCH FOR FACTOR GATE OPENING', AMBER)
+        html += section('🔑 Insider Buying This Week', cards)
 
-    # ── PEAD signals
-    if pead_signals:
-        html += '<div class="sec"><div class="sec-title">⚡ PEAD Signals Active</div>'
-        for ticker, ps in list(pead_signals.items())[:4]:
+    # PEAD signals
+    if pead_sigs:
+        cards = ''
+        for ticker, ps in list(pead_sigs.items())[:4]:
             sue     = ps.get('sue', 0)
             expires = ps.get('expires_at', '?')
             ann     = ps.get('announce_date', '?')
-            is_held = any(s.get('ticker') == ticker and s.get('is_holding') for s in signals)
-            html += sig_row('⚡', 'ic-p', ticker, '',
-                            f'<span class="tag t-p">SUE {sue:.2f} · Expires {expires}</span>',
-                            [
-                                f'Announced <strong>{ann}</strong> · top-quintile earnings surprise',
-                                f'PEAD drift window: 60 days · {"<strong>HELD</strong>" if is_held else "Not held"}',
-                            ])
-        html += '</div>'
+            is_held = any(s.get('ticker')==ticker and s.get('is_holding') for s in signals)
+            cards += card(ticker, f'SUE {sue:.2f}', f'EXP {expires}', PURPLE, '#12082a',
+                         [f'Announced {b(ann)} · top-quintile surprise · drift window 60 days',
+                          hi('HELD', GREEN) + ' · +10pts on buy score' if is_held else 'Not held'],
+                         'HOLD — PEAD ACTIVE' if is_held else 'WATCH ONLY',
+                         BLUE if is_held else TXT3)
+        html += section('⚡ PEAD Signals Active', cards)
 
-    # ── Held positions table
+    # Held positions table
     if held:
-        html += '<div class="sec"><div class="sec-title">📋 Held Positions — Weekly Review</div>'
-        html += '''<table class="tbl"><thead><tr>
-          <th>Ticker</th><th>Buy</th><th>Sell</th><th>Action</th><th>Note</th>
-        </tr></thead><tbody>'''
-        for s in sorted(held, key=lambda x: -x.get('sell_score', 0))[:8]:
-            sell  = s.get('sell_score', 0)
-            act   = 'EXIT' if sell >= 78 else 'REDUCE' if sell >= 65 else 'TRIM' if sell >= 52 else 'HOLD'
-            color = '#b91c1c' if act=='EXIT' else '#d97706' if act in ('REDUCE','TRIM') else '#15803d'
-            note  = s.get('guidance', '')[:60]
-            html += f'''<tr>
-              <td style="font-weight:700">{s["ticker"]}</td>
-              <td>{s.get("buy_score","—")}</td>
-              <td style="color:{'#d97706' if sell>=30 else '#6e6e73'}">{sell:.0f}</td>
-              <td style="color:{color};font-weight:600">{act}</td>
-              <td style="color:#6e6e73">{note}</td>
-            </tr>'''
-        html += '</tbody></table>'
-        if exit_count == 0 and reduce_count == 0:
-            html += '<p style="font-size:11px;color:#6e6e73;margin-top:10px">No EXIT or REDUCE signals on held positions this week.</p>'
-        html += '</div>'
+        rows = ''
+        for s in sorted(held, key=lambda x: -x.get('sell_score',0))[:8]:
+            sc   = s.get('sell_score', 0)
+            act  = 'EXIT' if sc>=78 else 'REDUCE' if sc>=65 else 'TRIM' if sc>=52 else 'HOLD'
+            acol = RED if act=='EXIT' else AMBER if act in ('REDUCE','TRIM') else GREEN
+            note = s.get('guidance','')[:55]
+            rows += f"""<tr>
+<td style="{MONO}font-size:12px;font-weight:700;color:{TXT};padding:9px 10px;border-bottom:1px solid #0f1720;">{s['ticker']}</td>
+<td style="{MONO}font-size:12px;color:{TXT2};padding:9px 10px;border-bottom:1px solid #0f1720;">{s.get('buy_score','—')}</td>
+<td style="{MONO}font-size:12px;color:{AMBER if sc>=30 else TXT3};padding:9px 10px;border-bottom:1px solid #0f1720;">{sc:.0f}</td>
+<td style="{MONO}font-size:12px;font-weight:600;color:{acol};padding:9px 10px;border-bottom:1px solid #0f1720;">{act}</td>
+<td style="{FONT}font-size:11px;color:{TXT3};padding:9px 10px;border-bottom:1px solid #0f1720;">{note}</td>
+</tr>"""
+        tbl = f"""<table width="100%" cellpadding="0" cellspacing="0" style="background:{BG2};border:{BORDER};border-radius:10px;margin-bottom:10px;">
+<tr>
+<th style="{MONO}font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:{TXT3};padding:9px 10px;border-bottom:1px solid #151f2e;text-align:left;font-weight:500;">Ticker</th>
+<th style="{MONO}font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:{TXT3};padding:9px 10px;border-bottom:1px solid #151f2e;text-align:left;font-weight:500;">Buy</th>
+<th style="{MONO}font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:{TXT3};padding:9px 10px;border-bottom:1px solid #151f2e;text-align:left;font-weight:500;">Sell</th>
+<th style="{MONO}font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:{TXT3};padding:9px 10px;border-bottom:1px solid #151f2e;text-align:left;font-weight:500;">Action</th>
+<th style="{MONO}font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:{TXT3};padding:9px 10px;border-bottom:1px solid #151f2e;text-align:left;font-weight:500;">Note</th>
+</tr>{rows}</table>"""
+        note = '' if exits or reduces else bullet_list([hi('No EXIT or REDUCE signals on held positions this week', GREEN)])
+        html += section('📋 Held Positions — Weekly Review', tbl + note)
 
-    # ── This week's signals from log ─────────────────────────────────
-    log_entries = weekly_log.get('entries', [])
-    if log_entries:
-        html += '<div class="sec"><div class="sec-title">Signals That Fired This Week</div>'
-        for entry in sorted(log_entries, key=lambda e: e.get('timestamp',''), reverse=True):
-            t         = entry['ticker']
-            sig_type  = entry.get('signal_type', 'WATCH')
-            score     = entry.get('score', 0)
-            fired_at  = entry.get('timestamp', '')[:10]
-            status    = entry.get('status', 'active')
-            fw        = entry.get('framework_score', '?')
-            dist      = entry.get('dist_252h', 0)
-            is_held   = entry.get('is_holding', False)
-            expire_r  = entry.get('expire_reason', '')
-            expire_d  = entry.get('expire_detail', '')
-            cur_score = entry.get('current_score', score)
-            price_fired = entry.get('price')
-            price_now   = entry.get('current_price')
-
-            # Status badge and recommendation
-            if status == 'active':
-                badge_cls  = 'badge-buy' if sig_type == 'BUY' else 'badge-w'
-                status_txt = f'ACTIVE · Score {cur_score}'
-                rec_dot    = 'd-w'
-                rec_col    = 'c-w'
-                if sig_type == 'BUY':
-                    rec_txt = 'SIGNAL STILL ACTIVE — consider entry if not yet positioned'
-                    rec_dot = 'd-g'
-                    rec_col = 'c-g'
-                else:
-                    rec_txt = f'STILL IN WATCH ZONE — {80 - cur_score}pts from trigger'
-            else:
-                badge_cls  = 'badge-hold'
-                status_txt = f'EXPIRED · {fired_at}'
-                rec_dot    = 'd-h'
-                rec_col    = 'c-h'
-                if expire_r == 'price_recovered':
-                    rec_txt = 'DO NOT CHASE — price recovered, opportunity closed'
-                elif expire_r == 'dfv3_faded':
-                    rec_txt = 'WAIT — factor gate may still be open but momentum faded, need fresh DFV confirmation'
-                elif expire_r == 'penalty_active':
-                    rec_txt = 'AVOID — signal overridden by Banker Weak or RBear penalty'
-                elif expire_r == 'sell_cleared':
-                    rec_txt = 'SELL SIGNAL CLEARED — no longer flagged, reassess hold'
-                else:
-                    rec_txt = 'SIGNAL EXPIRED — reassess on next scanner run'
-
-            # Price change if available
-            price_str = ''
-            if price_fired and price_now and price_fired != price_now:
-                chg = (price_now - price_fired) / price_fired * 100
-                chg_cls = 'hi-g' if chg > 0 else 'bad'
-                price_str = f'<span class="{chg_cls}">{chg:+.1f}% since signal</span>'
-
-            html += f'''
-<div class="card">
-  <div class="card-head">
-    <div class="card-left">
-      <span class="card-ticker">{t}</span>
-      <span class="card-sub">Fired {fired_at} · FW {fw} {"· HELD" if is_held else ""}</span>
-    </div>
-    <span class="badge {badge_cls}">{status_txt}</span>
-  </div>
-  <ul class="bl">
-    <li>Signal: <strong>{sig_type}</strong> · Score at fire: <strong>{score}</strong> · Dist {dist:+.1f}%</li>'''
-            if price_str:
-                html += f'<li>Price movement: {price_str}</li>'
-            if expire_d:
-                html += f'<li><span class="hi-y">{expire_d}</span></li>'
-            html += f'''
-  </ul>
-  <div class="card-action">
-    <span class="dot {rec_dot}"></span>
-    <span class="{rec_col}">{rec_txt}</span>
-  </div>
-</div>'''
-        html += '</div>'
-
-    # ── Watch next week
+    # Priority watch
+    top_watch = sorted([s for s in signals if s.get('fdfv3')],
+                       key=lambda x: (-x.get('buy_score',0), -(x.get('framework_score') or 0)))[:2]
     if top_watch:
-        html += '<div class="sec"><div class="sec-title">👀 Priority Watch — Coming Week</div>'
+        cards = ''
         for s in top_watch:
             fw   = s.get('framework_score', '?')
             dist = s.get('dist_252h', 0)
             gap  = 80 - s.get('buy_score', 0)
-            html += sig_row('★★', 'ic-w', s['ticker'],
-                            price_html(s.get('price')),
-                            f'<span class="tag t-w">WATCH · {s["buy_score"]}</span>',
-                            [
-                                f'Down <strong>{abs(dist):.1f}%</strong> from 252d high · FW {fw}',
-                                f'<strong>{gap} points</strong> below buy trigger · DFV lift {s.get("dfv_lift","?"):.1f}',
-                            ],
-                            action('Primary watchlist entry for next week'))
-        html += '</div>'
+            dfv  = s.get('dfv_lift', 0) or 0
+            cards += card(s['ticker'], f'FW {fw} · Score {s["buy_score"]}',
+                         f'{gap} PTS FROM TRIGGER', BLUE, '#0c1a3a',
+                         [f'Down {b(f"{abs(dist):.1f}%")} from 252d high · DFV lift {hi(f"{dfv:.1f}")}',
+                          f'{hi(str(gap) + " points", AMBER)} below buy trigger'],
+                         'PRIMARY WATCHLIST ENTRY FOR COMING WEEK', BLUE)
+        html += section('👀 Priority Watch — Coming Week', cards)
 
-    html += f'''<div class="footer">
-  <p>Auto-generated weekly summary · portfolio-signals · {run_date} · Next weekly: Monday · Buy ≥80 · TRIM ≥52 · REDUCE ≥65 · EXIT ≥78</p>
-</div>'''
-
-    return html_wrap(html, f'Portfolio Signals · Weekly · {run_date}')
+    html += note_bar(f'📊 Daily digest sent 18:00 Bangkok · Next weekly: Mon {run_date}')
+    html += footer(f'portfolio-signals · Weekly · {run_date}<br>Monday 07:00 BKK',
+                   'Buy ≥80 · TRIM ≥52<br>REDUCE ≥65 · EXIT ≥78')
+    return wrap(html, f'Portfolio Signals · Weekly · {run_date}')
 
 
 # ── SEND EMAIL ────────────────────────────────────────────────────────
@@ -871,23 +494,9 @@ def send_email(subject, html_body):
         print('ERROR: GMAIL_FROM, GMAIL_APP_PASSWORD, GMAIL_TO must all be set')
         sys.exit(1)
 
-    # Strip @import — blocked by all email clients
-    html_body = re.sub(r'@import\s+url\([^)]+\);?\s*', '', html_body)
-
-    # Inline all CSS — the only reliable approach for Gmail.
-    # Gmail strips <style> blocks entirely; every style must be inline.
-    try:
-        from premailer import transform
-        html_body = transform(html_body, remove_classes=False, strip_important=False)
-    except Exception as e:
-        print(f'Warning: premailer inlining failed ({e}) — sending without inlining')
-
-    # Base64 encode HTML part — most reliable encoding for Gmail
-    import base64
-    from email.utils import formatdate, make_msgid
     html_b64 = base64.b64encode(html_body.encode('utf-8')).decode('ascii')
     html_b64_lines = '\r\n'.join(html_b64[i:i+76] for i in range(0, len(html_b64), 76))
-    boundary = 'sig_' + base64.b64encode(os.urandom(9)).decode('ascii').replace('=','').replace('+','').replace('/','')
+    boundary = 'sig_' + base64.b64encode(os.urandom(9)).decode('ascii').replace('=','').replace('+','x').replace('/','y')
 
     raw = '\r\n'.join([
         f'From: Portfolio Signals <{GMAIL_FROM}>',
@@ -923,7 +532,7 @@ def send_email(subject, html_body):
         sys.exit(1)
 
 
-# ── MAIN ──────────────────────────────────────────────────────────────
+# ── MAIN ─────────────────────────────────────────────────────────────
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--mode', choices=['daily','weekly'], required=True)
@@ -944,13 +553,13 @@ def main():
         n_buys  = payload.get('summary', {}).get('strong_buy', 0)
         n_sells = payload.get('market', {}).get('sell_cap', 0)
         subject = f'📊 Portfolio Signals · {run_date} · {n_buys} buy{"s" if n_buys!=1 else ""} · {n_sells} sell flags'
-        send_email(subject, html)
-
-    elif args.mode == 'weekly':
+    else:
         html    = build_weekly(payload, insider_data, pead_data)
-        subject = f'📋 Weekly Summary · {run_date} · {len(insider_data.get("signals",{}))} insider · {len(pead_data.get("signals",{}))} PEAD'
-        send_email(subject, html)
+        n_ins   = len(load_insider().get('signals', {}))
+        n_pead  = len(load_pead().get('signals', {}))
+        subject = f'📋 Weekly Summary · {run_date} · {n_ins} insider · {n_pead} PEAD'
 
+    send_email(subject, html)
 
 if __name__ == '__main__':
     main()
