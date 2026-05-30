@@ -874,22 +874,6 @@ def send_email(subject, html_body):
     # Strip @import — blocked by all email clients
     html_body = re.sub(r'@import\s+url\([^)]+\);?\s*', '', html_body)
 
-<<<<<<< Updated upstream
-    # Build a raw RFC 2822 message with explicit base64 encoding.
-    # This is the most reliable method for Gmail — avoids all MIME library
-    # quirks that cause plain-text fallback rendering.
-    import base64
-    from email.utils import formatdate, make_msgid
-
-    html_b64  = base64.b64encode(html_body.encode('utf-8')).decode('ascii')
-
-    # Chunk base64 into 76-char lines (RFC 2045 requirement)
-    html_b64_lines = '\r\n'.join(
-        html_b64[i:i+76] for i in range(0, len(html_b64), 76)
-    )
-
-    boundary = 'signal_boundary_' + base64.b64encode(os.urandom(12)).decode('ascii').replace('=','')
-=======
     # Inline all CSS — the only reliable approach for Gmail.
     # Gmail strips <style> blocks entirely; every style must be inline.
     try:
@@ -904,7 +888,6 @@ def send_email(subject, html_body):
     html_b64 = base64.b64encode(html_body.encode('utf-8')).decode('ascii')
     html_b64_lines = '\r\n'.join(html_b64[i:i+76] for i in range(0, len(html_b64), 76))
     boundary = 'sig_' + base64.b64encode(os.urandom(9)).decode('ascii').replace('=','').replace('+','').replace('/','')
->>>>>>> Stashed changes
 
     raw = '\r\n'.join([
         f'From: Portfolio Signals <{GMAIL_FROM}>',
