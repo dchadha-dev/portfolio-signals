@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-05-28 05:10 UTC",
-    "tickers_checked": 8,
-    "new_signals": 5,
+    "timestamp": "2026-05-30 03:26 UTC",
+    "tickers_checked": 6,
+    "new_signals": 4,
     "total_signals": 7,
-    "expired_removed": 5,
+    "expired_removed": 4,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 116.4
+    "elapsed_seconds": 123.4
   },
   "signals": {
     "NVDA": {
@@ -22,7 +22,7 @@
       "std_dev_floored": true,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-05-28"
+      "as_of": "2026-05-30"
     },
     "AMAT": {
       "ticker": "AMAT",
@@ -78,21 +78,21 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-05-28"
+      "as_of": "2026-05-30"
     },
     "DELL": {
       "ticker": "DELL",
       "announce_date": "2026-05-28",
       "expires_at": "2026-07-27",
-      "sue": 2.416,
-      "surprise": 0.2918,
-      "actual_eps": 3.89,
-      "estimate_eps": 3.5982,
-      "std_dev": 0.1208,
+      "sue": 11.371,
+      "surprise": 1.8634,
+      "actual_eps": 4.86,
+      "estimate_eps": 2.9966,
+      "std_dev": 0.1639,
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-05-28"
+      "as_of": "2026-05-30"
     },
     "SNOW": {
       "ticker": "SNOW",
@@ -106,7 +106,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-05-28"
+      "as_of": "2026-05-30"
     }
   }
 }
