@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-30 13:46 UTC",
+  "timestamp": "2026-05-30 14:05 UTC",
   "run_date": "Saturday 30 May 2026",
   "prices": {
     "NVDA": {
@@ -228,38 +228,6 @@
     },
     "IDXX": {
       "price": 563.55,
-      "change_pct": null
-    },
-    "BLOK": {
-      "price": 67.98,
-      "change_pct": null
-    },
-    "AAXJ": {
-      "price": 119.08,
-      "change_pct": null
-    },
-    "BOTZ": {
-      "price": 40.16,
-      "change_pct": null
-    },
-    "EWJ": {
-      "price": 92.98,
-      "change_pct": null
-    },
-    "IVV": {
-      "price": 760.07,
-      "change_pct": null
-    },
-    "SMH": {
-      "price": 598.95,
-      "change_pct": null
-    },
-    "SPY": {
-      "price": 756.5,
-      "change_pct": null
-    },
-    "INDA": {
-      "price": 48.57,
       "change_pct": null
     }
   }
