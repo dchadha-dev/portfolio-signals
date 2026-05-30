@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-30 04:05 UTC",
+  "timestamp": "2026-05-30 04:15 UTC",
   "run_date": "Saturday 30 May 2026",
   "prices": {
     "NVDA": {
@@ -24,10 +24,6 @@
     },
     "MSFT": {
       "price": 450.24,
-      "change_pct": null
-    },
-    "AAPL": {
-      "price": 312.06,
       "change_pct": null
     },
     "AMZN": {
