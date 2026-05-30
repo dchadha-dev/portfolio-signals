@@ -1,12 +1,12 @@
 {
   "health": {
-    "timestamp": "2026-05-30 11:36 UTC",
+    "timestamp": "2026-05-30 13:50 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
     "n_insider_signals": 7,
     "n_politician_signals": 0,
     "n_combined_signals": 7,
-    "elapsed_seconds": 263.5,
+    "elapsed_seconds": 223.3,
     "retry_required": false,
     "retry_reason": []
   },
@@ -50,40 +50,6 @@
           "name": "CHEUNG MARTINA",
           "title": "Director, Officer, CEO & President",
           "is_cluster": true
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-05-30"
-    },
-    "SOFI": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "SOFI",
-          "date": "2026-05-11",
-          "value_usd": 248781,
-          "shares": 15545,
-          "price": 16.0,
-          "name": "Noto Anthony",
-          "title": "Director, Officer, Chief Executive Officer",
-          "is_cluster": false
-        },
-        {
-          "ticker": "SOFI",
-          "date": "2026-05-08",
-          "value_usd": 249769,
-          "shares": 15878,
-          "price": 15.73,
-          "name": "Noto Anthony",
-          "title": "Director, Officer, Chief Executive Officer",
-          "is_cluster": false
         }
       ],
       "politician_trades": [],
@@ -157,7 +123,7 @@
       "politician_trades": [],
       "as_of": "2026-05-30"
     },
-    "MELI": {
+    "TSM": {
       "buy_score_boost": 10,
       "insider_score": 10,
       "politician_score": 0,
@@ -168,23 +134,57 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "MELI",
-          "date": "2026-05-26",
-          "value_usd": 157226,
-          "shares": 95,
-          "price": 1655.01,
-          "name": "Aguzin Alejandro Nicolas",
-          "title": "Director",
+          "ticker": "TSM",
+          "date": "2026-05-19",
+          "value_usd": 69980,
+          "shares": 1000,
+          "price": 69.98,
+          "name": "Tien Bor-Zen",
+          "title": "Officer, VP",
           "is_cluster": false
         },
         {
-          "ticker": "MELI",
-          "date": "2026-05-26",
-          "value_usd": 836330,
-          "shares": 505,
-          "price": 1656.1,
-          "name": "Aguzin Alejandro Nicolas",
-          "title": "Director",
+          "ticker": "TSM",
+          "date": "2026-05-19",
+          "value_usd": 69830,
+          "shares": 1000,
+          "price": 69.83,
+          "name": "Tien Bor-Zen",
+          "title": "Officer, VP",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-05-30"
+    },
+    "SOFI": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "SOFI",
+          "date": "2026-05-11",
+          "value_usd": 248781,
+          "shares": 15545,
+          "price": 16.0,
+          "name": "Noto Anthony",
+          "title": "Director, Officer, Chief Executive Officer",
+          "is_cluster": false
+        },
+        {
+          "ticker": "SOFI",
+          "date": "2026-05-08",
+          "value_usd": 249769,
+          "shares": 15878,
+          "price": 15.73,
+          "name": "Noto Anthony",
+          "title": "Director, Officer, Chief Executive Officer",
           "is_cluster": false
         }
       ],
@@ -255,7 +255,7 @@
       "politician_trades": [],
       "as_of": "2026-05-30"
     },
-    "TSM": {
+    "MELI": {
       "buy_score_boost": 10,
       "insider_score": 10,
       "politician_score": 0,
@@ -266,23 +266,23 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "TSM",
-          "date": "2026-05-19",
-          "value_usd": 69980,
-          "shares": 1000,
-          "price": 69.98,
-          "name": "Tien Bor-Zen",
-          "title": "Officer, VP",
+          "ticker": "MELI",
+          "date": "2026-05-26",
+          "value_usd": 157226,
+          "shares": 95,
+          "price": 1655.01,
+          "name": "Aguzin Alejandro Nicolas",
+          "title": "Director",
           "is_cluster": false
         },
         {
-          "ticker": "TSM",
-          "date": "2026-05-19",
-          "value_usd": 69830,
-          "shares": 1000,
-          "price": 69.83,
-          "name": "Tien Bor-Zen",
-          "title": "Officer, VP",
+          "ticker": "MELI",
+          "date": "2026-05-26",
+          "value_usd": 836330,
+          "shares": 505,
+          "price": 1656.1,
+          "name": "Aguzin Alejandro Nicolas",
+          "title": "Director",
           "is_cluster": false
         }
       ],
