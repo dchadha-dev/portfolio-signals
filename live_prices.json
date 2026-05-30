@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-30 03:54 UTC",
+  "timestamp": "2026-05-30 04:05 UTC",
   "run_date": "Saturday 30 May 2026",
   "prices": {
     "NVDA": {
@@ -64,6 +64,10 @@
     },
     "ASML": {
       "price": 1612.76,
+      "change_pct": null
+    },
+    "ANET": {
+      "price": 159.47,
       "change_pct": null
     },
     "DDOG": {
@@ -224,122 +228,6 @@
     },
     "IDXX": {
       "price": 563.53,
-      "change_pct": null
-    },
-    "VICR": {
-      "price": 334.84,
-      "change_pct": null
-    },
-    "RIO": {
-      "price": 106.39,
-      "change_pct": null
-    },
-    "FCX": {
-      "price": 65.71,
-      "change_pct": null
-    },
-    "GDX": {
-      "price": 89.49,
-      "change_pct": null
-    },
-    "SLV": {
-      "price": 68.33,
-      "change_pct": null
-    },
-    "BEP": {
-      "price": 37.09,
-      "change_pct": null
-    },
-    "DNN": {
-      "price": 3.48,
-      "change_pct": null
-    },
-    "MSTR": {
-      "price": 159.09,
-      "change_pct": null
-    },
-    "AAL": {
-      "price": 14.64,
-      "change_pct": null
-    },
-    "OWL": {
-      "price": 10.28,
-      "change_pct": null
-    },
-    "PI": {
-      "price": 151,
-      "change_pct": null
-    },
-    "ALGN": {
-      "price": 174.95,
-      "change_pct": null
-    },
-    "BOTZ": {
-      "price": 40.15,
-      "change_pct": null
-    },
-    "INDA": {
-      "price": 48.56,
-      "change_pct": null
-    },
-    "KWEB": {
-      "price": 26.73,
-      "change_pct": null
-    },
-    "DIA": {
-      "price": 510.78,
-      "change_pct": null
-    },
-    "IWF": {
-      "price": 127.85,
-      "change_pct": null
-    },
-    "FINX": {
-      "price": 26.25,
-      "change_pct": null
-    },
-    "ARKG": {
-      "price": 34.64,
-      "change_pct": null
-    },
-    "SPY": {
-      "price": 756.48,
-      "change_pct": null
-    },
-    "BLOK": {
-      "price": 67.96,
-      "change_pct": null
-    },
-    "ACWV": {
-      "price": 122.01,
-      "change_pct": null
-    },
-    "IVV": {
-      "price": 760.05,
-      "change_pct": null
-    },
-    "DRIV": {
-      "price": 41.6,
-      "change_pct": null
-    },
-    "EWJ": {
-      "price": 92.96,
-      "change_pct": null
-    },
-    "SMH": {
-      "price": 598.93,
-      "change_pct": null
-    },
-    "AAXJ": {
-      "price": 119.06,
-      "change_pct": null
-    },
-    "AIQ": {
-      "price": 67.32,
-      "change_pct": null
-    },
-    "ARKK": {
-      "price": 81.95,
       "change_pct": null
     }
   }
