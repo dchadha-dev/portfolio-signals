@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-01 19:26 UTC",
+  "last_updated": "2026-06-01 22:19 UTC",
   "entries": [
     {
       "ticker": "ORCL",
@@ -14,7 +14,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 249.78,
+      "current_price": 248.15,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -32,7 +32,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 29.87,
+      "current_price": 29.18,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -50,7 +50,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 25.73,
+      "current_price": 25.63,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -158,7 +158,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 249.78,
+      "current_price": 248.15,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -176,7 +176,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 29.87,
+      "current_price": 29.18,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -194,7 +194,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 25.73,
+      "current_price": 25.63,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -248,7 +248,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 106.07,
+      "current_price": 105.65,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -266,7 +266,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 249.78,
+      "current_price": 248.15,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -284,7 +284,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 29.87,
+      "current_price": 29.18,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -302,7 +302,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 25.73,
+      "current_price": 25.63,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
