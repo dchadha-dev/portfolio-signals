@@ -891,7 +891,7 @@ const stocks = [
   { t:'BKNG', n:'Booking Holdings',     acct:'RSU / E*Trade',       shares:475,  direct:80741, fund:292,  currency:'USD' },
   { t:'NVDA', n:'NVIDIA Corp',           acct:'US Stock Account',    shares:160,  direct:31778, fund:3714, currency:'USD' },
   { t:'GOOG', n:'Alphabet',             acct:'US Stock + GTN',      shares:16,   direct:6466,  fund:2245, currency:'USD' },
-  { t:'AAPL', n:'Apple',                acct:'3 accounts',          shares:15,   direct:5317,  fund:2450, currency:'USD' },
+  { t:'AAPL', n:'Apple',                acct:'3 accounts',          shares:18.1, direct:6422,  fund:2450, currency:'USD' },
   { t:'MSFT', n:'Microsoft',            acct:'GTN EU + funds',      shares:4,    direct:2873,  fund:2569, currency:'USD' },
   { t:'META', n:'Meta Platforms',       acct:'GTN US',              shares:5,    direct:3879,  fund:1068, currency:'USD' },
   { t:'AMZN', n:'Amazon',               acct:'US Stock + GTN EU',   shares:6,    direct:2721,  fund:2089, currency:'USD' },
@@ -905,7 +905,7 @@ const stocks = [
   { t:'MELI', n:'MercadoLibre',         acct:'US Stock Account',    shares:1,    direct:2100,  fund:0,    currency:'USD' },
   { t:'RACE', n:'Ferrari NV',           acct:'GTN US',              shares:6,    direct:1825,  fund:0,    currency:'USD' },
   { t:'TM',   n:'Toyota Motor',         acct:'GTN US',              shares:14,   direct:2328,  fund:101,  currency:'USD' },
-  { t:'AMD',  n:'Advanced Micro Dev.',  acct:'Dime',                shares:10,   direct:2002,  fund:298,  currency:'USD' },
+  { t:'AMD',  n:'Advanced Micro Dev.',  acct:'Dime',                shares:9.5,  direct:1902,  fund:298,  currency:'USD' },
   { t:'AMAT', n:'Applied Materials',    acct:'US Stock Account',    shares:9,    direct:1665,  fund:238,  currency:'USD' },
   { t:'ANET', n:'Arista Networks',      acct:'Dime',                shares:7.47, direct:1160,  fund:0,    currency:'USD' },
   { t:'CRDO', n:'Credo Technology',     acct:'Dime',                shares:13,   direct:1500,  fund:0,    currency:'USD' },
@@ -921,20 +921,20 @@ const stocks = [
   { t:'RELX', n:'RELX PLC',             acct:'GTN EU',              shares:19,   direct:786,   fund:0,    currency:'USD' },
   { t:'DELL', n:'Dell Technologies',    acct:'Dime',                shares:11.3, direct:1154,  fund:0,    currency:'USD' },
   { t:'NOW',  n:'ServiceNow',           acct:'Dime',                shares:17.75,direct:1810,  fund:0,    currency:'USD' },
-  { t:'IREN', n:'IREN Limited',         acct:'Dime',                shares:19.3, direct:1160,  fund:0,    currency:'USD' },
+  { t:'IREN', n:'IREN Limited',         acct:'Dime',                shares:32,   direct:1920,  fund:0,    currency:'USD' },
   { t:'CRWV', n:'CoreWeave',            acct:'US Stock Account',    shares:8,    direct:880,   fund:0,    currency:'USD' },
   { t:'TEAM', n:'Atlassian',            acct:'GTN EU',              shares:4,    direct:384,   fund:0,    currency:'USD' },
   { t:'ADBE', n:'Adobe Inc',            acct:'US Stock Account',    shares:1,    direct:254,   fund:0,    currency:'USD' },
   { t:'COIN', n:'Coinbase (fund exp.)', acct:'KT-BLOCKCHAIN',       shares:0,    direct:0,     fund:355,  currency:'USD' },
   // ── ETFs ─────────────────────────────────────────────────
-  { t:'VOO',  n:'Vanguard S&P 500 ETF', acct:'GTN US',              shares:25,   direct:13864, fund:0,    currency:'USD' },
+  { t:'VOO',  n:'Vanguard S&P 500 ETF', acct:'GTN US',              shares:22,   direct:12210, fund:0,    currency:'USD' },
   { t:'VTI',  n:'Vanguard Total Market',acct:'GTN US',              shares:14,   direct:3654,  fund:0,    currency:'USD' },
   { t:'QQQ',  n:'Invesco Nasdaq 100',   acct:'GTN US',              shares:3,    direct:1440,  fund:0,    currency:'USD' },
   { t:'TQQQ', n:'ProShares UltraPro QQQ',acct:'US Stock Account',  shares:30,   direct:1860,  fund:0,    currency:'USD' },
   { t:'VXUS', n:'Vanguard Total Intl',  acct:'US Stock Account',    shares:25,   direct:2050,  fund:0,    currency:'USD' },
   // FDN sold 05/04/26 @ $270 — removed
   { t:'GLD',  n:'SPDR Gold Shares',     acct:'GTN US',              shares:4,    direct:1660,  fund:0,    currency:'USD' },
-  { t:'IEV',  n:'iShares Europe ETF',   acct:'GTN US',              shares:52,   direct:2770,  fund:0,    currency:'USD' },
+  { t:'IEV',  n:'iShares Europe ETF',   acct:'GTN US',              shares:39,   direct:2078,  fund:0,    currency:'USD' },
   { t:'VSS',  n:'Vanguard Intl SmallCap',acct:'GTN US',             shares:20,   direct:3168,  fund:0,    currency:'USD' },
   { t:'URTH', n:'iShares MSCI World',   acct:'GTN US',              shares:15,   direct:2955,  fund:0,    currency:'USD' },
   { t:'FLAX', n:'Franklin FTSE Asia xJP',acct:'GTN UK (GBP)',        shares:50,   direct:1200,  fund:0,    currency:'USD' },
@@ -2494,7 +2494,16 @@ function rankFilter(f) {
 
 function rankSearch(val) {
   document.getElementById('rankContent').dataset.search = val;
+  // Save cursor position before re-render
+  const inp = document.querySelector('input[placeholder="Search ticker..."]');
+  const pos = inp ? inp.selectionStart : null;
   renderRankings();
+  // Restore focus and cursor after re-render
+  const inp2 = document.querySelector('input[placeholder="Search ticker..."]');
+  if (inp2) {
+    inp2.focus();
+    if (pos !== null) inp2.setSelectionRange(pos, pos);
+  }
 }
 
 
@@ -4043,6 +4052,18 @@ function renderBuysFromPayload(payload) {
     const dayChg = s.change_pct || 0;
     const dayColor = dayChg >= 0 ? 'var(--green)' : 'var(--red)';
 
+    // ── Signal breakdown ──────────────────────────────────────────────
+    const signals_fired = [];
+    if (s.factor)       signals_fired.push(`<span style="color:var(--green)">Factor +40</span>`);
+    if (s.fdfv3)        signals_fired.push(`<span style="color:var(--green)">DFV V3 +25</span>`);
+    if (s.pfd)          signals_fired.push(`<span style="color:#0891b2">PFD +8</span>`);
+    if (s.triple)       signals_fired.push(`<span style="color:#8b5cf6">Triple +10</span>`);
+    if (s.insider_score)signals_fired.push(`<span style="color:var(--amber)">Insider +${s.insider_score}</span>`);
+    if (s.pead_score)   signals_fired.push(`<span style="color:#a78bfa">PEAD +${s.pead_score}</span>`);
+    if (s.sector_buy_boost) signals_fired.push(`<span style="color:#0891b2">Sector +${s.sector_buy_boost}</span>`);
+    if (s.banker_weak)  signals_fired.push(`<span style="color:var(--amber)">BankerWeak −20</span>`);
+    if (s.rbear)        signals_fired.push(`<span style="color:var(--amber)">RBear −10</span>`);
+
     return `<div class="signal-card" style="border-left:3px solid ${accentColor};margin-bottom:10px;">
       <div class="sc-header">
         <div>
@@ -4064,7 +4085,12 @@ function renderBuysFromPayload(payload) {
           <div style="font-size:9px;color:var(--text3)">framework</div>` : ''}
         </div>
       </div>
-      <div style="display:flex;gap:16px;margin:8px 0;font-size:11px;font-family:'DM Mono',monospace;color:var(--text3)">
+      <!-- Signal breakdown -->
+      ${signals_fired.length ? `<div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);margin:6px 0 4px;">
+        Signals: ${signals_fired.join(' &nbsp;·&nbsp; ')}
+        &nbsp;=&nbsp; <span style="color:${accentColor};font-weight:600">${s.buy_score} total</span>
+      </div>` : ''}
+      <div style="display:flex;gap:16px;margin:6px 0;font-size:11px;font-family:'DM Mono',monospace;color:var(--text3)">
         <span title="DFV lift">DFV lift: <b style="color:${isStrong?'var(--green)':'var(--text)'}">${(s.dfv_lift||0).toFixed(1)}</b></span>
         ${s.factor_sep != null ? `<span>Hist α: <b style="color:${s.factor_sep>0?'var(--green)':'var(--red)'}">${s.factor_sep>0?'+':''}${s.factor_sep}%</b></span>` : ''}
         ${s.triple ? '<span style="color:#8b5cf6">⚡ 3x momentum</span>' : ''}
@@ -4189,8 +4215,18 @@ function renderSellsFromPayload(payload) {
           ${s.sell_weekly_rsi != null ? `<span>wRSI: ${s.sell_weekly_rsi}</span>` : ''}
           ${s.sell_cmf != null ? `<span>CMF: ${s.sell_cmf}</span>` : ''}
           ${s.sell_rv_z != null ? `<span>RV-Z: ${s.sell_rv_z}</span>` : ''}
-          <span>Framework: ${s.framework_score || '—'}/100</span>
+          <span>FW: <b style="color:${(s.framework_score||0)>=80?'var(--green)':(s.framework_score||0)>=65?'#0891b2':'var(--amber)'}">${s.framework_score || '—'}/100</b></span>
         </div>
+        ${(() => {
+          const fw = s.framework_score;
+          const raw = s.sell_score_raw || s.sell_score;
+          if (!fw || !raw) return '';
+          const damp = (1.0 - 0.50 * Math.pow(fw/100, 1.5)).toFixed(3);
+          const damped = Math.round(raw * parseFloat(damp));
+          return `<div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);margin-top:4px;background:var(--s2);padding:5px 8px;border-radius:4px;">
+            FW damping: raw ${raw} × ${damp} (FW ${fw}) = <b style="color:${damped>=78?'var(--red)':damped>=65?'var(--amber)':'var(--green)'}">${damped} → ${damped>=78?'EXIT':damped>=65?'REDUCE':damped>=52?'TRIM':'HOLD'}</b>
+          </div>`;
+        })()}
       </div>`;
     }).join('')}
     <div style="margin-top:10px;font-size:10px;color:var(--text3);background:var(--s2);padding:8px 12px;border-radius:6px;">
