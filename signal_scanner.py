@@ -206,6 +206,42 @@ FRAMEWORK_SCORES = {
     'GEV':72,'CB':72,'LSCC':71,'CSCO':70,'DASH':70,'GE':70,
     'LMT':70,
     # 55–69 Marginal
+
+    # ── ETF FRAMEWORK SCORES ─────────────────────────────────────────────
+    # ETF scores reflect quality of underlying exposure, not single-company moat.
+    # Broad diversified index ETFs score highest (structural quality, low cost).
+    # Thematic/leveraged ETFs score lower (concentration, vol, decay risk).
+    # US broad market
+    'VOO':82,   # S&P 500 — gold standard, lowest cost, maximum diversification
+    'SPY':82,   # S&P 500 — same exposure as VOO, slightly higher fees
+    'IVV':82,   # S&P 500 iShares — equivalent to VOO/SPY
+    'QQQ':78,   # Nasdaq-100 — quality tilt but tech concentration risk
+    'DIA':72,   # Dow Jones — 30 large caps, price-weighted, less optimal
+    'VXF':70,   # Vanguard Extended Market — US small/mid, higher vol
+    'VXUS':68,  # Vanguard Total International — broad but EM drag
+    # Sector ETFs (US listed)
+    'XLK':76,   # Technology sector — quality but concentration
+    'XLV':74,   # Healthcare sector — defensive quality
+    'XLF':68,   # Financials — cyclical, regulatory risk
+    'XLI':68,   # Industrials — cyclical
+    'XLY':70,   # Consumer discretionary — quality names but cyclical
+    'XLE':58,   # Energy — commodity-dependent, ESG headwinds
+    # International
+    'IEV':65,   # iShares Europe ETF — Europe quality drag vs US
+    'EWJ':64,   # Japan — structural quality, yen risk
+    'URTH':72,  # MSCI World — global diversification, US-heavy
+    'EWY':60,   # South Korea — Samsung-heavy, EM premium
+    'EWZ':52,   # Brazil — EM political/commodity risk
+    # Commodities
+    'GLD':65,   # Gold — inflation hedge, no yield, no moat
+    # Bond ETFs
+    'IEF':60,   # 7-10yr Treasuries — rate duration risk
+    'TLT':55,   # 20yr+ Treasuries — high duration, volatile
+    # Leveraged (decay risk, short hold only)
+    'TQQQ':48,  # 3× Nasdaq — severe decay on sideways markets
+    # Asia/EM thematic
+    'FLAX':62,  # Franklin FTSE Asia ex-Japan — broad Asia quality
+
     'ACLS':68,'COHR':68,'GLW':68,'TSEM':68,'DELL':68,'BAC':68,
     'OWL':68,'MDT':68,'ALGN':68,'RCL':68,'SBUX':68,'CL':68,
     'ULTA':68,'CCJ':68,'XOM':68,'RTX':68,'AER':68,'PDD':68,
