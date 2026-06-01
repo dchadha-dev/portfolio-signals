@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-05-30 14:21 UTC",
-    "tickers_checked": 6,
-    "new_signals": 4,
-    "total_signals": 7,
+    "timestamp": "2026-06-01 19:35 UTC",
+    "tickers_checked": 8,
+    "new_signals": 6,
+    "total_signals": 9,
     "expired_removed": 4,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 111.7
+    "elapsed_seconds": 110.6
   },
   "signals": {
     "NVDA": {
@@ -22,7 +22,7 @@
       "std_dev_floored": true,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-05-30"
+      "as_of": "2026-06-01"
     },
     "AMAT": {
       "ticker": "AMAT",
@@ -71,28 +71,28 @@
       "announce_date": "2026-05-27",
       "expires_at": "2026-07-26",
       "sue": 2.309,
-      "surprise": 0.7317,
+      "surprise": 0.7318,
       "actual_eps": 3.88,
-      "estimate_eps": 3.1483,
+      "estimate_eps": 3.1482,
       "std_dev": 0.3169,
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-05-30"
+      "as_of": "2026-06-01"
     },
     "DELL": {
       "ticker": "DELL",
       "announce_date": "2026-05-28",
       "expires_at": "2026-07-27",
-      "sue": 11.371,
-      "surprise": 1.8634,
+      "sue": 11.36,
+      "surprise": 1.8615,
       "actual_eps": 4.86,
-      "estimate_eps": 2.9966,
+      "estimate_eps": 2.9985,
       "std_dev": 0.1639,
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-05-30"
+      "as_of": "2026-06-01"
     },
     "SNOW": {
       "ticker": "SNOW",
@@ -106,7 +106,35 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-05-30"
+      "as_of": "2026-06-01"
+    },
+    "HPE": {
+      "ticker": "HPE",
+      "announce_date": "2026-06-01",
+      "expires_at": "2026-07-31",
+      "sue": 2.34,
+      "surprise": 0.0554,
+      "actual_eps": 0.65,
+      "estimate_eps": 0.5946,
+      "std_dev": 0.0237,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-06-01"
+    },
+    "CRDO": {
+      "ticker": "CRDO",
+      "announce_date": "2026-06-01",
+      "expires_at": "2026-07-31",
+      "sue": 1.8,
+      "surprise": 0.0956,
+      "actual_eps": 1.07,
+      "estimate_eps": 0.9744,
+      "std_dev": 0.0531,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-06-01"
     }
   }
 }
