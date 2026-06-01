@@ -2285,26 +2285,20 @@ function renderRankings() {
   }
 
   function sellBadge(action, score, fw) {
-    // Compute damped score for tooltip
-    const dampFactor = fw ? (1.0 - 0.50 * Math.pow(fw/100, 1.5)) : 1.0;
-    const damped     = fw ? Math.round(score * dampFactor) : score;
-    const dampTip    = fw ? `Raw ${score} × ${dampFactor.toFixed(3)} (FW ${fw}) = ${damped} damped → ${action}` : '';
+    // sell_score from payload is ALREADY FW-damped by sell_side_scorer.py
+    // sell_action is ALREADY the correct post-damping action
+    // Do NOT re-compute damping here — it would double-damp the score
+
+    const tip = fw ? `Damped score: ${score} (FW ${fw}) → ${action || 'HOLD'}` : `Score: ${score} → ${action || 'HOLD'}`;
 
     if (!action || action === 'HOLD') {
-      if (score == null) {
-        return '<span style="color:var(--border);font-size:10px" title="No sell data">—</span>';
-      }
-      if (score === 0) {
-        return `<span style="color:var(--text3);font-size:10px;font-family:'DM Mono',monospace" title="No sell signals active">0</span>`;
-      }
-      // HOLD but non-zero score — FW damping reduced it below TRIM
-      const tip = dampTip || `Score ${score} — below TRIM threshold after FW damping`;
-      return `<span style="color:var(--text3);font-size:10px;font-family:'DM Mono',monospace" title="${tip}">
-        ${score}<span style="color:var(--text3);font-size:9px;margin-left:2px">→${damped}</span>
-      </span>`;
+      if (score == null) return '<span style="color:var(--border);font-size:10px">—</span>';
+      if (score === 0)   return `<span style="color:var(--text3);font-size:10px;font-family:'DM Mono',monospace" title="No sell signals active">0</span>`;
+      // HOLD with non-zero score — damping absorbed it below TRIM
+      return `<span style="color:var(--text3);font-size:10px;font-family:'DM Mono',monospace" title="${tip}">${score} → HOLD</span>`;
     }
     const c = action==='EXIT' ? '#8b0000' : action==='REDUCE' ? 'var(--red)' : 'var(--amber)';
-    return `<span style="background:${c};color:#fff;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:700;font-family:'DM Mono',monospace" title="${dampTip}">${action} ${damped||score}</span>`;
+    return `<span style="background:${c};color:#fff;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:700;font-family:'DM Mono',monospace" title="${tip}">${action} ${score}</span>`;
   }
 
   function signalDots(s) {
@@ -4188,13 +4182,11 @@ function renderSellsFromPayload(payload) {
       &nbsp;·&nbsp; CNN F&amp;G: <span style="color:${cnnColor};font-weight:600">${cnnScore.toFixed(0)} (${cnnLabel})</span>
     </div>
     ${sells.map(s => {
-      // Use the damped sell_action from the scanner — do NOT re-derive from raw score
+      // sell_score and sell_action are already FW-damped from sell_side_scorer.py
+      // Use them directly — do NOT re-compute damping
+      const score   = s.sell_score || 0;
       const fw      = s.framework_score || 0;
-      const rawSc   = s.sell_score || 0;
-      const damp    = fw ? (1.0 - 0.50 * Math.pow(fw/100, 1.5)) : 1.0;
-      const damped  = fw ? Math.round(rawSc * damp) : rawSc;
-      const action  = s.sell_action && s.sell_action !== 'HOLD' ? s.sell_action
-                    : damped >= 78 ? 'EXIT' : damped >= 65 ? 'REDUCE' : damped >= 52 ? 'TRIM' : 'HOLD';
+      const action  = s.sell_action && s.sell_action !== 'HOLD' ? s.sell_action : 'HOLD';
       const acColor = ac(action);
       return `
       <div class="signal-card sell-card" style="margin-bottom:10px;border-left:3px solid ${acColor};">
@@ -4210,7 +4202,8 @@ function renderSellsFromPayload(payload) {
           <div style="text-align:right;">
             <span style="background:${acColor};color:#fff;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:700;">${action}</span>
             <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);margin-top:3px;">
-              Raw: ${rawSc} → Damped: <b style="color:${damped>=78?'var(--red)':damped>=65?'var(--amber)':damped>=52?'#f59e0b':'var(--green)'}">${damped}</b>
+              Score: <b style="color:${score>=78?'var(--red)':score>=65?'var(--amber)':score>=52?'#f59e0b':'var(--green)'}">${score}</b>
+              ${fw ? `· FW ${fw}` : ''}
             </div>
           </div>
         </div>
@@ -4228,16 +4221,9 @@ function renderSellsFromPayload(payload) {
           ${s.sell_rv_z != null ? `<span>RV-Z: ${s.sell_rv_z}</span>` : ''}
           <span>FW: <b style="color:${(s.framework_score||0)>=80?'var(--green)':(s.framework_score||0)>=65?'#0891b2':'var(--amber)'}">${s.framework_score || '—'}/100</b></span>
         </div>
-        ${(() => {
-          const fw = s.framework_score;
-          const raw = s.sell_score_raw || s.sell_score;
-          if (!fw || !raw) return '';
-          const damp = (1.0 - 0.50 * Math.pow(fw/100, 1.5)).toFixed(3);
-          const damped = Math.round(raw * parseFloat(damp));
-          return `<div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);margin-top:4px;background:var(--s2);padding:5px 8px;border-radius:4px;">
-            FW damping: raw ${raw} × ${damp} (FW ${fw}) = <b style="color:${damped>=78?'var(--red)':damped>=65?'var(--amber)':'var(--green)'}">${damped} → ${damped>=78?'EXIT':damped>=65?'REDUCE':damped>=52?'TRIM':'HOLD'}</b>
-          </div>`;
-        })()}
+        ${fw ? `<div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);margin-top:4px;background:var(--s2);padding:5px 8px;border-radius:4px;">
+          FW ${fw} damping already applied by scanner · score ${score} is post-damp → ${action}
+        </div>` : ''}
       </div>`;
     }).join('')}
     <div style="margin-top:10px;font-size:10px;color:var(--text3);background:var(--s2);padding:8px 12px;border-radius:6px;">
