@@ -825,26 +825,28 @@ body .amt { transition: filter 0.18s ease; }
   <!-- ANALYTICS -->
   <!-- ── TAB: Trading Advice ─────────────────────────────────── -->
   <div class="tab-panel" id="tab-analytics">
-    <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;">
-      <div class="sub-tab active" onclick="switchAnalytics('signals',this)">&#9889; Signals</div>
-      <div class="sub-tab" onclick="switchAnalytics('buy',this)">&#11088; Buy Ideas</div>
-      <div class="sub-tab" onclick="switchAnalytics('sell',this)">&#9888; Sell Guidance</div>
-    </div>
-    <div id="ana-signals" class="ana-panel active">
-      <div id="signalsContent"><div class="placeholder">Click "Run Live Analysis" to generate signals based on current prices</div></div>
-    </div>
-    <div id="ana-buy" class="ana-panel">
-      <div id="buyContent"><div class="placeholder">Click "Run Live Analysis" to generate buy ideas aligned to your strategy</div></div>
-    </div>
-    <div id="ana-sell" class="ana-panel">
-      <div id="sellContent"><div class="placeholder">Click "Run Live Analysis" to generate sell guidance (max 10% of portfolio flagged)</div></div>
-    </div>
-    <div style="margin-top:20px;">
-      <button class="refresh-btn" id="anaBtn" onclick="runAnalytics()" style="background:var(--text);color:var(--white);">
+    <!-- Run Analysis button at top -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <button class="refresh-btn" id="anaBtn" onclick="runAnalytics()" style="background:var(--text);color:var(--white);margin:0;">
         <div class="spinner" id="anaSpinner"></div>
         <span id="anaLabel">Run Live Analysis</span>
       </button>
-      <div style="font-size:11px;color:var(--text3);margin-top:8px;font-family:'DM Mono',monospace;" id="anaUpdated"></div>
+      <div style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;" id="anaUpdated"></div>
+    </div>
+    <!-- Tabs: Buy Ideas → Sell Guidance → Signals -->
+    <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;">
+      <div class="sub-tab active" onclick="switchAnalytics('buy',this)">&#11088; Buy Ideas</div>
+      <div class="sub-tab" onclick="switchAnalytics('sell',this)">&#9888; Sell Guidance</div>
+      <div class="sub-tab" onclick="switchAnalytics('signals',this)">&#9889; Signals</div>
+    </div>
+    <div id="ana-buy" class="ana-panel active">
+      <div id="buyContent"><div class="placeholder">Signals auto-load from GitHub. Click "Run Live Analysis" for AI-enhanced analysis.</div></div>
+    </div>
+    <div id="ana-sell" class="ana-panel">
+      <div id="sellContent"><div class="placeholder">Sell guidance loads automatically. Click "Run Live Analysis" to refresh.</div></div>
+    </div>
+    <div id="ana-signals" class="ana-panel">
+      <div id="signalsContent"><div class="placeholder">Click "Run Live Analysis" to generate signals based on current prices.</div></div>
     </div>
   </div>
 
@@ -4103,8 +4105,8 @@ function renderBuysFromPayload(payload) {
         ${s.banker_weak ? '<span style="color:var(--amber)">⚠ Banker Weak</span>' : ''}
       </div>
       <div class="sc-body">${s.guidance || ''}</div>
-      ${s.sell_score > 0 ? `<div style="margin-top:6px;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3)">
-        Sell signal: <span style="color:${s.sell_score>=55?'var(--red)':'var(--amber)'}">${s.sell_action} ${s.sell_score}/100</span>
+      ${s.sell_score > 0 && s.sell_action && s.sell_action !== 'HOLD' ? `<div style="margin-top:6px;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3)">
+        Sell signal: <span style="color:${s.sell_action==='EXIT'?'var(--red)':s.sell_action==='REDUCE'?'#f97316':'var(--amber)'}">${s.sell_action} ${s.sell_score}/100</span>
         ${s.sell_flags && s.sell_flags!=='—' ? '· ' + s.sell_flags : ''}
       </div>` : ''}
     </div>`;
