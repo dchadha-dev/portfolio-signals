@@ -4017,29 +4017,34 @@ function renderBuysFromPayload(payload) {
   const finalStrongLimit  = market.strong_cap  || strongLimit;
   const finalRegularLimit = market.regular_cap || regularLimit;
 
-  // Strong buys: fdfv3 active + score >= 78 + FW >= 75
-  const strongBuys = allSigs
-    .filter(s => s.fdfv3 && s.buy_score >= 78 && (s.framework_score || 0) >= 75)
-    .sort((a,b) => {
-      if (a.is_holding !== b.is_holding) return a.is_holding ? -1 : 1;
-      return b.buy_score - a.buy_score;
+  // Single unified ranked list — sorted by buy_score descending.
+  // Minimum bar: score >= 40 AND FW >= 60 AND factor gate open (or fdfv3).
+  // No separate strong/regular split that causes lower-score tickers to
+  // appear above higher-score ones. Tier label shown on the card itself.
+  const totalLimit = Math.max(finalStrongLimit, finalRegularLimit);
+  const allBuys = allSigs
+    .filter(s => {
+      const fw = s.framework_score || 0;
+      const score = s.buy_score || 0;
+      const hasSignal = s.fdfv3 || (s.factor && !s.fdfv3);
+      return hasSignal && score >= 40 && fw >= 60 && s.signal !== 'WEAK_BUY';
     })
-    .slice(0, finalStrongLimit);
+    .sort((a, b) => {
+      // Held positions first, then by buy_score desc, then FW desc
+      if (a.is_holding !== b.is_holding) return a.is_holding ? -1 : 1;
+      if (b.buy_score !== a.buy_score) return b.buy_score - a.buy_score;
+      return (b.framework_score || 0) - (a.framework_score || 0);
+    })
+    .slice(0, totalLimit);
 
-  // Regular buys: factor only (not fdfv3) + score >= 40 + FW >= 70
-  const regularBuys = allSigs
-    .filter(s => s.factor && !s.fdfv3 && s.buy_score >= 40 &&
-                 (s.framework_score || 0) >= 70 && s.signal !== 'WEAK_BUY')
-    .sort((a,b) => {
-      if (a.is_holding !== b.is_holding) return a.is_holding ? -1 : 1;
-      return b.buy_score - a.buy_score;
-    })
-    .slice(0, finalRegularLimit);
+  // Keep legacy vars for section headers (unused now but referenced below)
+  const strongBuys  = allBuys.filter(s => s.fdfv3);
+  const regularBuys = allBuys.filter(s => !s.fdfv3);
 
   const el = document.getElementById('buyContent');
 
-  if (!strongBuys.length && !regularBuys.length) {
-    el.innerHTML = '<div class="placeholder">No buy signals meeting criteria. Threshold: score≥80 + FW≥70. Waiting for higher-conviction setups.</div>';
+  if (!allBuys.length) {
+    el.innerHTML = '<div class="placeholder">No buy signals meeting criteria. Threshold: score≥40 + FW≥60 + factor gate open. Waiting for higher-conviction setups.</div>';
     return;
   }
 
@@ -4108,33 +4113,14 @@ function renderBuysFromPayload(payload) {
     ${runDate}
     · VIX: <span style="color:${vixZ > 1 ? 'var(--green)' : vixZ < -1 ? 'var(--red)' : 'var(--text3)'};font-weight:600">${vixCur.toFixed(1)} z=${vixZ.toFixed(1)} (${vixLabel})</span>
     · CNN: <span style="color:${cnnScore < 40 ? 'var(--green)' : cnnScore > 75 ? 'var(--red)' : 'var(--text3)'}">${cnnScore.toFixed(0)}</span>
-    · Strong cap: ${finalStrongLimit} · Regular cap: ${finalRegularLimit}
+    · Cap: ${totalLimit} · Ranked by score
   </div>`;
 
-  if (strongBuys.length) {
-    html += `<div style="font-size:12px;font-weight:700;color:var(--green);margin:12px 0 8px;letter-spacing:.05em">
-      ★★ STRONG BUY — Factor+DFV V3 active (${strongBuys.length}/${finalStrongLimit})
-    </div>`;
-    html += strongBuys.map(s => buyCard(s, 'strong')).join('');
-  } else {
-    html += `<div style="background:var(--s2);border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:11px;color:var(--text3)">
-      ★★ No strong buys — Factor+DFV V3 not firing on any high-FW ticker. Conditions: beaten down >20%, hot money re-entering, FW≥75.
-    </div>`;
-  }
-
-  if (regularBuys.length) {
-    html += `<div style="font-size:12px;font-weight:700;color:#0891b2;margin:16px 0 8px;letter-spacing:.05em">
-      ★ REGULAR BUY — Factor gate active, waiting for DFV (${regularBuys.length}/${finalRegularLimit})
-    </div>`;
-    html += regularBuys.map(s => buyCard(s, 'regular')).join('');
-  } else {
-    html += `<div style="background:var(--s2);border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:11px;color:var(--text3)">
-      ★ No regular buys — Factor gate not firing on any FW≥70 ticker. Conditions: beaten down >20%, above 200d MA, FW≥70.
-    </div>`;
-  }
+  // Single ranked list — highest score first regardless of tier
+  html += allBuys.map(s => buyCard(s, s.fdfv3 ? 'strong' : 'regular')).join('');
 
   html += `<div style="margin-top:12px;font-size:10px;color:var(--text3);background:var(--s2);padding:8px 12px;border-radius:6px;font-family:'DM Mono',monospace">
-    Strong buy = Factor+DFV V3 both firing + FW≥75 · Regular = Factor only + FW≥70 · Full universe in Rankings tab
+    ★★ = Factor+DFV V3 both firing · ★ = Factor only (waiting for DFV V3) · Sorted by score · Full universe in Rankings tab
   </div>`;
 
   el.innerHTML = html;
