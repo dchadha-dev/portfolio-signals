@@ -2286,21 +2286,36 @@ function renderRankings() {
     </div>`;
   }
 
+  function dampedSellScore(rawScore, fw) {
+    // Compute damped score client-side — matches sell_side_scorer.py formula exactly
+    // Used as a stopgap until the next scanner run produces pre-damped values
+    if (!fw || fw <= 0) return rawScore;
+    const damp = 1.0 - 0.50 * Math.pow(fw / 100, 1.5);
+    return Math.round(rawScore * damp);
+  }
+
+  function dampedSellAction(dampedScore) {
+    if (dampedScore >= 78) return 'EXIT';
+    if (dampedScore >= 65) return 'REDUCE';
+    if (dampedScore >= 52) return 'TRIM';
+    return 'HOLD';
+  }
+
   function sellBadge(action, score, fw) {
-    // sell_score from payload is ALREADY FW-damped by sell_side_scorer.py
-    // sell_action is ALREADY the correct post-damping action
-    // Do NOT re-compute damping here — it would double-damp the score
+    // Always compute damped score client-side — prevents stale pre-damped
+    // payload values from showing wrong badge until next scanner run
+    const damped = dampedSellScore(score, fw);
+    const correctAction = dampedSellAction(damped);
+    const tip = fw
+      ? `Raw ${score} × ${(1 - 0.50 * Math.pow(fw/100, 1.5)).toFixed(3)} (FW ${fw}) = ${damped} → ${correctAction}`
+      : `Score: ${score} → ${correctAction}`;
 
-    const tip = fw ? `Damped score: ${score} (FW ${fw}) → ${action || 'HOLD'}` : `Score: ${score} → ${action || 'HOLD'}`;
-
-    if (!action || action === 'HOLD') {
-      if (score == null) return '<span style="color:var(--border);font-size:10px">—</span>';
-      if (score === 0)   return `<span style="color:var(--text3);font-size:10px;font-family:'DM Mono',monospace" title="No sell signals active">0</span>`;
-      // HOLD with non-zero score — damping absorbed it below TRIM
-      return `<span style="color:var(--text3);font-size:10px;font-family:'DM Mono',monospace" title="${tip}">${score} → HOLD</span>`;
+    if (!correctAction || correctAction === 'HOLD') {
+      if (score == null || score === 0) return `<span style="color:var(--text3);font-size:10px" title="No sell signals active">—</span>`;
+      return `<span style="color:var(--text3);font-size:10px;font-family:'DM Mono',monospace" title="${tip}">${damped} → HOLD</span>`;
     }
-    const c = action==='EXIT' ? '#8b0000' : action==='REDUCE' ? 'var(--red)' : 'var(--amber)';
-    return `<span style="background:${c};color:#fff;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:700;font-family:'DM Mono',monospace" title="${tip}">${action} ${score}</span>`;
+    const c = correctAction==='EXIT' ? '#8b0000' : correctAction==='REDUCE' ? 'var(--red)' : 'var(--amber)';
+    return `<span style="background:${c};color:#fff;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:700;font-family:'DM Mono',monospace" title="${tip}">${correctAction} ${damped}</span>`;
   }
 
   function signalDots(s) {
@@ -4105,10 +4120,16 @@ function renderBuysFromPayload(payload) {
         ${s.banker_weak ? '<span style="color:var(--amber)">⚠ Banker Weak</span>' : ''}
       </div>
       <div class="sc-body">${s.guidance || ''}</div>
-      ${s.sell_score > 0 && s.sell_action && s.sell_action !== 'HOLD' ? `<div style="margin-top:6px;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3)">
-        Sell signal: <span style="color:${s.sell_action==='EXIT'?'var(--red)':s.sell_action==='REDUCE'?'#f97316':'var(--amber)'}">${s.sell_action} ${s.sell_score}/100</span>
-        ${s.sell_flags && s.sell_flags!=='—' ? '· ' + s.sell_flags : ''}
-      </div>` : ''}
+      ${(() => {
+        const ds = dampedSellScore(s.sell_score||0, s.framework_score||0);
+        const da = dampedSellAction(ds);
+        return da !== 'HOLD' && ds > 0
+          ? `<div style="margin-top:6px;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3)">
+              Sell signal: <span style="color:${da==='EXIT'?'var(--red)':da==='REDUCE'?'#f97316':'var(--amber)'}">${da} ${ds}</span>
+              ${s.sell_flags && s.sell_flags!=='—' ? '· ' + s.sell_flags : ''}
+             </div>`
+          : '';
+      })()}
     </div>`;
   }
 
@@ -4148,18 +4169,19 @@ function renderSellsFromPayload(payload) {
   // Extreme Fear (<20):  show up to 1 — never pile on at lows
   const sellLimit = cnnScore > 80 ? 6 : cnnScore > 60 ? 4 : cnnScore > 40 ? 3 : cnnScore > 20 ? 2 : 1;
 
-  // Use validated sell_action from payload (already FW-damped by sell_side_scorer.py).
-  // DO NOT fall back to old sell_guidance — it uses raw scores without FW damping,
-  // which causes DELL (raw 72 → damped 51 HOLD) to wrongly appear as REDUCE.
   const newSells = allSigs
-    .filter(s => s.sell_action && s.sell_action !== 'HOLD' && s.is_holding)
+    .filter(s => {
+      const damped = dampedSellScore(s.sell_score || 0, s.framework_score || 0);
+      const action = dampedSellAction(damped);
+      return action !== 'HOLD' && s.is_holding;
+    })
     .sort((a, b) => {
-      // Sort by damped score (what sell_side_scorer already computed)
       const order = {EXIT:4, REDUCE:3, TRIM:2};
-      const ao = order[a.sell_action] || 0;
-      const bo = order[b.sell_action] || 0;
-      if (bo !== ao) return bo - ao;
-      return b.sell_score - a.sell_score;
+      const da = dampedSellScore(a.sell_score||0, a.framework_score||0);
+      const db = dampedSellScore(b.sell_score||0, b.framework_score||0);
+      const aa = dampedSellAction(da), ab = dampedSellAction(db);
+      if ((order[ab]||0) !== (order[aa]||0)) return (order[ab]||0) - (order[aa]||0);
+      return db - da;
     })
     .slice(0, sellLimit);
 
@@ -4184,12 +4206,18 @@ function renderSellsFromPayload(payload) {
       &nbsp;·&nbsp; CNN F&amp;G: <span style="color:${cnnColor};font-weight:600">${cnnScore.toFixed(0)} (${cnnLabel})</span>
     </div>
     ${sells.map(s => {
-      // sell_score and sell_action are already FW-damped from sell_side_scorer.py
-      // Use them directly — do NOT re-compute damping
-      const score   = s.sell_score || 0;
+      // Always compute damped score client-side — ensures correct display
+      // regardless of whether payload sell_score is pre or post damped
       const fw      = s.framework_score || 0;
-      const action  = s.sell_action && s.sell_action !== 'HOLD' ? s.sell_action : 'HOLD';
+      const raw     = s.sell_score || 0;
+      const score   = dampedSellScore(raw, fw);
+      const action  = dampedSellAction(score);
+      if (action === 'HOLD') return '';  // filter out HOLD after correct damping
       const acColor = ac(action);
+      // sell_dist is stored as decimal in payload (e.g. -0.168) — convert to pct
+      const distPct = s.sell_dist != null
+        ? (Math.abs(s.sell_dist) < 2 ? (s.sell_dist * 100).toFixed(1) : s.sell_dist.toFixed(1))
+        : s.dist_252h != null ? s.dist_252h : null;
       return `
       <div class="signal-card sell-card" style="margin-bottom:10px;border-left:3px solid ${acColor};">
         <div class="sc-header">
@@ -4198,14 +4226,13 @@ function renderSellsFromPayload(payload) {
               ${s.is_holding ? '<span class="tag tag-red" style="margin-left:6px;font-size:9px;">HELD</span>' : ''}
             </div>
             <div class="sc-name">$${s.price?.toLocaleString()} · ${s.change_pct >= 0 ? '+' : ''}${s.change_pct}% today
-              ${s.sell_dist != null ? ` · ${s.sell_dist}% from 252d high` : s.dist_252h != null ? ` · ${s.dist_252h}% from 252d high` : ''}
+              ${distPct != null ? ` · ${distPct}% from 252d high` : ''}
             </div>
           </div>
           <div style="text-align:right;">
             <span style="background:${acColor};color:#fff;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:700;">${action}</span>
             <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);margin-top:3px;">
-              Score: <b style="color:${score>=78?'var(--red)':score>=65?'var(--amber)':score>=52?'#f59e0b':'var(--green)'}">${score}</b>
-              ${fw ? `· FW ${fw}` : ''}
+              ${fw ? `Raw ${raw} → <b style="color:${score>=78?'var(--red)':score>=65?'var(--amber)':'#f59e0b'}">${score}</b> · FW ${fw}` : `Score: <b>${score}</b>`}
             </div>
           </div>
         </div>
