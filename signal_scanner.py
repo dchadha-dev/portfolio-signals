@@ -241,6 +241,41 @@ FRAMEWORK_SCORES = {
     'TQQQ':48,  # 3× Nasdaq — severe decay on sideways markets
     # Asia/EM thematic
     'FLAX':62,  # Franklin FTSE Asia ex-Japan — broad Asia quality
+    # US Broad / Large Cap additional
+    'VTI':82,   # Vanguard Total Market — max diversification
+    'IWF':76,   # iShares Russell 1000 Growth — quality growth tilt
+    'XLG':74,   # Invesco S&P Top 50 — mega-cap concentration
+    'SCHB':81,  # Schwab US Broad — VTI equivalent
+    'ITOT':81,  # iShares Total US — VTI equivalent
+    'VIG':78,   # Vanguard Dividend Appreciation — quality dividend growth
+    'DGRO':76,  # iShares Core Dividend Growth
+    'VYM':72,   # Vanguard High Dividend — value tilt, lower growth
+    'SCHD':76,  # Schwab US Dividend — quality/value filter, low cost
+    'NOBL':74,  # S&P 500 Dividend Aristocrats
+    'DGRW':75,  # WisdomTree Quality Dividend Growth
+    # Thematic / AI / Tech
+    'AIQ':65,   # Global X AI & Technology — broad AI, quality holdings
+    'QTUM':62,  # Defiance Quantum — quantum/AI thesis, early stage
+    'BOTZ':63,  # Global X Robotics & AI — cyclical
+    'WCLD':60,  # WisdomTree Cloud Computing
+    'CLOU':58,  # Global X Cloud Computing — elevated valuation risk
+    'FIVG':60,  # Defiance 5G
+    # ARK funds — high conviction, high vol, poor recent track record
+    'ARKG':44,  # ARK Genomic Revolution — speculative biotech
+    'ARKK':42,  # ARK Innovation — aggressive, concentration risk
+    'ARKW':44,  # ARK Next Gen Internet
+    'ARKF':44,  # ARK Fintech Innovation
+    # Asia / EM
+    'AAXJ':62,  # iShares Asia ex Japan — broad Asia, EM discount
+    'INDA':68,  # iShares India — structural growth, higher valuation
+    'KWEB':52,  # KraneShares China Internet — regulatory + geopolitical
+    'FXI':50,   # iShares China Large Cap — SOE-heavy
+    'VWO':60,   # Vanguard EM — broad, commodity/political drag
+    # Fixed Income
+    'BND':62,   # Vanguard Total Bond
+    'AGG':62,   # iShares Core US Agg
+    'HYG':55,   # iShares High Yield — credit + cyclical risk
+    'LQD':60,   # iShares IG Corporate
 
     'ACLS':68,'COHR':68,'GLW':68,'TSEM':68,'DELL':68,'BAC':68,
     'OWL':68,'MDT':68,'ALGN':68,'RCL':68,'SBUX':68,'CL':68,
