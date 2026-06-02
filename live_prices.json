@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-02 12:19 UTC",
+  "timestamp": "2026-06-02 12:29 UTC",
   "run_date": "Tuesday 02 Jun 2026",
   "prices": {
     "NVDA": {
@@ -206,10 +206,6 @@
       "price": 476.88,
       "change_pct": null
     },
-    "CEG": {
-      "price": 265.7,
-      "change_pct": null
-    },
     "CELH": {
       "price": 30.88,
       "change_pct": null
@@ -228,6 +224,10 @@
     },
     "IDXX": {
       "price": 566.79,
+      "change_pct": null
+    },
+    "KNSL": {
+      "price": 303.53,
       "change_pct": null
     }
   }
