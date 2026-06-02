@@ -449,6 +449,7 @@ def score_ticker(ticker, sell_sigs, market, sector_states, framework_score=None)
     else:
         fw_damp = 1.0
 
+    score_raw = score  # save pre-damp for payload
     score = min(100, round(score * fw_damp, 1))
 
     if   score >= EXIT_T:   action = "EXIT"
@@ -456,7 +457,7 @@ def score_ticker(ticker, sell_sigs, market, sector_states, framework_score=None)
     elif score >= TRIM_T:   action = "TRIM"
     else:                   action = "HOLD"
 
-    return score, action, " | ".join(flags) or "—", " | ".join(caution) or "—"
+    return score, score_raw, action, " | ".join(flags) or "—", " | ".join(caution) or "—"
 
 def score_all(universe_rows, market, sector_states):
     """
@@ -480,9 +481,10 @@ def score_all(universe_rows, market, sector_states):
         except Exception as e:
             print(f"  sell signals failed for {row.get('ticker','?')}: {e}")
             sigs = {}
-        sc, action, flags, caution = score_ticker(row.get("ticker",""), sigs, market, sector_states)
-        row["sell_score"]   = sc
-        row["sell_action"]  = action
+        sc, sc_raw, action, flags, caution = score_ticker(row.get("ticker",""), sigs, market, sector_states)
+        row["sell_score"]     = sc
+        row["sell_score_raw"] = sc_raw
+        row["sell_action"]    = action
         row["sell_flags"]   = flags
         row["sell_caution"] = caution
         # Pass through raw signal fields for dashboard display
