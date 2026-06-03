@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-03 01:03 UTC",
+  "last_updated": "2026-06-03 16:06 UTC",
   "entries": [
     {
       "ticker": "ORCL",
@@ -14,7 +14,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 244.58,
+      "current_price": 230.23,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -30,12 +30,12 @@
       "framework_score": 28,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 75,
       "current_price": 29.91,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 15",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "RGTI",
@@ -50,7 +50,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 26.88,
+      "current_price": 24.64,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -138,12 +138,12 @@
       "framework_score": 52,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 81.3,
       "current_price": 43.04,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 24",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "ORCL",
@@ -158,7 +158,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 244.58,
+      "current_price": 230.23,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -174,12 +174,12 @@
       "framework_score": 28,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 75,
       "current_price": 29.91,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 15",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "RGTI",
@@ -194,7 +194,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 26.88,
+      "current_price": 24.64,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -266,7 +266,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 244.58,
+      "current_price": 230.23,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -282,12 +282,12 @@
       "framework_score": 28,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 75,
       "current_price": 29.91,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 15",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "RGTI",
@@ -302,7 +302,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 26.88,
+      "current_price": 24.64,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -336,12 +336,12 @@
       "framework_score": null,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 66.6,
       "current_price": 69.57,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 15",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "FLAX",
@@ -372,12 +372,12 @@
       "framework_score": null,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 70.3,
       "current_price": 122.4,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 19",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "ASTS",
@@ -410,7 +410,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 244.58,
+      "current_price": 230.23,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -426,12 +426,12 @@
       "framework_score": 28,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 75,
       "current_price": 29.91,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 15",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "RGTI",
@@ -446,7 +446,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 26.88,
+      "current_price": 24.64,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -516,12 +516,12 @@
       "framework_score": 74,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 68.2,
       "current_price": 1048.58,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 14",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "SCB_SP500",
@@ -606,12 +606,12 @@
       "framework_score": 73,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 68.8,
       "current_price": 211.01,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 14",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "IBKR",
@@ -624,12 +624,12 @@
       "framework_score": 74,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 68.2,
       "current_price": 88.69,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 14",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "IBM",
@@ -642,12 +642,12 @@
       "framework_score": 65,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73.8,
       "current_price": 320.42,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 7",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "QQQ",
@@ -660,12 +660,12 @@
       "framework_score": 78,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 65.6,
       "current_price": 742.74,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 13",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "ARKG",
@@ -696,12 +696,12 @@
       "framework_score": 76,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 66.9,
       "current_price": 1035.5,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 18",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "VTI",
@@ -714,12 +714,12 @@
       "framework_score": null,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 100,
       "current_price": 373.4,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 13",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "TQQQ",
@@ -750,12 +750,12 @@
       "framework_score": 70,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 70.7,
       "current_price": 121.33,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 21",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "SMH",
@@ -840,12 +840,12 @@
       "framework_score": 68,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 72.0,
       "current_price": 86.31,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 14",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "XLG",
@@ -948,12 +948,12 @@
       "framework_score": 77,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 66.2,
       "current_price": 270.82,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 18",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "FDX",
@@ -984,12 +984,12 @@
       "framework_score": null,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 100,
       "current_price": 162.87,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 15",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "URTH",
@@ -1002,12 +1002,12 @@
       "framework_score": 72,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 69.5,
       "current_price": 205.36,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 14",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "HIMX",
@@ -1020,12 +1020,12 @@
       "framework_score": 48,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 83.4,
       "current_price": 21.91,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 22",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "SCB_WORLD",
@@ -1146,12 +1146,12 @@
       "framework_score": 44,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 85.4,
       "current_price": 78.51,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 16",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "DIA",
@@ -1164,12 +1164,12 @@
       "framework_score": 72,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 69.5,
       "current_price": 514.05,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 14",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "ENPH",
@@ -1182,12 +1182,12 @@
       "framework_score": 54,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 80.2,
       "current_price": 72.33,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 19",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "ALAB",
@@ -1218,12 +1218,12 @@
       "framework_score": 68,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 72.0,
       "current_price": 426.89,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 15",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "DRIV",
@@ -1236,12 +1236,12 @@
       "framework_score": null,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 100,
       "current_price": 42.53,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 21",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "HSBC",
@@ -1254,12 +1254,12 @@
       "framework_score": 58,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 77.9,
       "current_price": 95.21,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 16",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "FCX",
@@ -1272,12 +1272,12 @@
       "framework_score": 60,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 76.8,
       "current_price": 71.72,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 15",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "ON",
@@ -1310,7 +1310,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 75,
-      "current_price": 244.58,
+      "current_price": 230.23,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1326,12 +1326,12 @@
       "framework_score": 28,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 75,
       "current_price": 29.91,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 15",
+      "expired_at": "2026-06-03 16:06"
     },
     {
       "ticker": "RGTI",
@@ -1346,7 +1346,115 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 26.88,
+      "current_price": 24.64,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "CAT",
+      "signal_type": "SELL",
+      "score": 68.2,
+      "sell_score": 68.2,
+      "timestamp": "2026-06-03 16:06",
+      "price": 928.79,
+      "dist_252h": 0.2,
+      "framework_score": 74,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 68.2,
+      "current_price": 928.79,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "BEP",
+      "signal_type": "SELL",
+      "score": 76.8,
+      "sell_score": 76.8,
+      "timestamp": "2026-06-03 16:06",
+      "price": 37.8,
+      "dist_252h": 1.9,
+      "framework_score": 60,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 76.8,
+      "current_price": 37.8,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "SNDK",
+      "signal_type": "SELL",
+      "score": 77.9,
+      "sell_score": 77.9,
+      "timestamp": "2026-06-03 16:06",
+      "price": 1790.6,
+      "dist_252h": 1.7,
+      "framework_score": 58,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 77.9,
+      "current_price": 1790.6,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "VLO",
+      "signal_type": "SELL",
+      "score": 75.6,
+      "sell_score": 75.6,
+      "timestamp": "2026-06-03 16:06",
+      "price": 264.4,
+      "dist_252h": 1.2,
+      "framework_score": 62,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 75.6,
+      "current_price": 264.4,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "QCOM",
+      "signal_type": "SELL",
+      "score": 66.9,
+      "sell_score": 66.9,
+      "timestamp": "2026-06-03 16:06",
+      "price": 253.98,
+      "dist_252h": 1.2,
+      "framework_score": 76,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 66.9,
+      "current_price": 253.98,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "NVTS",
+      "signal_type": "SELL",
+      "score": 81.3,
+      "sell_score": 81.3,
+      "timestamp": "2026-06-03 16:06",
+      "price": 32.5,
+      "dist_252h": 2.2,
+      "framework_score": 52,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 81.3,
+      "current_price": 32.5,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
