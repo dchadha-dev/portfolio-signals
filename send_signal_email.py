@@ -8,9 +8,11 @@ import json, os, sys, smtplib, argparse, re, base64
 from datetime import datetime, date
 from email.utils import formatdate, make_msgid
 
-GMAIL_FROM = os.environ.get('GMAIL_FROM', '')
-GMAIL_PASS = os.environ.get('GMAIL_APP_PASSWORD', '')
-GMAIL_TO   = os.environ.get('GMAIL_TO', '')
+GMAIL_FROM  = os.environ.get('GMAIL_FROM', '')
+GMAIL_PASS  = os.environ.get('GMAIL_APP_PASSWORD', '')
+_gmail_to   = os.environ.get('GMAIL_TO', '')
+GMAIL_TO    = _gmail_to  # kept for single-recipient display in headers
+GMAIL_TO_LIST = [e.strip() for e in _gmail_to.split(',') if e.strip()]
 
 # ── INLINE STYLE CONSTANTS ───────────────────────────────────────────
 BG      = '#080c14'
@@ -490,7 +492,7 @@ def build_weekly(payload, insider_data, pead_data):
 
 # ── SEND EMAIL ────────────────────────────────────────────────────────
 def send_email(subject, html_body):
-    if not all([GMAIL_FROM, GMAIL_PASS, GMAIL_TO]):
+    if not all([GMAIL_FROM, GMAIL_PASS, GMAIL_TO_LIST]):
         print('ERROR: GMAIL_FROM, GMAIL_APP_PASSWORD, GMAIL_TO must all be set')
         sys.exit(1)
 
@@ -498,9 +500,12 @@ def send_email(subject, html_body):
     html_b64_lines = '\r\n'.join(html_b64[i:i+76] for i in range(0, len(html_b64), 76))
     boundary = 'sig_' + base64.b64encode(os.urandom(9)).decode('ascii').replace('=','').replace('+','x').replace('/','y')
 
+    # To header shows all recipients
+    to_header = ', '.join(GMAIL_TO_LIST)
+
     raw = '\r\n'.join([
         f'From: Portfolio Signals <{GMAIL_FROM}>',
-        f'To: {GMAIL_TO}',
+        f'To: {to_header}',
         f'Subject: {subject}',
         f'Date: {formatdate(localtime=True)}',
         f'Message-ID: {make_msgid()}',
@@ -525,8 +530,8 @@ def send_email(subject, html_body):
     try:
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
             server.login(GMAIL_FROM, GMAIL_PASS)
-            server.sendmail(GMAIL_FROM, [GMAIL_TO], raw.encode('utf-8'))
-        print(f'Email sent: {subject}')
+            server.sendmail(GMAIL_FROM, GMAIL_TO_LIST, raw.encode('utf-8'))
+        print(f'Email sent to {len(GMAIL_TO_LIST)} recipient(s): {subject}')
     except Exception as e:
         print(f'Email failed: {e}')
         sys.exit(1)

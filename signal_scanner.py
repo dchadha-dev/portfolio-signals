@@ -81,13 +81,13 @@ MY_HOLDINGS = [
     'NFLX','BKNG','SHOP','RACE','AMD','CRWV','ASML','ANET','DDOG','CRDO',
     'NBIS','TSM','TM','MU','INTU','CPRT','PGR','O','TEAM',
     'BRKB','NVO','RELX','DELL','BABA',
-    'NOW','IREN',
+    'NOW','IREN','GDX','ORCL',
     # European stocks
     'RMS.PA','MC.PA','ITX.MC',
     # US ETFs
-    'VOO','VTI','QQQ','TQQQ','JEPI','VXUS','VSS','IEV','URTH','GLD','XLG',
+    'VOO','VTI','QQQ','JEPI','VXUS','VSS','IEV','URTH','GLD','XLG',
     # Thematic ETFs
-    'AIQG','QNTM.L','QTUM','FLAX',
+    'AIQG','QNTM.L','QTUM',
     # Crypto
     'COIN',
     # Thai mutual funds (signal via proxy ETF)
@@ -99,7 +99,7 @@ MY_HOLDINGS = [
 
 CANDIDATES = [
     # Original candidates
-    'PANW','ORCL','COIN','AXON','CEG','CELH','DECK','ENPH','HIMS',
+    'PANW','AXON','CEG','CELH','DECK','ENPH','HIMS',
     'IDXX','KNSL','LULU','MPWR','NET','PLNT','RCL','SPOT','UBER',
     'ULTA','VEEV','SMCI','CAVA','SNOW','MEDP','PODD','HEI','ACLS',
     'FICO','APP','HOOD','RKLB','ARM',
@@ -130,7 +130,7 @@ CANDIDATES = [
     'HPE','SOUN','FIVN','ONDS','CBRS','NXT',
     'BULL','SOLS','RDDT','KEEL','SEDG',
     'SNDK','SYM','FORM','VICR','RIO','FCX',
-    'GDX','SLV','LIT','BEP','DNN','MSTR','AAL','OWL',
+    'SLV','LIT','BEP','DNN','MSTR','AAL','OWL',
     'PI','ALGN',
 ]
 
@@ -881,18 +881,12 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         buy = max(0, min(100, buy))
 
         sell_score = 0; sell_action = 'HOLD'; sell_flags = '—'; sell_caution = '—'
+        sell_score_raw = 0
         sell_sigs_data = {}
-        if SELL_SCORER_AVAILABLE:
-            try:
-                cl_s  = closes[proxy].dropna() if proxy in closes.columns else None
-                hi_s  = highs[proxy].dropna()  if proxy in highs.columns  else cl_s
-                lo_s  = lows[proxy].dropna()   if proxy in lows.columns   else cl_s
-                vol_s = volumes[proxy].dropna() if proxy in volumes.columns else pd.Series(dtype=float)
-                sell_sigs_data = compute_sell_signals(cl_s, hi_s, lo_s, vol_s)
-                sell_score, sell_score_raw, sell_action, sell_flags, sell_caution = score_ticker(
-                    fund, sell_sigs_data, sell_market, sell_sectors, fs)
-            except Exception as sell_err:
-                sell_caution = f'err:{str(sell_err)[:40]}'
+        # Thai mutual funds use US ETF proxies for buy signals (directional correlation)
+        # but sell signals based on proxy prices are meaningless — SET50 ≠ SPY price action.
+        # Sell scoring is skipped for all proxy-mapped funds.
+        sell_caution = 'proxy_fund — sell scoring disabled'
 
         fw_blocks_buy2 = fs is not None and fs < 55
         if sell_score >= EXIT_T: signal = 'SELL'
@@ -907,14 +901,15 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
             'ticker': fund, 'price': price, 'change_pct': 0.0,
             'signal': signal, 'guidance': f"[via {proxy}] {guidance}",
             'buy_score': buy, 'sell_score': sell_score,
+            'sell_score_raw': sell_score_raw,
             'sell_action': sell_action, 'sell_flags': sell_flags,
             'sell_caution': sell_caution,
-            'sell_dist': sell_sigs_data.get('dist'),
-            'sell_cmf': sell_sigs_data.get('cmf_20'),
-            'sell_rv_z': sell_sigs_data.get('rv_z'),
-            'sell_weekly_rsi': sell_sigs_data.get('weekly_rsi'),
-            'near_high': sell_sigs_data.get('near_high', False),
-            'sell_atr_dist': sell_sigs_data.get('sma_atr_dist'),
+            'sell_dist': None,
+            'sell_cmf': None,
+            'sell_rv_z': None,
+            'sell_weekly_rsi': None,
+            'near_high': False,
+            'sell_atr_dist': None,
             'is_holding': True, 'proxy': proxy,
             'dist_252h': round(float(last['dist'])*100, 1),
             'vs_200ma':  round(float(last['trend'])*100, 1),
