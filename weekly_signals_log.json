@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-02 21:39 UTC",
+  "last_updated": "2026-06-03 01:03 UTC",
   "entries": [
     {
       "ticker": "ORCL",
@@ -354,12 +354,12 @@
       "framework_score": null,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 69.5,
       "current_price": 38.47,
-      "expire_reason": null,
+      "expire_reason": "ticker_missing",
       "expire_detail": null,
-      "expired_at": null
+      "expired_at": "2026-06-03 01:03"
     },
     {
       "ticker": "AAXJ",
@@ -480,12 +480,12 @@
       "framework_score": 56,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 71.1,
       "current_price": 511.44,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 0",
+      "expired_at": "2026-06-03 01:03"
     },
     {
       "ticker": "SCB_GENO",
@@ -534,12 +534,12 @@
       "framework_score": 63,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 75.0,
       "current_price": 762.02,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 0",
+      "expired_at": "2026-06-03 01:03"
     },
     {
       "ticker": "SCB_SET50",
@@ -552,12 +552,12 @@
       "framework_score": 55,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 79.6,
       "current_price": 758.54,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 0",
+      "expired_at": "2026-06-03 01:03"
     },
     {
       "ticker": "SCB_BUSAA",
@@ -732,12 +732,12 @@
       "framework_score": 48,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 83.4,
       "current_price": 86.04,
-      "expire_reason": null,
+      "expire_reason": "ticker_missing",
       "expire_detail": null,
-      "expired_at": null
+      "expired_at": "2026-06-03 01:03"
     },
     {
       "ticker": "CSCO",
@@ -786,12 +786,12 @@
       "framework_score": 61,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 76.2,
       "current_price": 742.74,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 0",
+      "expired_at": "2026-06-03 01:03"
     },
     {
       "ticker": "SCB_SEMI",
@@ -804,12 +804,12 @@
       "framework_score": 72,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 69.5,
       "current_price": 607.81,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 0",
+      "expired_at": "2026-06-03 01:03"
     },
     {
       "ticker": "KT_WTAI",
@@ -822,12 +822,12 @@
       "framework_score": 68,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 72.0,
       "current_price": 69.44,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 0",
+      "expired_at": "2026-06-03 01:03"
     },
     {
       "ticker": "VXUS",
@@ -1038,12 +1038,12 @@
       "framework_score": 68,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 72.0,
       "current_price": 205.36,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 0",
+      "expired_at": "2026-06-03 01:03"
     },
     {
       "ticker": "SCB_AIEM",
@@ -1056,12 +1056,12 @@
       "framework_score": 64,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 74.4,
       "current_price": 122.28,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 0",
+      "expired_at": "2026-06-03 01:03"
     },
     {
       "ticker": "SCB_EV",
@@ -1074,12 +1074,12 @@
       "framework_score": 58,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 77.9,
       "current_price": 42.53,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 0",
+      "expired_at": "2026-06-03 01:03"
     },
     {
       "ticker": "RMBS",
@@ -1293,6 +1293,60 @@
       "status": "active",
       "current_score": 69.5,
       "current_price": 128.64,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "ORCL",
+      "signal_type": "WATCH",
+      "score": 75,
+      "sell_score": 0.0,
+      "timestamp": "2026-06-03 01:03",
+      "price": 244.58,
+      "dist_252h": -24.9,
+      "framework_score": 78,
+      "fdfv3": true,
+      "is_holding": true,
+      "status": "active",
+      "current_score": 75,
+      "current_price": 244.58,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "QBTS",
+      "signal_type": "WATCH",
+      "score": 75,
+      "sell_score": 0.0,
+      "timestamp": "2026-06-03 01:03",
+      "price": 29.91,
+      "dist_252h": -33.2,
+      "framework_score": 28,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 75,
+      "current_price": 29.91,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "RGTI",
+      "signal_type": "WATCH",
+      "score": 75,
+      "sell_score": 0.0,
+      "timestamp": "2026-06-03 01:03",
+      "price": 26.88,
+      "dist_252h": -52.3,
+      "framework_score": 28,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 75,
+      "current_price": 26.88,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null

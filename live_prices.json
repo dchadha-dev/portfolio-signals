@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-02 21:39 UTC",
+  "timestamp": "2026-06-03 01:03 UTC",
   "run_date": "Wednesday 03 Jun 2026",
   "prices": {
     "NVDA": {
@@ -138,6 +138,14 @@
       "price": 66.6,
       "change_pct": null
     },
+    "GDX": {
+      "price": 88.05,
+      "change_pct": null
+    },
+    "ORCL": {
+      "price": 244.58,
+      "change_pct": null
+    },
     "MC.PA": {
       "price": 69.25,
       "change_pct": null
@@ -148,10 +156,6 @@
     },
     "QQQ": {
       "price": 746.16,
-      "change_pct": null
-    },
-    "TQQQ": {
-      "price": 87.22,
       "change_pct": null
     },
     "JEPI": {
@@ -186,20 +190,12 @@
       "price": 168.76,
       "change_pct": null
     },
-    "FLAX": {
-      "price": 38.74,
-      "change_pct": null
-    },
     "COIN": {
       "price": 173.99,
       "change_pct": null
     },
     "PANW": {
       "price": 297.18,
-      "change_pct": null
-    },
-    "ORCL": {
-      "price": 244.58,
       "change_pct": null
     },
     "AXON": {
@@ -228,6 +224,10 @@
     },
     "IDXX": {
       "price": 550.82,
+      "change_pct": null
+    },
+    "KNSL": {
+      "price": 295.4,
       "change_pct": null
     }
   }
