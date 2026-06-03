@@ -924,6 +924,7 @@ const stocks = [
   { t:'DELL', n:'Dell Technologies',    acct:'Dime',                shares:11.3, direct:1154,  fund:0,    currency:'USD' },
   { t:'NOW',  n:'ServiceNow',           acct:'Dime',                shares:17.75,direct:1810,  fund:0,    currency:'USD' },
   { t:'IREN', n:'IREN Limited',         acct:'Dime',                shares:32,   direct:1920,  fund:0,    currency:'USD' },
+  { t:'GDX',  n:'VanEck Gold Miners ETF',acct:'US Stock Account',  shares:10,   direct:870,   fund:0,    currency:'USD' },
   { t:'CRWV', n:'CoreWeave',            acct:'US Stock Account',    shares:8,    direct:880,   fund:0,    currency:'USD' },
   { t:'TEAM', n:'Atlassian',            acct:'GTN EU',              shares:4,    direct:384,   fund:0,    currency:'USD' },
   { t:'ADBE', n:'Adobe Inc',            acct:'US Stock Account',    shares:1,    direct:254,   fund:0,    currency:'USD' },
@@ -932,16 +933,15 @@ const stocks = [
   { t:'VOO',  n:'Vanguard S&P 500 ETF', acct:'GTN US',              shares:22,   direct:12210, fund:0,    currency:'USD' },
   { t:'VTI',  n:'Vanguard Total Market',acct:'GTN US',              shares:14,   direct:3654,  fund:0,    currency:'USD' },
   { t:'QQQ',  n:'Invesco Nasdaq 100',   acct:'GTN US',              shares:3,    direct:1440,  fund:0,    currency:'USD' },
-  { t:'TQQQ', n:'ProShares UltraPro QQQ',acct:'US Stock Account',  shares:30,   direct:1860,  fund:0,    currency:'USD' },
   { t:'VXUS', n:'Vanguard Total Intl',  acct:'US Stock Account',    shares:25,   direct:2050,  fund:0,    currency:'USD' },
   // FDN sold 05/04/26 @ $270 — removed
-  { t:'GLD',  n:'SPDR Gold Shares',     acct:'GTN US',              shares:4,    direct:1660,  fund:0,    currency:'USD' },
+  { t:'GLD',  n:'SPDR Gold Shares',     acct:'GTN US',              shares:14,   direct:5700,  fund:0,    currency:'USD' },
   { t:'IEV',  n:'iShares Europe ETF',   acct:'GTN US',              shares:39,   direct:2078,  fund:0,    currency:'USD' },
   { t:'VSS',  n:'Vanguard Intl SmallCap',acct:'GTN US',             shares:20,   direct:3168,  fund:0,    currency:'USD' },
   { t:'URTH', n:'iShares MSCI World',   acct:'GTN US',              shares:15,   direct:2955,  fund:0,    currency:'USD' },
-  { t:'FLAX', n:'Franklin FTSE Asia xJP',acct:'GTN UK (GBP)',        shares:50,   direct:1200,  fund:0,    currency:'USD' },
   { t:'XLG',  n:'Invesco S&P 500 Top 50',acct:'Dime',              shares:24,   direct:1389,  fund:0,    currency:'USD' },
   { t:'QTUM', n:'Defiance Quantum ETF', acct:'Dime',                shares:14,   direct:1624,  fund:0,    currency:'USD' },
+  { t:'ORCL', n:'Oracle Corporation',   acct:'US Stock Account',    shares:8,    direct:1800,  fund:0,    currency:'USD' },
   { t:'JEPI', n:'JPMorgan Equity Prem.',acct:'GTN US',              shares:86,   direct:4859,  fund:0,    currency:'USD' },
   { t:'AIQG', n:'Global X AI UCITS ETF',acct:'GTN UK (GBP)',        shares:26,   direct:430,   fund:0,    currency:'GBP' },
   // ── EU / KR listed (price in EUR/KRW, value pre-converted to USD) ─
@@ -962,7 +962,7 @@ const otherAssets = [
   { n:'SCB World Equity',           direct:0, fund:0, total:7124,  tag:'blue',   tagTxt:'SCB Fund',  proxy:'URTH'  },
   { n:'SCB SET50',                  direct:0, fund:0, total:8188,  tag:'blue',   tagTxt:'SCB Fund',  proxy:null    },
   { n:'SCB Semiconductor (A)',      direct:0, fund:0, total:5960,  tag:'blue',   tagTxt:'SCB Fund',  proxy:'SMH'   },
-  { n:'SCB Gold',                   direct:0, fund:0, total:5246,  tag:'amber',  tagTxt:'SCB Fund',  proxy:'GLD'   },
+  { n:'SCB Gold',                   direct:0, fund:0, total:5765,  tag:'amber',  tagTxt:'SCB Fund',  proxy:'GLD'   },
   { n:'SCB EV & Mobility (A)',      direct:0, fund:0, total:3380,  tag:'blue',   tagTxt:'SCB Fund',  proxy:'DRIV'  },
   { n:'SCB Fintech (A)',            direct:0, fund:0, total:2154,  tag:'blue',   tagTxt:'SCB Fund',  proxy:'FINX'  },
   { n:'SCB Asian EM',               direct:0, fund:0, total:2861,  tag:'blue',   tagTxt:'SCB Fund',  proxy:'AAXJ'  },
@@ -973,11 +973,10 @@ const otherAssets = [
   { n:'SCB Genomic Revolution',     direct:0, fund:0, total:745,   tag:'blue',   tagTxt:'SCB Fund',  proxy:'ARKG'  },
   { n:'SCB China Tech (A)',         direct:0, fund:0, total:500,   tag:'blue',   tagTxt:'SCB Fund',  proxy:'KWEB'  },
   // ── KT Mutual Funds ──────────────────────────────────────
-  { n:'KTAM India Equity (A)',      direct:0, fund:0, total:13047, tag:'amber',  tagTxt:'KT Fund',   proxy:'INDA'  },
+  { n:'KTAM India Equity (A)',      direct:0, fund:0, total:6147,  tag:'amber',  tagTxt:'KT Fund',   proxy:'INDA'  },
   { n:'KTAM World Equity (A)',      direct:0, fund:0, total:10423, tag:'amber',  tagTxt:'KT Fund',   proxy:'ACWV'  },
   { n:'KTAM World Tech AI (A)',     direct:0, fund:0, total:7679,  tag:'amber',  tagTxt:'KT Fund',   proxy:'AIQ'   },
   { n:'KTAM Blockchain (A)',        direct:0, fund:0, total:4437,  tag:'purple', tagTxt:'KT Fund',   proxy:'BLOK'  },
-  { n:'KTAM Technology (A)',        direct:0, fund:0, total:3788,  tag:'amber',  tagTxt:'KT Fund',   proxy:'IWF'   },
   { n:'KTAM Global ESG (A)',        direct:0, fund:0, total:3475,  tag:'amber',  tagTxt:'KT Fund',   proxy:'ACWV'  },
 ];
 
@@ -986,7 +985,7 @@ const funds = [
   { t:'SCBNDQ(A)',     n:'SCB Nasdaq 100',        broker:'SCB', underlying:'Invesco QQQM',        val:2983,  proxy:'QQQ'   },
   { t:'SCBSEMI(A)',    n:'SCB Semiconductor',     broker:'SCB', underlying:'VanEck SMH',          val:5960,  proxy:'SMH'   },
   { t:'SCBWORLDA',    n:'SCB World Equity',       broker:'SCB', underlying:'iShares MSCI World',  val:7124,  proxy:'URTH'  },
-  { t:'SCBGOLD',       n:'SCB Gold',              broker:'SCB', underlying:'SPDR GLD',            val:5246,  proxy:'GLD'   },
+  { t:'SCBGOLD',       n:'SCB Gold',              broker:'SCB', underlying:'SPDR GLD',            val:5765,  proxy:'GLD'   },
   { t:'SCBNK225',     n:'SCB Nikkei 225',         broker:'SCB', underlying:'iShares 1329',        val:8418,  proxy:'EWJ'   },
   { t:'SCBDJI(A)',    n:'SCB Dow Jones',           broker:'SCB', underlying:'SPDR DIA',            val:8449,  proxy:'DIA'   },
   { t:'SCBBUSAA',     n:'SCB US Business',        broker:'SCB', underlying:'MS US Growth Fund',   val:1969,  proxy:'IWF'   },
@@ -1000,9 +999,8 @@ const funds = [
   { t:'SCBSET50',     n:'SCB SET50',              broker:'SCB', underlying:'Thai SET50',          val:8188,  proxy:null    },
   { t:'KT-WEQ-A',    n:'KTAM World Equity',       broker:'KT',  underlying:'AB Low Vol Global',  val:10423, proxy:'ACWV'  },
   { t:'KT-WTAI-A',   n:'KTAM World Tech AI',      broker:'KT',  underlying:'AI global equity',   val:7679,  proxy:'AIQ'   },
-  { t:'KT-TECHNOLOGY',n:'KTAM Technology',        broker:'KT',  underlying:'AB American Growth', val:3788,  proxy:'IWF'   },
   { t:'KT-BLOCKCHAIN',n:'KTAM Blockchain',        broker:'KT',  underlying:'BLOK + BLCN',        val:4437,  proxy:'BLOK'  },
-  { t:'KT-INDIA-A',  n:'KTAM India Equity',       broker:'KT',  underlying:'India equity fund',  val:13047, proxy:'INDA'  },
+  { t:'KT-INDIA-A',  n:'KTAM India Equity',       broker:'KT',  underlying:'India equity fund',  val:6147,  proxy:'INDA'  },
   { t:'KT-GESG-A',   n:'KTAM Global ESG',         broker:'KT',  underlying:'Global ESG blend',   val:3475,  proxy:'ACWV'  },
 ];
 
@@ -1082,16 +1080,16 @@ function computeBuckets(total) {
   const vooVal  = pos('VOO',25,13864);
   const vtiVal  = pos('VTI',14,3654);
   const qqqVal  = pos('QQQ',3,1440);
-  const tqqqVal = pos('TQQQ',30,1860);
+  const tqqqVal = pos('TQQQ',28,1736);
   const vxusVal = pos('VXUS',25,2050);
   const fdnVal  = 0; // FDN sold 05/04/26
-  const gldVal  = pos('GLD',10,3060);
+  const gldVal  = pos('GLD',14,5700);
   const ievVal  = pos('IEV',52,2770);
   const vssVal  = pos('VSS',20,3168);
   const urthVal = pos('URTH',15,2955);
-  const flaxVal = pos('FLAX',107,3186);
   const xlgVal  = pos('XLG',24,1389);
   const qtumVal = pos('QTUM',14,1624);
+  const orclVal = pos('ORCL',8,1800);
   const aiqgVal = pos('AIQG',26,430);
   const qntmVal = pos('QNTM.L',55,1667);
   // Thai funds — proxy-scaled
@@ -1099,8 +1097,8 @@ function computeBuckets(total) {
   const scbNdq   = fScale(2983,'QQQ');
   const scbSemi  = fScale(5960,'SMH');
   const scbWorld = fScale(7124,'URTH');
-  const scbGold  = fScale(5246,'GLD');
-  const scbNik   = fScale(8418,'EWJ');   // Full Nikkei fund → Japan
+  const scbGold  = fScale(5765,'GLD');
+  const scbNik   = fScale(8418,'EWJ');
   const scbDji   = fScale(8449,'DIA');
   const scbBusaa = fScale(1969,'IWF');
   const scbEV    = fScale(3380,'DRIV');
@@ -1113,9 +1111,8 @@ function computeBuckets(total) {
   const scbSet50 = 8188;
   const ktWEQ    = fScale(10423,'ACWV');
   const ktWTAI   = fScale(7679,'AIQ');
-  const ktTech   = fScale(3788,'IWF');
   const ktBlock  = fScale(4437,'BLOK');
-  const ktIndia  = fScale(13047,'INDA');
+  const ktIndia  = fScale(6147,'INDA');
   const ktGESG   = fScale(3475,'ACWV');
 
   // ── BUCKET 1: BKNG ──────────────────────────────────────
@@ -1124,8 +1121,8 @@ function computeBuckets(total) {
   // ── BUCKET 2: US Large Cap Tech ─────────────────────────
   // Named mega-caps + all US-focused ETFs and US portions of broad funds
   const B_USTECH = nvdaVal + googVal + aaplVal + msftVal + metaVal + amznVal + avgoVal + tslaVal
-    + vooVal + vtiVal + qqqVal + xlgVal + fdnVal
-    + scbSP500 + scbNdq + scbDji + scbBusaa + ktTech;
+    + vooVal + vtiVal + qqqVal + xlgVal + fdnVal + orclVal
+    + scbSP500 + scbNdq + scbDji + scbBusaa;
 
   // ── BUCKET 3: AI Infrastructure ─────────────────────────
   const B_AIINFRA = nbisVal + anetVal + crdoVal + amdVal + asmlVal + tsmVal
@@ -1153,17 +1150,15 @@ function computeBuckets(total) {
     + (scbWorld * 0.065) + (ktWEQ * 0.040);
 
   // ── BUCKET 10: Asia / Europe / EM ────────────────────────
-  // EU direct stocks, FLAX, IEV, VSS, VXUS, Samsung, SCBAEM, SCBCTECHA, MELI
-  // + intl portions of world funds
   const B_ASIAEM = rmsVal + itxVal + mcVal + samsungVal
-    + flaxVal + ievVal + vssVal + vxusVal + urthVal + scbAEM + scbChina + meliVal
+    + ievVal + vssVal + vxusVal + urthVal + scbAEM + scbChina + meliVal
     + (scbWorld * 0.585) + (ktWEQ * 0.300) + (ktGESG * 0.500);
 
   // ── BUCKET 11: Thematic Funds ────────────────────────────
   const B_THEMATIC = scbEV + scbFin + scbGenom + scbAuto + scbInno;
 
   // ── BUCKET 12: Leveraged / Speculative ───────────────────
-  const B_LEVERAGE = tqqqVal;
+  const B_LEVERAGE = 0; // TQQQ closed Jun 2026
 
   // ── BUCKET 13: Other Individual Stocks ───────────────────
   const adbeVal = pos('ADBE',1,254);
@@ -3649,7 +3644,7 @@ function renderSellsLocal(snap) {
     { t:'TSLA', n:'Tesla', shares:5, acct:'US Stock Account',
       why:'VOO excess: +74% avg annual — backtest says never sell on quality alone. PFD 2021 sell signal was +3.13 (TSLA regime change confirmed) — that was the right time. Current PFD sell: -0.350 (no active regime change signal). Only sell for July 2026 liquidity. Only sell TSLA when raising specific July 2026 cash. Moat 7/30 — no durable moat as BYD and legacy OEMs close the EV gap. 3yr Earnings 16/25 — delivery growth stalled, robotaxi missed every deadline since 2019. Valuation 9/15 — not cheap given execution risk. Brand damage from Musk accumulating. Trim 3 shares into any strength above $440. Keep 2 as optionality on humanoid robots.',
       action:'TRIM', trimShares:3, gtcPct:1.12 },
-    { t:'TQQQ', n:'ProShares 3x QQQ', shares:30, acct:'US Stock Account',
+    { t:'TQQQ', n:'ProShares 3x QQQ', shares:28, acct:'US Stock Account',
       why:'VOO excess: +54% avg annual — backtest says NEVER sell on quality alone. Only trim for July 2026 liquidity. Moat 5/30, 3yr Earnings 13/25 — 3x leverage structurally incompatible with buy-and-hold. Daily rebalancing decay erodes value in flat markets. Valuation 7/15 — expensive relative to NAV fair value. Trim 15 of 30 shares — keeps the bullish Nasdaq thesis without the structural decay.',
       action:'TRIM', trimShares:15, gtcPct:1.18 },
     { t:'ADBE', n:'Adobe Inc', shares:1, acct:'US Stock Account',
