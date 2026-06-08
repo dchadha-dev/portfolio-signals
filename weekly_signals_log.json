@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-07 15:54 UTC",
+  "last_updated": "2026-06-08 14:38 UTC",
   "entries": [
     {
       "ticker": "ASTS",
@@ -1452,12 +1452,12 @@
       "framework_score": 74,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 68.2,
       "current_price": 408.83,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 14",
+      "expired_at": "2026-06-08 14:38"
     },
     {
       "ticker": "CSCO",
@@ -1632,9 +1632,27 @@
       "framework_score": 72,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 69.5,
       "current_price": 89.93,
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 14",
+      "expired_at": "2026-06-08 14:38"
+    },
+    {
+      "ticker": "BEP",
+      "signal_type": "SELL",
+      "score": 76.8,
+      "sell_score": 76.8,
+      "timestamp": "2026-06-08 14:38",
+      "price": 37.33,
+      "dist_252h": 0.6,
+      "framework_score": 60,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 76.8,
+      "current_price": 37.33,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
