@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-06-01 19:35 UTC",
+    "timestamp": "2026-06-08 14:54 UTC",
     "tickers_checked": 8,
     "new_signals": 6,
-    "total_signals": 9,
-    "expired_removed": 4,
+    "total_signals": 10,
+    "expired_removed": 5,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 110.6
+    "elapsed_seconds": 111.6
   },
   "signals": {
     "NVDA": {
@@ -78,7 +78,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-06-01"
+      "as_of": "2026-06-08"
     },
     "DELL": {
       "ticker": "DELL",
@@ -92,7 +92,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-06-01"
+      "as_of": "2026-06-08"
     },
     "SNOW": {
       "ticker": "SNOW",
@@ -106,35 +106,49 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-06-01"
+      "as_of": "2026-06-08"
     },
     "HPE": {
       "ticker": "HPE",
       "announce_date": "2026-06-01",
       "expires_at": "2026-07-31",
-      "sue": 2.34,
-      "surprise": 0.0554,
-      "actual_eps": 0.65,
-      "estimate_eps": 0.5946,
-      "std_dev": 0.0237,
+      "sue": 9.949,
+      "surprise": 0.2504,
+      "actual_eps": 0.79,
+      "estimate_eps": 0.5396,
+      "std_dev": 0.0252,
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-06-01"
+      "as_of": "2026-06-08"
     },
     "CRDO": {
       "ticker": "CRDO",
       "announce_date": "2026-06-01",
       "expires_at": "2026-07-31",
-      "sue": 1.8,
-      "surprise": 0.0956,
-      "actual_eps": 1.07,
-      "estimate_eps": 0.9744,
-      "std_dev": 0.0531,
+      "sue": 2.915,
+      "surprise": 0.1103,
+      "actual_eps": 1.16,
+      "estimate_eps": 1.0497,
+      "std_dev": 0.0378,
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-06-01"
+      "as_of": "2026-06-08"
+    },
+    "PANW": {
+      "ticker": "PANW",
+      "announce_date": "2026-06-02",
+      "expires_at": "2026-08-01",
+      "sue": 1.628,
+      "surprise": 0.0388,
+      "actual_eps": 0.85,
+      "estimate_eps": 0.8112,
+      "std_dev": 0.0238,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-06-08"
     }
   }
 }

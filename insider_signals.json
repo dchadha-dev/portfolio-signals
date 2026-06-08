@@ -1,17 +1,17 @@
 {
   "health": {
-    "timestamp": "2026-06-01 19:39 UTC",
+    "timestamp": "2026-06-08 14:58 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
     "n_insider_signals": 7,
     "n_politician_signals": 0,
     "n_combined_signals": 7,
-    "elapsed_seconds": 230.3,
+    "elapsed_seconds": 209.8,
     "retry_required": false,
     "retry_reason": []
   },
   "signals": {
-    "MELI": {
+    "SOFI": {
       "buy_score_boost": 10,
       "insider_score": 10,
       "politician_score": 0,
@@ -22,96 +22,28 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "MELI",
-          "date": "2026-05-26",
-          "value_usd": 157226,
-          "shares": 95,
-          "price": 1655.01,
-          "name": "Aguzin Alejandro Nicolas",
-          "title": "Director",
+          "ticker": "SOFI",
+          "date": "2026-05-11",
+          "value_usd": 248781,
+          "shares": 15545,
+          "price": 16.0,
+          "name": "Noto Anthony",
+          "title": "Director, Officer, Chief Executive Officer",
           "is_cluster": false
         },
         {
-          "ticker": "MELI",
-          "date": "2026-05-26",
-          "value_usd": 836330,
-          "shares": 505,
-          "price": 1656.1,
-          "name": "Aguzin Alejandro Nicolas",
-          "title": "Director",
+          "ticker": "SOFI",
+          "date": "2026-05-08",
+          "value_usd": 249769,
+          "shares": 15878,
+          "price": 15.73,
+          "name": "Noto Anthony",
+          "title": "Director, Officer, Chief Executive Officer",
           "is_cluster": false
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-06-01"
-    },
-    "INTU": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "INTU",
-          "date": "2026-05-26",
-          "value_usd": 386808,
-          "shares": 1250,
-          "price": 309.45,
-          "name": "PRABHU VASANT M",
-          "title": "Director",
-          "is_cluster": false
-        },
-        {
-          "ticker": "INTU",
-          "date": "2026-05-26",
-          "value_usd": 154858,
-          "shares": 500,
-          "price": 309.71,
-          "name": "PRABHU VASANT M",
-          "title": "Director",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-06-01"
-    },
-    "TSM": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "TSM",
-          "date": "2026-05-19",
-          "value_usd": 69980,
-          "shares": 1000,
-          "price": 69.98,
-          "name": "Tien Bor-Zen",
-          "title": "Officer, VP",
-          "is_cluster": false
-        },
-        {
-          "ticker": "TSM",
-          "date": "2026-05-19",
-          "value_usd": 69830,
-          "shares": 1000,
-          "price": 69.83,
-          "name": "Tien Bor-Zen",
-          "title": "Officer, VP",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-06-01"
+      "as_of": "2026-06-08"
     },
     "SPGI": {
       "buy_score_boost": 20,
@@ -155,9 +87,9 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-06-01"
+      "as_of": "2026-06-08"
     },
-    "ENPH": {
+    "INTU": {
       "buy_score_boost": 10,
       "insider_score": 10,
       "politician_score": 0,
@@ -168,62 +100,28 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "ENPH",
+          "ticker": "INTU",
           "date": "2026-05-26",
-          "value_usd": 296450,
-          "shares": 4400,
-          "price": 67.37,
-          "name": "Kothandaraman Badrinarayanan",
-          "title": "Director, Officer, President & CEO",
+          "value_usd": 386808,
+          "shares": 1250,
+          "price": 309.45,
+          "name": "PRABHU VASANT M",
+          "title": "Director",
           "is_cluster": false
         },
         {
-          "ticker": "ENPH",
+          "ticker": "INTU",
           "date": "2026-05-26",
-          "value_usd": 41032,
-          "shares": 600,
-          "price": 68.39,
-          "name": "Kothandaraman Badrinarayanan",
-          "title": "Director, Officer, President & CEO",
+          "value_usd": 154858,
+          "shares": 500,
+          "price": 309.71,
+          "name": "PRABHU VASANT M",
+          "title": "Director",
           "is_cluster": false
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-06-01"
-    },
-    "SOFI": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "SOFI",
-          "date": "2026-05-11",
-          "value_usd": 248781,
-          "shares": 15545,
-          "price": 16.0,
-          "name": "Noto Anthony",
-          "title": "Director, Officer, Chief Executive Officer",
-          "is_cluster": false
-        },
-        {
-          "ticker": "SOFI",
-          "date": "2026-05-08",
-          "value_usd": 249769,
-          "shares": 15878,
-          "price": 15.73,
-          "name": "Noto Anthony",
-          "title": "Director, Officer, Chief Executive Officer",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-06-01"
+      "as_of": "2026-06-08"
     },
     "MSCI": {
       "buy_score_boost": 10,
@@ -287,7 +185,109 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-06-01"
+      "as_of": "2026-06-08"
+    },
+    "ENPH": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "ENPH",
+          "date": "2026-05-26",
+          "value_usd": 296450,
+          "shares": 4400,
+          "price": 67.37,
+          "name": "Kothandaraman Badrinarayanan",
+          "title": "Director, Officer, President & CEO",
+          "is_cluster": false
+        },
+        {
+          "ticker": "ENPH",
+          "date": "2026-05-26",
+          "value_usd": 41032,
+          "shares": 600,
+          "price": 68.39,
+          "name": "Kothandaraman Badrinarayanan",
+          "title": "Director, Officer, President & CEO",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-06-08"
+    },
+    "MELI": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "MELI",
+          "date": "2026-05-26",
+          "value_usd": 157226,
+          "shares": 95,
+          "price": 1655.01,
+          "name": "Aguzin Alejandro Nicolas",
+          "title": "Director",
+          "is_cluster": false
+        },
+        {
+          "ticker": "MELI",
+          "date": "2026-05-26",
+          "value_usd": 836330,
+          "shares": 505,
+          "price": 1656.1,
+          "name": "Aguzin Alejandro Nicolas",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-06-08"
+    },
+    "TSM": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "TSM",
+          "date": "2026-05-19",
+          "value_usd": 69980,
+          "shares": 1000,
+          "price": 69.98,
+          "name": "Tien Bor-Zen",
+          "title": "Officer, VP",
+          "is_cluster": false
+        },
+        {
+          "ticker": "TSM",
+          "date": "2026-05-19",
+          "value_usd": 69830,
+          "shares": 1000,
+          "price": 69.83,
+          "name": "Tien Bor-Zen",
+          "title": "Officer, VP",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-06-08"
     }
   }
 }
