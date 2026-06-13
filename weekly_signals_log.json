@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-12 18:23 UTC",
+  "last_updated": "2026-06-13 10:09 UTC",
   "entries": [
     {
       "ticker": "BEP",
@@ -120,12 +120,12 @@
       "framework_score": 72,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 69.5,
       "current_price": 367.22,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 14",
+      "expired_at": "2026-06-13 10:09"
     },
     {
       "ticker": "SNDK",
@@ -174,12 +174,12 @@
       "framework_score": 48,
       "fdfv3": true,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 83,
       "current_price": 60.79,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 58",
+      "expired_at": "2026-06-13 10:09"
     },
     {
       "ticker": "IBKR",
