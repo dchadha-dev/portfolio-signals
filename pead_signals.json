@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-06-08 14:54 UTC",
-    "tickers_checked": 8,
-    "new_signals": 6,
+    "timestamp": "2026-06-15 18:20 UTC",
+    "tickers_checked": 6,
+    "new_signals": 3,
     "total_signals": 10,
-    "expired_removed": 5,
+    "expired_removed": 3,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 111.6
+    "elapsed_seconds": 118.8
   },
   "signals": {
     "NVDA": {
@@ -120,7 +120,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-06-08"
+      "as_of": "2026-06-15"
     },
     "CRDO": {
       "ticker": "CRDO",
@@ -134,7 +134,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-06-08"
+      "as_of": "2026-06-15"
     },
     "PANW": {
       "ticker": "PANW",
@@ -148,7 +148,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-06-08"
+      "as_of": "2026-06-15"
     }
   }
 }
