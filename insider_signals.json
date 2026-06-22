@@ -1,16 +1,104 @@
 {
   "health": {
-    "timestamp": "2026-06-15 18:24 UTC",
+    "timestamp": "2026-06-22 18:11 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
-    "n_insider_signals": 5,
+    "n_insider_signals": 8,
     "n_politician_signals": 0,
-    "n_combined_signals": 5,
-    "elapsed_seconds": 262.5,
+    "n_combined_signals": 8,
+    "elapsed_seconds": 222.7,
     "retry_required": false,
     "retry_reason": []
   },
   "signals": {
+    "FISV": {
+      "buy_score_boost": 20,
+      "insider_score": 20,
+      "politician_score": 0,
+      "insider_n": 6,
+      "insider_cluster": true,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "FISV",
+          "date": "2026-06-18",
+          "value_usd": 499982,
+          "shares": 10060,
+          "price": 49.7,
+          "name": "Todd Paul M",
+          "title": "Officer, Chief Financial Officer",
+          "is_cluster": true
+        },
+        {
+          "ticker": "FISV",
+          "date": "2026-06-17",
+          "value_usd": 149746,
+          "shares": 2960,
+          "price": 50.59,
+          "name": "Mamilli Wafaa",
+          "title": "Director",
+          "is_cluster": true
+        },
+        {
+          "ticker": "FISV",
+          "date": "2026-06-16",
+          "value_usd": 500700,
+          "shares": 10150,
+          "price": 49.33,
+          "name": "Rosman Adam L.",
+          "title": "Officer, Chief Admin. and Legal Officer",
+          "is_cluster": true
+        },
+        {
+          "ticker": "FISV",
+          "date": "2026-06-16",
+          "value_usd": 100118,
+          "shares": 2023,
+          "price": 49.49,
+          "name": "Yarkoni Charlotte",
+          "title": "Director",
+          "is_cluster": true
+        },
+        {
+          "ticker": "FISV",
+          "date": "2026-06-16",
+          "value_usd": 101080,
+          "shares": 2088,
+          "price": 48.41,
+          "name": "DiSimone Harry",
+          "title": "Director",
+          "is_cluster": true
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-06-22"
+    },
+    "MELI": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "MELI",
+          "date": "2026-06-15",
+          "value_usd": 200000,
+          "shares": 124,
+          "price": 1604.62,
+          "name": "Melamud Marcelo",
+          "title": "Officer, SVP - Chief Accounting Officer",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-06-22"
+    },
     "SPGI": {
       "buy_score_boost": 20,
       "insider_score": 20,
@@ -53,7 +141,55 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-06-15"
+      "as_of": "2026-06-22"
+    },
+    "TSM": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "TSM",
+          "date": "2026-06-16",
+          "value_usd": 75260,
+          "shares": 1000,
+          "price": 75.26,
+          "name": "Yuan Lipen",
+          "title": "Officer, VP",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-06-22"
+    },
+    "AVGO": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "AVGO",
+          "date": "2026-06-15",
+          "value_usd": 373570,
+          "shares": 1000,
+          "price": 373.57,
+          "name": "You Harry L.",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-06-22"
     },
     "MSCI": {
       "buy_score_boost": 10,
@@ -117,41 +253,7 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-06-15"
-    },
-    "ENPH": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "ENPH",
-          "date": "2026-05-26",
-          "value_usd": 296450,
-          "shares": 4400,
-          "price": 67.37,
-          "name": "Kothandaraman Badrinarayanan",
-          "title": "Director, Officer, President & CEO",
-          "is_cluster": false
-        },
-        {
-          "ticker": "ENPH",
-          "date": "2026-05-26",
-          "value_usd": 41032,
-          "shares": 600,
-          "price": 68.39,
-          "name": "Kothandaraman Badrinarayanan",
-          "title": "Director, Officer, President & CEO",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-06-15"
+      "as_of": "2026-06-22"
     },
     "INTU": {
       "buy_score_boost": 10,
@@ -185,41 +287,51 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-06-15"
+      "as_of": "2026-06-22"
     },
-    "MELI": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
+    "ENPH": {
+      "buy_score_boost": 20,
+      "insider_score": 20,
       "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
+      "insider_n": 2,
+      "insider_cluster": true,
       "politician_n": 0,
       "politician_cluster": false,
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "MELI",
-          "date": "2026-05-26",
-          "value_usd": 157226,
-          "shares": 95,
-          "price": 1655.01,
-          "name": "Aguzin Alejandro Nicolas",
+          "ticker": "ENPH",
+          "date": "2026-06-15",
+          "value_usd": 53910,
+          "shares": 1000,
+          "price": 53.91,
+          "name": "Trivedi Shanker",
           "title": "Director",
-          "is_cluster": false
+          "is_cluster": true
         },
         {
-          "ticker": "MELI",
+          "ticker": "ENPH",
           "date": "2026-05-26",
-          "value_usd": 836330,
-          "shares": 505,
-          "price": 1656.1,
-          "name": "Aguzin Alejandro Nicolas",
-          "title": "Director",
-          "is_cluster": false
+          "value_usd": 296450,
+          "shares": 4400,
+          "price": 67.37,
+          "name": "Kothandaraman Badrinarayanan",
+          "title": "Director, Officer, President & CEO",
+          "is_cluster": true
+        },
+        {
+          "ticker": "ENPH",
+          "date": "2026-05-26",
+          "value_usd": 41032,
+          "shares": 600,
+          "price": 68.39,
+          "name": "Kothandaraman Badrinarayanan",
+          "title": "Director, Officer, President & CEO",
+          "is_cluster": true
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-06-15"
+      "as_of": "2026-06-22"
     }
   }
 }
