@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-22 23:59 UTC",
+  "last_updated": "2026-06-23 13:38 UTC",
   "entries": [
     {
       "ticker": "GDX",
@@ -48,12 +48,12 @@
       "framework_score": 42,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 3.27,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "NXE",
@@ -138,12 +138,12 @@
       "framework_score": 74,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 68.2,
       "current_price": 958.73,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 17",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "MS",
@@ -192,12 +192,12 @@
       "framework_score": 64,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 74.4,
       "current_price": 94.5,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 14",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "GDX",
@@ -246,12 +246,12 @@
       "framework_score": 42,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 3.27,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "NXE",
@@ -426,12 +426,12 @@
       "framework_score": 42,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 3.27,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "CCJ",
@@ -534,12 +534,12 @@
       "framework_score": 58,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 77.9,
       "current_price": 2116.54,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 0",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "MU",
@@ -552,12 +552,12 @@
       "framework_score": 76,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 66.9,
       "current_price": 1101.87,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 7",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "ALAB",
@@ -570,12 +570,12 @@
       "framework_score": 72,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 69.5,
       "current_price": 391.74,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 0",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "SMH",
@@ -588,12 +588,12 @@
       "framework_score": 72,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 69.5,
       "current_price": 652.28,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 6",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "INTC",
@@ -606,12 +606,12 @@
       "framework_score": 42,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 81.8,
       "current_price": 129.61,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 4",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "HOOD",
@@ -642,12 +642,12 @@
       "framework_score": 42,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 3.27,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "CCJ",
@@ -696,12 +696,12 @@
       "framework_score": 48,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 83.4,
       "current_price": 328.91,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 0",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "MRNA",
@@ -732,12 +732,12 @@
       "framework_score": 62,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 75.6,
       "current_price": 123.3,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 8",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "ARKG",
@@ -768,12 +768,12 @@
       "framework_score": 68,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 72.0,
       "current_price": 86.79,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 18",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "IBKR",
@@ -786,12 +786,12 @@
       "framework_score": 74,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 68.2,
       "current_price": 96.0,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 14",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "HOOD",
@@ -822,12 +822,12 @@
       "framework_score": 42,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 3.27,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "CCJ",
@@ -894,12 +894,12 @@
       "framework_score": 42,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 3.27,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "CCJ",
@@ -966,12 +966,12 @@
       "framework_score": 42,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 3.27,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "CCJ",
@@ -1038,12 +1038,12 @@
       "framework_score": 68,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 72.0,
       "current_price": 298.46,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 6",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "BAC",
@@ -1074,12 +1074,12 @@
       "framework_score": 62,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 75.6,
       "current_price": 145.62,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 15",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "HSBC",
@@ -1092,12 +1092,12 @@
       "framework_score": 58,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 77.9,
       "current_price": 96.68,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 18",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "VICR",
@@ -1110,12 +1110,12 @@
       "framework_score": 58,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 77.9,
       "current_price": 357.82,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 1",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "LSCC",
@@ -1128,12 +1128,12 @@
       "framework_score": 71,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 70.1,
       "current_price": 154.91,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 2",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "MS",
@@ -1146,12 +1146,12 @@
       "framework_score": 73,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 68.8,
       "current_price": 227.31,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 14",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "KEEL",
@@ -1164,12 +1164,12 @@
       "framework_score": 32,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 90.9,
       "current_price": 7.34,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 0",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "AAL",
@@ -1200,12 +1200,12 @@
       "framework_score": 68,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 72.0,
       "current_price": 209.83,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 7",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "GS",
@@ -1218,12 +1218,12 @@
       "framework_score": 74,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 68.2,
       "current_price": 1106.37,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 15",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "FORM",
@@ -1236,12 +1236,12 @@
       "framework_score": 58,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 77.9,
       "current_price": 156.66,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 6",
+      "expired_at": "2026-06-23 13:38"
     },
     {
       "ticker": "STX",
@@ -1254,9 +1254,27 @@
       "framework_score": 60,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 76.8,
       "current_price": 1094.04,
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 2",
+      "expired_at": "2026-06-23 13:38"
+    },
+    {
+      "ticker": "CCJ",
+      "signal_type": "WATCH",
+      "score": 65,
+      "sell_score": 1.5,
+      "timestamp": "2026-06-23 13:38",
+      "price": 106.14,
+      "dist_252h": -20.8,
+      "framework_score": 68,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 65,
+      "current_price": 106.14,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
