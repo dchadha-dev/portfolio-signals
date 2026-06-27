@@ -1,24 +1,6 @@
 {
-  "last_updated": "2026-06-26 23:53 UTC",
+  "last_updated": "2026-06-27 12:06 UTC",
   "entries": [
-    {
-      "ticker": "IBKR",
-      "signal_type": "SELL",
-      "score": 68.2,
-      "sell_score": 68.2,
-      "timestamp": "2026-06-19 23:58",
-      "price": 96.0,
-      "dist_252h": 1.0,
-      "framework_score": 74,
-      "fdfv3": false,
-      "is_holding": false,
-      "status": "expired",
-      "current_score": 68.2,
-      "current_price": 96.0,
-      "expire_reason": "sell_cleared",
-      "expire_detail": "sell score dropped to 14",
-      "expired_at": "2026-06-23 13:38"
-    },
     {
       "ticker": "HOOD",
       "signal_type": "WATCH",
