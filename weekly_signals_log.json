@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-27 23:52 UTC",
+  "last_updated": "2026-06-28 12:14 UTC",
   "entries": [
     {
       "ticker": "HOOD",
@@ -825,6 +825,24 @@
       "status": "active",
       "current_score": 69.5,
       "current_price": 341.44,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "HON",
+      "signal_type": "SELL",
+      "score": 100,
+      "sell_score": 100,
+      "timestamp": "2026-06-28 12:14",
+      "price": 464.42,
+      "dist_252h": 0.4,
+      "framework_score": null,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 100,
+      "current_price": 464.42,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
