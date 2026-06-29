@@ -1,12 +1,12 @@
 {
   "health": {
-    "timestamp": "2026-06-22 18:11 UTC",
+    "timestamp": "2026-06-29 05:32 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
-    "n_insider_signals": 8,
+    "n_insider_signals": 9,
     "n_politician_signals": 0,
-    "n_combined_signals": 8,
-    "elapsed_seconds": 222.7,
+    "n_combined_signals": 9,
+    "elapsed_seconds": 267.5,
     "retry_required": false,
     "retry_reason": []
   },
@@ -73,9 +73,9 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-06-22"
+      "as_of": "2026-06-29"
     },
-    "MELI": {
+    "AVGO": {
       "buy_score_boost": 10,
       "insider_score": 10,
       "politician_score": 0,
@@ -86,18 +86,18 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "MELI",
+          "ticker": "AVGO",
           "date": "2026-06-15",
-          "value_usd": 200000,
-          "shares": 124,
-          "price": 1604.62,
-          "name": "Melamud Marcelo",
-          "title": "Officer, SVP - Chief Accounting Officer",
+          "value_usd": 373570,
+          "shares": 1000,
+          "price": 373.57,
+          "name": "You Harry L.",
+          "title": "Director",
           "is_cluster": false
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-06-22"
+      "as_of": "2026-06-29"
     },
     "SPGI": {
       "buy_score_boost": 20,
@@ -141,55 +141,7 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-06-22"
-    },
-    "TSM": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "TSM",
-          "date": "2026-06-16",
-          "value_usd": 75260,
-          "shares": 1000,
-          "price": 75.26,
-          "name": "Yuan Lipen",
-          "title": "Officer, VP",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-06-22"
-    },
-    "AVGO": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "AVGO",
-          "date": "2026-06-15",
-          "value_usd": 373570,
-          "shares": 1000,
-          "price": 373.57,
-          "name": "You Harry L.",
-          "title": "Director",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-06-22"
+      "as_of": "2026-06-29"
     },
     "MSCI": {
       "buy_score_boost": 10,
@@ -253,7 +205,7 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-06-22"
+      "as_of": "2026-06-29"
     },
     "INTU": {
       "buy_score_boost": 10,
@@ -287,7 +239,41 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-06-22"
+      "as_of": "2026-06-29"
+    },
+    "TSM": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "TSM",
+          "date": "2026-06-23",
+          "value_usd": 79190,
+          "shares": 1000,
+          "price": 79.19,
+          "name": "Yuan Lipen",
+          "title": "Officer, VP",
+          "is_cluster": false
+        },
+        {
+          "ticker": "TSM",
+          "date": "2026-06-16",
+          "value_usd": 75260,
+          "shares": 1000,
+          "price": 75.26,
+          "name": "Yuan Lipen",
+          "title": "Officer, VP",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-06-29"
     },
     "ENPH": {
       "buy_score_boost": 20,
@@ -331,7 +317,55 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-06-22"
+      "as_of": "2026-06-29"
+    },
+    "ADBE": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "ADBE",
+          "date": "2026-06-26",
+          "value_usd": 1945130,
+          "shares": 10000,
+          "price": 194.51,
+          "name": "Ricks David A",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-06-29"
+    },
+    "MELI": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "MELI",
+          "date": "2026-06-15",
+          "value_usd": 200000,
+          "shares": 124,
+          "price": 1604.62,
+          "name": "Melamud Marcelo",
+          "title": "Officer, SVP - Chief Accounting Officer",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-06-29"
     }
   }
 }

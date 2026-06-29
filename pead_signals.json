@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-06-22 18:08 UTC",
+    "timestamp": "2026-06-29 05:27 UTC",
     "tickers_checked": 1,
-    "new_signals": 0,
-    "total_signals": 10,
+    "new_signals": 1,
+    "total_signals": 11,
     "expired_removed": 0,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 112.8
+    "elapsed_seconds": 121.8
   },
   "signals": {
     "NVDA": {
@@ -149,6 +149,20 @@
       "history_quarters": 3,
       "buy_score_boost": 10,
       "as_of": "2026-06-15"
+    },
+    "MU": {
+      "ticker": "MU",
+      "announce_date": "2026-06-24",
+      "expires_at": "2026-08-23",
+      "sue": 2.812,
+      "surprise": 3.7081,
+      "actual_eps": 25.11,
+      "estimate_eps": 21.4019,
+      "std_dev": 1.3187,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-06-29"
     }
   }
 }
