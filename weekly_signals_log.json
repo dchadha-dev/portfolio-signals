@@ -1,24 +1,6 @@
 {
-  "last_updated": "2026-07-05 12:10 UTC",
+  "last_updated": "2026-07-05 23:55 UTC",
   "entries": [
-    {
-      "ticker": "HON",
-      "signal_type": "SELL",
-      "score": 100,
-      "sell_score": 100,
-      "timestamp": "2026-06-28 12:14",
-      "price": 464.42,
-      "dist_252h": 0.4,
-      "framework_score": null,
-      "fdfv3": false,
-      "is_holding": false,
-      "status": "expired",
-      "current_score": 100,
-      "current_price": 464.42,
-      "expire_reason": "sell_cleared",
-      "expire_detail": "sell score dropped to 10",
-      "expired_at": "2026-06-29 14:44"
-    },
     {
       "ticker": "GE",
       "signal_type": "SELL",
