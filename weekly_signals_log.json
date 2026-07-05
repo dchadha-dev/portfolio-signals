@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-07-04 23:52 UTC",
+  "last_updated": "2026-07-05 12:10 UTC",
   "entries": [
     {
       "ticker": "HON",
@@ -753,6 +753,42 @@
       "status": "active",
       "current_score": 66.9,
       "current_price": 57.2,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "RKLB",
+      "signal_type": "WATCH",
+      "score": 83,
+      "sell_score": 1.1,
+      "timestamp": "2026-07-05 12:10",
+      "price": 100.46,
+      "dist_252h": -33.1,
+      "framework_score": 52,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 83,
+      "current_price": 100.46,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "ASTS",
+      "signal_type": "WATCH",
+      "score": 65,
+      "sell_score": 0.0,
+      "timestamp": "2026-07-05 12:10",
+      "price": 85.13,
+      "dist_252h": -36.0,
+      "framework_score": 46,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 65,
+      "current_price": 85.13,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
