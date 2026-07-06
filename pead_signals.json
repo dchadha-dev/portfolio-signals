@@ -1,19 +1,19 @@
 {
   "health": {
-    "timestamp": "2026-06-29 05:27 UTC",
-    "tickers_checked": 1,
-    "new_signals": 1,
+    "timestamp": "2026-07-06 05:07 UTC",
+    "tickers_checked": 15,
+    "new_signals": 9,
     "total_signals": 11,
-    "expired_removed": 0,
+    "expired_removed": 9,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 121.8
+    "elapsed_seconds": 137.7
   },
   "signals": {
     "NVDA": {
       "ticker": "NVDA",
-      "announce_date": "2026-05-20",
-      "expires_at": "2026-07-19",
+      "announce_date": "2026-06-30",
+      "expires_at": "2026-08-29",
       "sue": 3.89,
       "surprise": 0.0778,
       "actual_eps": 1.87,
@@ -22,12 +22,12 @@
       "std_dev_floored": true,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-06-01"
+      "as_of": "2026-07-06"
     },
     "AMAT": {
       "ticker": "AMAT",
-      "announce_date": "2026-05-14",
-      "expires_at": "2026-07-13",
+      "announce_date": "2026-06-30",
+      "expires_at": "2026-08-29",
       "sue": 2.915,
       "surprise": 0.1424,
       "actual_eps": 2.86,
@@ -36,7 +36,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-05-28"
+      "as_of": "2026-07-06"
     },
     "NBIS": {
       "ticker": "NBIS",
@@ -68,8 +68,8 @@
     },
     "CRM": {
       "ticker": "CRM",
-      "announce_date": "2026-05-27",
-      "expires_at": "2026-07-26",
+      "announce_date": "2026-06-30",
+      "expires_at": "2026-08-29",
       "sue": 2.309,
       "surprise": 0.7318,
       "actual_eps": 3.88,
@@ -78,12 +78,12 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-06-08"
+      "as_of": "2026-07-06"
     },
     "DELL": {
       "ticker": "DELL",
-      "announce_date": "2026-05-28",
-      "expires_at": "2026-07-27",
+      "announce_date": "2026-06-30",
+      "expires_at": "2026-08-29",
       "sue": 11.36,
       "surprise": 1.8615,
       "actual_eps": 4.86,
@@ -92,12 +92,12 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-06-08"
+      "as_of": "2026-07-06"
     },
     "SNOW": {
       "ticker": "SNOW",
-      "announce_date": "2026-05-27",
-      "expires_at": "2026-07-26",
+      "announce_date": "2026-06-30",
+      "expires_at": "2026-08-29",
       "sue": 2.727,
       "surprise": 0.0654,
       "actual_eps": 0.39,
@@ -106,12 +106,12 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-06-08"
+      "as_of": "2026-07-06"
     },
     "HPE": {
       "ticker": "HPE",
-      "announce_date": "2026-06-01",
-      "expires_at": "2026-07-31",
+      "announce_date": "2026-06-30",
+      "expires_at": "2026-08-29",
       "sue": 9.949,
       "surprise": 0.2504,
       "actual_eps": 0.79,
@@ -120,12 +120,12 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-06-15"
+      "as_of": "2026-07-06"
     },
     "CRDO": {
       "ticker": "CRDO",
-      "announce_date": "2026-06-01",
-      "expires_at": "2026-07-31",
+      "announce_date": "2026-06-30",
+      "expires_at": "2026-08-29",
       "sue": 2.915,
       "surprise": 0.1103,
       "actual_eps": 1.16,
@@ -134,12 +134,12 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-06-15"
+      "as_of": "2026-07-06"
     },
     "PANW": {
       "ticker": "PANW",
-      "announce_date": "2026-06-02",
-      "expires_at": "2026-08-01",
+      "announce_date": "2026-06-30",
+      "expires_at": "2026-08-29",
       "sue": 1.628,
       "surprise": 0.0388,
       "actual_eps": 0.85,
@@ -148,7 +148,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-06-15"
+      "as_of": "2026-07-06"
     },
     "MU": {
       "ticker": "MU",
@@ -162,7 +162,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-06-29"
+      "as_of": "2026-07-06"
     }
   }
 }

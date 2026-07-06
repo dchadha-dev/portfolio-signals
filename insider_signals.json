@@ -1,79 +1,69 @@
 {
   "health": {
-    "timestamp": "2026-06-29 05:32 UTC",
+    "timestamp": "2026-07-06 05:12 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
-    "n_insider_signals": 9,
+    "n_insider_signals": 8,
     "n_politician_signals": 0,
-    "n_combined_signals": 9,
-    "elapsed_seconds": 267.5,
+    "n_combined_signals": 8,
+    "elapsed_seconds": 298.2,
     "retry_required": false,
     "retry_reason": []
   },
   "signals": {
-    "FISV": {
+    "TSM": {
       "buy_score_boost": 20,
       "insider_score": 20,
       "politician_score": 0,
-      "insider_n": 6,
+      "insider_n": 2,
       "insider_cluster": true,
       "politician_n": 0,
       "politician_cluster": false,
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "FISV",
-          "date": "2026-06-18",
-          "value_usd": 499982,
-          "shares": 10060,
-          "price": 49.7,
-          "name": "Todd Paul M",
-          "title": "Officer, Chief Financial Officer",
+          "ticker": "TSM",
+          "date": "2026-06-30",
+          "value_usd": 76640,
+          "shares": 1000,
+          "price": 76.64,
+          "name": "Tien Bor-Zen",
+          "title": "Officer, VP",
           "is_cluster": true
         },
         {
-          "ticker": "FISV",
-          "date": "2026-06-17",
-          "value_usd": 149746,
-          "shares": 2960,
-          "price": 50.59,
-          "name": "Mamilli Wafaa",
-          "title": "Director",
+          "ticker": "TSM",
+          "date": "2026-06-30",
+          "value_usd": 75700,
+          "shares": 1000,
+          "price": 75.7,
+          "name": "Tien Bor-Zen",
+          "title": "Officer, VP",
           "is_cluster": true
         },
         {
-          "ticker": "FISV",
+          "ticker": "TSM",
+          "date": "2026-06-23",
+          "value_usd": 79190,
+          "shares": 1000,
+          "price": 79.19,
+          "name": "Yuan Lipen",
+          "title": "Officer, VP",
+          "is_cluster": true
+        },
+        {
+          "ticker": "TSM",
           "date": "2026-06-16",
-          "value_usd": 500700,
-          "shares": 10150,
-          "price": 49.33,
-          "name": "Rosman Adam L.",
-          "title": "Officer, Chief Admin. and Legal Officer",
-          "is_cluster": true
-        },
-        {
-          "ticker": "FISV",
-          "date": "2026-06-16",
-          "value_usd": 100118,
-          "shares": 2023,
-          "price": 49.49,
-          "name": "Yarkoni Charlotte",
-          "title": "Director",
-          "is_cluster": true
-        },
-        {
-          "ticker": "FISV",
-          "date": "2026-06-16",
-          "value_usd": 101080,
-          "shares": 2088,
-          "price": 48.41,
-          "name": "DiSimone Harry",
-          "title": "Director",
+          "value_usd": 75260,
+          "shares": 1000,
+          "price": 75.26,
+          "name": "Yuan Lipen",
+          "title": "Officer, VP",
           "is_cluster": true
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-06-29"
+      "as_of": "2026-07-06"
     },
     "AVGO": {
       "buy_score_boost": 10,
@@ -97,51 +87,157 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-06-29"
+      "as_of": "2026-07-06"
     },
-    "SPGI": {
+    "UBER": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "UBER",
+          "date": "2026-07-02",
+          "value_usd": 20000000,
+          "shares": 800000,
+          "price": 25.0,
+          "name": "Uber Technologies, Inc",
+          "title": "TenPercentOwner",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-07-06"
+    },
+    "ENPH": {
       "buy_score_boost": 20,
       "insider_score": 20,
       "politician_score": 0,
-      "insider_n": 3,
+      "insider_n": 2,
       "insider_cluster": true,
       "politician_n": 0,
       "politician_cluster": false,
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "SPGI",
-          "date": "2026-05-04",
-          "value_usd": 500001,
-          "shares": 1151,
-          "price": 434.03,
-          "name": "Moritz Robert Edward Jr.",
+          "ticker": "ENPH",
+          "date": "2026-06-15",
+          "value_usd": 53910,
+          "shares": 1000,
+          "price": 53.91,
+          "name": "Trivedi Shanker",
           "title": "Director",
           "is_cluster": true
         },
         {
-          "ticker": "SPGI",
-          "date": "2026-05-04",
-          "value_usd": 1078475,
-          "shares": 2500,
-          "price": 431.39,
-          "name": "Clay Catherine R",
-          "title": "Officer, CEO, S&P Dow Jones Indices",
+          "ticker": "ENPH",
+          "date": "2026-05-26",
+          "value_usd": 296450,
+          "shares": 4400,
+          "price": 67.37,
+          "name": "Kothandaraman Badrinarayanan",
+          "title": "Director, Officer, President & CEO",
           "is_cluster": true
         },
         {
-          "ticker": "SPGI",
-          "date": "2026-05-01",
-          "value_usd": 998297,
-          "shares": 2322,
-          "price": 429.93,
-          "name": "CHEUNG MARTINA",
-          "title": "Director, Officer, CEO & President",
+          "ticker": "ENPH",
+          "date": "2026-05-26",
+          "value_usd": 41032,
+          "shares": 600,
+          "price": 68.39,
+          "name": "Kothandaraman Badrinarayanan",
+          "title": "Director, Officer, President & CEO",
           "is_cluster": true
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-06-29"
+      "as_of": "2026-07-06"
+    },
+    "INTU": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "INTU",
+          "date": "2026-05-26",
+          "value_usd": 386808,
+          "shares": 1250,
+          "price": 309.45,
+          "name": "PRABHU VASANT M",
+          "title": "Director",
+          "is_cluster": false
+        },
+        {
+          "ticker": "INTU",
+          "date": "2026-05-26",
+          "value_usd": 154858,
+          "shares": 500,
+          "price": 309.71,
+          "name": "PRABHU VASANT M",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-07-06"
+    },
+    "MELI": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "MELI",
+          "date": "2026-06-15",
+          "value_usd": 200000,
+          "shares": 124,
+          "price": 1604.62,
+          "name": "Melamud Marcelo",
+          "title": "Officer, SVP - Chief Accounting Officer",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-07-06"
+    },
+    "ADBE": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "ADBE",
+          "date": "2026-06-26",
+          "value_usd": 1945130,
+          "shares": 10000,
+          "price": 194.51,
+          "name": "Ricks David A",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-07-06"
     },
     "MSCI": {
       "buy_score_boost": 10,
@@ -205,167 +301,7 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-06-29"
-    },
-    "INTU": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "INTU",
-          "date": "2026-05-26",
-          "value_usd": 386808,
-          "shares": 1250,
-          "price": 309.45,
-          "name": "PRABHU VASANT M",
-          "title": "Director",
-          "is_cluster": false
-        },
-        {
-          "ticker": "INTU",
-          "date": "2026-05-26",
-          "value_usd": 154858,
-          "shares": 500,
-          "price": 309.71,
-          "name": "PRABHU VASANT M",
-          "title": "Director",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-06-29"
-    },
-    "TSM": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "TSM",
-          "date": "2026-06-23",
-          "value_usd": 79190,
-          "shares": 1000,
-          "price": 79.19,
-          "name": "Yuan Lipen",
-          "title": "Officer, VP",
-          "is_cluster": false
-        },
-        {
-          "ticker": "TSM",
-          "date": "2026-06-16",
-          "value_usd": 75260,
-          "shares": 1000,
-          "price": 75.26,
-          "name": "Yuan Lipen",
-          "title": "Officer, VP",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-06-29"
-    },
-    "ENPH": {
-      "buy_score_boost": 20,
-      "insider_score": 20,
-      "politician_score": 0,
-      "insider_n": 2,
-      "insider_cluster": true,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "ENPH",
-          "date": "2026-06-15",
-          "value_usd": 53910,
-          "shares": 1000,
-          "price": 53.91,
-          "name": "Trivedi Shanker",
-          "title": "Director",
-          "is_cluster": true
-        },
-        {
-          "ticker": "ENPH",
-          "date": "2026-05-26",
-          "value_usd": 296450,
-          "shares": 4400,
-          "price": 67.37,
-          "name": "Kothandaraman Badrinarayanan",
-          "title": "Director, Officer, President & CEO",
-          "is_cluster": true
-        },
-        {
-          "ticker": "ENPH",
-          "date": "2026-05-26",
-          "value_usd": 41032,
-          "shares": 600,
-          "price": 68.39,
-          "name": "Kothandaraman Badrinarayanan",
-          "title": "Director, Officer, President & CEO",
-          "is_cluster": true
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-06-29"
-    },
-    "ADBE": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "ADBE",
-          "date": "2026-06-26",
-          "value_usd": 1945130,
-          "shares": 10000,
-          "price": 194.51,
-          "name": "Ricks David A",
-          "title": "Director",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-06-29"
-    },
-    "MELI": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "MELI",
-          "date": "2026-06-15",
-          "value_usd": 200000,
-          "shares": 124,
-          "price": 1604.62,
-          "name": "Melamud Marcelo",
-          "title": "Officer, SVP - Chief Accounting Officer",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-06-29"
+      "as_of": "2026-07-06"
     }
   }
 }
