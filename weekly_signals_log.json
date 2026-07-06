@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-07-05 23:55 UTC",
+  "last_updated": "2026-07-06 14:23 UTC",
   "entries": [
     {
       "ticker": "GE",
@@ -12,12 +12,12 @@
       "framework_score": 70,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 70.7,
       "current_price": 374.59,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 14",
+      "expired_at": "2026-07-06 14:23"
     },
     {
       "ticker": "DIA",
@@ -86,7 +86,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 100.46,
+      "current_price": 97.3,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -104,7 +104,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 85.13,
+      "current_price": 82.96,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -176,7 +176,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 100.46,
+      "current_price": 97.3,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -194,7 +194,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 85.13,
+      "current_price": 82.96,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -302,7 +302,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 100.46,
+      "current_price": 97.3,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -320,7 +320,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 85.13,
+      "current_price": 82.96,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -374,7 +374,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 100.46,
+      "current_price": 97.3,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -410,7 +410,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 85.13,
+      "current_price": 82.96,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -480,12 +480,12 @@
       "framework_score": 44,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 85.4,
       "current_price": 42.62,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 17",
+      "expired_at": "2026-07-06 14:23"
     },
     {
       "ticker": "VLO",
@@ -516,12 +516,12 @@
       "framework_score": 72,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 69.5,
       "current_price": 351.73,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 15",
+      "expired_at": "2026-07-06 14:23"
     },
     {
       "ticker": "ABBV",
@@ -534,12 +534,12 @@
       "framework_score": 74,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 68.2,
       "current_price": 261.07,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 15",
+      "expired_at": "2026-07-06 14:23"
     },
     {
       "ticker": "JNJ",
@@ -552,12 +552,12 @@
       "framework_score": 76,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 66.9,
       "current_price": 263.04,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 18",
+      "expired_at": "2026-07-06 14:23"
     },
     {
       "ticker": "IEV",
@@ -606,12 +606,12 @@
       "framework_score": 76,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 66.9,
       "current_price": 148.93,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 9",
+      "expired_at": "2026-07-06 14:23"
     },
     {
       "ticker": "KO",
@@ -624,12 +624,12 @@
       "framework_score": 72,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 69.5,
       "current_price": 84.14,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 19",
+      "expired_at": "2026-07-06 14:23"
     },
     {
       "ticker": "DIA",
@@ -642,12 +642,12 @@
       "framework_score": 72,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 69.5,
       "current_price": 527.88,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 19",
+      "expired_at": "2026-07-06 14:23"
     },
     {
       "ticker": "RKLB",
@@ -662,7 +662,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 100.46,
+      "current_price": 97.3,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -680,7 +680,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 85.13,
+      "current_price": 82.96,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -698,7 +698,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 100.46,
+      "current_price": 97.3,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -716,7 +716,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 85.13,
+      "current_price": 82.96,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -732,12 +732,12 @@
       "framework_score": 76,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 66.9,
       "current_price": 57.2,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 11",
+      "expired_at": "2026-07-06 14:23"
     },
     {
       "ticker": "RKLB",
@@ -752,7 +752,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 100.46,
+      "current_price": 97.3,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -770,7 +770,97 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 85.13,
+      "current_price": 82.96,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "RKLB",
+      "signal_type": "WATCH",
+      "score": 83,
+      "sell_score": 0.8,
+      "timestamp": "2026-07-06 14:23",
+      "price": 97.3,
+      "dist_252h": -35.2,
+      "framework_score": 52,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 83,
+      "current_price": 97.3,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "ASTS",
+      "signal_type": "WATCH",
+      "score": 65,
+      "sell_score": 0.0,
+      "timestamp": "2026-07-06 14:23",
+      "price": 82.96,
+      "dist_252h": -37.7,
+      "framework_score": 46,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 65,
+      "current_price": 82.96,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "GEV",
+      "signal_type": "SELL",
+      "score": 69.5,
+      "sell_score": 69.5,
+      "timestamp": "2026-07-06 14:23",
+      "price": 1185.84,
+      "dist_252h": 0.9,
+      "framework_score": 72,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 69.5,
+      "current_price": 1185.84,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "VLO",
+      "signal_type": "SELL",
+      "score": 75.6,
+      "sell_score": 75.6,
+      "timestamp": "2026-07-06 14:23",
+      "price": 272.27,
+      "dist_252h": 1.1,
+      "framework_score": 62,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 75.6,
+      "current_price": 272.27,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "JPM",
+      "signal_type": "SELL",
+      "score": 66.9,
+      "sell_score": 66.9,
+      "timestamp": "2026-07-06 14:23",
+      "price": 336.23,
+      "dist_252h": 0.3,
+      "framework_score": 76,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 66.9,
+      "current_price": 336.23,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
