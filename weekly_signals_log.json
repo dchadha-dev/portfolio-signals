@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-07-07 13:13 UTC",
+  "last_updated": "2026-07-07 23:44 UTC",
   "entries": [
     {
       "ticker": "RMBS",
@@ -156,12 +156,12 @@
       "framework_score": 76,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 66.9,
       "current_price": 358.61,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 14",
+      "expired_at": "2026-07-07 23:44"
     },
     {
       "ticker": "RKLB",
@@ -246,12 +246,12 @@
       "framework_score": 68,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 72.0,
       "current_price": 58.36,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 16",
+      "expired_at": "2026-07-07 23:44"
     },
     {
       "ticker": "MRNA",
@@ -264,12 +264,12 @@
       "framework_score": 52,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 81.3,
       "current_price": 72.5,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 16",
+      "expired_at": "2026-07-07 23:44"
     },
     {
       "ticker": "ARKG",
@@ -372,12 +372,12 @@
       "framework_score": 65,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 73.8,
       "current_price": 73.6,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 16",
+      "expired_at": "2026-07-07 23:44"
     },
     {
       "ticker": "HSBC",
@@ -390,12 +390,12 @@
       "framework_score": 58,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 77.9,
       "current_price": 96.78,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 20",
+      "expired_at": "2026-07-07 23:44"
     },
     {
       "ticker": "ABNB",
@@ -642,12 +642,12 @@
       "framework_score": 62,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 75.6,
       "current_price": 272.27,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 15",
+      "expired_at": "2026-07-07 23:44"
     },
     {
       "ticker": "JPM",
@@ -678,12 +678,12 @@
       "framework_score": 74,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 75,
       "current_price": 543.79,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 15",
+      "expired_at": "2026-07-07 23:44"
     },
     {
       "ticker": "GE",
@@ -696,12 +696,12 @@
       "framework_score": 70,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 70.7,
       "current_price": 378.68,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 14",
+      "expired_at": "2026-07-07 23:44"
     },
     {
       "ticker": "ITX.MC",
@@ -732,12 +732,12 @@
       "framework_score": 44,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 85.4,
       "current_price": 43.57,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 17",
+      "expired_at": "2026-07-07 23:44"
     },
     {
       "ticker": "DIA",
@@ -750,12 +750,12 @@
       "framework_score": 72,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 69.5,
       "current_price": 530.09,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 17",
+      "expired_at": "2026-07-07 23:44"
     },
     {
       "ticker": "APP",
@@ -768,9 +768,27 @@
       "framework_score": 74,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 75,
       "current_price": 543.79,
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 15",
+      "expired_at": "2026-07-07 23:44"
+    },
+    {
+      "ticker": "JNJ",
+      "signal_type": "SELL",
+      "score": 66.9,
+      "sell_score": 66.9,
+      "timestamp": "2026-07-07 23:44",
+      "price": 267.24,
+      "dist_252h": 1.6,
+      "framework_score": 76,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 66.9,
+      "current_price": 267.24,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
