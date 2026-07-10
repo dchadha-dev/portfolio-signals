@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-07-10 13:06 UTC",
+  "last_updated": "2026-07-10 23:46 UTC",
   "entries": [
     {
       "ticker": "RKLB",
@@ -318,12 +318,12 @@
       "framework_score": 77,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 66.2,
       "current_price": 273.4,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 11",
+      "expired_at": "2026-07-10 23:46"
     },
     {
       "ticker": "VLO",
@@ -354,12 +354,12 @@
       "framework_score": 48,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 75,
       "current_price": 15.72,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 50",
+      "expired_at": "2026-07-10 23:46"
     },
     {
       "ticker": "ELV",
@@ -390,9 +390,27 @@
       "framework_score": 48,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 75,
       "current_price": 15.72,
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 50",
+      "expired_at": "2026-07-10 23:46"
+    },
+    {
+      "ticker": "HSBC",
+      "signal_type": "SELL",
+      "score": 77.9,
+      "sell_score": 77.9,
+      "timestamp": "2026-07-10 23:46",
+      "price": 99.09,
+      "dist_252h": 0.4,
+      "framework_score": 58,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 77.9,
+      "current_price": 99.09,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
