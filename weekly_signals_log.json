@@ -1,42 +1,6 @@
 {
-  "last_updated": "2026-07-12 11:54 UTC",
+  "last_updated": "2026-07-12 23:42 UTC",
   "entries": [
-    {
-      "ticker": "RKLB",
-      "signal_type": "WATCH",
-      "score": 83,
-      "sell_score": 1.1,
-      "timestamp": "2026-07-05 12:10",
-      "price": 100.46,
-      "dist_252h": -33.1,
-      "framework_score": 52,
-      "fdfv3": true,
-      "is_holding": false,
-      "status": "expired",
-      "current_score": 83,
-      "current_price": 97.3,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 58",
-      "expired_at": "2026-07-06 23:56"
-    },
-    {
-      "ticker": "ASTS",
-      "signal_type": "WATCH",
-      "score": 65,
-      "sell_score": 0.0,
-      "timestamp": "2026-07-05 12:10",
-      "price": 85.13,
-      "dist_252h": -36.0,
-      "framework_score": 46,
-      "fdfv3": true,
-      "is_holding": false,
-      "status": "expired",
-      "current_score": 65,
-      "current_price": 82.96,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 0",
-      "expired_at": "2026-07-06 23:56"
-    },
     {
       "ticker": "RKLB",
       "signal_type": "WATCH",
