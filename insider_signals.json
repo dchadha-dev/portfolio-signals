@@ -1,71 +1,17 @@
 {
   "health": {
-    "timestamp": "2026-07-06 05:12 UTC",
+    "timestamp": "2026-07-13 04:31 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
-    "n_insider_signals": 8,
+    "n_insider_signals": 6,
     "n_politician_signals": 0,
-    "n_combined_signals": 8,
-    "elapsed_seconds": 298.2,
+    "n_combined_signals": 6,
+    "elapsed_seconds": 235.9,
     "retry_required": false,
     "retry_reason": []
   },
   "signals": {
-    "TSM": {
-      "buy_score_boost": 20,
-      "insider_score": 20,
-      "politician_score": 0,
-      "insider_n": 2,
-      "insider_cluster": true,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "TSM",
-          "date": "2026-06-30",
-          "value_usd": 76640,
-          "shares": 1000,
-          "price": 76.64,
-          "name": "Tien Bor-Zen",
-          "title": "Officer, VP",
-          "is_cluster": true
-        },
-        {
-          "ticker": "TSM",
-          "date": "2026-06-30",
-          "value_usd": 75700,
-          "shares": 1000,
-          "price": 75.7,
-          "name": "Tien Bor-Zen",
-          "title": "Officer, VP",
-          "is_cluster": true
-        },
-        {
-          "ticker": "TSM",
-          "date": "2026-06-23",
-          "value_usd": 79190,
-          "shares": 1000,
-          "price": 79.19,
-          "name": "Yuan Lipen",
-          "title": "Officer, VP",
-          "is_cluster": true
-        },
-        {
-          "ticker": "TSM",
-          "date": "2026-06-16",
-          "value_usd": 75260,
-          "shares": 1000,
-          "price": 75.26,
-          "name": "Yuan Lipen",
-          "title": "Officer, VP",
-          "is_cluster": true
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-07-06"
-    },
-    "AVGO": {
+    "ADBE": {
       "buy_score_boost": 10,
       "insider_score": 10,
       "politician_score": 0,
@@ -76,20 +22,20 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "AVGO",
-          "date": "2026-06-15",
-          "value_usd": 373570,
-          "shares": 1000,
-          "price": 373.57,
-          "name": "You Harry L.",
+          "ticker": "ADBE",
+          "date": "2026-06-26",
+          "value_usd": 1945130,
+          "shares": 10000,
+          "price": 194.51,
+          "name": "Ricks David A",
           "title": "Director",
           "is_cluster": false
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-07-06"
+      "as_of": "2026-07-13"
     },
-    "UBER": {
+    "MELI": {
       "buy_score_boost": 10,
       "insider_score": 10,
       "politician_score": 0,
@@ -100,18 +46,18 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "UBER",
-          "date": "2026-07-02",
-          "value_usd": 20000000,
-          "shares": 800000,
-          "price": 25.0,
-          "name": "Uber Technologies, Inc",
-          "title": "TenPercentOwner",
+          "ticker": "MELI",
+          "date": "2026-06-15",
+          "value_usd": 200000,
+          "shares": 124,
+          "price": 1604.62,
+          "name": "Melamud Marcelo",
+          "title": "Officer, SVP - Chief Accounting Officer",
           "is_cluster": false
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-07-06"
+      "as_of": "2026-07-13"
     },
     "ENPH": {
       "buy_score_boost": 20,
@@ -155,9 +101,9 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-07-06"
+      "as_of": "2026-07-13"
     },
-    "INTU": {
+    "UBER": {
       "buy_score_boost": 10,
       "insider_score": 10,
       "politician_score": 0,
@@ -168,30 +114,20 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "INTU",
-          "date": "2026-05-26",
-          "value_usd": 386808,
-          "shares": 1250,
-          "price": 309.45,
-          "name": "PRABHU VASANT M",
-          "title": "Director",
-          "is_cluster": false
-        },
-        {
-          "ticker": "INTU",
-          "date": "2026-05-26",
-          "value_usd": 154858,
-          "shares": 500,
-          "price": 309.71,
-          "name": "PRABHU VASANT M",
-          "title": "Director",
+          "ticker": "UBER",
+          "date": "2026-07-02",
+          "value_usd": 20000000,
+          "shares": 800000,
+          "price": 25.0,
+          "name": "Uber Technologies, Inc",
+          "title": "TenPercentOwner",
           "is_cluster": false
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-07-06"
+      "as_of": "2026-07-13"
     },
-    "MELI": {
+    "AVGO": {
       "buy_score_boost": 10,
       "insider_score": 10,
       "politician_score": 0,
@@ -202,42 +138,18 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "MELI",
+          "ticker": "AVGO",
           "date": "2026-06-15",
-          "value_usd": 200000,
-          "shares": 124,
-          "price": 1604.62,
-          "name": "Melamud Marcelo",
-          "title": "Officer, SVP - Chief Accounting Officer",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-07-06"
-    },
-    "ADBE": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "ADBE",
-          "date": "2026-06-26",
-          "value_usd": 1945130,
-          "shares": 10000,
-          "price": 194.51,
-          "name": "Ricks David A",
+          "value_usd": 373570,
+          "shares": 1000,
+          "price": 373.57,
+          "name": "You Harry L.",
           "title": "Director",
           "is_cluster": false
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-07-06"
+      "as_of": "2026-07-13"
     },
     "MSCI": {
       "buy_score_boost": 10,
@@ -301,7 +213,7 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-07-06"
+      "as_of": "2026-07-13"
     }
   }
 }

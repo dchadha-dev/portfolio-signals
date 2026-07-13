@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-07-06 05:07 UTC",
+    "timestamp": "2026-07-13 04:27 UTC",
     "tickers_checked": 15,
     "new_signals": 9,
-    "total_signals": 11,
+    "total_signals": 9,
     "expired_removed": 9,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 137.7
+    "elapsed_seconds": 127.8
   },
   "signals": {
     "NVDA": {
@@ -22,7 +22,7 @@
       "std_dev_floored": true,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-07-06"
+      "as_of": "2026-07-13"
     },
     "AMAT": {
       "ticker": "AMAT",
@@ -36,35 +36,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-07-06"
-    },
-    "NBIS": {
-      "ticker": "NBIS",
-      "announce_date": "2026-05-13",
-      "expires_at": "2026-07-12",
-      "sue": 2.301,
-      "surprise": 0.4631,
-      "actual_eps": -0.32,
-      "estimate_eps": -0.7831,
-      "std_dev": 0.2013,
-      "std_dev_floored": false,
-      "history_quarters": 3,
-      "buy_score_boost": 10,
-      "as_of": "2026-05-27"
-    },
-    "TSEM": {
-      "ticker": "TSEM",
-      "announce_date": "2026-05-13",
-      "expires_at": "2026-07-12",
-      "sue": 1.893,
-      "surprise": 0.0768,
-      "actual_eps": 0.65,
-      "estimate_eps": 0.5732,
-      "std_dev": 0.0406,
-      "std_dev_floored": false,
-      "history_quarters": 3,
-      "buy_score_boost": 10,
-      "as_of": "2026-05-27"
+      "as_of": "2026-07-13"
     },
     "CRM": {
       "ticker": "CRM",
@@ -78,7 +50,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-07-06"
+      "as_of": "2026-07-13"
     },
     "DELL": {
       "ticker": "DELL",
@@ -92,7 +64,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-07-06"
+      "as_of": "2026-07-13"
     },
     "SNOW": {
       "ticker": "SNOW",
@@ -106,7 +78,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-07-06"
+      "as_of": "2026-07-13"
     },
     "HPE": {
       "ticker": "HPE",
@@ -120,7 +92,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-07-06"
+      "as_of": "2026-07-13"
     },
     "CRDO": {
       "ticker": "CRDO",
@@ -134,7 +106,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-07-06"
+      "as_of": "2026-07-13"
     },
     "PANW": {
       "ticker": "PANW",
@@ -148,12 +120,12 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-07-06"
+      "as_of": "2026-07-13"
     },
     "MU": {
       "ticker": "MU",
-      "announce_date": "2026-06-24",
-      "expires_at": "2026-08-23",
+      "announce_date": "2026-06-30",
+      "expires_at": "2026-08-29",
       "sue": 2.812,
       "surprise": 3.7081,
       "actual_eps": 25.11,
@@ -162,7 +134,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-07-06"
+      "as_of": "2026-07-13"
     }
   }
 }
