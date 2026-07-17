@@ -1,24 +1,6 @@
 {
-  "last_updated": "2026-07-17 12:04 UTC",
+  "last_updated": "2026-07-17 23:42 UTC",
   "entries": [
-    {
-      "ticker": "HIMX",
-      "signal_type": "WATCH",
-      "score": 75,
-      "sell_score": 1.4,
-      "timestamp": "2026-07-10 13:06",
-      "price": 15.72,
-      "dist_252h": -33.9,
-      "framework_score": 48,
-      "fdfv3": true,
-      "is_holding": false,
-      "status": "expired",
-      "current_score": 75,
-      "current_price": 15.72,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 50",
-      "expired_at": "2026-07-10 23:46"
-    },
     {
       "ticker": "HSBC",
       "signal_type": "SELL",
@@ -390,12 +372,12 @@
       "framework_score": 72,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 69.5,
       "current_price": 99.94,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 15",
+      "expired_at": "2026-07-17 23:42"
     },
     {
       "ticker": "SBUX",
@@ -408,12 +390,12 @@
       "framework_score": 68,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 72.0,
       "current_price": 108.37,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 11",
+      "expired_at": "2026-07-17 23:42"
     },
     {
       "ticker": "UPS",
@@ -444,9 +426,27 @@
       "framework_score": 72,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 69.5,
       "current_price": 84.92,
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 16",
+      "expired_at": "2026-07-17 23:42"
+    },
+    {
+      "ticker": "VLO",
+      "signal_type": "SELL",
+      "score": 75.6,
+      "sell_score": 75.6,
+      "timestamp": "2026-07-17 23:42",
+      "price": 309.65,
+      "dist_252h": 2.7,
+      "framework_score": 62,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 75.6,
+      "current_price": 309.65,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
