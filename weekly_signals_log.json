@@ -1,24 +1,6 @@
 {
-  "last_updated": "2026-07-17 23:42 UTC",
+  "last_updated": "2026-07-18 11:46 UTC",
   "entries": [
-    {
-      "ticker": "HSBC",
-      "signal_type": "SELL",
-      "score": 77.9,
-      "sell_score": 77.9,
-      "timestamp": "2026-07-10 23:46",
-      "price": 99.09,
-      "dist_252h": 0.4,
-      "framework_score": 58,
-      "fdfv3": false,
-      "is_holding": false,
-      "status": "expired",
-      "current_score": 77.9,
-      "current_price": 99.09,
-      "expire_reason": "sell_cleared",
-      "expire_detail": "sell score dropped to 18",
-      "expired_at": "2026-07-13 23:41"
-    },
     {
       "ticker": "VLO",
       "signal_type": "SELL",
