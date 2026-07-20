@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-07-13 04:27 UTC",
-    "tickers_checked": 15,
-    "new_signals": 9,
-    "total_signals": 9,
-    "expired_removed": 9,
+    "timestamp": "2026-07-20 04:34 UTC",
+    "tickers_checked": 4,
+    "new_signals": 2,
+    "total_signals": 11,
+    "expired_removed": 0,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 127.8
+    "elapsed_seconds": 120.9
   },
   "signals": {
     "NVDA": {
@@ -135,6 +135,34 @@
       "history_quarters": 3,
       "buy_score_boost": 10,
       "as_of": "2026-07-13"
+    },
+    "ISRG": {
+      "ticker": "ISRG",
+      "announce_date": "2026-07-16",
+      "expires_at": "2026-09-14",
+      "sue": 3.031,
+      "surprise": 0.2497,
+      "actual_eps": 2.8,
+      "estimate_eps": 2.5503,
+      "std_dev": 0.0824,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-07-20"
+    },
+    "UNH": {
+      "ticker": "UNH",
+      "announce_date": "2026-07-16",
+      "expires_at": "2026-09-14",
+      "sue": 4.455,
+      "surprise": 1.4267,
+      "actual_eps": 6.38,
+      "estimate_eps": 4.9533,
+      "std_dev": 0.3203,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-07-20"
     }
   }
 }

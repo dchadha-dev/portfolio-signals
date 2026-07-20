@@ -1,17 +1,17 @@
 {
   "health": {
-    "timestamp": "2026-07-13 04:31 UTC",
+    "timestamp": "2026-07-20 04:38 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
-    "n_insider_signals": 6,
+    "n_insider_signals": 3,
     "n_politician_signals": 0,
-    "n_combined_signals": 6,
-    "elapsed_seconds": 235.9,
+    "n_combined_signals": 3,
+    "elapsed_seconds": 243.3,
     "retry_required": false,
     "retry_reason": []
   },
   "signals": {
-    "ADBE": {
+    "UBER": {
       "buy_score_boost": 10,
       "insider_score": 10,
       "politician_score": 0,
@@ -22,42 +22,18 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "ADBE",
-          "date": "2026-06-26",
-          "value_usd": 1945130,
-          "shares": 10000,
-          "price": 194.51,
-          "name": "Ricks David A",
-          "title": "Director",
+          "ticker": "UBER",
+          "date": "2026-07-02",
+          "value_usd": 20000000,
+          "shares": 800000,
+          "price": 25.0,
+          "name": "Uber Technologies, Inc",
+          "title": "TenPercentOwner",
           "is_cluster": false
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-07-13"
-    },
-    "MELI": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "MELI",
-          "date": "2026-06-15",
-          "value_usd": 200000,
-          "shares": 124,
-          "price": 1604.62,
-          "name": "Melamud Marcelo",
-          "title": "Officer, SVP - Chief Accounting Officer",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-07-13"
+      "as_of": "2026-07-20"
     },
     "ENPH": {
       "buy_score_boost": 20,
@@ -101,9 +77,9 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-07-13"
+      "as_of": "2026-07-20"
     },
-    "UBER": {
+    "MELI": {
       "buy_score_boost": 10,
       "insider_score": 10,
       "politician_score": 0,
@@ -114,106 +90,18 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "UBER",
-          "date": "2026-07-02",
-          "value_usd": 20000000,
-          "shares": 800000,
-          "price": 25.0,
-          "name": "Uber Technologies, Inc",
-          "title": "TenPercentOwner",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-07-13"
-    },
-    "AVGO": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "AVGO",
+          "ticker": "MELI",
           "date": "2026-06-15",
-          "value_usd": 373570,
-          "shares": 1000,
-          "price": 373.57,
-          "name": "You Harry L.",
-          "title": "Director",
+          "value_usd": 200000,
+          "shares": 124,
+          "price": 1604.62,
+          "name": "Melamud Marcelo",
+          "title": "Officer, SVP - Chief Accounting Officer",
           "is_cluster": false
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-07-13"
-    },
-    "MSCI": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "MSCI",
-          "date": "2026-05-18",
-          "value_usd": 67128,
-          "shares": 120,
-          "price": 559.4,
-          "name": "Fernandez Henry A",
-          "title": "Director, Officer, Chairman and CEO",
-          "is_cluster": false
-        },
-        {
-          "ticker": "MSCI",
-          "date": "2026-05-18",
-          "value_usd": 134467,
-          "shares": 240,
-          "price": 560.28,
-          "name": "Fernandez Henry A",
-          "title": "Director, Officer, Chairman and CEO",
-          "is_cluster": false
-        },
-        {
-          "ticker": "MSCI",
-          "date": "2026-05-18",
-          "value_usd": 695211,
-          "shares": 1238,
-          "price": 561.56,
-          "name": "Fernandez Henry A",
-          "title": "Director, Officer, Chairman and CEO",
-          "is_cluster": false
-        },
-        {
-          "ticker": "MSCI",
-          "date": "2026-05-18",
-          "value_usd": 631091,
-          "shares": 1122,
-          "price": 562.47,
-          "name": "Fernandez Henry A",
-          "title": "Director, Officer, Chairman and CEO",
-          "is_cluster": false
-        },
-        {
-          "ticker": "MSCI",
-          "date": "2026-05-18",
-          "value_usd": 450712,
-          "shares": 800,
-          "price": 563.39,
-          "name": "Fernandez Henry A",
-          "title": "Director, Officer, Chairman and CEO",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-07-13"
+      "as_of": "2026-07-20"
     }
   }
 }
