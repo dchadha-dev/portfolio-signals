@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-22 23:53 UTC",
+  "timestamp": "2026-07-23 12:21 UTC",
   "run_date": "Thursday 23 Jul 2026",
   "prices": {
     "NVDA": {
@@ -228,6 +228,78 @@
     },
     "IDXX": {
       "price": 545,
+      "change_pct": null
+    },
+    "ALGN": {
+      "price": 172.46,
+      "change_pct": null
+    },
+    "SPY": {
+      "price": 747.41,
+      "change_pct": null
+    },
+    "BLOK": {
+      "price": 62.54,
+      "change_pct": null
+    },
+    "DRIV": {
+      "price": 35.03,
+      "change_pct": null
+    },
+    "BOTZ": {
+      "price": 34.89,
+      "change_pct": null
+    },
+    "ACWV": {
+      "price": 121.51,
+      "change_pct": null
+    },
+    "IVV": {
+      "price": 750.93,
+      "change_pct": null
+    },
+    "ARKK": {
+      "price": 76.03,
+      "change_pct": null
+    },
+    "FINX": {
+      "price": 25.52,
+      "change_pct": null
+    },
+    "DIA": {
+      "price": 521.47,
+      "change_pct": null
+    },
+    "AIQ": {
+      "price": 60.14,
+      "change_pct": null
+    },
+    "SMH": {
+      "price": 586.91,
+      "change_pct": null
+    },
+    "KWEB": {
+      "price": 26.44,
+      "change_pct": null
+    },
+    "IWF": {
+      "price": 120.92,
+      "change_pct": null
+    },
+    "INDA": {
+      "price": 48.22,
+      "change_pct": null
+    },
+    "AAXJ": {
+      "price": 112.76,
+      "change_pct": null
+    },
+    "ARKG": {
+      "price": 38.85,
+      "change_pct": null
+    },
+    "EWJ": {
+      "price": 92.19,
       "change_pct": null
     }
   }
