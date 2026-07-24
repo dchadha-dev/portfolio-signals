@@ -1,24 +1,6 @@
 {
-  "last_updated": "2026-07-24 12:14 UTC",
+  "last_updated": "2026-07-24 23:53 UTC",
   "entries": [
-    {
-      "ticker": "VLO",
-      "signal_type": "SELL",
-      "score": 75.6,
-      "sell_score": 75.6,
-      "timestamp": "2026-07-17 23:42",
-      "price": 309.65,
-      "dist_252h": 2.7,
-      "framework_score": 62,
-      "fdfv3": false,
-      "is_holding": false,
-      "status": "expired",
-      "current_score": 75.6,
-      "current_price": 309.65,
-      "expire_reason": "sell_cleared",
-      "expire_detail": "sell score dropped to 15",
-      "expired_at": "2026-07-22 23:53"
-    },
     {
       "ticker": "NBIS",
       "signal_type": "BUY",
@@ -30,12 +12,12 @@
       "framework_score": 87,
       "fdfv3": true,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 86,
       "current_price": 220.97,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 51",
+      "expired_at": "2026-07-24 23:53"
     },
     {
       "ticker": "WDC",
@@ -48,12 +30,12 @@
       "framework_score": 58,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 83,
       "current_price": 558.3,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 58",
+      "expired_at": "2026-07-24 23:53"
     },
     {
       "ticker": "KEEL",
@@ -66,12 +48,12 @@
       "framework_score": 32,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 83,
       "current_price": 4.81,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 58",
+      "expired_at": "2026-07-24 23:53"
     },
     {
       "ticker": "TSEM",
@@ -138,12 +120,12 @@
       "framework_score": 58,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 83,
       "current_price": 558.3,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 58",
+      "expired_at": "2026-07-24 23:53"
     },
     {
       "ticker": "KEEL",
@@ -156,12 +138,12 @@
       "framework_score": 32,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 83,
       "current_price": 4.81,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 58",
+      "expired_at": "2026-07-24 23:53"
     },
     {
       "ticker": "TSEM",
@@ -228,12 +210,12 @@
       "framework_score": 58,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 83,
       "current_price": 558.3,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 58",
+      "expired_at": "2026-07-24 23:53"
     },
     {
       "ticker": "KEEL",
@@ -246,12 +228,12 @@
       "framework_score": 32,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 83,
       "current_price": 4.81,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 58",
+      "expired_at": "2026-07-24 23:53"
     },
     {
       "ticker": "TSEM",
@@ -282,12 +264,12 @@
       "framework_score": 93,
       "fdfv3": true,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 96,
       "current_price": 236.5,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 53",
+      "expired_at": "2026-07-24 23:53"
     },
     {
       "ticker": "WDC",
@@ -300,12 +282,12 @@
       "framework_score": 58,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 83,
       "current_price": 558.3,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 58",
+      "expired_at": "2026-07-24 23:53"
     },
     {
       "ticker": "KEEL",
@@ -318,9 +300,81 @@
       "framework_score": 32,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 83,
       "current_price": 4.81,
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 58",
+      "expired_at": "2026-07-24 23:53"
+    },
+    {
+      "ticker": "STX",
+      "signal_type": "WATCH",
+      "score": 83,
+      "sell_score": 6.8,
+      "timestamp": "2026-07-24 23:53",
+      "price": 851.69,
+      "dist_252h": -22.1,
+      "framework_score": 60,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 83,
+      "current_price": 851.69,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "RTX",
+      "signal_type": "SELL",
+      "score": 72.0,
+      "sell_score": 72.0,
+      "timestamp": "2026-07-24 23:53",
+      "price": 212.79,
+      "dist_252h": 0.7,
+      "framework_score": 68,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 72.0,
+      "current_price": 212.79,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "HSBC",
+      "signal_type": "SELL",
+      "score": 77.9,
+      "sell_score": 77.9,
+      "timestamp": "2026-07-24 23:53",
+      "price": 103.4,
+      "dist_252h": 0.3,
+      "framework_score": 58,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 77.9,
+      "current_price": 103.4,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "BAC",
+      "signal_type": "SELL",
+      "score": 72.0,
+      "sell_score": 72.0,
+      "timestamp": "2026-07-24 23:53",
+      "price": 62.05,
+      "dist_252h": 0.7,
+      "framework_score": 68,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 72.0,
+      "current_price": 62.05,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
