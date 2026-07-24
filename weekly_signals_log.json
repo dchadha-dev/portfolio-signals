@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-07-23 23:48 UTC",
+  "last_updated": "2026-07-24 12:14 UTC",
   "entries": [
     {
       "ticker": "VLO",
@@ -285,6 +285,42 @@
       "status": "active",
       "current_score": 96,
       "current_price": 236.5,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "WDC",
+      "signal_type": "WATCH",
+      "score": 83,
+      "sell_score": 6.9,
+      "timestamp": "2026-07-24 12:14",
+      "price": 558.3,
+      "dist_252h": -25.2,
+      "framework_score": 58,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 83,
+      "current_price": 558.3,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "KEEL",
+      "signal_type": "WATCH",
+      "score": 83,
+      "sell_score": 0.0,
+      "timestamp": "2026-07-24 12:14",
+      "price": 4.81,
+      "dist_252h": -27.8,
+      "framework_score": 32,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 83,
+      "current_price": 4.81,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
