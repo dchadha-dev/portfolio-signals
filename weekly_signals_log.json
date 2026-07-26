@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-07-25 23:49 UTC",
+  "last_updated": "2026-07-26 11:57 UTC",
   "entries": [
     {
       "ticker": "NBIS",
@@ -519,6 +519,24 @@
       "status": "active",
       "current_score": 72.0,
       "current_price": 62.05,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "STX",
+      "signal_type": "WATCH",
+      "score": 83,
+      "sell_score": 6.8,
+      "timestamp": "2026-07-26 11:57",
+      "price": 851.69,
+      "dist_252h": -22.1,
+      "framework_score": 60,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 83,
+      "current_price": 851.69,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
