@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-07-27 13:34 UTC",
+  "last_updated": "2026-07-27 23:53 UTC",
   "entries": [
     {
       "ticker": "NBIS",
@@ -462,12 +462,12 @@
       "framework_score": 60,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 83,
       "current_price": 858.0,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 58",
+      "expired_at": "2026-07-27 23:53"
     },
     {
       "ticker": "RTX",
@@ -534,12 +534,12 @@
       "framework_score": 60,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 83,
       "current_price": 858.0,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 58",
+      "expired_at": "2026-07-27 23:53"
     },
     {
       "ticker": "STX",
@@ -552,12 +552,12 @@
       "framework_score": 60,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 83,
       "current_price": 858.0,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 58",
+      "expired_at": "2026-07-27 23:53"
     },
     {
       "ticker": "MMM",
