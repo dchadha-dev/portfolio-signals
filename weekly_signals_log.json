@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-07-26 23:51 UTC",
+  "last_updated": "2026-07-27 13:34 UTC",
   "entries": [
     {
       "ticker": "NBIS",
@@ -464,7 +464,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 851.69,
+      "current_price": 858.0,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -536,7 +536,43 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 851.69,
+      "current_price": 858.0,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "STX",
+      "signal_type": "WATCH",
+      "score": 83,
+      "sell_score": 6.7,
+      "timestamp": "2026-07-27 13:34",
+      "price": 858.0,
+      "dist_252h": -21.5,
+      "framework_score": 60,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 83,
+      "current_price": 858.0,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "MMM",
+      "signal_type": "SELL",
+      "score": 79.0,
+      "sell_score": 79.0,
+      "timestamp": "2026-07-27 13:34",
+      "price": 176.57,
+      "dist_252h": 2.1,
+      "framework_score": 56,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 79.0,
+      "current_price": 176.57,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
