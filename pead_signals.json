@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-07-20 04:34 UTC",
-    "tickers_checked": 4,
-    "new_signals": 2,
-    "total_signals": 11,
-    "expired_removed": 0,
+    "timestamp": "2026-07-27 04:33 UTC",
+    "tickers_checked": 11,
+    "new_signals": 3,
+    "total_signals": 12,
+    "expired_removed": 2,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 120.9
+    "elapsed_seconds": 112.5
   },
   "signals": {
     "NVDA": {
@@ -148,7 +148,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-07-20"
+      "as_of": "2026-07-27"
     },
     "UNH": {
       "ticker": "UNH",
@@ -162,7 +162,21 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-07-20"
+      "as_of": "2026-07-27"
+    },
+    "TMO": {
+      "ticker": "TMO",
+      "announce_date": "2026-07-23",
+      "expires_at": "2026-09-21",
+      "sue": 2.857,
+      "surprise": 0.2611,
+      "actual_eps": 6.03,
+      "estimate_eps": 5.7689,
+      "std_dev": 0.0914,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-07-27"
     }
   }
 }

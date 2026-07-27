@@ -1,84 +1,16 @@
 {
   "health": {
-    "timestamp": "2026-07-20 04:38 UTC",
+    "timestamp": "2026-07-27 04:38 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
     "n_insider_signals": 3,
     "n_politician_signals": 0,
     "n_combined_signals": 3,
-    "elapsed_seconds": 243.3,
+    "elapsed_seconds": 252.7,
     "retry_required": false,
     "retry_reason": []
   },
   "signals": {
-    "UBER": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "UBER",
-          "date": "2026-07-02",
-          "value_usd": 20000000,
-          "shares": 800000,
-          "price": 25.0,
-          "name": "Uber Technologies, Inc",
-          "title": "TenPercentOwner",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-07-20"
-    },
-    "ENPH": {
-      "buy_score_boost": 20,
-      "insider_score": 20,
-      "politician_score": 0,
-      "insider_n": 2,
-      "insider_cluster": true,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "ENPH",
-          "date": "2026-06-15",
-          "value_usd": 53910,
-          "shares": 1000,
-          "price": 53.91,
-          "name": "Trivedi Shanker",
-          "title": "Director",
-          "is_cluster": true
-        },
-        {
-          "ticker": "ENPH",
-          "date": "2026-05-26",
-          "value_usd": 296450,
-          "shares": 4400,
-          "price": 67.37,
-          "name": "Kothandaraman Badrinarayanan",
-          "title": "Director, Officer, President & CEO",
-          "is_cluster": true
-        },
-        {
-          "ticker": "ENPH",
-          "date": "2026-05-26",
-          "value_usd": 41032,
-          "shares": 600,
-          "price": 68.39,
-          "name": "Kothandaraman Badrinarayanan",
-          "title": "Director, Officer, President & CEO",
-          "is_cluster": true
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-07-20"
-    },
     "MELI": {
       "buy_score_boost": 10,
       "insider_score": 10,
@@ -101,7 +33,95 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-07-20"
+      "as_of": "2026-07-27"
+    },
+    "ENPH": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "ENPH",
+          "date": "2026-06-15",
+          "value_usd": 53910,
+          "shares": 1000,
+          "price": 53.91,
+          "name": "Trivedi Shanker",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-07-27"
+    },
+    "TSM": {
+      "buy_score_boost": 20,
+      "insider_score": 20,
+      "politician_score": 0,
+      "insider_n": 2,
+      "insider_cluster": true,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "TSM",
+          "date": "2026-07-23",
+          "value_usd": 74130,
+          "shares": 1000,
+          "price": 74.13,
+          "name": "Tien Bor-Zen",
+          "title": "Officer, VP",
+          "is_cluster": true
+        },
+        {
+          "ticker": "TSM",
+          "date": "2026-07-23",
+          "value_usd": 73980,
+          "shares": 1000,
+          "price": 73.98,
+          "name": "Tien Bor-Zen",
+          "title": "Officer, VP",
+          "is_cluster": true
+        },
+        {
+          "ticker": "TSM",
+          "date": "2026-07-23",
+          "value_usd": 74440,
+          "shares": 1000,
+          "price": 74.44,
+          "name": "Tien Bor-Zen",
+          "title": "Officer, VP",
+          "is_cluster": true
+        },
+        {
+          "ticker": "TSM",
+          "date": "2026-07-23",
+          "value_usd": 74750,
+          "shares": 1000,
+          "price": 74.75,
+          "name": "Tien Bor-Zen",
+          "title": "Officer, VP",
+          "is_cluster": true
+        },
+        {
+          "ticker": "TSM",
+          "date": "2026-07-22",
+          "value_usd": 72650,
+          "shares": 1000,
+          "price": 72.65,
+          "name": "Lin Shyue-Shyh",
+          "title": "Officer, VP",
+          "is_cluster": true
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-07-27"
     }
   }
 }
