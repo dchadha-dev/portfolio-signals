@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-07-29 12:57 UTC",
+  "last_updated": "2026-07-29 23:52 UTC",
   "entries": [
     {
       "ticker": "JPM",
@@ -12,12 +12,12 @@
       "framework_score": 76,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 66.9,
       "current_price": 348.21,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 11",
+      "expired_at": "2026-07-29 23:52"
     },
     {
       "ticker": "WDC",
@@ -300,12 +300,12 @@
       "framework_score": 68,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 72.0,
       "current_price": 212.79,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 15",
+      "expired_at": "2026-07-29 23:52"
     },
     {
       "ticker": "HSBC",
@@ -336,12 +336,12 @@
       "framework_score": 68,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 72.0,
       "current_price": 62.05,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 14",
+      "expired_at": "2026-07-29 23:52"
     },
     {
       "ticker": "STX",
@@ -390,12 +390,12 @@
       "framework_score": 56,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 79.0,
       "current_price": 176.57,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 15",
+      "expired_at": "2026-07-29 23:52"
     },
     {
       "ticker": "KO",
@@ -426,12 +426,12 @@
       "framework_score": 72,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 69.5,
       "current_price": 363.5,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 18",
+      "expired_at": "2026-07-29 23:52"
     },
     {
       "ticker": "ACWV",
@@ -480,9 +480,45 @@
       "framework_score": 76,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 66.9,
       "current_price": 153.11,
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 13",
+      "expired_at": "2026-07-29 23:52"
+    },
+    {
+      "ticker": "EXPE",
+      "signal_type": "SELL",
+      "score": 75.6,
+      "sell_score": 75.6,
+      "timestamp": "2026-07-29 23:52",
+      "price": 304.27,
+      "dist_252h": 1.4,
+      "framework_score": 62,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 75.6,
+      "current_price": 304.27,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "SNOW",
+      "signal_type": "SELL",
+      "score": 73.8,
+      "sell_score": 73.8,
+      "timestamp": "2026-07-29 23:52",
+      "price": 282.9,
+      "dist_252h": 1.0,
+      "framework_score": 65,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 73.8,
+      "current_price": 282.9,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
