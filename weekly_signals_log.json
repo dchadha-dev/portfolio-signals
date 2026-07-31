@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-07-31 13:02 UTC",
+  "last_updated": "2026-07-31 23:51 UTC",
   "entries": [
     {
       "ticker": "STX",
@@ -318,12 +318,12 @@
       "framework_score": null,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 100,
       "current_price": 124.65,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 21",
+      "expired_at": "2026-07-31 23:51"
     },
     {
       "ticker": "ABBV",
@@ -390,12 +390,12 @@
       "framework_score": 65,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73.8,
       "current_price": 282.9,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 15",
+      "expired_at": "2026-07-31 23:51"
     },
     {
       "ticker": "AMAT",
@@ -410,7 +410,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 96,
-      "current_price": 501.77,
+      "current_price": 507.67,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -426,12 +426,12 @@
       "framework_score": 76,
       "fdfv3": true,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 96,
       "current_price": 874.66,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 71",
+      "expired_at": "2026-07-31 23:51"
     },
     {
       "ticker": "NBIS",
@@ -446,7 +446,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 86,
-      "current_price": 188.43,
+      "current_price": 190.41,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -464,7 +464,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 533.04,
+      "current_price": 544.84,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -482,7 +482,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 851.68,
+      "current_price": 856.13,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -500,7 +500,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 4.05,
+      "current_price": 3.97,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -518,7 +518,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 299.69,
+      "current_price": 311.23,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -536,7 +536,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 297.72,
+      "current_price": 293.02,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -554,7 +554,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 207.12,
+      "current_price": 205.81,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -572,7 +572,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 105.38,
+      "current_price": 106.2,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -588,12 +588,12 @@
       "framework_score": 58,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 77.9,
       "current_price": 107.09,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 16",
+      "expired_at": "2026-07-31 23:51"
     },
     {
       "ticker": "IEV",
@@ -606,12 +606,12 @@
       "framework_score": 65,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 73.8,
       "current_price": 74.62,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 15",
+      "expired_at": "2026-07-31 23:51"
     },
     {
       "ticker": "NET",
@@ -624,12 +624,12 @@
       "framework_score": 77,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 66.2,
       "current_price": 283.39,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 11",
+      "expired_at": "2026-07-31 23:51"
     },
     {
       "ticker": "WDC",
@@ -644,7 +644,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 533.04,
+      "current_price": 544.84,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -662,7 +662,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 851.68,
+      "current_price": 856.13,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -680,7 +680,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 4.05,
+      "current_price": 3.97,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -698,7 +698,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 299.69,
+      "current_price": 311.23,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -716,7 +716,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 297.72,
+      "current_price": 293.02,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -734,7 +734,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 207.12,
+      "current_price": 205.81,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -752,7 +752,79 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 105.38,
+      "current_price": 106.2,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "TSEM",
+      "signal_type": "WATCH",
+      "score": 73,
+      "sell_score": 4.2,
+      "timestamp": "2026-07-31 23:51",
+      "price": 219.67,
+      "dist_252h": -30.7,
+      "framework_score": 68,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 73,
+      "current_price": 219.67,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "COHR",
+      "signal_type": "WATCH",
+      "score": 73,
+      "sell_score": 1.0,
+      "timestamp": "2026-07-31 23:51",
+      "price": 262.89,
+      "dist_252h": -38.4,
+      "framework_score": 68,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 73,
+      "current_price": 262.89,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "ACLS",
+      "signal_type": "WATCH",
+      "score": 65,
+      "sell_score": 2.2,
+      "timestamp": "2026-07-31 23:51",
+      "price": 130.38,
+      "dist_252h": -32.0,
+      "framework_score": 68,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 65,
+      "current_price": 130.38,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "ITX.MC",
+      "signal_type": "SELL",
+      "score": 66.9,
+      "sell_score": 66.9,
+      "timestamp": "2026-07-31 23:51",
+      "price": 57.48,
+      "dist_252h": 0.5,
+      "framework_score": 76,
+      "fdfv3": false,
+      "is_holding": true,
+      "status": "active",
+      "current_score": 66.9,
+      "current_price": 57.48,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
