@@ -1,24 +1,6 @@
 {
-  "last_updated": "2026-08-02 11:55 UTC",
+  "last_updated": "2026-08-02 23:48 UTC",
   "entries": [
-    {
-      "ticker": "STX",
-      "signal_type": "WATCH",
-      "score": 83,
-      "sell_score": 6.8,
-      "timestamp": "2026-07-26 11:57",
-      "price": 851.69,
-      "dist_252h": -22.1,
-      "framework_score": 60,
-      "fdfv3": true,
-      "is_holding": false,
-      "status": "expired",
-      "current_score": 83,
-      "current_price": 858.0,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 58",
-      "expired_at": "2026-07-27 23:53"
-    },
     {
       "ticker": "STX",
       "signal_type": "WATCH",
@@ -804,12 +786,12 @@
       "framework_score": 76,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 66.9,
       "current_price": 57.48,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 4",
+      "expired_at": "2026-08-02 23:48"
     },
     {
       "ticker": "WDC",
