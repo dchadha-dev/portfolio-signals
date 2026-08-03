@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-07-27 04:33 UTC",
-    "tickers_checked": 11,
-    "new_signals": 3,
-    "total_signals": 12,
-    "expired_removed": 2,
+    "timestamp": "2026-08-03 04:27 UTC",
+    "tickers_checked": 24,
+    "new_signals": 4,
+    "total_signals": 15,
+    "expired_removed": 1,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 112.5
+    "elapsed_seconds": 122.7
   },
   "signals": {
     "NVDA": {
@@ -168,15 +168,57 @@
       "ticker": "TMO",
       "announce_date": "2026-07-23",
       "expires_at": "2026-09-21",
-      "sue": 2.857,
-      "surprise": 0.2611,
+      "sue": 2.862,
+      "surprise": 0.2616,
       "actual_eps": 6.03,
-      "estimate_eps": 5.7689,
+      "estimate_eps": 5.7684,
       "std_dev": 0.0914,
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-07-27"
+      "as_of": "2026-08-03"
+    },
+    "LRCX": {
+      "ticker": "LRCX",
+      "announce_date": "2026-07-29",
+      "expires_at": "2026-09-27",
+      "sue": 3.0,
+      "surprise": 0.1028,
+      "actual_eps": 1.82,
+      "estimate_eps": 1.7172,
+      "std_dev": 0.0343,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-08-03"
+    },
+    "MSFT": {
+      "ticker": "MSFT",
+      "announce_date": "2026-07-29",
+      "expires_at": "2026-09-27",
+      "sue": 2.595,
+      "surprise": 0.4126,
+      "actual_eps": 4.74,
+      "estimate_eps": 4.3274,
+      "std_dev": 0.159,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-08-03"
+    },
+    "KLAC": {
+      "ticker": "KLAC",
+      "announce_date": "2026-07-28",
+      "expires_at": "2026-09-26",
+      "sue": 1.685,
+      "surprise": 0.0337,
+      "actual_eps": 1.05,
+      "estimate_eps": 1.0163,
+      "std_dev": 0.02,
+      "std_dev_floored": true,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-08-03"
     }
   }
 }

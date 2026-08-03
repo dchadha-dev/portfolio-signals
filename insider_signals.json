@@ -1,64 +1,16 @@
 {
   "health": {
-    "timestamp": "2026-07-27 04:38 UTC",
+    "timestamp": "2026-08-03 04:30 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
     "n_insider_signals": 3,
     "n_politician_signals": 0,
     "n_combined_signals": 3,
-    "elapsed_seconds": 252.7,
+    "elapsed_seconds": 204.3,
     "retry_required": false,
     "retry_reason": []
   },
   "signals": {
-    "MELI": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "MELI",
-          "date": "2026-06-15",
-          "value_usd": 200000,
-          "shares": 124,
-          "price": 1604.62,
-          "name": "Melamud Marcelo",
-          "title": "Officer, SVP - Chief Accounting Officer",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-07-27"
-    },
-    "ENPH": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "ENPH",
-          "date": "2026-06-15",
-          "value_usd": 53910,
-          "shares": 1000,
-          "price": 53.91,
-          "name": "Trivedi Shanker",
-          "title": "Director",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-07-27"
-    },
     "TSM": {
       "buy_score_boost": 20,
       "insider_score": 20,
@@ -69,6 +21,16 @@
       "politician_cluster": false,
       "reporting_lag_days": null,
       "insider_buys": [
+        {
+          "ticker": "TSM",
+          "date": "2026-07-30",
+          "value_usd": 67970,
+          "shares": 1000,
+          "price": 67.97,
+          "name": "Tien Bor-Zen",
+          "title": "Officer, VP",
+          "is_cluster": true
+        },
         {
           "ticker": "TSM",
           "date": "2026-07-23",
@@ -108,20 +70,58 @@
           "name": "Tien Bor-Zen",
           "title": "Officer, VP",
           "is_cluster": true
-        },
-        {
-          "ticker": "TSM",
-          "date": "2026-07-22",
-          "value_usd": 72650,
-          "shares": 1000,
-          "price": 72.65,
-          "name": "Lin Shyue-Shyh",
-          "title": "Officer, VP",
-          "is_cluster": true
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-07-27"
+      "as_of": "2026-08-03"
+    },
+    "MELI": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "MELI",
+          "date": "2026-06-15",
+          "value_usd": 200000,
+          "shares": 124,
+          "price": 1604.62,
+          "name": "Melamud Marcelo",
+          "title": "Officer, SVP - Chief Accounting Officer",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-08-03"
+    },
+    "ENPH": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "ENPH",
+          "date": "2026-06-15",
+          "value_usd": 53910,
+          "shares": 1000,
+          "price": 53.91,
+          "name": "Trivedi Shanker",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-08-03"
     }
   }
 }
