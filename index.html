@@ -1067,9 +1067,13 @@ function computeBuckets(total) {
   const fisvVal = pos('FISV',6,386);
   const nextVal = pos('NEXT',152,1441);
   const relxVal = pos('RELX',19,786);
-  const unhVal  = pos('UNH',5,1460);
-  const crwvVal = pos('CRWV',8,880);
-  const teamVal = pos('TEAM',4,384);
+  const unhVal  = pos('UNH',2,923);
+  const crwvVal = pos('CRWV',8,730);
+  const teamVal = pos('TEAM',5,987);
+  const gdxVal  = pos('GDX',10,753);
+  const irenVal = pos('IREN',32,1263);
+  const babaVal = pos('BABA',4,500);
+  const klacVal = pos('KLAC',4.8,3500);
   // EU stocks (EUR price * shares * EUR_USD)
   const rmsVal  = (get('RMS.PA') ?? 1708) * 1  * EUR_USD;
   const itxVal  = (get('ITX.MC') ?? 34)   * 42 * EUR_USD;
@@ -1125,7 +1129,7 @@ function computeBuckets(total) {
     + scbSP500 + scbNdq + scbDji + scbBusaa;
 
   // ── BUCKET 3: AI Infrastructure ─────────────────────────
-  const B_AIINFRA = nbisVal + anetVal + crdoVal + amdVal + asmlVal + tsmVal
+  const B_AIINFRA = nbisVal + anetVal + crdoVal + amdVal + asmlVal + tsmVal + klacVal
     + qtumVal + qntmVal + aiqgVal
     + (scbSemi * 1.0);
 
@@ -1149,7 +1153,7 @@ function computeBuckets(total) {
 
   // ── BUCKET 10: Asia / Europe / EM ────────────────────────
   const B_ASIAEM = rmsVal + itxVal + mcVal + samsungVal
-    + ievVal + vssVal + vxusVal + urthVal + scbAEM + scbChina + meliVal + cqqqVal
+    + ievVal + vssVal + vxusVal + urthVal + scbAEM + scbChina + meliVal + cqqqVal + babaVal
     + (scbWorld * 0.585);
 
   // ── BUCKET 11: Thematic Funds ────────────────────────────
