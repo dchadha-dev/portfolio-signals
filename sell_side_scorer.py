@@ -336,11 +336,13 @@ def score_ticker(ticker, sell_sigs, market, sector_states, framework_score=None)
     # ── Signal 1: Distance from 252d high — continuous 0→35 ──────────
     # dist is negative (e.g. -0.02 = 2% below high, -0.25 = 25% below)
     # Score peaks at 0% (at high) and fades linearly to 0 at -10% and beyond
-    dist = sell_sigs.get("dist")  # float DECIMAL from compute_sell_signals e.g. -0.168 = 16.8% below high
+    # dist arrives from compute_sell_signals ALREADY in percentage points
+    # (that function does round(dist*100, 1)), e.g. -3.9 means 3.9% below high.
+    # Do NOT multiply by 100 again.
+    dist = sell_sigs.get("dist")  # e.g. -3.9 = 3.9% below 252d high
     near_high = sell_sigs.get("near_high", False)
     if dist is not None:
-        # Convert decimal to percentage points for scoring
-        dist_pct = dist * 100  # e.g. -0.168 → -16.8
+        dist_pct = dist
         if dist_pct > -10:  # within 10% of high
             # Linear: 0% below = 35pts, 10% below = 0pts
             near_score = max(0, 35 * (1 + dist_pct / 10))

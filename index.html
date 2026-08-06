@@ -4178,9 +4178,8 @@ function renderSellsFromPayload(payload) {
       const action  = s.sell_action || 'HOLD';
       if (action === 'HOLD') return '';
       const acColor = ac(action);
-      const distPct = s.sell_dist != null
-        ? (Math.abs(s.sell_dist) < 2 ? (s.sell_dist * 100).toFixed(1) : s.sell_dist.toFixed(1))
-        : s.dist_252h != null ? s.dist_252h : null;
+      const distPct = s.sell_dist != null ? s.sell_dist
+                    : s.dist_252h != null ? s.dist_252h : null;
       return `
       <div class="signal-card sell-card" style="margin-bottom:10px;border-left:3px solid ${acColor};">
         <div class="sc-header">
