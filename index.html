@@ -1774,6 +1774,7 @@ async function fetchOneTicker(ticker) {
     const tid = setTimeout(() => ctrl.abort(), 10000);
     const res = await fetch(url, { signal: ctrl.signal });
     clearTimeout(tid);
+    if (res.status === 429) throw new Error('RATE_LIMIT');
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const d = await res.json();
     if (!d.c || d.c === 0) throw new Error('empty');
@@ -1795,32 +1796,55 @@ function activeTickers() {
 }
 
 async function fetchPrices() {
-  const result = {};
-  let liveCount = 0;
-  const TICKERS = activeTickers();
+  // Finnhub free tier allows 60 calls/minute. Fetching 5 at a time with a
+  // ~5.2s gap keeps us just under that. Going faster returns 429s on a random
+  // subset of tickers, which is why refreshes previously looked inconsistent.
+  const BATCH = 5;
+  const DELAY = 5200;
 
-  // Batch into groups of 10, 200ms between batches
-  const BATCH = 10;
+  const TICKERS = activeTickers();
+  const result  = {};
+  // Seed with whatever we already have (GitHub scanner prices / cache) so a
+  // failed call never blanks out a ticker that previously had a price.
+  Object.entries(typeof prices !== 'undefined' && prices ? prices : {})
+    .forEach(([t, v]) => { if (v && v.price) result[t] = { ...v }; });
+
+  let liveCount = 0, rateLimited = 0, failed = [];
+  const lbl = document.getElementById('refreshLabel');
+
   for (let i = 0; i < TICKERS.length; i += BATCH) {
     const batch = TICKERS.slice(i, i + BATCH);
+    if (lbl) lbl.textContent = `Fetching ${Math.min(i + BATCH, TICKERS.length)}/${TICKERS.length}…`;
+
     await Promise.all(batch.map(async ticker => {
       try {
         result[ticker] = await fetchOneTicker(ticker);
         liveCount++;
-      } catch(e) {
-        console.warn(`[${ticker}] failed: ${e.message}`);
-        if (FALLBACK[ticker]) result[ticker] = { ...FALLBACK[ticker], stale: true };
+      } catch (e) {
+        if (e.message === 'RATE_LIMIT') rateLimited++;
+        // Keep any existing price rather than dropping the ticker
+        if (!result[ticker]) {
+          if (FALLBACK[ticker]) result[ticker] = { ...FALLBACK[ticker], stale: true };
+          else failed.push(ticker);
+        } else {
+          result[ticker].stale = true;
+        }
       }
     }));
-    if (i + BATCH < TICKERS.length) await new Promise(r => setTimeout(r, 200));
+
+    if (i + BATCH < TICKERS.length) await new Promise(r => setTimeout(r, DELAY));
   }
 
+  if (failed.length) console.warn('No price available for:', failed.join(', '));
+  result._failed      = failed;
+  result._rateLimited = rateLimited;
   if (liveCount === 0) {
     Object.assign(result, FALLBACK);
     result._allStale = true;
   }
   return result;
 }
+
 
 async function refreshPrices() {
   const btn = document.getElementById('refreshBtn');
@@ -1846,7 +1870,13 @@ async function refreshPrices() {
     } else {
       const staleCount = Object.values(prices).filter(p => p.stale).length;
       const liveCount  = Object.values(prices).filter(p => !p.stale && !p._allStale).length;
-      if (staleCount > 0) {
+      const failed     = prices._failed || [];
+      const limited    = prices._rateLimited || 0;
+      if (failed.length || limited) {
+        err.textContent = (limited ? `⚠ ${limited} calls rate-limited by Finnhub. ` : '')
+          + (failed.length ? `No price for: ${failed.join(', ')}` : 'Retry in a minute for full coverage.');
+        err.style.cssText = 'display:block;background:#fdf8ee;border-color:#edd9a0;color:#8a5c00;border-radius:8px;padding:10px 16px;font-size:12px;margin-bottom:16px;';
+      } else if (staleCount > 0) {
         err.textContent = `ℹ ${liveCount} tickers live · ${staleCount} using fallback`;
         err.style.cssText = 'display:block;background:#f0f5fc;border-color:#c5d9f0;color:#1a5fa8;border-radius:8px;padding:10px 16px;font-size:12px;margin-bottom:16px;';
       } else {
