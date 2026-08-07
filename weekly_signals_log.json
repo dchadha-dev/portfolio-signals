@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-08-07 01:40 UTC",
+  "last_updated": "2026-08-07 05:28 UTC",
   "entries": [
     {
       "ticker": "WDC",
@@ -1848,12 +1848,12 @@
       "framework_score": 60,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 72.41,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
+      "expired_at": "2026-08-07 05:28"
     },
     {
       "ticker": "RTX",
@@ -1902,12 +1902,12 @@
       "framework_score": null,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 90.0,
       "current_price": 57.51,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 15",
+      "expired_at": "2026-08-07 05:28"
     },
     {
       "ticker": "JPM",
@@ -2172,12 +2172,12 @@
       "framework_score": 60,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 72.41,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
+      "expired_at": "2026-08-07 05:28"
     },
     {
       "ticker": "ACLS",
@@ -2442,12 +2442,12 @@
       "framework_score": 60,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 72.41,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
+      "expired_at": "2026-08-07 05:28"
     },
     {
       "ticker": "NBIS",

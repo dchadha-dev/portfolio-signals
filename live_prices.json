@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-07 01:40 UTC",
+  "timestamp": "2026-08-07 05:28 UTC",
   "run_date": "Friday 07 Aug 2026",
   "prices": {
     "NVDA": {
@@ -134,6 +134,10 @@
       "price": 126.81,
       "change_pct": null
     },
+    "KLAC": {
+      "price": 193.22,
+      "change_pct": null
+    },
     "NOW": {
       "price": 117.35,
       "change_pct": null
@@ -148,6 +152,26 @@
     },
     "ORCL": {
       "price": 143.47,
+      "change_pct": null
+    },
+    "QCOM": {
+      "price": 160.39,
+      "change_pct": null
+    },
+    "MSTR": {
+      "price": 96.85,
+      "change_pct": null
+    },
+    "GME": {
+      "price": 19.23,
+      "change_pct": null
+    },
+    "CCJ": {
+      "price": 93.62,
+      "change_pct": null
+    },
+    "UNH": {
+      "price": 403.97,
       "change_pct": null
     },
     "MC.PA": {
@@ -190,44 +214,20 @@
       "price": 62.95,
       "change_pct": null
     },
+    "XLB": {
+      "price": 52.17,
+      "change_pct": null
+    },
+    "CQQQ": {
+      "price": 52.18,
+      "change_pct": null
+    },
     "QTUM": {
       "price": 149.24,
       "change_pct": null
     },
-    "COIN": {
-      "price": 145.41,
-      "change_pct": null
-    },
     "PANW": {
       "price": 359.49,
-      "change_pct": null
-    },
-    "AXON": {
-      "price": 522.46,
-      "change_pct": null
-    },
-    "CEG": {
-      "price": 261.1,
-      "change_pct": null
-    },
-    "CELH": {
-      "price": 23.77,
-      "change_pct": null
-    },
-    "DECK": {
-      "price": 97.87,
-      "change_pct": null
-    },
-    "ENPH": {
-      "price": 39.67,
-      "change_pct": null
-    },
-    "HIMS": {
-      "price": 29.66,
-      "change_pct": null
-    },
-    "IDXX": {
-      "price": 590,
       "change_pct": null
     }
   }
