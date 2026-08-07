@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-08-07T05:33:54.673687Z",
-  "source": "initial-export",
+  "updated_at": "2026-08-07T17:30:08.233Z",
+  "source": "dashboard-editor",
   "stocks": [
     {
       "t": "BKNG",
@@ -363,15 +363,6 @@
       "fund": 0
     },
     {
-      "t": "BABA",
-      "n": "Alibaba Group",
-      "acct": "US Stock Account",
-      "currency": "USD",
-      "shares": 4,
-      "direct": 600,
-      "fund": 0
-    },
-    {
       "t": "QCOM",
       "n": "Qualcomm",
       "acct": "Dime",
@@ -544,7 +535,7 @@
     },
     {
       "t": "RMS.PA",
-      "n": "Herm\u00e8s International",
+      "n": "Hermès International",
       "acct": "GTN EU",
       "currency": "EUR",
       "shares": 1,
