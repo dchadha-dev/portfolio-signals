@@ -80,21 +80,20 @@ MY_HOLDINGS = [
     'NVDA','AVGO','TSLA','MELI','AMAT','MSFT','AAPL','AMZN','META','GOOG',
     'NFLX','BKNG','SHOP','RACE','AMD','CRWV','ASML','ANET','DDOG','CRDO',
     'NBIS','TSM','TM','MU','INTU','CPRT','PGR','O','TEAM',
-    'BRKB','NVO','RELX','DELL','BABA',
+    'BRKB','NVO','RELX','DELL','BABA','KLAC',
     'NOW','IREN','GDX','ORCL',
+    'QCOM','MSTR','GME','CCJ','UNH',
     # European stocks
     'RMS.PA','MC.PA','ITX.MC',
     # US ETFs
     'VOO','VTI','QQQ','JEPI','VXUS','VSS','IEV','URTH','GLD','XLG',
+    'XLB','CQQQ',
     # Thematic ETFs
     'AIQG','QNTM.L','QTUM',
-    # Crypto
-    'COIN',
-    # Thai mutual funds (signal via proxy ETF)
+    # Thai mutual funds — SCB unchanged, KT all closed
     'SCB_SP500','SCB_NDQ','SCB_SEMI','SCB_WORLD','SCB_GOLD','SCB_NK225',
     'SCB_SET50','SCB_DJ','SCB_AIEM','SCB_FINTECH','SCB_AUTO','SCB_INNOV',
     'SCB_GENO','SCB_CHINA','SCB_EV','SCB_BUSAA',
-    'KT_INDIA','KT_WORLD','KT_WTAI','KT_BLOCK','KT_TECH','KT_ESG',
 ]
 
 CANDIDATES = [
@@ -276,6 +275,14 @@ FRAMEWORK_SCORES = {
     'AGG':62,   # iShares Core US Agg
     'HYG':55,   # iShares High Yield — credit + cyclical risk
     'LQD':60,   # iShares IG Corporate
+    # Previously unscored holdings — added Aug 2026
+    'JEPI':70,  # JPM Equity Premium Income — quality income, upside capped by covered calls
+    'VSS':68,   # Vanguard Intl Small Cap — broad diversification, higher vol than large cap
+    'XLB':62,   # Materials Select Sector — cyclical, commodity-linked, no structural moat
+    'CQQQ':52,  # Invesco China Tech — regulatory + geopolitical risk, same profile as KWEB
+    'AIQG':65,  # Global X AI UCITS — mirrors AIQ exposure, UCITS wrapper
+    'QNTM.L':58,# VanEck Quantum UCITS — early-stage theme, thinner liquidity than QTUM
+    'GME':25,   # GameStop — no durable moat, weak fundamentals, sentiment-driven
 
     'ACLS':68,'COHR':68,'GLW':68,'TSEM':68,'DELL':68,'BAC':68,
     'OWL':68,'MDT':68,'ALGN':68,'RCL':68,'SBUX':68,'CL':68,
@@ -420,8 +427,12 @@ def fetch_history():
     fetch_t = list(dict.fromkeys(fetch_t))  # dedupe after alias
 
     print(f'Fetching {len(fetch_t)} tickers ({YEARS}yr daily)...')
+    # auto_adjust=False → split-adjusted but NOT dividend-adjusted.
+    # Matches TradingView's default chart. Critical for high-yield holdings
+    # (JEPI ~9%, O ~5%): dividend adjustment depresses historical prices, which
+    # makes current price look like a new 252d high and inflates ATR extension.
     raw = yf.download(fetch_t, start=start, end=end, interval='1d',
-                      auto_adjust=True, progress=False, threads=True)
+                      auto_adjust=False, progress=False, threads=True)
 
     if isinstance(raw.columns, pd.MultiIndex):
         closes = raw['Close'].dropna(how='all')
@@ -452,7 +463,7 @@ def fetch_history():
             try:
                 time.sleep(0.5)  # avoid rate limiting
                 single = yf.download(fetch_sym, start=start, end=end, interval='1d',
-                                     auto_adjust=True, progress=False)
+                                     auto_adjust=False, progress=False)
                 if len(single) > 100:
                     cl = single['Close'] if 'Close' in single.columns else single.iloc[:, 0]
                     closes[t]  = cl
