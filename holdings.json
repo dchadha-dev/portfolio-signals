@@ -1,0 +1,591 @@
+{
+  "updated_at": "2026-08-07T05:33:54.673687Z",
+  "source": "initial-export",
+  "stocks": [
+    {
+      "t": "BKNG",
+      "n": "Booking Holdings",
+      "acct": "RSU / E*Trade",
+      "currency": "USD",
+      "shares": 475,
+      "direct": 80741,
+      "fund": 292
+    },
+    {
+      "t": "NVDA",
+      "n": "NVIDIA Corp",
+      "acct": "US Stock Account",
+      "currency": "USD",
+      "shares": 160,
+      "direct": 31778,
+      "fund": 3714
+    },
+    {
+      "t": "GOOG",
+      "n": "Alphabet",
+      "acct": "US Stock + GTN",
+      "currency": "USD",
+      "shares": 16,
+      "direct": 6466,
+      "fund": 2245
+    },
+    {
+      "t": "AAPL",
+      "n": "Apple",
+      "acct": "GTN US + Dime",
+      "currency": "USD",
+      "shares": 13,
+      "direct": 3964,
+      "fund": 2450
+    },
+    {
+      "t": "MSFT",
+      "n": "Microsoft",
+      "acct": "GTN EU + funds",
+      "currency": "USD",
+      "shares": 4,
+      "direct": 2873,
+      "fund": 2569
+    },
+    {
+      "t": "META",
+      "n": "Meta Platforms",
+      "acct": "GTN US",
+      "currency": "USD",
+      "shares": 5,
+      "direct": 3879,
+      "fund": 1068
+    },
+    {
+      "t": "AMZN",
+      "n": "Amazon",
+      "acct": "US Stock + GTN EU",
+      "currency": "USD",
+      "shares": 5,
+      "direct": 2268,
+      "fund": 2089
+    },
+    {
+      "t": "ASML",
+      "n": "ASML Holding",
+      "acct": "GTN US + Dime",
+      "currency": "USD",
+      "shares": 3,
+      "direct": 4935,
+      "fund": 520
+    },
+    {
+      "t": "AVGO",
+      "n": "Broadcom",
+      "acct": "US Stock Account",
+      "currency": "USD",
+      "shares": 10,
+      "direct": 3889,
+      "fund": 967
+    },
+    {
+      "t": "TSLA",
+      "n": "Tesla",
+      "acct": "US Stock Account",
+      "currency": "USD",
+      "shares": 5,
+      "direct": 2454,
+      "fund": 1149
+    },
+    {
+      "t": "NBIS",
+      "n": "Nebius Group",
+      "acct": "Dime",
+      "currency": "USD",
+      "shares": 36,
+      "direct": 7898,
+      "fund": 0
+    },
+    {
+      "t": "O",
+      "n": "Realty Income",
+      "acct": "GTN US",
+      "currency": "USD",
+      "shares": 84,
+      "direct": 4900,
+      "fund": 0
+    },
+    {
+      "t": "TSM",
+      "n": "Taiwan Semi",
+      "acct": "GTN US",
+      "currency": "USD",
+      "shares": 6,
+      "direct": 1155,
+      "fund": 661
+    },
+    {
+      "t": "SHOP",
+      "n": "Shopify",
+      "acct": "GTN US",
+      "currency": "USD",
+      "shares": 19,
+      "direct": 2463,
+      "fund": 0
+    },
+    {
+      "t": "MELI",
+      "n": "MercadoLibre",
+      "acct": "US Stock Account",
+      "currency": "USD",
+      "shares": 1,
+      "direct": 2100,
+      "fund": 0
+    },
+    {
+      "t": "RACE",
+      "n": "Ferrari NV",
+      "acct": "GTN US",
+      "currency": "USD",
+      "shares": 5,
+      "direct": 2070,
+      "fund": 0
+    },
+    {
+      "t": "TM",
+      "n": "Toyota Motor",
+      "acct": "GTN US",
+      "currency": "USD",
+      "shares": 10,
+      "direct": 1977,
+      "fund": 101
+    },
+    {
+      "t": "AMD",
+      "n": "Advanced Micro Dev.",
+      "acct": "Dime",
+      "currency": "USD",
+      "shares": 9.5,
+      "direct": 4586,
+      "fund": 298
+    },
+    {
+      "t": "AMAT",
+      "n": "Applied Materials",
+      "acct": "US Stock Account",
+      "currency": "USD",
+      "shares": 10.5,
+      "direct": 5393,
+      "fund": 238
+    },
+    {
+      "t": "ANET",
+      "n": "Arista Networks",
+      "acct": "Dime",
+      "currency": "USD",
+      "shares": 7.47,
+      "direct": 3182,
+      "fund": 0
+    },
+    {
+      "t": "CRDO",
+      "n": "Credo Technology",
+      "acct": "Dime",
+      "currency": "USD",
+      "shares": 13,
+      "direct": 3834,
+      "fund": 0
+    },
+    {
+      "t": "NFLX",
+      "n": "Netflix",
+      "acct": "Dime",
+      "currency": "USD",
+      "shares": 4,
+      "direct": 1010,
+      "fund": 0
+    },
+    {
+      "t": "DDOG",
+      "n": "Datadog",
+      "acct": "US Stock Account",
+      "currency": "USD",
+      "shares": 10,
+      "direct": 2739,
+      "fund": 0
+    },
+    {
+      "t": "NVO",
+      "n": "Novo Nordisk",
+      "acct": "GTN EU",
+      "currency": "USD",
+      "shares": 37,
+      "direct": 4352,
+      "fund": 0
+    },
+    {
+      "t": "INTU",
+      "n": "Intuit",
+      "acct": "Dime",
+      "currency": "USD",
+      "shares": 2,
+      "direct": 643,
+      "fund": 0
+    },
+    {
+      "t": "MU",
+      "n": "Micron Technology",
+      "acct": "US Stock Account",
+      "currency": "USD",
+      "shares": 3,
+      "direct": 2460,
+      "fund": 0
+    },
+    {
+      "t": "BRKB",
+      "n": "Berkshire Hathaway B",
+      "acct": "Dime",
+      "currency": "USD",
+      "shares": 3,
+      "direct": 1562,
+      "fund": 0
+    },
+    {
+      "t": "BABA",
+      "n": "Alibaba Group",
+      "acct": "US Stock Account",
+      "currency": "USD",
+      "shares": 4,
+      "direct": 500,
+      "fund": 0
+    },
+    {
+      "t": "KLAC",
+      "n": "KLA Corporation",
+      "acct": "US Stock Account",
+      "currency": "USD",
+      "shares": 4.8,
+      "direct": 3500,
+      "fund": 0
+    },
+    {
+      "t": "CPRT",
+      "n": "Copart",
+      "acct": "Dime",
+      "currency": "USD",
+      "shares": 25,
+      "direct": 730,
+      "fund": 0
+    },
+    {
+      "t": "PGR",
+      "n": "Progressive Corp",
+      "acct": "Dime",
+      "currency": "USD",
+      "shares": 5,
+      "direct": 1142,
+      "fund": 0
+    },
+    {
+      "t": "NEXT",
+      "n": "NextDecade Corp",
+      "acct": "GTN EU",
+      "currency": "USD",
+      "shares": 243,
+      "direct": 1428,
+      "fund": 0
+    },
+    {
+      "t": "RELX",
+      "n": "RELX PLC",
+      "acct": "GTN EU",
+      "currency": "USD",
+      "shares": 23,
+      "direct": 1059,
+      "fund": 0
+    },
+    {
+      "t": "DELL",
+      "n": "Dell Technologies",
+      "acct": "Dime",
+      "currency": "USD",
+      "shares": 11.3,
+      "direct": 4754,
+      "fund": 0
+    },
+    {
+      "t": "NOW",
+      "n": "ServiceNow",
+      "acct": "Dime",
+      "currency": "USD",
+      "shares": 17.75,
+      "direct": 2046,
+      "fund": 0
+    },
+    {
+      "t": "IREN",
+      "n": "IREN Limited",
+      "acct": "US Stock Account",
+      "currency": "USD",
+      "shares": 32,
+      "direct": 1263,
+      "fund": 0
+    },
+    {
+      "t": "GDX",
+      "n": "VanEck Gold Miners ETF",
+      "acct": "US Stock Account",
+      "currency": "USD",
+      "shares": 10,
+      "direct": 753,
+      "fund": 0
+    },
+    {
+      "t": "CRWV",
+      "n": "CoreWeave",
+      "acct": "US Stock Account",
+      "currency": "USD",
+      "shares": 8,
+      "direct": 730,
+      "fund": 0
+    },
+    {
+      "t": "TEAM",
+      "n": "Atlassian",
+      "acct": "GTN EU",
+      "currency": "USD",
+      "shares": 5,
+      "direct": 987,
+      "fund": 0
+    },
+    {
+      "t": "ORCL",
+      "n": "Oracle Corporation",
+      "acct": "US Stock Account",
+      "currency": "USD",
+      "shares": 8,
+      "direct": 1974,
+      "fund": 0
+    },
+    {
+      "t": "BABA",
+      "n": "Alibaba Group",
+      "acct": "US Stock Account",
+      "currency": "USD",
+      "shares": 4,
+      "direct": 600,
+      "fund": 0
+    },
+    {
+      "t": "QCOM",
+      "n": "Qualcomm",
+      "acct": "Dime",
+      "currency": "USD",
+      "shares": 7,
+      "direct": 1073,
+      "fund": 0
+    },
+    {
+      "t": "MSTR",
+      "n": "Strategy Inc",
+      "acct": "GTN US",
+      "currency": "USD",
+      "shares": 12,
+      "direct": 2462,
+      "fund": 0
+    },
+    {
+      "t": "GME",
+      "n": "GameStop",
+      "acct": "US Stock Account",
+      "currency": "USD",
+      "shares": 4,
+      "direct": 75,
+      "fund": 0
+    },
+    {
+      "t": "CCJ",
+      "n": "Cameco Corp",
+      "acct": "US Stock Account",
+      "currency": "USD",
+      "shares": 9,
+      "direct": 800,
+      "fund": 0
+    },
+    {
+      "t": "UNH",
+      "n": "UnitedHealth Group",
+      "acct": "GTN US",
+      "currency": "USD",
+      "shares": 2,
+      "direct": 923,
+      "fund": 0
+    },
+    {
+      "t": "VOO",
+      "n": "Vanguard S&P 500 ETF",
+      "acct": "GTN US",
+      "currency": "USD",
+      "shares": 22,
+      "direct": 12210,
+      "fund": 0
+    },
+    {
+      "t": "VTI",
+      "n": "Vanguard Total Market",
+      "acct": "GTN US",
+      "currency": "USD",
+      "shares": 14,
+      "direct": 3654,
+      "fund": 0
+    },
+    {
+      "t": "QQQ",
+      "n": "Invesco Nasdaq 100",
+      "acct": "GTN US",
+      "currency": "USD",
+      "shares": 3,
+      "direct": 1440,
+      "fund": 0
+    },
+    {
+      "t": "VXUS",
+      "n": "Vanguard Total Intl",
+      "acct": "US Stock Account",
+      "currency": "USD",
+      "shares": 25,
+      "direct": 2050,
+      "fund": 0
+    },
+    {
+      "t": "GLD",
+      "n": "SPDR Gold Shares",
+      "acct": "GTN US",
+      "currency": "USD",
+      "shares": 14,
+      "direct": 5700,
+      "fund": 0
+    },
+    {
+      "t": "IEV",
+      "n": "iShares Europe ETF",
+      "acct": "GTN US",
+      "currency": "USD",
+      "shares": 19,
+      "direct": 1042,
+      "fund": 0
+    },
+    {
+      "t": "VSS",
+      "n": "Vanguard Intl SmallCap",
+      "acct": "GTN US",
+      "currency": "USD",
+      "shares": 20,
+      "direct": 3168,
+      "fund": 0
+    },
+    {
+      "t": "URTH",
+      "n": "iShares MSCI World",
+      "acct": "GTN US",
+      "currency": "USD",
+      "shares": 15,
+      "direct": 2955,
+      "fund": 0
+    },
+    {
+      "t": "XLG",
+      "n": "Invesco S&P 500 Top 50",
+      "acct": "Dime",
+      "currency": "USD",
+      "shares": 24,
+      "direct": 1497,
+      "fund": 0
+    },
+    {
+      "t": "QTUM",
+      "n": "Defiance Quantum ETF",
+      "acct": "Dime",
+      "currency": "USD",
+      "shares": 14,
+      "direct": 2075,
+      "fund": 0
+    },
+    {
+      "t": "JEPI",
+      "n": "JPMorgan Equity Prem.",
+      "acct": "GTN US",
+      "currency": "USD",
+      "shares": 86,
+      "direct": 4859,
+      "fund": 0
+    },
+    {
+      "t": "XLB",
+      "n": "Materials Select Sector ETF",
+      "acct": "GTN US",
+      "currency": "USD",
+      "shares": 46,
+      "direct": 4197,
+      "fund": 0
+    },
+    {
+      "t": "CQQQ",
+      "n": "Invesco China Tech ETF",
+      "acct": "GTN US",
+      "currency": "USD",
+      "shares": 34,
+      "direct": 1498,
+      "fund": 0
+    },
+    {
+      "t": "AIQG",
+      "n": "Global X AI UCITS ETF",
+      "acct": "GTN UK (GBP)",
+      "currency": "GBP",
+      "shares": 19,
+      "direct": 430,
+      "fund": 0
+    },
+    {
+      "t": "RMS.PA",
+      "n": "Herm\u00e8s International",
+      "acct": "GTN EU",
+      "currency": "EUR",
+      "shares": 1,
+      "direct": 1930,
+      "fund": 0
+    },
+    {
+      "t": "ITX.MC",
+      "n": "Inditex (Zara)",
+      "acct": "GTN EU",
+      "currency": "EUR",
+      "shares": 30,
+      "direct": 1292,
+      "fund": 0
+    },
+    {
+      "t": "MC.PA",
+      "n": "LVMH",
+      "acct": "GTN EU",
+      "currency": "EUR",
+      "shares": 2,
+      "direct": 1378,
+      "fund": 0
+    },
+    {
+      "t": "005930",
+      "n": "Samsung Electronics",
+      "acct": "GTN KR",
+      "currency": "KRW",
+      "shares": 23,
+      "direct": 3300,
+      "fund": 0
+    },
+    {
+      "t": "QNTM.L",
+      "n": "VanEck Quantum Computing ETF",
+      "acct": "GTN UK (GBP)",
+      "currency": "USD",
+      "shares": 55,
+      "direct": 1245,
+      "fund": 0
+    }
+  ]
+}

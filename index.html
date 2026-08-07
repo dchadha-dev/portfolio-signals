@@ -859,11 +859,15 @@ body .amt { transition: filter 0.18s ease; }
   <div class="tab-panel" id="tab-tools">
     <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;">
       <div class="sub-tab active" id="tools-pine-tab" onclick="switchTools('pine',this)">&#128251; Pine Script</div>
+      <div class="sub-tab" id="tools-hold-tab" onclick="switchTools('hold',this)">&#9998; Edit Holdings</div>
       <div class="sub-tab" id="tools-ref-tab" onclick="switchTools('ref',this)">&#128216; Reference</div>
       <div class="sub-tab" id="tools-cpcv-tab" onclick="switchTools('cpcv',this)">&#128202; CPCV Validation</div>
     </div>
     <div id="tools-pine-panel" style="max-height:70vh;overflow-y:auto;">
       <div id="pineContent"></div>
+    </div>
+    <div id="tools-hold-panel" style="display:none;max-height:70vh;overflow-y:auto;">
+      <div id="holdContent"></div>
     </div>
     <div id="tools-ref-panel" style="display:none;max-height:70vh;overflow-y:auto;">
       <div id="refContent"></div>
@@ -1882,6 +1886,7 @@ function switchAnalytics(id, el) {
 
 function switchTools(id, el) {
   document.getElementById('tools-pine-panel').style.display = id === 'pine' ? '' : 'none';
+  document.getElementById('tools-hold-panel').style.display = id === 'hold' ? '' : 'none';
   document.getElementById('tools-ref-panel').style.display  = id === 'ref'  ? '' : 'none';
   document.getElementById('tools-cpcv-panel').style.display = id === 'cpcv' ? '' : 'none';
   document.querySelectorAll('#tab-tools .sub-tab').forEach(t => t.classList.remove('active'));
@@ -1889,6 +1894,7 @@ function switchTools(id, el) {
   if (id === 'ref')  loadReference();
   if (id === 'pine') loadPineScript();
   if (id === 'cpcv') loadCPCVReport();
+  if (id === 'hold') renderHoldingsEditor();
 }
 
 async function loadCPCVReport() {
@@ -4416,6 +4422,207 @@ setTimeout(async () => {
     }
   }
 })();
+
+// ════════════════════════════════════════════════════════════════
+// HOLDINGS EDITOR — add / edit / remove tickers in the browser
+// Source of truth: holdings.json in the GitHub repo.
+// Flow: edit here → Save to GitHub → scanner + dashboard both read it.
+// ════════════════════════════════════════════════════════════════
+const HOLD_REPO = 'dchadha-dev/portfolio-signals';
+const HOLD_PATH = 'holdings.json';
+
+function _ghHeadersJSON() {
+  const t = localStorage.getItem('gh_pat') || '';
+  const h = {'Accept':'application/vnd.github+json','Content-Type':'application/json'};
+  if (t) h['Authorization'] = 'Bearer ' + t;
+  return h;
+}
+
+// ── Load holdings.json and replace the in-memory stocks array ────
+async function loadHoldingsFromRepo(silent) {
+  // localStorage first so the UI is instant
+  try {
+    const local = JSON.parse(localStorage.getItem('holdings_override') || 'null');
+    if (local && Array.isArray(local.stocks) && local.stocks.length) _applyHoldings(local.stocks);
+  } catch (e) {}
+  // then GitHub as authoritative
+  try {
+    const r = await fetch(`https://api.github.com/repos/${HOLD_REPO}/contents/${HOLD_PATH}?ref=main&t=${Date.now()}`,
+                          {headers:_ghHeadersJSON()});
+    if (!r.ok) return false;
+    const meta = await r.json();
+    const json = JSON.parse(decodeURIComponent(escape(atob(meta.content.replace(/\n/g,'')))));
+    if (Array.isArray(json.stocks) && json.stocks.length) {
+      _applyHoldings(json.stocks);
+      localStorage.setItem('holdings_override', JSON.stringify(json));
+      localStorage.setItem('holdings_sha', meta.sha);
+      if (!silent) _holdStatus(`Loaded ${json.stocks.length} holdings from GitHub`, 'ok');
+      return true;
+    }
+  } catch (e) { if (!silent) _holdStatus('Could not reach GitHub: ' + e.message, 'err'); }
+  return false;
+}
+
+function _applyHoldings(list) {
+  stocks.length = 0;
+  list.forEach(s => stocks.push(s));
+}
+
+function _holdStatus(msg, kind) {
+  const el = document.getElementById('holdStatus');
+  if (!el) return;
+  const c = kind === 'ok' ? 'var(--green)' : kind === 'err' ? 'var(--red)' : 'var(--text3)';
+  el.innerHTML = `<span style="color:${c}">${msg}</span>`;
+}
+
+// ── Render the editor table ──────────────────────────────────────
+function renderHoldingsEditor() {
+  const el = document.getElementById('holdContent');
+  const hasPat = !!(localStorage.getItem('gh_pat') || '');
+
+  const rows = stocks.map((s, i) => `
+    <tr data-i="${i}">
+      <td style="padding:5px 8px;border-bottom:1px solid var(--border)">
+        <input value="${s.t || ''}" onchange="editHold(${i},'t',this.value)"
+          style="width:78px;background:transparent;border:1px solid var(--border);border-radius:4px;
+                 padding:3px 6px;color:var(--text);font-family:'DM Mono',monospace;font-size:11px;font-weight:600">
+      </td>
+      <td style="padding:5px 8px;border-bottom:1px solid var(--border)">
+        <input value="${(s.n || '').replace(/"/g,'&quot;')}" onchange="editHold(${i},'n',this.value)"
+          style="width:100%;min-width:150px;background:transparent;border:1px solid var(--border);
+                 border-radius:4px;padding:3px 6px;color:var(--text);font-size:11px">
+      </td>
+      <td style="padding:5px 8px;border-bottom:1px solid var(--border)">
+        <input value="${(s.acct || '').replace(/"/g,'&quot;')}" onchange="editHold(${i},'acct',this.value)"
+          style="width:120px;background:transparent;border:1px solid var(--border);border-radius:4px;
+                 padding:3px 6px;color:var(--text3);font-size:11px">
+      </td>
+      <td style="padding:5px 8px;border-bottom:1px solid var(--border)">
+        <input type="number" step="any" value="${s.shares ?? 0}" onchange="editHold(${i},'shares',parseFloat(this.value)||0)"
+          style="width:72px;background:transparent;border:1px solid var(--border);border-radius:4px;
+                 padding:3px 6px;color:var(--text);font-family:'DM Mono',monospace;font-size:11px;text-align:right">
+      </td>
+      <td style="padding:5px 8px;border-bottom:1px solid var(--border)">
+        <input type="number" step="any" value="${s.direct ?? 0}" onchange="editHold(${i},'direct',parseFloat(this.value)||0)"
+          style="width:88px;background:transparent;border:1px solid var(--border);border-radius:4px;
+                 padding:3px 6px;color:var(--text3);font-family:'DM Mono',monospace;font-size:11px;text-align:right">
+      </td>
+      <td style="padding:5px 8px;border-bottom:1px solid var(--border);text-align:center">
+        <button onclick="removeHold(${i})" title="Remove"
+          style="background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--red);
+                 cursor:pointer;padding:2px 8px;font-size:12px;line-height:1.4">&times;</button>
+      </td>
+    </tr>`).join('');
+
+  el.innerHTML = `
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+      <button onclick="addHold()" style="background:var(--text);color:var(--white);border:none;border-radius:6px;
+        padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer">+ Add ticker</button>
+      <button onclick="saveHoldingsToGitHub()" ${hasPat?'':'disabled'}
+        style="background:${hasPat?'var(--green)':'var(--border)'};color:#fff;border:none;border-radius:6px;
+        padding:7px 14px;font-size:12px;font-weight:600;cursor:${hasPat?'pointer':'not-allowed'}">
+        &#8593; Save to GitHub</button>
+      <button onclick="loadHoldingsFromRepo(false).then(renderHoldingsEditor)"
+        style="background:transparent;color:var(--text);border:1px solid var(--border);border-radius:6px;
+        padding:7px 14px;font-size:12px;cursor:pointer">&#8635; Reload from GitHub</button>
+      <span id="holdStatus" style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text3)">
+        ${stocks.length} tickers${hasPat ? '' : ' · set gh_pat in localStorage to enable saving'}</span>
+    </div>
+
+    <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:11px">
+      <thead><tr>
+        ${['Ticker','Name','Account','Shares','Value $','']
+          .map(h=>`<th style="text-align:left;font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+                 color:var(--text3);padding:6px 8px;border-bottom:1px solid var(--border);font-weight:500">${h}</th>`).join('')}
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    </div>
+
+    <div style="margin-top:14px;padding:10px 12px;background:var(--s2);border-radius:6px;
+                font-size:10px;color:var(--text3);line-height:1.6;font-family:'DM Mono',monospace">
+      Saving writes <b>holdings.json</b> to ${HOLD_REPO}. The scanner reads the same file on its next run,
+      so signals follow your edits automatically. Thai proxy funds are managed separately in signal_scanner.py.
+    </div>`;
+}
+
+function editHold(i, field, val) {
+  if (!stocks[i]) return;
+  if (field === 't') val = String(val).toUpperCase().trim();
+  stocks[i][field] = val;
+  _cacheHold();
+  _holdStatus('Edited ' + (stocks[i].t || '?') + ' — unsaved', 'warn');
+}
+
+function addHold() {
+  stocks.push({t:'', n:'', acct:'', shares:0, direct:0, fund:0, currency:'USD'});
+  renderHoldingsEditor();
+  _holdStatus('New row added — fill ticker then save', 'warn');
+}
+
+function removeHold(i) {
+  const tk = stocks[i] ? stocks[i].t : '';
+  if (!confirm('Remove ' + (tk || 'this row') + ' from holdings?')) return;
+  stocks.splice(i, 1);
+  _cacheHold();
+  renderHoldingsEditor();
+  _holdStatus('Removed ' + tk + ' — unsaved', 'warn');
+}
+
+function _cacheHold() {
+  localStorage.setItem('holdings_override', JSON.stringify({
+    updated_at: new Date().toISOString(),
+    stocks: stocks
+  }));
+}
+
+// ── Commit holdings.json back to GitHub ──────────────────────────
+async function saveHoldingsToGitHub() {
+  const pat = localStorage.getItem('gh_pat') || '';
+  if (!pat) { _holdStatus('No gh_pat in localStorage — cannot save', 'err'); return; }
+
+  const clean = stocks.filter(s => s.t && s.t.trim());
+  if (!clean.length) { _holdStatus('Nothing to save', 'err'); return; }
+
+  const payload = {
+    updated_at: new Date().toISOString(),
+    source: 'dashboard-editor',
+    stocks: clean
+  };
+
+  _holdStatus('Saving...', 'warn');
+  try {
+    // always re-read sha to avoid stale-conflict rejections
+    let sha = null;
+    const cur = await fetch(`https://api.github.com/repos/${HOLD_REPO}/contents/${HOLD_PATH}?ref=main`,
+                            {headers:_ghHeadersJSON()});
+    if (cur.ok) sha = (await cur.json()).sha;
+
+    const body = {
+      message: `chore: holdings update ${new Date().toISOString().slice(0,16)} (dashboard)`,
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2)))),
+      branch: 'main'
+    };
+    if (sha) body.sha = sha;
+
+    const r = await fetch(`https://api.github.com/repos/${HOLD_REPO}/contents/${HOLD_PATH}`,
+                          {method:'PUT', headers:_ghHeadersJSON(), body:JSON.stringify(body)});
+    if (!r.ok) {
+      const err = await r.json().catch(()=>({}));
+      throw new Error(err.message || ('HTTP ' + r.status));
+    }
+    const res = await r.json();
+    localStorage.setItem('holdings_sha', res.content.sha);
+    localStorage.setItem('holdings_override', JSON.stringify(payload));
+    _holdStatus(`Saved ${clean.length} holdings to GitHub ✓`, 'ok');
+  } catch (e) {
+    _holdStatus('Save failed: ' + e.message, 'err');
+  }
+}
+
+// Pull holdings on page load so dashboard reflects the repo
+loadHoldingsFromRepo(true);
 
 </script>
 </body>

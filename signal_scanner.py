@@ -164,6 +164,25 @@ TICKER_PROXY_MAP = {
 }
 
 # Proxy tickers to fetch for Thai funds
+# ── holdings.json override (written by the dashboard editor) ─────────
+# If holdings.json exists in the repo root, its ticker list replaces the
+# direct-equity portion of MY_HOLDINGS. Thai proxy funds stay defined above,
+# since they are managed through TICKER_PROXY_MAP rather than the editor.
+try:
+    import json as _json, os as _os
+    if _os.path.exists('holdings.json'):
+        with open('holdings.json') as _f:
+            _hj = _json.load(_f)
+        _editor_tickers = [s['t'].strip().upper() for s in _hj.get('stocks', [])
+                           if s.get('t') and s['t'].strip()]
+        if _editor_tickers:
+            _thai = [t for t in MY_HOLDINGS if t in TICKER_PROXY_MAP]
+            MY_HOLDINGS = list(dict.fromkeys(_editor_tickers + _thai))
+            print(f"holdings.json: {len(_editor_tickers)} tickers loaded "
+                  f"(updated {_hj.get('updated_at','?')})")
+except Exception as _e:
+    print(f"holdings.json not applied ({_e}) — using built-in MY_HOLDINGS")
+
 PROXY_TICKERS = list(set(TICKER_PROXY_MAP.values()))
 # Tickers kept in holdings but excluded from signal computation
 # (LSE-listed or insufficient yfinance history — shown as NO_DATA with reason)
