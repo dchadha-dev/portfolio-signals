@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-07T17:30:08.233Z",
+  "updated_at": "2026-08-07T17:31:26.070Z",
   "source": "dashboard-editor",
   "stocks": [
     {
@@ -577,6 +577,33 @@
       "shares": 55,
       "direct": 1245,
       "fund": 0
+    },
+    {
+      "t": "ARM",
+      "n": "Arm Holdings",
+      "acct": "Dime",
+      "shares": 6,
+      "direct": 0,
+      "fund": 0,
+      "currency": "USD"
+    },
+    {
+      "t": "MRVL",
+      "n": "Marvel Tech",
+      "acct": "Dime",
+      "shares": 7,
+      "direct": 0,
+      "fund": 0,
+      "currency": "USD"
+    },
+    {
+      "t": "ALAB",
+      "n": "Astera Labs",
+      "acct": "Dime",
+      "shares": 4.5,
+      "direct": 0,
+      "fund": 0,
+      "currency": "USD"
     }
   ]
 }
