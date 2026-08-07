@@ -1784,14 +1784,25 @@ async function fetchOneTicker(ticker) {
   }
 }
 
+// Tickers to price = static list UNION whatever is currently in holdings.
+// Must be computed at call time, not module load, so tickers added through
+// the Holdings editor are fetched without a page reload.
+function activeTickers() {
+  const fromHoldings = (typeof stocks !== 'undefined' ? stocks : [])
+    .map(s => (s.t || '').trim().toUpperCase())
+    .filter(Boolean);
+  return Array.from(new Set([...ALL_TICKERS, ...fromHoldings]));
+}
+
 async function fetchPrices() {
   const result = {};
   let liveCount = 0;
+  const TICKERS = activeTickers();
 
-  // Batch into groups of 10, 200ms between batches — handles 45 tickers in ~1s
+  // Batch into groups of 10, 200ms between batches
   const BATCH = 10;
-  for (let i = 0; i < ALL_TICKERS.length; i += BATCH) {
-    const batch = ALL_TICKERS.slice(i, i + BATCH);
+  for (let i = 0; i < TICKERS.length; i += BATCH) {
+    const batch = TICKERS.slice(i, i + BATCH);
     await Promise.all(batch.map(async ticker => {
       try {
         result[ticker] = await fetchOneTicker(ticker);
@@ -1801,7 +1812,7 @@ async function fetchPrices() {
         if (FALLBACK[ticker]) result[ticker] = { ...FALLBACK[ticker], stale: true };
       }
     }));
-    if (i + BATCH < ALL_TICKERS.length) await new Promise(r => setTimeout(r, 200));
+    if (i + BATCH < TICKERS.length) await new Promise(r => setTimeout(r, 200));
   }
 
   if (liveCount === 0) {
@@ -4443,7 +4454,10 @@ async function loadHoldingsFromRepo(silent) {
   // localStorage first so the UI is instant
   try {
     const local = JSON.parse(localStorage.getItem('holdings_override') || 'null');
-    if (local && Array.isArray(local.stocks) && local.stocks.length) _applyHoldings(local.stocks);
+    if (local && Array.isArray(local.stocks) && local.stocks.length) {
+      _applyHoldings(local.stocks);
+      _afterHoldingsChange();
+    }
   } catch (e) {}
   // then GitHub as authoritative
   try {
@@ -4456,6 +4470,7 @@ async function loadHoldingsFromRepo(silent) {
       _applyHoldings(json.stocks);
       localStorage.setItem('holdings_override', JSON.stringify(json));
       localStorage.setItem('holdings_sha', meta.sha);
+      _afterHoldingsChange();
       if (!silent) _holdStatus(`Loaded ${json.stocks.length} holdings from GitHub`, 'ok');
       return true;
     }
@@ -4466,6 +4481,15 @@ async function loadHoldingsFromRepo(silent) {
 function _applyHoldings(list) {
   stocks.length = 0;
   list.forEach(s => stocks.push(s));
+}
+
+// Re-render the whole dashboard after the holdings list changes.
+// Without this, edits only appear after a manual price refresh, because
+// the initial render runs before the async holdings fetch resolves.
+function _afterHoldingsChange() {
+  try {
+    if (typeof renderEverything === 'function') renderEverything();
+  } catch (e) { console.warn('re-render after holdings change failed', e); }
 }
 
 function _holdStatus(msg, kind) {
@@ -4608,6 +4632,7 @@ function editHold(i, field, val) {
   if (field === 't') val = String(val).toUpperCase().trim();
   stocks[i][field] = val;
   _cacheHold();
+  _afterHoldingsChange();
   _holdStatus('Edited ' + (stocks[i].t || '?') + ' — unsaved', 'warn');
 }
 
@@ -4622,6 +4647,7 @@ function removeHold(i) {
   if (!confirm('Remove ' + (tk || 'this row') + ' from holdings?')) return;
   stocks.splice(i, 1);
   _cacheHold();
+  _afterHoldingsChange();
   renderHoldingsEditor();
   _holdStatus('Removed ' + tk + ' — unsaved', 'warn');
 }
