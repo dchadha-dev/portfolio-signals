@@ -4515,6 +4515,25 @@ function renderHoldingsEditor() {
     </tr>`).join('');
 
   el.innerHTML = `
+    ${hasPat ? '' : `
+    <div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:8px;
+                padding:12px 14px;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:600;color:var(--amber);margin-bottom:6px">
+        GitHub token required to save</div>
+      <div style="font-size:11px;color:var(--text3);line-height:1.6;margin-bottom:10px">
+        Create a fine-grained token at <b>github.com/settings/personal-access-tokens</b> with
+        <b>Repository access → ${HOLD_REPO}</b> and <b>Permissions → Contents: Read and write</b>.
+        It is stored only in this browser's localStorage.
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <input id="patInput" type="password" placeholder="github_pat_... or ghp_..."
+          style="flex:1;min-width:240px;background:var(--s2);border:1px solid var(--border);border-radius:6px;
+                 padding:7px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:11px">
+        <button onclick="saveGhPat()" style="background:var(--text);color:var(--white);border:none;
+          border-radius:6px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer">Save token</button>
+      </div>
+    </div>`}
+
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
       <button onclick="addHold()" style="background:var(--text);color:var(--white);border:none;border-radius:6px;
         padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer">+ Add ticker</button>
@@ -4525,8 +4544,11 @@ function renderHoldingsEditor() {
       <button onclick="loadHoldingsFromRepo(false).then(renderHoldingsEditor)"
         style="background:transparent;color:var(--text);border:1px solid var(--border);border-radius:6px;
         padding:7px 14px;font-size:12px;cursor:pointer">&#8635; Reload from GitHub</button>
+      ${hasPat ? `<button onclick="clearGhPat()" title="Remove stored token"
+        style="background:transparent;color:var(--text3);border:1px solid var(--border);border-radius:6px;
+        padding:7px 10px;font-size:11px;cursor:pointer">Clear token</button>` : ''}
       <span id="holdStatus" style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text3)">
-        ${stocks.length} tickers${hasPat ? '' : ' · set gh_pat in localStorage to enable saving'}</span>
+        ${stocks.length} tickers</span>
     </div>
 
     <div style="overflow-x:auto">
@@ -4545,6 +4567,41 @@ function renderHoldingsEditor() {
       Saving writes <b>holdings.json</b> to ${HOLD_REPO}. The scanner reads the same file on its next run,
       so signals follow your edits automatically. Thai proxy funds are managed separately in signal_scanner.py.
     </div>`;
+}
+
+// ── Token management ─────────────────────────────────────────────
+async function saveGhPat() {
+  const inp = document.getElementById('patInput');
+  const tok = (inp && inp.value || '').trim();
+  if (!tok) { _holdStatus('Paste a token first', 'err'); return; }
+
+  _holdStatus('Verifying token...', 'warn');
+  // Verify the token can actually read the repo before storing it
+  try {
+    const r = await fetch(`https://api.github.com/repos/${HOLD_REPO}`, {
+      headers: {'Accept':'application/vnd.github+json','Authorization':'Bearer ' + tok}
+    });
+    if (!r.ok) {
+      _holdStatus(`Token rejected (HTTP ${r.status}) — check repo access and Contents permission`, 'err');
+      return;
+    }
+    const repo = await r.json();
+    if (repo.permissions && repo.permissions.push === false) {
+      _holdStatus('Token is read-only — enable Contents: Read and write', 'err');
+      return;
+    }
+    localStorage.setItem('gh_pat', tok);
+    renderHoldingsEditor();
+    _holdStatus('Token saved and verified ✓ — you can now save holdings', 'ok');
+  } catch (e) {
+    _holdStatus('Verification failed: ' + e.message, 'err');
+  }
+}
+
+function clearGhPat() {
+  if (!confirm('Remove the stored GitHub token from this browser?')) return;
+  localStorage.removeItem('gh_pat');
+  renderHoldingsEditor();
 }
 
 function editHold(i, field, val) {
