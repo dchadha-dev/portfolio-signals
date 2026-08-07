@@ -4586,13 +4586,12 @@ async function saveGhPat() {
       return;
     }
     const repo = await r.json();
-    if (repo.permissions && repo.permissions.push === false) {
-      _holdStatus('Token is read-only — enable Contents: Read and write', 'err');
-      return;
-    }
+    // NOTE: repo.permissions.push is unreliable for fine-grained tokens — it can
+    // report true while Contents: write is still missing. Store and let the first
+    // real save surface any permission problem with a specific message.
     localStorage.setItem('gh_pat', tok);
     renderHoldingsEditor();
-    _holdStatus('Token saved and verified ✓ — you can now save holdings', 'ok');
+    _holdStatus('Token saved — click "Save to GitHub" to confirm write access', 'ok');
   } catch (e) {
     _holdStatus('Verification failed: ' + e.message, 'err');
   }
@@ -4667,7 +4666,15 @@ async function saveHoldingsToGitHub() {
                           {method:'PUT', headers:_ghHeadersJSON(), body:JSON.stringify(body)});
     if (!r.ok) {
       const err = await r.json().catch(()=>({}));
-      throw new Error(err.message || ('HTTP ' + r.status));
+      const msg = err.message || ('HTTP ' + r.status);
+      if (r.status === 403 || /not accessible/i.test(msg)) {
+        throw new Error(msg + ' — token needs Repository permissions → Contents: Read and write '
+                      + '(github.com/settings/personal-access-tokens), or use a classic token with the repo scope');
+      }
+      if (r.status === 409) {
+        throw new Error('File changed on GitHub since load — click "Reload from GitHub", re-apply edits, then save');
+      }
+      throw new Error(msg);
     }
     const res = await r.json();
     localStorage.setItem('holdings_sha', res.content.sha);
