@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-08-07 16:45 UTC",
+  "last_updated": "2026-08-07 23:23 UTC",
   "entries": [
     {
       "ticker": "TSEM",
@@ -230,7 +230,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 117.88,
+      "current_price": 117.39,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -428,7 +428,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 117.88,
+      "current_price": 117.39,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -464,7 +464,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 117.88,
+      "current_price": 117.39,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -572,7 +572,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 308.52,
+      "current_price": 311.35,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -590,7 +590,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 3.81,
+      "current_price": 3.88,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -626,7 +626,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 333.49,
+      "current_price": 334.17,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -680,7 +680,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 166.16,
+      "current_price": 165.68,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -698,7 +698,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 217.18,
+      "current_price": 219.34,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -752,7 +752,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 138.32,
+      "current_price": 140.27,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -770,7 +770,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 276.47,
+      "current_price": 272.4,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -788,7 +788,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 216.96,
+      "current_price": 218.72,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -860,7 +860,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 3.81,
+      "current_price": 3.88,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -896,7 +896,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 333.49,
+      "current_price": 334.17,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -950,7 +950,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 166.16,
+      "current_price": 165.68,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -968,7 +968,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 217.18,
+      "current_price": 219.34,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1004,7 +1004,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 117.88,
+      "current_price": 117.39,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1040,7 +1040,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 138.32,
+      "current_price": 140.27,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1058,7 +1058,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 276.47,
+      "current_price": 272.4,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1076,7 +1076,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 216.96,
+      "current_price": 218.72,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1094,7 +1094,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 96,
-      "current_price": 867.49,
+      "current_price": 877.57,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1148,7 +1148,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 283.19,
+      "current_price": 282.57,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1184,7 +1184,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 101.07,
+      "current_price": 101.65,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1202,7 +1202,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 223.12,
+      "current_price": 221.2,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1436,7 +1436,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 3.81,
+      "current_price": 3.88,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1454,7 +1454,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 283.19,
+      "current_price": 282.57,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1472,7 +1472,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 333.49,
+      "current_price": 334.17,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1490,7 +1490,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 216.96,
+      "current_price": 218.72,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1526,7 +1526,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 276.47,
+      "current_price": 272.4,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1580,7 +1580,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 166.16,
+      "current_price": 165.68,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1598,7 +1598,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 217.18,
+      "current_price": 219.34,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1616,7 +1616,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 101.07,
+      "current_price": 101.65,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1652,7 +1652,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 117.88,
+      "current_price": 117.39,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1670,7 +1670,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 223.12,
+      "current_price": 221.2,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1688,7 +1688,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 138.32,
+      "current_price": 140.27,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1832,7 +1832,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 283.19,
+      "current_price": 282.57,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1850,7 +1850,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 333.49,
+      "current_price": 334.17,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1868,7 +1868,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 216.96,
+      "current_price": 218.72,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1886,7 +1886,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 276.47,
+      "current_price": 272.4,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1922,7 +1922,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 166.16,
+      "current_price": 165.68,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1940,7 +1940,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 217.18,
+      "current_price": 219.34,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1958,7 +1958,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 101.07,
+      "current_price": 101.65,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1976,7 +1976,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 3.81,
+      "current_price": 3.88,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2012,7 +2012,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 117.88,
+      "current_price": 117.39,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2030,7 +2030,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 223.12,
+      "current_price": 221.2,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2066,7 +2066,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 138.32,
+      "current_price": 140.27,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2084,7 +2084,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 96,
-      "current_price": 538.74,
+      "current_price": 539.14,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2102,7 +2102,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 197.89,
+      "current_price": 198.11,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2120,7 +2120,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 283.19,
+      "current_price": 282.57,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2138,7 +2138,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 333.49,
+      "current_price": 334.17,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2156,7 +2156,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 216.96,
+      "current_price": 218.72,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2174,7 +2174,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 252.26,
+      "current_price": 252.49,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2192,7 +2192,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 166.16,
+      "current_price": 165.68,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2228,7 +2228,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 217.18,
+      "current_price": 219.34,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2246,7 +2246,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 101.07,
+      "current_price": 101.65,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2264,7 +2264,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 3.81,
+      "current_price": 3.88,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2282,7 +2282,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 117.88,
+      "current_price": 117.39,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2300,7 +2300,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 223.12,
+      "current_price": 221.2,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2336,7 +2336,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 68,
-      "current_price": 186.35,
+      "current_price": 187.97,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2354,7 +2354,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 138.32,
+      "current_price": 140.27,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2372,7 +2372,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 276.47,
+      "current_price": 272.4,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2390,7 +2390,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 14.46,
+      "current_price": 14.61,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2426,7 +2426,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 845.16,
+      "current_price": 842.19,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2444,7 +2444,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 65,
-      "current_price": 89.3,
+      "current_price": 89.89,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2462,7 +2462,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 254.47,
+      "current_price": 250.05,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
