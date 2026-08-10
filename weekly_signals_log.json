@@ -1,96 +1,6 @@
 {
-  "last_updated": "2026-08-10 11:42 UTC",
+  "last_updated": "2026-08-10 23:24 UTC",
   "entries": [
-    {
-      "ticker": "FORM",
-      "signal_type": "WATCH",
-      "score": 73,
-      "sell_score": 6.9,
-      "timestamp": "2026-08-03 13:34",
-      "price": 101.42,
-      "dist_252h": -36.6,
-      "framework_score": 58,
-      "fdfv3": true,
-      "is_holding": false,
-      "status": "active",
-      "current_score": 73,
-      "current_price": 117.39,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
-    },
-    {
-      "ticker": "SNOW",
-      "signal_type": "SELL",
-      "score": 73.8,
-      "sell_score": 73.8,
-      "timestamp": "2026-08-03 13:34",
-      "price": 302.8,
-      "dist_252h": 1.6,
-      "framework_score": 65,
-      "fdfv3": false,
-      "is_holding": false,
-      "status": "active",
-      "current_score": 73.8,
-      "current_price": 302.8,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
-    },
-    {
-      "ticker": "ITX.MC",
-      "signal_type": "SELL",
-      "score": 66.9,
-      "sell_score": 66.9,
-      "timestamp": "2026-08-03 13:34",
-      "price": 57.76,
-      "dist_252h": 0.5,
-      "framework_score": 76,
-      "fdfv3": false,
-      "is_holding": true,
-      "status": "active",
-      "current_score": 66.9,
-      "current_price": 57.76,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
-    },
-    {
-      "ticker": "BRKB",
-      "signal_type": "SELL",
-      "score": 65.6,
-      "sell_score": 65.6,
-      "timestamp": "2026-08-03 13:34",
-      "price": 518.84,
-      "dist_252h": 1.0,
-      "framework_score": 78,
-      "fdfv3": false,
-      "is_holding": true,
-      "status": "expired",
-      "current_score": 65.6,
-      "current_price": 518.84,
-      "expire_reason": "sell_cleared",
-      "expire_detail": "sell score dropped to 6",
-      "expired_at": "2026-08-03 23:59"
-    },
-    {
-      "ticker": "FIVN",
-      "signal_type": "SELL",
-      "score": 75.6,
-      "sell_score": 75.6,
-      "timestamp": "2026-08-03 13:34",
-      "price": 28.23,
-      "dist_252h": 2.1,
-      "framework_score": 62,
-      "fdfv3": false,
-      "is_holding": false,
-      "status": "expired",
-      "current_score": 75.6,
-      "current_price": 28.23,
-      "expire_reason": "sell_cleared",
-      "expire_detail": "sell score dropped to 15",
-      "expired_at": "2026-08-05 23:45"
-    },
     {
       "ticker": "SCB_EV",
       "signal_type": "BUY",
@@ -122,7 +32,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 311.35,
+      "current_price": 306.4,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -138,12 +48,12 @@
       "framework_score": 32,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 3.88,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 8",
+      "expired_at": "2026-08-10 23:24"
     },
     {
       "ticker": "CRDO",
@@ -176,7 +86,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 85,
-      "current_price": 334.17,
+      "current_price": 317.23,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -230,7 +140,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 165.68,
+      "current_price": 157.76,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -248,7 +158,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 219.34,
+      "current_price": 210.63,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -302,7 +212,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 140.27,
+      "current_price": 132.65,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -319,8 +229,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 65,
-      "current_price": 272.4,
+      "current_score": 73,
+      "current_price": 270.1,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -338,7 +248,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 218.72,
+      "current_price": 208.56,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -408,12 +318,12 @@
       "framework_score": 32,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 3.88,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 8",
+      "expired_at": "2026-08-10 23:24"
     },
     {
       "ticker": "CRDO",
@@ -446,7 +356,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 85,
-      "current_price": 334.17,
+      "current_price": 317.23,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -500,7 +410,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 165.68,
+      "current_price": 157.76,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -518,7 +428,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 219.34,
+      "current_price": 210.63,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -554,7 +464,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 117.39,
+      "current_price": 112.47,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -590,7 +500,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 140.27,
+      "current_price": 132.65,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -607,8 +517,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 65,
-      "current_price": 272.4,
+      "current_score": 73,
+      "current_price": 270.1,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -626,7 +536,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 218.72,
+      "current_price": 208.56,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -642,12 +552,12 @@
       "framework_score": 76,
       "fdfv3": true,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 96,
       "current_price": 877.57,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 61",
+      "expired_at": "2026-08-10 23:24"
     },
     {
       "ticker": "KLAC",
@@ -698,7 +608,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 282.57,
+      "current_price": 267.85,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -734,7 +644,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 101.65,
+      "current_price": 97.52,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -750,12 +660,12 @@
       "framework_score": 58,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 221.2,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-08-10 23:24"
     },
     {
       "ticker": "SEDG",
@@ -984,12 +894,12 @@
       "framework_score": 32,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 3.88,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 8",
+      "expired_at": "2026-08-10 23:24"
     },
     {
       "ticker": "ARM",
@@ -1004,7 +914,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 282.57,
+      "current_price": 267.85,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1022,7 +932,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 85,
-      "current_price": 334.17,
+      "current_price": 317.23,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1040,7 +950,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 218.72,
+      "current_price": 208.56,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1075,8 +985,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 65,
-      "current_price": 272.4,
+      "current_score": 73,
+      "current_price": 270.1,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1130,7 +1040,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 165.68,
+      "current_price": 157.76,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1148,7 +1058,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 219.34,
+      "current_price": 210.63,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1166,7 +1076,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 101.65,
+      "current_price": 97.52,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1202,7 +1112,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 117.39,
+      "current_price": 112.47,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1218,12 +1128,12 @@
       "framework_score": 58,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 221.2,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-08-10 23:24"
     },
     {
       "ticker": "ACLS",
@@ -1238,7 +1148,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 140.27,
+      "current_price": 132.65,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1382,7 +1292,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 282.57,
+      "current_price": 267.85,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1400,7 +1310,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 85,
-      "current_price": 334.17,
+      "current_price": 317.23,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1418,7 +1328,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 218.72,
+      "current_price": 208.56,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1435,8 +1345,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 65,
-      "current_price": 272.4,
+      "current_score": 73,
+      "current_price": 270.1,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1472,7 +1382,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 165.68,
+      "current_price": 157.76,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1490,7 +1400,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 219.34,
+      "current_price": 210.63,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1508,7 +1418,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 101.65,
+      "current_price": 97.52,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1524,12 +1434,12 @@
       "framework_score": 32,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 3.88,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 8",
+      "expired_at": "2026-08-10 23:24"
     },
     {
       "ticker": "SNDK",
@@ -1562,7 +1472,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 117.39,
+      "current_price": 112.47,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1578,12 +1488,12 @@
       "framework_score": 58,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 221.2,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-08-10 23:24"
     },
     {
       "ticker": "LIT",
@@ -1616,7 +1526,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 140.27,
+      "current_price": 132.65,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1633,8 +1543,8 @@
       "fdfv3": true,
       "is_holding": true,
       "status": "active",
-      "current_score": 96,
-      "current_price": 539.14,
+      "current_score": 86,
+      "current_price": 522.12,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1652,7 +1562,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 83,
-      "current_price": 198.11,
+      "current_price": 192.74,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1670,7 +1580,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 282.57,
+      "current_price": 267.85,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1688,7 +1598,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 85,
-      "current_price": 334.17,
+      "current_price": 317.23,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1706,7 +1616,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 75,
-      "current_price": 218.72,
+      "current_price": 208.56,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1723,8 +1633,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 83,
-      "current_price": 252.49,
+      "current_score": 73,
+      "current_price": 252.55,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1742,7 +1652,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 165.68,
+      "current_price": 157.76,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1778,7 +1688,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 219.34,
+      "current_price": 210.63,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1796,7 +1706,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 101.65,
+      "current_price": 97.52,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1812,12 +1722,12 @@
       "framework_score": 32,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 3.88,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 8",
+      "expired_at": "2026-08-10 23:24"
     },
     {
       "ticker": "FORM",
@@ -1832,7 +1742,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 117.39,
+      "current_price": 112.47,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1848,12 +1758,12 @@
       "framework_score": 58,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 221.2,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-08-10 23:24"
     },
     {
       "ticker": "LIT",
@@ -1886,7 +1796,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 68,
-      "current_price": 187.97,
+      "current_price": 184.11,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1904,7 +1814,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 140.27,
+      "current_price": 132.65,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1921,8 +1831,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 65,
-      "current_price": 272.4,
+      "current_score": 73,
+      "current_price": 270.1,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1940,7 +1850,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 14.61,
+      "current_price": 14.73,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1976,7 +1886,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 842.19,
+      "current_price": 837.58,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1994,7 +1904,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 65,
-      "current_price": 89.89,
+      "current_price": 90.49,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2010,12 +1920,12 @@
       "framework_score": 64,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 250.05,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 5",
+      "expired_at": "2026-08-10 23:24"
     },
     {
       "ticker": "ABNB",
@@ -2065,8 +1975,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 83,
-      "current_price": 252.49,
+      "current_score": 73,
+      "current_price": 252.55,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2084,7 +1994,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 75,
-      "current_price": 282.57,
+      "current_price": 267.85,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2102,7 +2012,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 75,
-      "current_price": 218.72,
+      "current_price": 208.56,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2120,7 +2030,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 85,
-      "current_price": 334.17,
+      "current_price": 317.23,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2138,7 +2048,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 165.68,
+      "current_price": 157.76,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2156,7 +2066,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 219.34,
+      "current_price": 210.63,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2174,7 +2084,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 842.19,
+      "current_price": 837.58,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2192,7 +2102,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 101.65,
+      "current_price": 97.52,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2210,7 +2120,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 117.39,
+      "current_price": 112.47,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2226,12 +2136,12 @@
       "framework_score": 58,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 221.2,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-08-10 23:24"
     },
     {
       "ticker": "NBIS",
@@ -2246,7 +2156,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 68,
-      "current_price": 187.97,
+      "current_price": 184.11,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2264,7 +2174,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 65,
-      "current_price": 89.89,
+      "current_price": 90.49,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2282,7 +2192,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 140.27,
+      "current_price": 132.65,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2299,8 +2209,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 65,
-      "current_price": 272.4,
+      "current_score": 73,
+      "current_price": 270.1,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2318,7 +2228,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 14.61,
+      "current_price": 14.73,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2334,12 +2244,12 @@
       "framework_score": 64,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 250.05,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 5",
+      "expired_at": "2026-08-10 23:24"
     },
     {
       "ticker": "KEEL",
@@ -2352,12 +2262,12 @@
       "framework_score": 32,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 3.88,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 8",
+      "expired_at": "2026-08-10 23:24"
     },
     {
       "ticker": "TSEM",
@@ -2371,8 +2281,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 83,
-      "current_price": 252.49,
+      "current_score": 73,
+      "current_price": 252.55,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2390,7 +2300,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 75,
-      "current_price": 282.57,
+      "current_price": 267.85,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2408,7 +2318,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 75,
-      "current_price": 218.72,
+      "current_price": 208.56,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2426,7 +2336,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 85,
-      "current_price": 334.17,
+      "current_price": 317.23,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2444,7 +2354,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 165.68,
+      "current_price": 157.76,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2462,7 +2372,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 219.34,
+      "current_price": 210.63,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2480,7 +2390,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 842.19,
+      "current_price": 837.58,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2498,7 +2408,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 101.65,
+      "current_price": 97.52,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2516,7 +2426,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 117.39,
+      "current_price": 112.47,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2532,12 +2442,12 @@
       "framework_score": 58,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 221.2,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-08-10 23:24"
     },
     {
       "ticker": "NBIS",
@@ -2552,7 +2462,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 68,
-      "current_price": 187.97,
+      "current_price": 184.11,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2570,7 +2480,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 65,
-      "current_price": 89.89,
+      "current_price": 90.49,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2588,7 +2498,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 140.27,
+      "current_price": 132.65,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2605,8 +2515,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 65,
-      "current_price": 272.4,
+      "current_score": 73,
+      "current_price": 270.1,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2624,7 +2534,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 14.61,
+      "current_price": 14.73,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2640,12 +2550,12 @@
       "framework_score": 64,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 250.05,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 5",
+      "expired_at": "2026-08-10 23:24"
     },
     {
       "ticker": "KEEL",
@@ -2658,12 +2568,12 @@
       "framework_score": 32,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 3.88,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 8",
+      "expired_at": "2026-08-10 23:24"
     },
     {
       "ticker": "ALAB",
@@ -2678,7 +2588,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 85,
-      "current_price": 334.17,
+      "current_price": 317.23,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2695,8 +2605,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 83,
-      "current_price": 252.49,
+      "current_score": 73,
+      "current_price": 252.55,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2714,7 +2624,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 75,
-      "current_price": 282.57,
+      "current_price": 267.85,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2732,7 +2642,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 75,
-      "current_price": 218.72,
+      "current_price": 208.56,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2750,7 +2660,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 165.68,
+      "current_price": 157.76,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2768,7 +2678,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 219.34,
+      "current_price": 210.63,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2786,7 +2696,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 842.19,
+      "current_price": 837.58,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2804,7 +2714,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 101.65,
+      "current_price": 97.52,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2822,7 +2732,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 117.39,
+      "current_price": 112.47,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2838,12 +2748,12 @@
       "framework_score": 58,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 221.2,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-08-10 23:24"
     },
     {
       "ticker": "NBIS",
@@ -2858,7 +2768,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 68,
-      "current_price": 187.97,
+      "current_price": 184.11,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2876,7 +2786,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 65,
-      "current_price": 89.89,
+      "current_price": 90.49,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2894,7 +2804,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 140.27,
+      "current_price": 132.65,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2911,8 +2821,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 65,
-      "current_price": 272.4,
+      "current_score": 73,
+      "current_price": 270.1,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2930,7 +2840,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 14.61,
+      "current_price": 14.73,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -2946,12 +2856,12 @@
       "framework_score": 64,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 250.05,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 5",
+      "expired_at": "2026-08-10 23:24"
     },
     {
       "ticker": "KEEL",
@@ -2964,9 +2874,117 @@
       "framework_score": 32,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 3.88,
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 8",
+      "expired_at": "2026-08-10 23:24"
+    },
+    {
+      "ticker": "CRDO",
+      "signal_type": "BUY",
+      "score": 88,
+      "sell_score": 0.0,
+      "timestamp": "2026-08-10 23:24",
+      "price": 239.94,
+      "dist_252h": -20.7,
+      "framework_score": 93,
+      "fdfv3": true,
+      "is_holding": true,
+      "status": "active",
+      "current_score": 88,
+      "current_price": 239.94,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "COHR",
+      "signal_type": "WATCH",
+      "score": 73,
+      "sell_score": 5.3,
+      "timestamp": "2026-08-10 23:24",
+      "price": 325.15,
+      "dist_252h": -23.8,
+      "framework_score": 68,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 73,
+      "current_price": 325.15,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "MRNA",
+      "signal_type": "WATCH",
+      "score": 73,
+      "sell_score": 0.0,
+      "timestamp": "2026-08-10 23:24",
+      "price": 59.81,
+      "dist_252h": -26.9,
+      "framework_score": 52,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 73,
+      "current_price": 59.81,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "RKLB",
+      "signal_type": "WATCH",
+      "score": 65,
+      "sell_score": 0.0,
+      "timestamp": "2026-08-10 23:24",
+      "price": 80.04,
+      "dist_252h": -46.7,
+      "framework_score": 52,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 65,
+      "current_price": 80.04,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "NVTS",
+      "signal_type": "WATCH",
+      "score": 65,
+      "sell_score": 0.0,
+      "timestamp": "2026-08-10 23:24",
+      "price": 13.17,
+      "dist_252h": -58.6,
+      "framework_score": 52,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 65,
+      "current_price": 13.17,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "MNST",
+      "signal_type": "SELL",
+      "score": 69.5,
+      "sell_score": 69.5,
+      "timestamp": "2026-08-10 23:24",
+      "price": 91.43,
+      "dist_252h": 83.0,
+      "framework_score": 72,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 69.5,
+      "current_price": 91.43,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
