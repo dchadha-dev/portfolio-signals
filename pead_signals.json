@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-08-03 04:27 UTC",
-    "tickers_checked": 24,
-    "new_signals": 4,
-    "total_signals": 15,
-    "expired_removed": 1,
+    "timestamp": "2026-08-10 03:10 UTC",
+    "tickers_checked": 25,
+    "new_signals": 7,
+    "total_signals": 22,
+    "expired_removed": 0,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 122.7
+    "elapsed_seconds": 115.9
   },
   "signals": {
     "NVDA": {
@@ -219,6 +219,104 @@
       "history_quarters": 3,
       "buy_score_boost": 10,
       "as_of": "2026-08-03"
+    },
+    "DDOG": {
+      "ticker": "DDOG",
+      "announce_date": "2026-08-06",
+      "expires_at": "2026-10-05",
+      "sue": 1.523,
+      "surprise": 0.0481,
+      "actual_eps": 0.65,
+      "estimate_eps": 0.6019,
+      "std_dev": 0.0316,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-08-10"
+    },
+    "TEAM": {
+      "ticker": "TEAM",
+      "announce_date": "2026-08-06",
+      "expires_at": "2026-10-05",
+      "sue": 1.925,
+      "surprise": 0.3368,
+      "actual_eps": 1.87,
+      "estimate_eps": 1.5332,
+      "std_dev": 0.175,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-08-10"
+    },
+    "EXPE": {
+      "ticker": "EXPE",
+      "announce_date": "2026-08-05",
+      "expires_at": "2026-10-04",
+      "sue": 4.515,
+      "surprise": 0.4905,
+      "actual_eps": 5.76,
+      "estimate_eps": 5.2695,
+      "std_dev": 0.1086,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-08-10"
+    },
+    "LLY": {
+      "ticker": "LLY",
+      "announce_date": "2026-08-05",
+      "expires_at": "2026-10-04",
+      "sue": 4.544,
+      "surprise": 2.3139,
+      "actual_eps": 8.38,
+      "estimate_eps": 6.0661,
+      "std_dev": 0.5092,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-08-10"
+    },
+    "SOUN": {
+      "ticker": "SOUN",
+      "announce_date": "2026-08-05",
+      "expires_at": "2026-10-04",
+      "sue": 1.845,
+      "surprise": 0.0369,
+      "actual_eps": -0.02,
+      "estimate_eps": -0.0569,
+      "std_dev": 0.02,
+      "std_dev_floored": true,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-08-10"
+    },
+    "ALAB": {
+      "ticker": "ALAB",
+      "announce_date": "2026-08-04",
+      "expires_at": "2026-10-03",
+      "sue": 4.755,
+      "surprise": 0.0951,
+      "actual_eps": 0.8,
+      "estimate_eps": 0.7049,
+      "std_dev": 0.02,
+      "std_dev_floored": true,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-08-10"
+    },
+    "ANET": {
+      "ticker": "ANET",
+      "announce_date": "2026-08-04",
+      "expires_at": "2026-10-03",
+      "sue": 5.87,
+      "surprise": 0.1174,
+      "actual_eps": 1.02,
+      "estimate_eps": 0.9026,
+      "std_dev": 0.02,
+      "std_dev_floored": true,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-08-10"
     }
   }
 }
