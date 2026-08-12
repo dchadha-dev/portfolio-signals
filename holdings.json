@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-07T17:31:26.070Z",
+  "updated_at": "2026-08-12T15:23:20.957Z",
   "source": "dashboard-editor",
   "stocks": [
     {
@@ -566,7 +566,7 @@
       "acct": "GTN KR",
       "currency": "KRW",
       "shares": 23,
-      "direct": 3300,
+      "direct": 4300,
       "fund": 0
     },
     {
