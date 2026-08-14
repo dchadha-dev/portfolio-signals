@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-13 23:30 UTC",
+  "timestamp": "2026-08-14 11:38 UTC",
   "run_date": "Friday 14 Aug 2026",
   "prices": {
     "BKNG": {
@@ -228,26 +228,6 @@
     },
     "MC.PA": {
       "price": 70.38,
-      "change_pct": null
-    },
-    "ACWV": {
-      "price": 126.75,
-      "change_pct": null
-    },
-    "IVV": {
-      "price": 781.47,
-      "change_pct": null
-    },
-    "INDA": {
-      "price": 49.98,
-      "change_pct": null
-    },
-    "AIQ": {
-      "price": 64.62,
-      "change_pct": null
-    },
-    "ARKG": {
-      "price": 44.32,
       "change_pct": null
     }
   }
