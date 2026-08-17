@@ -1,17 +1,17 @@
 {
   "health": {
-    "timestamp": "2026-08-10 03:14 UTC",
+    "timestamp": "2026-08-17 02:21 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
-    "n_insider_signals": 4,
+    "n_insider_signals": 3,
     "n_politician_signals": 0,
-    "n_combined_signals": 4,
-    "elapsed_seconds": 249.3,
+    "n_combined_signals": 3,
+    "elapsed_seconds": 191.2,
     "retry_required": false,
     "retry_reason": []
   },
   "signals": {
-    "MELI": {
+    "KEEL": {
       "buy_score_boost": 10,
       "insider_score": 10,
       "politician_score": 0,
@@ -22,20 +22,20 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "MELI",
-          "date": "2026-06-15",
-          "value_usd": 200000,
-          "shares": 124,
-          "price": 1604.62,
-          "name": "Melamud Marcelo",
-          "title": "Officer, SVP - Chief Accounting Officer",
+          "ticker": "KEEL",
+          "date": "2026-08-14",
+          "value_usd": 196097,
+          "shares": 58888,
+          "price": 3.33,
+          "name": "Gagnon Benjamin",
+          "title": "Director, Officer, Chief Executive Officer",
           "is_cluster": false
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-08-10"
+      "as_of": "2026-08-17"
     },
-    "ENPH": {
+    "FISV": {
       "buy_score_boost": 10,
       "insider_score": 10,
       "politician_score": 0,
@@ -46,18 +46,18 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "ENPH",
-          "date": "2026-06-15",
-          "value_usd": 53910,
-          "shares": 1000,
-          "price": 53.91,
-          "name": "Trivedi Shanker",
+          "ticker": "FISV",
+          "date": "2026-08-11",
+          "value_usd": 519500,
+          "shares": 10000,
+          "price": 51.95,
+          "name": "FRITZ LANCE M",
           "title": "Director",
           "is_cluster": false
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-08-10"
+      "as_of": "2026-08-17"
     },
     "TM": {
       "buy_score_boost": 10,
@@ -81,71 +81,7 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-08-10"
-    },
-    "TSM": {
-      "buy_score_boost": 20,
-      "insider_score": 20,
-      "politician_score": 0,
-      "insider_n": 2,
-      "insider_cluster": true,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "TSM",
-          "date": "2026-08-04",
-          "value_usd": 73060,
-          "shares": 1000,
-          "price": 73.06,
-          "name": "Tien Bor-Zen",
-          "title": "Officer, VP",
-          "is_cluster": true
-        },
-        {
-          "ticker": "TSM",
-          "date": "2026-07-30",
-          "value_usd": 67970,
-          "shares": 1000,
-          "price": 67.97,
-          "name": "Tien Bor-Zen",
-          "title": "Officer, VP",
-          "is_cluster": true
-        },
-        {
-          "ticker": "TSM",
-          "date": "2026-07-23",
-          "value_usd": 74130,
-          "shares": 1000,
-          "price": 74.13,
-          "name": "Tien Bor-Zen",
-          "title": "Officer, VP",
-          "is_cluster": true
-        },
-        {
-          "ticker": "TSM",
-          "date": "2026-07-23",
-          "value_usd": 73980,
-          "shares": 1000,
-          "price": 73.98,
-          "name": "Tien Bor-Zen",
-          "title": "Officer, VP",
-          "is_cluster": true
-        },
-        {
-          "ticker": "TSM",
-          "date": "2026-07-23",
-          "value_usd": 74440,
-          "shares": 1000,
-          "price": 74.44,
-          "name": "Tien Bor-Zen",
-          "title": "Officer, VP",
-          "is_cluster": true
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-08-10"
+      "as_of": "2026-08-17"
     }
   }
 }

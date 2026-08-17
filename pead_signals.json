@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-08-10 03:10 UTC",
-    "tickers_checked": 25,
-    "new_signals": 7,
-    "total_signals": 22,
+    "timestamp": "2026-08-17 02:18 UTC",
+    "tickers_checked": 7,
+    "new_signals": 2,
+    "total_signals": 24,
     "expired_removed": 0,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 115.9
+    "elapsed_seconds": 116.7
   },
   "signals": {
     "NVDA": {
@@ -317,6 +317,34 @@
       "history_quarters": 3,
       "buy_score_boost": 10,
       "as_of": "2026-08-10"
+    },
+    "ONDS": {
+      "ticker": "ONDS",
+      "announce_date": "2026-08-13",
+      "expires_at": "2026-10-12",
+      "sue": 2.92,
+      "surprise": 0.0584,
+      "actual_eps": -0.03,
+      "estimate_eps": -0.0884,
+      "std_dev": 0.02,
+      "std_dev_floored": true,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-08-17"
+    },
+    "NBIS": {
+      "ticker": "NBIS",
+      "announce_date": "2026-08-12",
+      "expires_at": "2026-10-11",
+      "sue": 3.069,
+      "surprise": 0.573,
+      "actual_eps": -0.12,
+      "estimate_eps": -0.693,
+      "std_dev": 0.1867,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-08-17"
     }
   }
 }
