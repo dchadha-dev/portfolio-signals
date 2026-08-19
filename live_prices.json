@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-18 23:12 UTC",
+  "timestamp": "2026-08-19 11:18 UTC",
   "run_date": "Wednesday 19 Aug 2026",
   "prices": {
     "BKNG": {
@@ -228,6 +228,106 @@
     },
     "MC.PA": {
       "price": 66.57,
+      "change_pct": null
+    },
+    "SLV": {
+      "price": 57.44,
+      "change_pct": null
+    },
+    "LIT": {
+      "price": 74.02,
+      "change_pct": null
+    },
+    "BEP": {
+      "price": 32.8,
+      "change_pct": null
+    },
+    "DNN": {
+      "price": 3.15,
+      "change_pct": null
+    },
+    "AAL": {
+      "price": 14.05,
+      "change_pct": null
+    },
+    "OWL": {
+      "price": 11.59,
+      "change_pct": null
+    },
+    "PI": {
+      "price": 168.07,
+      "change_pct": null
+    },
+    "ALGN": {
+      "price": 167.91,
+      "change_pct": null
+    },
+    "ARKG": {
+      "price": 43.21,
+      "change_pct": null
+    },
+    "BOTZ": {
+      "price": 36.55,
+      "change_pct": null
+    },
+    "AAXJ": {
+      "price": 113.55,
+      "change_pct": null
+    },
+    "SPY": {
+      "price": 767.45,
+      "change_pct": null
+    },
+    "KWEB": {
+      "price": 26.78,
+      "change_pct": null
+    },
+    "DIA": {
+      "price": 532.91,
+      "change_pct": null
+    },
+    "ARKK": {
+      "price": 79.15,
+      "change_pct": null
+    },
+    "IWF": {
+      "price": 123.07,
+      "change_pct": null
+    },
+    "IVV": {
+      "price": 770.98,
+      "change_pct": null
+    },
+    "INDA": {
+      "price": 49.38,
+      "change_pct": null
+    },
+    "ACWV": {
+      "price": 126.03,
+      "change_pct": null
+    },
+    "DRIV": {
+      "price": 34.78,
+      "change_pct": null
+    },
+    "EWJ": {
+      "price": 95.37,
+      "change_pct": null
+    },
+    "FINX": {
+      "price": 26,
+      "change_pct": null
+    },
+    "SMH": {
+      "price": 569.77,
+      "change_pct": null
+    },
+    "BLOK": {
+      "price": 59.21,
+      "change_pct": null
+    },
+    "AIQ": {
+      "price": 62.53,
       "change_pct": null
     }
   }
