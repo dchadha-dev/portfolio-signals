@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-12T15:23:20.957Z",
+  "updated_at": "2026-08-19T13:42:04.493Z",
   "source": "dashboard-editor",
   "stocks": [
     {
@@ -399,15 +399,6 @@
       "fund": 0
     },
     {
-      "t": "UNH",
-      "n": "UnitedHealth Group",
-      "acct": "GTN US",
-      "currency": "USD",
-      "shares": 2,
-      "direct": 923,
-      "fund": 0
-    },
-    {
       "t": "VOO",
       "n": "Vanguard S&P 500 ETF",
       "acct": "GTN US",
@@ -566,7 +557,7 @@
       "acct": "GTN KR",
       "currency": "KRW",
       "shares": 23,
-      "direct": 4300,
+      "direct": 3300,
       "fund": 0
     },
     {
@@ -601,6 +592,15 @@
       "n": "Astera Labs",
       "acct": "Dime",
       "shares": 4.5,
+      "direct": 0,
+      "fund": 0,
+      "currency": "USD"
+    },
+    {
+      "t": "MRNA",
+      "n": "Moderna",
+      "acct": "GTN US",
+      "shares": 13,
       "direct": 0,
       "fund": 0,
       "currency": "USD"
