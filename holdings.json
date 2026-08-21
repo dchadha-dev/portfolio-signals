@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-19T13:42:04.493Z",
+  "updated_at": "2026-08-21T15:45:26.511Z",
   "source": "dashboard-editor",
   "stocks": [
     {
@@ -601,6 +601,15 @@
       "n": "Moderna",
       "acct": "GTN US",
       "shares": 13,
+      "direct": 0,
+      "fund": 0,
+      "currency": "USD"
+    },
+    {
+      "t": "LRCX",
+      "n": "Lam Research Corp",
+      "acct": "GTN US",
+      "shares": 2.6,
       "direct": 0,
       "fund": 0,
       "currency": "USD"
