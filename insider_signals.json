@@ -1,17 +1,17 @@
 {
   "health": {
-    "timestamp": "2026-08-17 02:21 UTC",
+    "timestamp": "2026-08-24 02:25 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
-    "n_insider_signals": 3,
+    "n_insider_signals": 4,
     "n_politician_signals": 0,
-    "n_combined_signals": 3,
-    "elapsed_seconds": 191.2,
+    "n_combined_signals": 4,
+    "elapsed_seconds": 247.5,
     "retry_required": false,
     "retry_reason": []
   },
   "signals": {
-    "KEEL": {
+    "TM": {
       "buy_score_boost": 10,
       "insider_score": 10,
       "politician_score": 0,
@@ -22,18 +22,18 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "KEEL",
-          "date": "2026-08-14",
-          "value_usd": 196097,
-          "shares": 58888,
-          "price": 3.33,
-          "name": "Gagnon Benjamin",
-          "title": "Director, Officer, Chief Executive Officer",
+          "ticker": "TM",
+          "date": "2026-08-06",
+          "value_usd": 1564850,
+          "shares": 85000,
+          "price": 18.41,
+          "name": "Kon Kenta",
+          "title": "Director, Officer, President",
           "is_cluster": false
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-08-17"
+      "as_of": "2026-08-24"
     },
     "FISV": {
       "buy_score_boost": 10,
@@ -57,9 +57,63 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-08-17"
+      "as_of": "2026-08-24"
     },
-    "TM": {
+    "KEEL": {
+      "buy_score_boost": 20,
+      "insider_score": 20,
+      "politician_score": 0,
+      "insider_n": 2,
+      "insider_cluster": true,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "KEEL",
+          "date": "2026-08-21",
+          "value_usd": 129497,
+          "shares": 38888,
+          "price": 3.33,
+          "name": "Gagnon Benjamin",
+          "title": "Director, Officer, Chief Executive Officer",
+          "is_cluster": true
+        },
+        {
+          "ticker": "KEEL",
+          "date": "2026-08-20",
+          "value_usd": 99999,
+          "shares": 30769,
+          "price": 3.25,
+          "name": "WILSON LIAM DANIEL",
+          "title": "Officer, Chief Operating Officer",
+          "is_cluster": true
+        },
+        {
+          "ticker": "KEEL",
+          "date": "2026-08-17",
+          "value_usd": 100064,
+          "shares": 26472,
+          "price": 3.78,
+          "name": "WILSON LIAM DANIEL",
+          "title": "Officer, Chief Operating Officer",
+          "is_cluster": true
+        },
+        {
+          "ticker": "KEEL",
+          "date": "2026-08-14",
+          "value_usd": 196097,
+          "shares": 58888,
+          "price": 3.33,
+          "name": "Gagnon Benjamin",
+          "title": "Director, Officer, Chief Executive Officer",
+          "is_cluster": true
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-08-24"
+    },
+    "TSM": {
       "buy_score_boost": 10,
       "insider_score": 10,
       "politician_score": 0,
@@ -70,18 +124,38 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "TM",
-          "date": "2026-08-06",
-          "value_usd": 1564850,
-          "shares": 85000,
-          "price": 18.41,
-          "name": "Kon Kenta",
-          "title": "Director, Officer, President",
+          "ticker": "TSM",
+          "date": "2026-08-20",
+          "value_usd": 74500,
+          "shares": 1000,
+          "price": 74.5,
+          "name": "Yuan Lipen",
+          "title": "Officer, VP",
+          "is_cluster": false
+        },
+        {
+          "ticker": "TSM",
+          "date": "2026-08-20",
+          "value_usd": 73770,
+          "shares": 1000,
+          "price": 73.77,
+          "name": "Yuan Lipen",
+          "title": "Officer, VP",
+          "is_cluster": false
+        },
+        {
+          "ticker": "TSM",
+          "date": "2026-08-20",
+          "value_usd": 25753,
+          "shares": 350,
+          "price": 73.58,
+          "name": "Yuan Lipen",
+          "title": "Officer, VP",
           "is_cluster": false
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-08-17"
+      "as_of": "2026-08-24"
     }
   }
 }

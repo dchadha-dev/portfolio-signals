@@ -1,10 +1,10 @@
 {
   "health": {
-    "timestamp": "2026-08-17 02:18 UTC",
-    "tickers_checked": 7,
+    "timestamp": "2026-08-24 02:21 UTC",
+    "tickers_checked": 8,
     "new_signals": 2,
     "total_signals": 24,
-    "expired_removed": 0,
+    "expired_removed": 2,
     "sue_threshold": 1.5,
     "hold_days": 60,
     "elapsed_seconds": 116.7
@@ -330,7 +330,7 @@
       "std_dev_floored": true,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-08-17"
+      "as_of": "2026-08-24"
     },
     "NBIS": {
       "ticker": "NBIS",
@@ -344,7 +344,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-08-17"
+      "as_of": "2026-08-24"
     }
   }
 }
