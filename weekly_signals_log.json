@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-08-28 21:18 UTC",
+  "last_updated": "2026-08-29 03:57 UTC",
   "entries": [
     {
       "ticker": "SNDK",
@@ -213,6 +213,24 @@
       "status": "active",
       "current_score": 65.4,
       "current_price": 127.4,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "MRNA",
+      "signal_type": "WATCH",
+      "score": 83,
+      "sell_score": 9.3,
+      "timestamp": "2026-08-29 03:57",
+      "price": 137.99,
+      "dist_252h": -20.9,
+      "framework_score": 52,
+      "fdfv3": true,
+      "is_holding": true,
+      "status": "active",
+      "current_score": 83,
+      "current_price": 137.99,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
