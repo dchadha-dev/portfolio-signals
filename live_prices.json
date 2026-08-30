@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-08-29 15:24 UTC",
-  "run_date": "Saturday 29 Aug 2026",
+  "timestamp": "2026-08-30 00:52 UTC",
+  "run_date": "Sunday 30 Aug 2026",
   "prices": {
     "BKNG": {
       "price": 205.63,
@@ -228,22 +228,6 @@
     },
     "ARM": {
       "price": 239.05,
-      "change_pct": null
-    },
-    "ARKG": {
-      "price": 47.64,
-      "change_pct": null
-    },
-    "AIQ": {
-      "price": 64.22,
-      "change_pct": null
-    },
-    "IVV": {
-      "price": 773,
-      "change_pct": null
-    },
-    "DRIV": {
-      "price": 34.58,
       "change_pct": null
     }
   }
