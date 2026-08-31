@@ -1,24 +1,6 @@
 {
-  "last_updated": "2026-08-31 00:58 UTC",
+  "last_updated": "2026-08-31 17:48 UTC",
   "entries": [
-    {
-      "ticker": "SNDK",
-      "signal_type": "WATCH",
-      "score": 73,
-      "sell_score": 0.0,
-      "timestamp": "2026-08-24 11:19",
-      "price": 1596.08,
-      "dist_252h": -31.6,
-      "framework_score": 58,
-      "fdfv3": true,
-      "is_holding": false,
-      "status": "expired",
-      "current_score": 73,
-      "current_price": 1596.08,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
-      "expired_at": "2026-08-24 23:13"
-    },
     {
       "ticker": "MRNA",
       "signal_type": "WATCH",
@@ -156,12 +138,12 @@
       "framework_score": 52,
       "fdfv3": true,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 83,
       "current_price": 137.99,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 23",
+      "expired_at": "2026-08-31 17:48"
     },
     {
       "ticker": "ACWV",
@@ -192,12 +174,12 @@
       "framework_score": 52,
       "fdfv3": true,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 83,
       "current_price": 137.99,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 23",
+      "expired_at": "2026-08-31 17:48"
     },
     {
       "ticker": "MRNA",
@@ -210,12 +192,12 @@
       "framework_score": 52,
       "fdfv3": true,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 83,
       "current_price": 137.99,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 23",
+      "expired_at": "2026-08-31 17:48"
     },
     {
       "ticker": "MRNA",
@@ -228,12 +210,12 @@
       "framework_score": 52,
       "fdfv3": true,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 83,
       "current_price": 137.99,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 23",
+      "expired_at": "2026-08-31 17:48"
     }
   ]
 }
