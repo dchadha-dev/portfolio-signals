@@ -1,24 +1,6 @@
 {
-  "last_updated": "2026-09-01 01:31 UTC",
+  "last_updated": "2026-09-01 15:20 UTC",
   "entries": [
-    {
-      "ticker": "MRNA",
-      "signal_type": "WATCH",
-      "score": 83,
-      "sell_score": 8.1,
-      "timestamp": "2026-08-25 11:19",
-      "price": 138.89,
-      "dist_252h": -20.4,
-      "framework_score": 52,
-      "fdfv3": true,
-      "is_holding": true,
-      "status": "expired",
-      "current_score": 83,
-      "current_price": 138.89,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 23",
-      "expired_at": "2026-08-25 23:16"
-    },
     {
       "ticker": "CCJ",
       "signal_type": "WATCH",
