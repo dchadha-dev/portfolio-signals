@@ -1,24 +1,6 @@
 {
-  "last_updated": "2026-09-02 00:39 UTC",
+  "last_updated": "2026-09-02 14:50 UTC",
   "entries": [
-    {
-      "ticker": "CCJ",
-      "signal_type": "WATCH",
-      "score": 65,
-      "sell_score": 0.0,
-      "timestamp": "2026-08-26 11:21",
-      "price": 106.96,
-      "dist_252h": -20.2,
-      "framework_score": 68,
-      "fdfv3": true,
-      "is_holding": true,
-      "status": "expired",
-      "current_score": 65,
-      "current_price": 106.96,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 5",
-      "expired_at": "2026-08-27 04:08"
-    },
     {
       "ticker": "NXE",
       "signal_type": "WATCH",
