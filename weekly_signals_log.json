@@ -1,24 +1,6 @@
 {
-  "last_updated": "2026-09-03 00:48 UTC",
+  "last_updated": "2026-09-03 14:50 UTC",
   "entries": [
-    {
-      "ticker": "NXE",
-      "signal_type": "WATCH",
-      "score": 65,
-      "sell_score": 0.0,
-      "timestamp": "2026-08-27 04:08",
-      "price": 11.07,
-      "dist_252h": -20.5,
-      "framework_score": 52,
-      "fdfv3": true,
-      "is_holding": false,
-      "status": "expired",
-      "current_score": 65,
-      "current_price": 11.07,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 5",
-      "expired_at": "2026-08-27 20:53"
-    },
     {
       "ticker": "CCJ",
       "signal_type": "WATCH",
@@ -144,6 +126,24 @@
       "expire_reason": "dfv3_faded",
       "expire_detail": "DFV V3 lift dropped \u00b7 score 23",
       "expired_at": "2026-08-31 17:48"
+    },
+    {
+      "ticker": "SNOW",
+      "signal_type": "SELL",
+      "score": 67.0,
+      "sell_score": 67.0,
+      "timestamp": "2026-09-03 14:50",
+      "price": 370.3,
+      "dist_252h": 9.8,
+      "framework_score": 65,
+      "fdfv3": false,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 67.0,
+      "current_price": 370.3,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
     }
   ]
 }
