@@ -1,24 +1,6 @@
 {
-  "last_updated": "2026-09-04 00:30 UTC",
+  "last_updated": "2026-09-04 14:38 UTC",
   "entries": [
-    {
-      "ticker": "CCJ",
-      "signal_type": "WATCH",
-      "score": 65,
-      "sell_score": 0.0,
-      "timestamp": "2026-08-28 06:26",
-      "price": 106.33,
-      "dist_252h": -20.7,
-      "framework_score": 68,
-      "fdfv3": true,
-      "is_holding": true,
-      "status": "expired",
-      "current_score": 65,
-      "current_price": 106.33,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 0",
-      "expired_at": "2026-08-28 21:18"
-    },
     {
       "ticker": "MRNA",
       "signal_type": "WATCH",
@@ -126,6 +108,42 @@
       "expire_reason": "sell_cleared",
       "expire_detail": "sell score dropped to 2",
       "expired_at": "2026-09-04 00:30"
+    },
+    {
+      "ticker": "ALAB",
+      "signal_type": "WATCH",
+      "score": 75,
+      "sell_score": 0.0,
+      "timestamp": "2026-09-04 14:38",
+      "price": 314.95,
+      "dist_252h": -34.8,
+      "framework_score": 72,
+      "fdfv3": true,
+      "is_holding": true,
+      "status": "active",
+      "current_score": 75,
+      "current_price": 314.95,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "BE",
+      "signal_type": "WATCH",
+      "score": 73,
+      "sell_score": 0.0,
+      "timestamp": "2026-09-04 14:38",
+      "price": 243.94,
+      "dist_252h": -29.5,
+      "framework_score": 48,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 73,
+      "current_price": 243.94,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
     }
   ]
 }
