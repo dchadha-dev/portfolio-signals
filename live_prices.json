@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-05 00:28 UTC",
+  "timestamp": "2026-09-05 13:37 UTC",
   "run_date": "Saturday 05 Sep 2026",
   "prices": {
     "BKNG": {
@@ -182,10 +182,6 @@
       "price": 718.96,
       "change_pct": null
     },
-    "VXUS": {
-      "price": 88.41,
-      "change_pct": null
-    },
     "GLD": {
       "price": 406.77,
       "change_pct": null
@@ -228,6 +224,10 @@
     },
     "ARM": {
       "price": 252.09,
+      "change_pct": null
+    },
+    "MRVL": {
+      "price": 223.55,
       "change_pct": null
     }
   }

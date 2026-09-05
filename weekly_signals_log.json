@@ -1,24 +1,6 @@
 {
-  "last_updated": "2026-09-05 00:28 UTC",
+  "last_updated": "2026-09-05 13:37 UTC",
   "entries": [
-    {
-      "ticker": "MRNA",
-      "signal_type": "WATCH",
-      "score": 83,
-      "sell_score": 9.3,
-      "timestamp": "2026-08-29 03:57",
-      "price": 137.99,
-      "dist_252h": -20.9,
-      "framework_score": 52,
-      "fdfv3": true,
-      "is_holding": true,
-      "status": "expired",
-      "current_score": 83,
-      "current_price": 137.99,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 23",
-      "expired_at": "2026-08-31 17:48"
-    },
     {
       "ticker": "MRNA",
       "signal_type": "WATCH",
@@ -104,7 +86,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 235.55,
+      "current_price": 252.87,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -122,7 +104,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 235.55,
+      "current_price": 252.87,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -138,12 +120,12 @@
       "framework_score": 65,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 68.7,
       "current_price": 356.47,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 14",
+      "expired_at": "2026-09-05 13:37"
     },
     {
       "ticker": "ACWV",
@@ -159,6 +141,42 @@
       "status": "active",
       "current_score": 68.4,
       "current_price": 128.22,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "VRT",
+      "signal_type": "WATCH",
+      "score": 73,
+      "sell_score": 0.0,
+      "timestamp": "2026-09-05 13:37",
+      "price": 280.53,
+      "dist_252h": -25.4,
+      "framework_score": 77,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 73,
+      "current_price": 280.53,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "SNDK",
+      "signal_type": "WATCH",
+      "score": 73,
+      "sell_score": 0.0,
+      "timestamp": "2026-09-05 13:37",
+      "price": 1740.0,
+      "dist_252h": -25.5,
+      "framework_score": 58,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 73,
+      "current_price": 1740.0,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
