@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-21T15:45:26.511Z",
+  "updated_at": "2026-09-05T12:16:06.328Z",
   "source": "dashboard-editor",
   "stocks": [
     {
@@ -423,15 +423,6 @@
       "currency": "USD",
       "shares": 3,
       "direct": 1440,
-      "fund": 0
-    },
-    {
-      "t": "VXUS",
-      "n": "Vanguard Total Intl",
-      "acct": "US Stock Account",
-      "currency": "USD",
-      "shares": 25,
-      "direct": 2050,
       "fund": 0
     },
     {
