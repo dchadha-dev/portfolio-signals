@@ -1,16 +1,98 @@
 {
   "health": {
-    "timestamp": "2026-08-31 06:37 UTC",
+    "timestamp": "2026-09-07 05:39 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
-    "n_insider_signals": 4,
+    "n_insider_signals": 5,
     "n_politician_signals": 0,
-    "n_combined_signals": 4,
-    "elapsed_seconds": 246.8,
+    "n_combined_signals": 5,
+    "elapsed_seconds": 198.9,
     "retry_required": false,
     "retry_reason": []
   },
   "signals": {
+    "FISV": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "FISV",
+          "date": "2026-08-11",
+          "value_usd": 519500,
+          "shares": 10000,
+          "price": 51.95,
+          "name": "FRITZ LANCE M",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-09-07"
+    },
+    "TSM": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "TSM",
+          "date": "2026-09-04",
+          "value_usd": 77090,
+          "shares": 1000,
+          "price": 77.09,
+          "name": "Fang Shu-Hua",
+          "title": "Officer, SVP and GC",
+          "is_cluster": false
+        },
+        {
+          "ticker": "TSM",
+          "date": "2026-09-04",
+          "value_usd": 77090,
+          "shares": 1000,
+          "price": 77.09,
+          "name": "Fang Shu-Hua",
+          "title": "Officer, SVP and GC",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-09-07"
+    },
+    "MSCI": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "MSCI",
+          "date": "2026-09-04",
+          "value_usd": 1000160,
+          "shares": 1786,
+          "price": 560.0,
+          "name": "Taneja Rajat",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-09-07"
+    },
     "BABA": {
       "buy_score_boost": 20,
       "insider_score": 20,
@@ -53,31 +135,7 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-08-31"
-    },
-    "FISV": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "FISV",
-          "date": "2026-08-11",
-          "value_usd": 519500,
-          "shares": 10000,
-          "price": 51.95,
-          "name": "FRITZ LANCE M",
-          "title": "Director",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-08-31"
+      "as_of": "2026-09-07"
     },
     "KEEL": {
       "buy_score_boost": 20,
@@ -131,51 +189,7 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-08-31"
-    },
-    "TSM": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "TSM",
-          "date": "2026-08-20",
-          "value_usd": 74500,
-          "shares": 1000,
-          "price": 74.5,
-          "name": "Yuan Lipen",
-          "title": "Officer, VP",
-          "is_cluster": false
-        },
-        {
-          "ticker": "TSM",
-          "date": "2026-08-20",
-          "value_usd": 73770,
-          "shares": 1000,
-          "price": 73.77,
-          "name": "Yuan Lipen",
-          "title": "Officer, VP",
-          "is_cluster": false
-        },
-        {
-          "ticker": "TSM",
-          "date": "2026-08-20",
-          "value_usd": 25753,
-          "shares": 350,
-          "price": 73.58,
-          "name": "Yuan Lipen",
-          "title": "Officer, VP",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-08-31"
+      "as_of": "2026-09-07"
     }
   }
 }

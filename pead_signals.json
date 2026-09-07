@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-08-31 06:33 UTC",
-    "tickers_checked": 6,
-    "new_signals": 3,
-    "total_signals": 18,
-    "expired_removed": 0,
+    "timestamp": "2026-09-07 05:35 UTC",
+    "tickers_checked": 11,
+    "new_signals": 5,
+    "total_signals": 20,
+    "expired_removed": 3,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 120.5
+    "elapsed_seconds": 116.9
   },
   "signals": {
     "ISRG": {
@@ -232,7 +232,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-08-31"
+      "as_of": "2026-09-07"
     },
     "NVDA": {
       "ticker": "NVDA",
@@ -246,7 +246,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-08-31"
+      "as_of": "2026-09-07"
     },
     "INTU": {
       "ticker": "INTU",
@@ -260,7 +260,35 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-08-31"
+      "as_of": "2026-09-07"
+    },
+    "SNOW": {
+      "ticker": "SNOW",
+      "announce_date": "2026-09-02",
+      "expires_at": "2026-11-01",
+      "sue": 8.24,
+      "surprise": 0.1648,
+      "actual_eps": 0.62,
+      "estimate_eps": 0.4552,
+      "std_dev": 0.02,
+      "std_dev_floored": true,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-09-07"
+    },
+    "DELL": {
+      "ticker": "DELL",
+      "announce_date": "2026-09-01",
+      "expires_at": "2026-10-31",
+      "sue": 2.075,
+      "surprise": 2.028,
+      "actual_eps": 7.04,
+      "estimate_eps": 5.012,
+      "std_dev": 0.9771,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-09-07"
     }
   }
 }
