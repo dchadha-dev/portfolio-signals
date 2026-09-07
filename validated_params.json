@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-06T22:20:05Z",
+  "generated_at": "2026-09-07T22:34:01Z",
   "p_threshold": 0.15,
   "n_cv_windows": 12,
   "universe_size": 159,
@@ -143,11 +143,11 @@
       "win_rate": 0.75
     },
     "mfbear": {
-      "mean_sep": 0.0734,
+      "mean_sep": 0.0733,
       "std": 0.0724,
       "ci_lo": 0.0314,
-      "ci_hi": 0.1082,
-      "p_value": 0.0063,
+      "ci_hi": 0.1081,
+      "p_value": 0.0064,
       "significant": true,
       "n_wins": 9,
       "n_windows": 12,
@@ -263,8 +263,8 @@
     {
       "signal": "mfbear",
       "name": "MFI bearish div",
-      "mean_sep_252d": 7.34,
-      "p_value": 0.0063,
+      "mean_sep_252d": 7.33,
+      "p_value": 0.0064,
       "consistency": 0,
       "validated": false,
       "weight": 0
