@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-05T12:16:06.328Z",
+  "updated_at": "2026-09-12T08:55:07.105Z",
   "source": "dashboard-editor",
   "stocks": [
     {
@@ -178,7 +178,7 @@
       "n": "Arista Networks",
       "acct": "Dime",
       "currency": "USD",
-      "shares": 7.47,
+      "shares": 17.47,
       "direct": 3182,
       "fund": 0
     },
