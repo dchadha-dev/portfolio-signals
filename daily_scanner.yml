@@ -2,8 +2,10 @@ name: Daily Signal Scanner
 
 on:
   schedule:
-    - cron: '0 23 * * *'   # 6am Bangkok (UTC+7)
-    - cron: '0 11 * * *'   # 6pm Bangkok (UTC+7)
+    # Times are UTC. US market opens 13:30 UTC (EDT) / 14:30 UTC (EST).
+    - cron: '0 23 * * 2-6'    # 06:00 BKK — after US close (post-close prices)
+    - cron: '32 13 * * 1-5'   # 20:32 BKK — 2 min after US open (EDT)
+                              # When US clocks change in Nov, switch to '32 14'
   workflow_dispatch:        # manual trigger
   push:
     branches:

@@ -12,6 +12,12 @@
   # (3.14 has none, which is what broke the build.)
   PYTHON_VERSION = "3.12"
 
+# Warm the cached snapshot ~15 min after each scanner run so the endpoint
+# is always fresh before you check it. UTC — see daily_scanner.yml for the
+# market-open reasoning.
+[functions."trigger_refresh"]
+  schedule = "36 13 * * 1-5"  # 20:36 BKK — just after the scanner run
+
 [functions]
   node_bundler = "esbuild"
   external_node_modules = ["@netlify/blobs"]
