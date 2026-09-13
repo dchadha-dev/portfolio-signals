@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-12T15:23:20.957Z",
+  "updated_at": "2026-09-12T08:55:07.105Z",
   "source": "dashboard-editor",
   "stocks": [
     {
@@ -178,7 +178,7 @@
       "n": "Arista Networks",
       "acct": "Dime",
       "currency": "USD",
-      "shares": 7.47,
+      "shares": 17.47,
       "direct": 3182,
       "fund": 0
     },
@@ -399,15 +399,6 @@
       "fund": 0
     },
     {
-      "t": "UNH",
-      "n": "UnitedHealth Group",
-      "acct": "GTN US",
-      "currency": "USD",
-      "shares": 2,
-      "direct": 923,
-      "fund": 0
-    },
-    {
       "t": "VOO",
       "n": "Vanguard S&P 500 ETF",
       "acct": "GTN US",
@@ -432,15 +423,6 @@
       "currency": "USD",
       "shares": 3,
       "direct": 1440,
-      "fund": 0
-    },
-    {
-      "t": "VXUS",
-      "n": "Vanguard Total Intl",
-      "acct": "US Stock Account",
-      "currency": "USD",
-      "shares": 25,
-      "direct": 2050,
       "fund": 0
     },
     {
@@ -566,7 +548,7 @@
       "acct": "GTN KR",
       "currency": "KRW",
       "shares": 23,
-      "direct": 4300,
+      "direct": 3300,
       "fund": 0
     },
     {
@@ -601,6 +583,24 @@
       "n": "Astera Labs",
       "acct": "Dime",
       "shares": 4.5,
+      "direct": 0,
+      "fund": 0,
+      "currency": "USD"
+    },
+    {
+      "t": "MRNA",
+      "n": "Moderna",
+      "acct": "GTN US",
+      "shares": 13,
+      "direct": 0,
+      "fund": 0,
+      "currency": "USD"
+    },
+    {
+      "t": "LRCX",
+      "n": "Lam Research Corp",
+      "acct": "GTN US",
+      "shares": 2.6,
       "direct": 0,
       "fund": 0,
       "currency": "USD"
