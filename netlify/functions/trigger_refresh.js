@@ -26,6 +26,21 @@ async function loadTickers() {
   }
 }
 
+/** Fallback source: live_prices.json committed by the scanner 2x daily.
+ *  Lets this function work with no FINNHUB_TOKEN configured at all. */
+async function loadScannerPrices() {
+  const url = `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/live_prices.json?t=${Date.now()}`;
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`live_prices.json HTTP ${r.status}`);
+  const j = await r.json();
+  const out = {};
+  Object.entries(j.prices || {}).forEach(([t, v]) => {
+    if (v && v.price) out[t] = { price: v.price, change_pct: v.change_pct || 0, stale: false };
+  });
+  if (!Object.keys(out).length) throw new Error('live_prices.json empty');
+  return { prices: out, source: 'scanner', scanner_timestamp: j.timestamp || j.run_date || null };
+}
+
 async function fetchQuote(ticker) {
   const url = `https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(ticker)}&token=${FINNHUB_KEY}`;
   const ctrl = new AbortController();
@@ -51,12 +66,33 @@ export default async (req, context) => {
   };
   if (req.method === 'OPTIONS') return new Response('', { status: 204, headers: cors });
 
+  const store = getStore('portfolio');
+
+  // No Finnhub key? Cache the scanner's committed prices instead. Slightly
+  // less fresh, but zero configuration and still serves the crawler use case.
   if (!FINNHUB_KEY) {
-    return new Response(JSON.stringify({ error: 'FINNHUB_TOKEN not configured' }),
-                        { status: 500, headers: cors });
+    try {
+      const fb = await loadScannerPrices();
+      const snapshot = {
+        timestamp:    new Date().toISOString(),
+        source:       'scanner-fallback',
+        note:         'FINNHUB_TOKEN not set — served from live_prices.json',
+        scanner_timestamp: fb.scanner_timestamp,
+        ticker_count: Object.keys(fb.prices).length,
+        live_count:   Object.keys(fb.prices).length,
+        rate_limited: 0,
+        failed:       [],
+        prices:       fb.prices,
+      };
+      await store.setJSON('latest', snapshot);
+      return new Response(JSON.stringify(snapshot), { status: 200, headers: cors });
+    } catch (e) {
+      return new Response(JSON.stringify({
+        error: 'no FINNHUB_TOKEN and scanner fallback failed: ' + e.message
+      }), { status: 502, headers: cors });
+    }
   }
 
-  const store   = getStore('portfolio');
   const tickers = await loadTickers();
 
   if (!tickers.length) {

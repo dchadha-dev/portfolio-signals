@@ -1,18 +1,21 @@
 [build]
   publish = "."
   functions = "netlify/functions"
+  # Only rebuild when the site itself changes. Scanner data commits
+  # (signals_payload.json, live_prices.json) no longer burn build credits.
+  ignore = "git diff --quiet HEAD^ HEAD -- index.html netlify/ netlify.toml package.json robots.txt _headers"
 
-# Netlify Blobs needs this package available to the functions bundle.
+[build.environment]
+  # requirements.txt in the repo root makes Netlify install Python deps.
+  # Those are for the GitHub Actions scanner, not this site, but the install
+  # still runs — so pin a version where prebuilt pandas wheels exist.
+  # (3.14 has none, which is what broke the build.)
+  PYTHON_VERSION = "3.12"
+
 [functions]
   node_bundler = "esbuild"
   external_node_modules = ["@netlify/blobs"]
 
-# Scheduled warm-up so the cached snapshot is fresh before the
-# 7:00 and 20:30 Bangkok (UTC+7) checks — i.e. 23:30 and 13:00 UTC.
-[functions."trigger_refresh"]
-  schedule = "30 23,12 * * *"
-
-# Do not fingerprint or cache the shell — data comes from functions/GitHub.
 [[headers]]
   for = "/*"
   [headers.values]
