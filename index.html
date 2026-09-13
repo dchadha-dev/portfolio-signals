@@ -4371,6 +4371,39 @@ setTimeout(async () => {
     return false;
   }
 
+  // Helper: fetch the server-side cached snapshot from Netlify Blobs.
+  // Instant, unauthenticated, and works for headless crawlers that never
+  // click anything. Tried before GitHub because it is the freshest source.
+  async function fetchNetlifyPrices() {
+    try {
+      const r = await fetch('/.netlify/functions/get_latest_portfolio?t=' + Date.now());
+      if (!r.ok) return false;
+      const data = await r.json();
+      if (!data || !data.prices || !Object.keys(data.prices).length) return false;
+      Object.entries(data.prices).forEach(([t, v]) => {
+        if (v && v.price) prices[t] = { price: v.price, change: v.change_pct || 0, stale: !!v.stale };
+      });
+      localStorage.setItem('prices_cache', JSON.stringify(prices));
+      localStorage.setItem('prices_cache_ts', Date.now().toString());
+      renderEverything();
+      const age = data.age_minutes != null ? `${data.age_minutes}m ago` : 'recently';
+      if (lu) lu.textContent = `Prices from ${age} · server cache`;
+      timerSecs = 3600; restartTimer();
+      return true;
+    } catch (e) { return false; }
+  }
+
+  // Kick off a background server-side refresh. Fire-and-forget: the function
+  // takes ~1min for a full ticker sweep, so we do not await it on page load.
+  function triggerServerRefresh() {
+    try {
+      fetch('/.netlify/functions/trigger_refresh', { method: 'POST' })
+        .then(r => r.ok ? r.json() : null)
+        .then(d => { if (d && d.prices) fetchNetlifyPrices(); })
+        .catch(() => {});
+    } catch (e) {}
+  }
+
   if (cached && ageMs < ONE_HR) {
     // Fresh cache — use immediately
     prices = {...FALLBACK, ...cached};
@@ -4384,15 +4417,27 @@ setTimeout(async () => {
     prices = {...FALLBACK, ...cached};
     renderEverything();
     if (lu) lu.textContent = `Prices from ${ageMin}m ago · updating…`;
-    fetchGitHubPrices();
+    // Prefer the server cache, fall back to the scanner file.
+    fetchNetlifyPrices().then(ok => { if (!ok) fetchGitHubPrices(); });
 
   } else {
-    // No cache or >4hrs — fetch GitHub immediately
-    if (lu) lu.textContent = 'Fetching prices from scanner…';
-    const ok = await fetchGitHubPrices();
+    // No cache or >4hrs old — walk the full chain automatically so the page
+    // is never left showing the "Click Refresh" placeholder. No click needed.
+    if (lu) lu.textContent = 'Loading prices…';
+
+    let ok = await fetchNetlifyPrices();          // 1. Netlify server cache
+    if (!ok) ok = await fetchGitHubPrices();      // 2. scanner live_prices.json
+
     if (!ok) {
-      // GitHub failed — fall back to Finnhub
-      if (lu) lu.textContent = 'GitHub unavailable · tap Refresh for live prices';
+      // 3. Nothing cached anywhere — ask the server to build a snapshot and
+      //    fetch live from the browser in parallel.
+      if (lu) lu.textContent = 'Building price snapshot… (up to 2 min)';
+      triggerServerRefresh();
+      try { await refreshPrices(); }
+      catch (e) { if (lu) lu.textContent = 'Price sources unavailable · tap Refresh to retry'; }
+    } else {
+      // Served from cache — top it up in the background for next time.
+      triggerServerRefresh();
     }
   }
 }, 300);

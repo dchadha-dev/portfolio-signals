@@ -1,25 +1,30 @@
-# Static site — no build step needed.
-# Python runs on GitHub Actions only, not here.
 [build]
   publish = "."
-  command = "echo 'No build needed'"
-  ignore = "exit 1"
+  functions = "netlify/functions"
 
-[build.environment]
-  PYTHON_VERSION = "3.12"
+# Netlify Blobs needs this package available to the functions bundle.
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["@netlify/blobs"]
 
+# Scheduled warm-up so the cached snapshot is fresh before the
+# 7:00 and 20:30 Bangkok (UTC+7) checks — i.e. 23:30 and 13:00 UTC.
+[functions."trigger_refresh"]
+  schedule = "30 23,12 * * *"
+
+# Do not fingerprint or cache the shell — data comes from functions/GitHub.
 [[headers]]
-  for = "/signals_payload.json"
+  for = "/*"
   [headers.values]
-    Cache-Control = "no-cache, no-store, must-revalidate"
+    X-Robots-Tag = "all"
     Access-Control-Allow-Origin = "*"
 
 [[headers]]
-  for = "/validated_params.json"
+  for = "/index.html"
   [headers.values]
-    Cache-Control = "no-cache, no-store, must-revalidate"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
-  for = "/validation_report.html"
+  for = "/.netlify/functions/*"
   [headers.values]
-    Cache-Control = "no-cache, no-store, must-revalidate"
+    Access-Control-Allow-Origin = "*"

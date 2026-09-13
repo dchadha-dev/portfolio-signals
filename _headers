@@ -1,0 +1,6 @@
+/*
+  X-Robots-Tag: all
+  Access-Control-Allow-Origin: *
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
