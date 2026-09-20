@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-20 00:29 UTC",
+  "timestamp": "2026-09-20 14:25 UTC",
   "run_date": "Sunday 20 Sep 2026",
   "prices": {
     "BKNG": {
@@ -228,6 +228,90 @@
     },
     "MRVL": {
       "price": 244.25,
+      "change_pct": null
+    },
+    "AAL": {
+      "price": 12.96,
+      "change_pct": null
+    },
+    "OWL": {
+      "price": 9.84,
+      "change_pct": null
+    },
+    "PI": {
+      "price": 181.23,
+      "change_pct": null
+    },
+    "ALGN": {
+      "price": 147.61,
+      "change_pct": null
+    },
+    "SMH": {
+      "price": 573,
+      "change_pct": null
+    },
+    "BLOK": {
+      "price": 64.86,
+      "change_pct": null
+    },
+    "SPY": {
+      "price": 761.69,
+      "change_pct": null
+    },
+    "ACWV": {
+      "price": 124.93,
+      "change_pct": null
+    },
+    "IVV": {
+      "price": 764.92,
+      "change_pct": null
+    },
+    "ARKK": {
+      "price": 88.23,
+      "change_pct": null
+    },
+    "FINX": {
+      "price": 25.77,
+      "change_pct": null
+    },
+    "IWF": {
+      "price": 123.25,
+      "change_pct": null
+    },
+    "INDA": {
+      "price": 48.02,
+      "change_pct": null
+    },
+    "AAXJ": {
+      "price": 116.24,
+      "change_pct": null
+    },
+    "DIA": {
+      "price": 515.88,
+      "change_pct": null
+    },
+    "BOTZ": {
+      "price": 35.11,
+      "change_pct": null
+    },
+    "EWJ": {
+      "price": 97,
+      "change_pct": null
+    },
+    "ARKG": {
+      "price": 51.64,
+      "change_pct": null
+    },
+    "DRIV": {
+      "price": 33.52,
+      "change_pct": null
+    },
+    "KWEB": {
+      "price": 24.83,
+      "change_pct": null
+    },
+    "AIQ": {
+      "price": 64.13,
       "change_pct": null
     }
   }
