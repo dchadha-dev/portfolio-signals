@@ -1,43 +1,15 @@
 {
   "health": {
-    "timestamp": "2026-09-14 05:39 UTC",
-    "tickers_checked": 8,
-    "new_signals": 2,
-    "total_signals": 20,
-    "expired_removed": 2,
+    "timestamp": "2026-09-21 05:47 UTC",
+    "tickers_checked": 2,
+    "new_signals": 0,
+    "total_signals": 18,
+    "expired_removed": 0,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 115.2
+    "elapsed_seconds": 110.4
   },
   "signals": {
-    "ISRG": {
-      "ticker": "ISRG",
-      "announce_date": "2026-07-16",
-      "expires_at": "2026-09-14",
-      "sue": 3.031,
-      "surprise": 0.2497,
-      "actual_eps": 2.8,
-      "estimate_eps": 2.5503,
-      "std_dev": 0.0824,
-      "std_dev_floored": false,
-      "history_quarters": 3,
-      "buy_score_boost": 10,
-      "as_of": "2026-07-27"
-    },
-    "UNH": {
-      "ticker": "UNH",
-      "announce_date": "2026-07-16",
-      "expires_at": "2026-09-14",
-      "sue": 4.455,
-      "surprise": 1.4267,
-      "actual_eps": 6.38,
-      "estimate_eps": 4.9533,
-      "std_dev": 0.3203,
-      "std_dev_floored": false,
-      "history_quarters": 3,
-      "buy_score_boost": 10,
-      "as_of": "2026-07-27"
-    },
     "TMO": {
       "ticker": "TMO",
       "announce_date": "2026-07-23",

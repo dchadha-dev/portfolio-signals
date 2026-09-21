@@ -1,22 +1,22 @@
 {
   "health": {
-    "timestamp": "2026-09-14 05:44 UTC",
+    "timestamp": "2026-09-21 05:51 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
     "n_insider_signals": 5,
     "n_politician_signals": 0,
     "n_combined_signals": 5,
-    "elapsed_seconds": 266.5,
+    "elapsed_seconds": 204.6,
     "retry_required": false,
     "retry_reason": []
   },
   "signals": {
     "UBER": {
-      "buy_score_boost": 20,
-      "insider_score": 20,
+      "buy_score_boost": 10,
+      "insider_score": 10,
       "politician_score": 0,
-      "insider_n": 2,
-      "insider_cluster": true,
+      "insider_n": 1,
+      "insider_cluster": false,
       "politician_n": 0,
       "politician_cluster": false,
       "reporting_lag_days": null,
@@ -29,55 +29,11 @@
           "price": 70.96,
           "name": "KHOSROWSHAHI DARA",
           "title": "Director, Officer, Chief Executive Officer",
-          "is_cluster": true
-        },
-        {
-          "ticker": "UBER",
-          "date": "2026-09-08",
-          "value_usd": 4109827,
-          "shares": 54325,
-          "price": 75.65,
-          "name": "Macdonald Andrew",
-          "title": "Officer, See Remarks",
-          "is_cluster": true
-        },
-        {
-          "ticker": "UBER",
-          "date": "2026-09-08",
-          "value_usd": 1198236,
-          "shares": 15675,
-          "price": 76.44,
-          "name": "Macdonald Andrew",
-          "title": "Officer, See Remarks",
-          "is_cluster": true
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-09-14"
-    },
-    "FISV": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "FISV",
-          "date": "2026-08-11",
-          "value_usd": 519500,
-          "shares": 10000,
-          "price": 51.95,
-          "name": "FRITZ LANCE M",
-          "title": "Director",
           "is_cluster": false
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-09-14"
+      "as_of": "2026-09-21"
     },
     "MSCI": {
       "buy_score_boost": 10,
@@ -101,51 +57,31 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-09-14"
+      "as_of": "2026-09-21"
     },
-    "BABA": {
-      "buy_score_boost": 20,
-      "insider_score": 20,
+    "FISV": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
       "politician_score": 0,
-      "insider_n": 2,
-      "insider_cluster": true,
+      "insider_n": 1,
+      "insider_cluster": false,
       "politician_n": 0,
       "politician_cluster": false,
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "BABA",
-          "date": "2026-08-25",
-          "value_usd": 10418400,
-          "shares": 720000,
-          "price": 14.47,
-          "name": "Tsai Joseph C",
+          "ticker": "FISV",
+          "date": "2026-08-11",
+          "value_usd": 519500,
+          "shares": 10000,
+          "price": 51.95,
+          "name": "FRITZ LANCE M",
           "title": "Director",
-          "is_cluster": true
-        },
-        {
-          "ticker": "BABA",
-          "date": "2026-08-24",
-          "value_usd": 10288800,
-          "shares": 720000,
-          "price": 14.29,
-          "name": "Tsai Joseph C",
-          "title": "Director",
-          "is_cluster": true
-        },
-        {
-          "ticker": "BABA",
-          "date": "2026-08-24",
-          "value_usd": 4984000,
-          "shares": 350000,
-          "price": 14.24,
-          "name": "Wu Yongming",
-          "title": "Director, Officer, Chief Executive Officer",
-          "is_cluster": true
+          "is_cluster": false
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-09-14"
+      "as_of": "2026-09-21"
     },
     "KEEL": {
       "buy_score_boost": 20,
@@ -199,7 +135,51 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-09-14"
+      "as_of": "2026-09-21"
+    },
+    "BABA": {
+      "buy_score_boost": 20,
+      "insider_score": 20,
+      "politician_score": 0,
+      "insider_n": 2,
+      "insider_cluster": true,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "BABA",
+          "date": "2026-08-25",
+          "value_usd": 10418400,
+          "shares": 720000,
+          "price": 14.47,
+          "name": "Tsai Joseph C",
+          "title": "Director",
+          "is_cluster": true
+        },
+        {
+          "ticker": "BABA",
+          "date": "2026-08-24",
+          "value_usd": 10288800,
+          "shares": 720000,
+          "price": 14.29,
+          "name": "Tsai Joseph C",
+          "title": "Director",
+          "is_cluster": true
+        },
+        {
+          "ticker": "BABA",
+          "date": "2026-08-24",
+          "value_usd": 4984000,
+          "shares": 350000,
+          "price": 14.24,
+          "name": "Wu Yongming",
+          "title": "Director, Officer, Chief Executive Officer",
+          "is_cluster": true
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-09-21"
     }
   }
 }
