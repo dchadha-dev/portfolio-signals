@@ -1,24 +1,6 @@
 {
-  "last_updated": "2026-09-23 01:01 UTC",
+  "last_updated": "2026-09-23 15:15 UTC",
   "entries": [
-    {
-      "ticker": "INTC",
-      "signal_type": "WATCH",
-      "score": 73,
-      "sell_score": 0.0,
-      "timestamp": "2026-09-16 15:14",
-      "price": 101.48,
-      "dist_252h": -28.0,
-      "framework_score": 42,
-      "fdfv3": true,
-      "is_holding": false,
-      "status": "expired",
-      "current_score": 73,
-      "current_price": 101.48,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
-      "expired_at": "2026-09-17 00:57"
-    },
     {
       "ticker": "DDOG",
       "signal_type": "WATCH",
@@ -175,8 +157,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 63,
-      "current_price": 233.82,
+      "current_score": 73,
+      "current_price": 233.7,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -210,12 +192,12 @@
       "framework_score": 58,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 119.31,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
+      "expired_at": "2026-09-23 15:15"
     },
     {
       "ticker": "VICR",
@@ -230,7 +212,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 223.9,
+      "current_price": 275.15,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -247,8 +229,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 63,
-      "current_price": 233.82,
+      "current_score": 73,
+      "current_price": 233.7,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -264,12 +246,12 @@
       "framework_score": 58,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 119.31,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
+      "expired_at": "2026-09-23 15:15"
     },
     {
       "ticker": "VICR",
@@ -284,7 +266,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 223.9,
+      "current_price": 275.15,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -302,7 +284,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 65,
-      "current_price": 333.2,
+      "current_price": 326.89,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -372,12 +354,12 @@
       "framework_score": 68,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 63,
       "current_price": 321.52,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-09-23 15:15"
     },
     {
       "ticker": "SNDK",
@@ -409,8 +391,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 63,
-      "current_price": 233.82,
+      "current_score": 73,
+      "current_price": 233.7,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -480,12 +462,12 @@
       "framework_score": 68,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 63,
       "current_price": 321.52,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-09-23 15:15"
     },
     {
       "ticker": "SNDK",
@@ -516,12 +498,12 @@
       "framework_score": 58,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 119.31,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
+      "expired_at": "2026-09-23 15:15"
     },
     {
       "ticker": "VICR",
@@ -536,7 +518,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 223.9,
+      "current_price": 275.15,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -553,8 +535,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 63,
-      "current_price": 233.82,
+      "current_score": 73,
+      "current_price": 233.7,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -624,12 +606,12 @@
       "framework_score": 68,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 63,
       "current_price": 321.52,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-09-23 15:15"
     },
     {
       "ticker": "SNDK",
@@ -660,12 +642,12 @@
       "framework_score": 58,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 119.31,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
+      "expired_at": "2026-09-23 15:15"
     },
     {
       "ticker": "VICR",
@@ -680,7 +662,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 223.9,
+      "current_price": 275.15,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -734,7 +716,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 65,
-      "current_price": 333.2,
+      "current_price": 326.89,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -769,8 +751,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 63,
-      "current_price": 233.82,
+      "current_score": 73,
+      "current_price": 233.7,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -840,12 +822,12 @@
       "framework_score": 68,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 63,
       "current_price": 321.52,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-09-23 15:15"
     },
     {
       "ticker": "SNDK",
@@ -860,7 +842,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 1766.64,
+      "current_price": 1841.89,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -876,12 +858,12 @@
       "framework_score": 58,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 119.31,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
+      "expired_at": "2026-09-23 15:15"
     },
     {
       "ticker": "VICR",
@@ -896,7 +878,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 223.9,
+      "current_price": 275.15,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -914,7 +896,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 83,
-      "current_price": 188.32,
+      "current_price": 187.12,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -932,7 +914,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 83,
-      "current_price": 302.28,
+      "current_price": 306.24,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -950,7 +932,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 76,
-      "current_price": 472.46,
+      "current_price": 473.17,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -968,7 +950,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 65,
-      "current_price": 333.2,
+      "current_price": 326.89,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -984,12 +966,12 @@
       "framework_score": 48,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 14.61,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 40",
+      "expired_at": "2026-09-23 15:15"
     },
     {
       "ticker": "LSCC",
@@ -1003,8 +985,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 65,
-      "current_price": 117.24,
+      "current_score": 55,
+      "current_price": 121.99,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1040,7 +1022,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 76,
-      "current_price": 472.46,
+      "current_price": 473.17,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1058,7 +1040,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 1766.64,
+      "current_price": 1841.89,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1074,12 +1056,12 @@
       "framework_score": 58,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 119.31,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
+      "expired_at": "2026-09-23 15:15"
     },
     {
       "ticker": "VICR",
@@ -1094,7 +1076,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 223.9,
+      "current_price": 275.15,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1112,7 +1094,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 65,
-      "current_price": 333.2,
+      "current_price": 326.89,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1129,8 +1111,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 65,
-      "current_price": 1277.68,
+      "current_score": 55,
+      "current_price": 1325.99,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1146,12 +1128,12 @@
       "framework_score": 48,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 14.61,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 40",
+      "expired_at": "2026-09-23 15:15"
     },
     {
       "ticker": "LSCC",
@@ -1165,8 +1147,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 65,
-      "current_price": 117.24,
+      "current_score": 55,
+      "current_price": 121.99,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1183,8 +1165,8 @@
       "fdfv3": true,
       "is_holding": false,
       "status": "active",
-      "current_score": 63,
-      "current_price": 233.82,
+      "current_score": 73,
+      "current_price": 233.7,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -1200,12 +1182,12 @@
       "framework_score": 68,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 63,
       "current_price": 321.52,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-09-23 15:15"
     },
     {
       "ticker": "FIVN",
@@ -1221,6 +1203,24 @@
       "status": "active",
       "current_score": 69.4,
       "current_price": 37.01,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "WDC",
+      "signal_type": "WATCH",
+      "score": 73,
+      "sell_score": 0.0,
+      "timestamp": "2026-09-23 15:15",
+      "price": 467.37,
+      "dist_252h": -37.4,
+      "framework_score": 58,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 73,
+      "current_price": 467.37,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
