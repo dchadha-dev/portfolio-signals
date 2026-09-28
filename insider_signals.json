@@ -1,88 +1,16 @@
 {
   "health": {
-    "timestamp": "2026-09-21 05:51 UTC",
+    "timestamp": "2026-09-28 06:19 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
-    "n_insider_signals": 5,
+    "n_insider_signals": 6,
     "n_politician_signals": 0,
-    "n_combined_signals": 5,
-    "elapsed_seconds": 204.6,
+    "n_combined_signals": 6,
+    "elapsed_seconds": 271.2,
     "retry_required": false,
     "retry_reason": []
   },
   "signals": {
-    "UBER": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "UBER",
-          "date": "2026-09-10",
-          "value_usd": 10005952,
-          "shares": 141000,
-          "price": 70.96,
-          "name": "KHOSROWSHAHI DARA",
-          "title": "Director, Officer, Chief Executive Officer",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-09-21"
-    },
-    "MSCI": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "MSCI",
-          "date": "2026-09-04",
-          "value_usd": 1000160,
-          "shares": 1786,
-          "price": 560.0,
-          "name": "Taneja Rajat",
-          "title": "Director",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-09-21"
-    },
-    "FISV": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "FISV",
-          "date": "2026-08-11",
-          "value_usd": 519500,
-          "shares": 10000,
-          "price": 51.95,
-          "name": "FRITZ LANCE M",
-          "title": "Director",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-09-21"
-    },
     "KEEL": {
       "buy_score_boost": 20,
       "insider_score": 20,
@@ -135,9 +63,81 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-09-21"
+      "as_of": "2026-09-28"
     },
-    "BABA": {
+    "CRM": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "CRM",
+          "date": "2026-09-21",
+          "value_usd": 999451,
+          "shares": 4176,
+          "price": 239.33,
+          "name": "Kirk David Blair",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-09-28"
+    },
+    "UBER": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "UBER",
+          "date": "2026-09-10",
+          "value_usd": 10005952,
+          "shares": 141000,
+          "price": 70.96,
+          "name": "KHOSROWSHAHI DARA",
+          "title": "Director, Officer, Chief Executive Officer",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-09-28"
+    },
+    "MSCI": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "MSCI",
+          "date": "2026-09-04",
+          "value_usd": 1000160,
+          "shares": 1786,
+          "price": 560.0,
+          "name": "Taneja Rajat",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-09-28"
+    },
+    "GRAB": {
       "buy_score_boost": 20,
       "insider_score": 20,
       "politician_score": 0,
@@ -148,38 +148,52 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "BABA",
-          "date": "2026-08-25",
-          "value_usd": 10418400,
-          "shares": 720000,
-          "price": 14.47,
-          "name": "Tsai Joseph C",
-          "title": "Director",
+          "ticker": "GRAB",
+          "date": "2026-09-21",
+          "value_usd": 866839,
+          "shares": 299571,
+          "price": 2.89,
+          "name": "Hungate Alexander Charles",
+          "title": "Director, Officer, President and COO",
           "is_cluster": true
         },
         {
-          "ticker": "BABA",
-          "date": "2026-08-24",
-          "value_usd": 10288800,
-          "shares": 720000,
-          "price": 14.29,
-          "name": "Tsai Joseph C",
-          "title": "Director",
-          "is_cluster": true
-        },
-        {
-          "ticker": "BABA",
-          "date": "2026-08-24",
-          "value_usd": 4984000,
-          "shares": 350000,
-          "price": 14.24,
-          "name": "Wu Yongming",
+          "ticker": "GRAB",
+          "date": "2026-09-21",
+          "value_usd": 29876310,
+          "shares": 10350000,
+          "price": 2.89,
+          "name": "Tan Anthony Ping Yeow",
           "title": "Director, Officer, Chief Executive Officer",
           "is_cluster": true
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-09-21"
+      "as_of": "2026-09-28"
+    },
+    "FISV": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "FISV",
+          "date": "2026-08-11",
+          "value_usd": 519500,
+          "shares": 10000,
+          "price": 51.95,
+          "name": "FRITZ LANCE M",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-09-28"
     }
   }
 }

@@ -1,71 +1,15 @@
 {
   "health": {
-    "timestamp": "2026-09-21 05:47 UTC",
-    "tickers_checked": 2,
+    "timestamp": "2026-09-28 06:14 UTC",
+    "tickers_checked": 0,
     "new_signals": 0,
-    "total_signals": 18,
+    "total_signals": 14,
     "expired_removed": 0,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 110.4
+    "elapsed_seconds": 113.9
   },
   "signals": {
-    "TMO": {
-      "ticker": "TMO",
-      "announce_date": "2026-07-23",
-      "expires_at": "2026-09-21",
-      "sue": 2.862,
-      "surprise": 0.2616,
-      "actual_eps": 6.03,
-      "estimate_eps": 5.7684,
-      "std_dev": 0.0914,
-      "std_dev_floored": false,
-      "history_quarters": 3,
-      "buy_score_boost": 10,
-      "as_of": "2026-08-03"
-    },
-    "LRCX": {
-      "ticker": "LRCX",
-      "announce_date": "2026-07-29",
-      "expires_at": "2026-09-27",
-      "sue": 3.0,
-      "surprise": 0.1028,
-      "actual_eps": 1.82,
-      "estimate_eps": 1.7172,
-      "std_dev": 0.0343,
-      "std_dev_floored": false,
-      "history_quarters": 3,
-      "buy_score_boost": 10,
-      "as_of": "2026-08-03"
-    },
-    "MSFT": {
-      "ticker": "MSFT",
-      "announce_date": "2026-07-29",
-      "expires_at": "2026-09-27",
-      "sue": 2.595,
-      "surprise": 0.4126,
-      "actual_eps": 4.74,
-      "estimate_eps": 4.3274,
-      "std_dev": 0.159,
-      "std_dev_floored": false,
-      "history_quarters": 3,
-      "buy_score_boost": 10,
-      "as_of": "2026-08-03"
-    },
-    "KLAC": {
-      "ticker": "KLAC",
-      "announce_date": "2026-07-28",
-      "expires_at": "2026-09-26",
-      "sue": 1.685,
-      "surprise": 0.0337,
-      "actual_eps": 1.05,
-      "estimate_eps": 1.0163,
-      "std_dev": 0.02,
-      "std_dev_floored": true,
-      "history_quarters": 3,
-      "buy_score_boost": 10,
-      "as_of": "2026-08-03"
-    },
     "DDOG": {
       "ticker": "DDOG",
       "announce_date": "2026-08-06",
