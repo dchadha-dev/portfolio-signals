@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-09-28 06:14 UTC",
-    "tickers_checked": 0,
-    "new_signals": 0,
-    "total_signals": 14,
-    "expired_removed": 0,
+    "timestamp": "2026-10-05 06:30 UTC",
+    "tickers_checked": 15,
+    "new_signals": 5,
+    "total_signals": 9,
+    "expired_removed": 5,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 113.9
+    "elapsed_seconds": 134.2
   },
   "signals": {
     "DDOG": {
@@ -34,76 +34,6 @@
       "estimate_eps": 1.5332,
       "std_dev": 0.175,
       "std_dev_floored": false,
-      "history_quarters": 3,
-      "buy_score_boost": 10,
-      "as_of": "2026-08-10"
-    },
-    "EXPE": {
-      "ticker": "EXPE",
-      "announce_date": "2026-08-05",
-      "expires_at": "2026-10-04",
-      "sue": 4.515,
-      "surprise": 0.4905,
-      "actual_eps": 5.76,
-      "estimate_eps": 5.2695,
-      "std_dev": 0.1086,
-      "std_dev_floored": false,
-      "history_quarters": 3,
-      "buy_score_boost": 10,
-      "as_of": "2026-08-10"
-    },
-    "LLY": {
-      "ticker": "LLY",
-      "announce_date": "2026-08-05",
-      "expires_at": "2026-10-04",
-      "sue": 4.544,
-      "surprise": 2.3139,
-      "actual_eps": 8.38,
-      "estimate_eps": 6.0661,
-      "std_dev": 0.5092,
-      "std_dev_floored": false,
-      "history_quarters": 3,
-      "buy_score_boost": 10,
-      "as_of": "2026-08-10"
-    },
-    "SOUN": {
-      "ticker": "SOUN",
-      "announce_date": "2026-08-05",
-      "expires_at": "2026-10-04",
-      "sue": 1.845,
-      "surprise": 0.0369,
-      "actual_eps": -0.02,
-      "estimate_eps": -0.0569,
-      "std_dev": 0.02,
-      "std_dev_floored": true,
-      "history_quarters": 3,
-      "buy_score_boost": 10,
-      "as_of": "2026-08-10"
-    },
-    "ALAB": {
-      "ticker": "ALAB",
-      "announce_date": "2026-08-04",
-      "expires_at": "2026-10-03",
-      "sue": 4.755,
-      "surprise": 0.0951,
-      "actual_eps": 0.8,
-      "estimate_eps": 0.7049,
-      "std_dev": 0.02,
-      "std_dev_floored": true,
-      "history_quarters": 3,
-      "buy_score_boost": 10,
-      "as_of": "2026-08-10"
-    },
-    "ANET": {
-      "ticker": "ANET",
-      "announce_date": "2026-08-04",
-      "expires_at": "2026-10-03",
-      "sue": 5.87,
-      "surprise": 0.1174,
-      "actual_eps": 1.02,
-      "estimate_eps": 0.9026,
-      "std_dev": 0.02,
-      "std_dev_floored": true,
       "history_quarters": 3,
       "buy_score_boost": 10,
       "as_of": "2026-08-10"
@@ -138,8 +68,8 @@
     },
     "CRM": {
       "ticker": "CRM",
-      "announce_date": "2026-08-26",
-      "expires_at": "2026-10-25",
+      "announce_date": "2026-09-30",
+      "expires_at": "2026-11-29",
       "sue": 12.14,
       "surprise": 2.5935,
       "actual_eps": 5.9,
@@ -148,12 +78,12 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-09-07"
+      "as_of": "2026-10-05"
     },
     "NVDA": {
       "ticker": "NVDA",
-      "announce_date": "2026-08-26",
-      "expires_at": "2026-10-25",
+      "announce_date": "2026-09-30",
+      "expires_at": "2026-11-29",
       "sue": 3.096,
       "surprise": 0.0816,
       "actual_eps": 2.22,
@@ -162,12 +92,12 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-09-07"
+      "as_of": "2026-10-05"
     },
     "INTU": {
       "ticker": "INTU",
-      "announce_date": "2026-08-25",
-      "expires_at": "2026-10-24",
+      "announce_date": "2026-09-30",
+      "expires_at": "2026-11-29",
       "sue": 1.736,
       "surprise": 0.3768,
       "actual_eps": 4.03,
@@ -176,12 +106,12 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-09-07"
+      "as_of": "2026-10-05"
     },
     "SNOW": {
       "ticker": "SNOW",
-      "announce_date": "2026-09-02",
-      "expires_at": "2026-11-01",
+      "announce_date": "2026-09-30",
+      "expires_at": "2026-11-29",
       "sue": 8.24,
       "surprise": 0.1648,
       "actual_eps": 0.62,
@@ -190,12 +120,12 @@
       "std_dev_floored": true,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-09-14"
+      "as_of": "2026-10-05"
     },
     "DELL": {
       "ticker": "DELL",
-      "announce_date": "2026-09-01",
-      "expires_at": "2026-10-31",
+      "announce_date": "2026-09-30",
+      "expires_at": "2026-11-29",
       "sue": 2.077,
       "surprise": 2.0295,
       "actual_eps": 7.04,
@@ -204,7 +134,7 @@
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-09-14"
+      "as_of": "2026-10-05"
     }
   }
 }
