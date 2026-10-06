@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-04T23:28:10Z",
+  "generated_at": "2026-10-06T01:50:02Z",
   "p_threshold": 0.15,
   "n_cv_windows": 12,
   "universe_size": 159,
@@ -91,7 +91,7 @@
       "std": 0.0366,
       "ci_lo": -0.0752,
       "ci_hi": -0.0351,
-      "p_value": 0.0005,
+      "p_value": 0.0004,
       "significant": false,
       "n_wins": 1,
       "n_windows": 12,
@@ -112,7 +112,7 @@
       "mean_sep": 0.0865,
       "std": 0.0849,
       "ci_lo": 0.0389,
-      "ci_hi": 0.1308,
+      "ci_hi": 0.1307,
       "p_value": 0.0061,
       "significant": true,
       "n_wins": 9,
@@ -143,8 +143,8 @@
       "win_rate": 0.75
     },
     "mfbear": {
-      "mean_sep": 0.0708,
-      "std": 0.0592,
+      "mean_sep": 0.0707,
+      "std": 0.0591,
       "ci_lo": 0.0346,
       "ci_hi": 0.099,
       "p_value": 0.0022,
@@ -154,10 +154,10 @@
       "win_rate": 0.75
     },
     "bred": {
-      "mean_sep": 0.0813,
+      "mean_sep": 0.0812,
       "std": 0.0732,
       "ci_lo": 0.0387,
-      "ci_hi": 0.1242,
+      "ci_hi": 0.1241,
       "p_value": 0.0036,
       "significant": true,
       "n_wins": 9,
@@ -210,7 +210,7 @@
       "signal": "near_high",
       "name": "Near 252d high",
       "mean_sep_252d": -5.44,
-      "p_value": 0.0005,
+      "p_value": 0.0004,
       "consistency": 3,
       "validated": true,
       "weight": 100
@@ -263,7 +263,7 @@
     {
       "signal": "mfbear",
       "name": "MFI bearish div",
-      "mean_sep_252d": 7.08,
+      "mean_sep_252d": 7.07,
       "p_value": 0.0022,
       "consistency": 0,
       "validated": false,
@@ -272,7 +272,7 @@
     {
       "signal": "bred",
       "name": "BRED (2+ components)",
-      "mean_sep_252d": 8.13,
+      "mean_sep_252d": 8.12,
       "p_value": 0.0036,
       "consistency": 0,
       "validated": false,
