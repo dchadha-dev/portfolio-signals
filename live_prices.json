@@ -1,201 +1,201 @@
 {
-  "timestamp": "2026-10-07 01:53 UTC",
-  "run_date": "Wednesday 07 Oct 2026",
+  "timestamp": "2026-10-07 17:38 UTC",
+  "run_date": "Thursday 08 Oct 2026",
   "prices": {
     "BKNG": {
-      "price": 157.63,
-      "change_pct": null
-    },
-    "NVDA": {
-      "price": 239.24,
-      "change_pct": null
-    },
-    "GOOG": {
-      "price": 344.59,
-      "change_pct": null
-    },
-    "AAPL": {
-      "price": 333.63,
-      "change_pct": null
-    },
-    "MSFT": {
-      "price": 529.3,
-      "change_pct": null
-    },
-    "META": {
-      "price": 738.88,
-      "change_pct": null
-    },
-    "AMZN": {
-      "price": 256.29,
-      "change_pct": null
-    },
-    "ASML": {
-      "price": 1834.1,
-      "change_pct": null
-    },
-    "AVGO": {
-      "price": 375.81,
-      "change_pct": null
-    },
-    "TSLA": {
-      "price": 380.68,
-      "change_pct": null
-    },
-    "NBIS": {
-      "price": 249.87,
-      "change_pct": null
-    },
-    "O": {
-      "price": 54.25,
-      "change_pct": null
-    },
-    "TSM": {
-      "price": 482.3,
-      "change_pct": null
-    },
-    "SHOP": {
-      "price": 164.44,
-      "change_pct": null
-    },
-    "MELI": {
-      "price": 1857.99,
-      "change_pct": null
-    },
-    "RACE": {
-      "price": 386.5,
-      "change_pct": null
-    },
-    "TM": {
-      "price": 185.57,
-      "change_pct": null
-    },
-    "AMD": {
-      "price": 649.42,
-      "change_pct": null
-    },
-    "AMAT": {
-      "price": 530.27,
-      "change_pct": null
-    },
-    "ANET": {
-      "price": 215.36,
-      "change_pct": null
-    },
-    "CRDO": {
-      "price": 220.83,
-      "change_pct": null
-    },
-    "NFLX": {
-      "price": 68.69,
-      "change_pct": null
-    },
-    "DDOG": {
-      "price": 278.24,
-      "change_pct": null
-    },
-    "NVO": {
-      "price": 37.53,
-      "change_pct": null
-    },
-    "INTU": {
-      "price": 289.81,
-      "change_pct": null
-    },
-    "MU": {
-      "price": 1045.56,
-      "change_pct": null
-    },
-    "BABA": {
-      "price": 109.26,
-      "change_pct": null
-    },
-    "KLAC": {
-      "price": 197.46,
-      "change_pct": null
-    },
-    "CPRT": {
-      "price": 26.82,
-      "change_pct": null
-    },
-    "PGR": {
-      "price": 212.05,
-      "change_pct": null
-    },
-    "NEXT": {
-      "price": 6.83,
-      "change_pct": null
-    },
-    "RELX": {
-      "price": 34.03,
-      "change_pct": null
-    },
-    "DELL": {
-      "price": 574,
-      "change_pct": null
-    },
-    "NOW": {
-      "price": 137.97,
-      "change_pct": null
-    },
-    "IREN": {
-      "price": 41.28,
-      "change_pct": null
-    },
-    "GDX": {
-      "price": 88.22,
-      "change_pct": null
-    },
-    "CRWV": {
-      "price": 91.72,
-      "change_pct": null
-    },
-    "TEAM": {
-      "price": 193.98,
-      "change_pct": null
-    },
-    "ORCL": {
-      "price": 144.77,
-      "change_pct": null
-    },
-    "QCOM": {
-      "price": 181.03,
-      "change_pct": null
-    },
-    "MSTR": {
-      "price": 164.55,
-      "change_pct": null
-    },
-    "GME": {
-      "price": 24.76,
-      "change_pct": null
-    },
-    "CCJ": {
-      "price": 93.02,
-      "change_pct": null
-    },
-    "VTI": {
-      "price": 382.54,
-      "change_pct": null
-    },
-    "QQQ": {
-      "price": 759.66,
-      "change_pct": null
-    },
-    "GLD": {
-      "price": 382.27,
-      "change_pct": null
-    },
-    "IEV": {
-      "price": 70.94,
-      "change_pct": null
-    },
-    "VSS": {
       "price": 156.32,
       "change_pct": null
     },
+    "NVDA": {
+      "price": 237.13,
+      "change_pct": null
+    },
+    "GOOG": {
+      "price": 344.16,
+      "change_pct": null
+    },
+    "AAPL": {
+      "price": 335.99,
+      "change_pct": null
+    },
+    "MSFT": {
+      "price": 529.34,
+      "change_pct": null
+    },
+    "META": {
+      "price": 726.15,
+      "change_pct": null
+    },
+    "AMZN": {
+      "price": 258.6,
+      "change_pct": null
+    },
+    "ASML": {
+      "price": 1808.91,
+      "change_pct": null
+    },
+    "AVGO": {
+      "price": 373.96,
+      "change_pct": null
+    },
+    "TSLA": {
+      "price": 376.62,
+      "change_pct": null
+    },
+    "NBIS": {
+      "price": 235.11,
+      "change_pct": null
+    },
+    "O": {
+      "price": 53.66,
+      "change_pct": null
+    },
+    "TSM": {
+      "price": 473.97,
+      "change_pct": null
+    },
+    "SHOP": {
+      "price": 165.18,
+      "change_pct": null
+    },
+    "MELI": {
+      "price": 1865.06,
+      "change_pct": null
+    },
+    "RACE": {
+      "price": 387.9,
+      "change_pct": null
+    },
+    "TM": {
+      "price": 183,
+      "change_pct": null
+    },
+    "AMD": {
+      "price": 644.85,
+      "change_pct": null
+    },
+    "AMAT": {
+      "price": 522.2,
+      "change_pct": null
+    },
+    "ANET": {
+      "price": 216.15,
+      "change_pct": null
+    },
+    "CRDO": {
+      "price": 217.47,
+      "change_pct": null
+    },
+    "NFLX": {
+      "price": 69.33,
+      "change_pct": null
+    },
+    "DDOG": {
+      "price": 274.16,
+      "change_pct": null
+    },
+    "NVO": {
+      "price": 38.24,
+      "change_pct": null
+    },
+    "INTU": {
+      "price": 295.89,
+      "change_pct": null
+    },
+    "MU": {
+      "price": 1084.62,
+      "change_pct": null
+    },
+    "BABA": {
+      "price": 106.73,
+      "change_pct": null
+    },
+    "KLAC": {
+      "price": 197,
+      "change_pct": null
+    },
+    "CPRT": {
+      "price": 26.59,
+      "change_pct": null
+    },
+    "PGR": {
+      "price": 214.78,
+      "change_pct": null
+    },
+    "NEXT": {
+      "price": 6.66,
+      "change_pct": null
+    },
+    "RELX": {
+      "price": 34.57,
+      "change_pct": null
+    },
+    "DELL": {
+      "price": 580.96,
+      "change_pct": null
+    },
+    "NOW": {
+      "price": 139.1,
+      "change_pct": null
+    },
+    "IREN": {
+      "price": 38.7,
+      "change_pct": null
+    },
+    "GDX": {
+      "price": 86.05,
+      "change_pct": null
+    },
+    "CRWV": {
+      "price": 88.01,
+      "change_pct": null
+    },
+    "TEAM": {
+      "price": 196.73,
+      "change_pct": null
+    },
+    "ORCL": {
+      "price": 144.14,
+      "change_pct": null
+    },
+    "QCOM": {
+      "price": 176.49,
+      "change_pct": null
+    },
+    "MSTR": {
+      "price": 153.69,
+      "change_pct": null
+    },
+    "GME": {
+      "price": 24.56,
+      "change_pct": null
+    },
+    "CCJ": {
+      "price": 89.52,
+      "change_pct": null
+    },
+    "VTI": {
+      "price": 381.19,
+      "change_pct": null
+    },
+    "QQQ": {
+      "price": 757.02,
+      "change_pct": null
+    },
+    "GLD": {
+      "price": 377.2,
+      "change_pct": null
+    },
+    "IEV": {
+      "price": 70.21,
+      "change_pct": null
+    },
+    "VSS": {
+      "price": 154.7,
+      "change_pct": null
+    },
     "URTH": {
-      "price": 209.73,
+      "price": 208.7,
       "change_pct": null
     },
     "XLG": {
@@ -203,31 +203,31 @@
       "change_pct": null
     },
     "QTUM": {
-      "price": 157.39,
+      "price": 154.56,
       "change_pct": null
     },
     "JEPI": {
-      "price": 56.54,
+      "price": 56.49,
       "change_pct": null
     },
     "XLB": {
-      "price": 49.73,
+      "price": 49.13,
       "change_pct": null
     },
     "CQQQ": {
-      "price": 45.03,
+      "price": 44.33,
       "change_pct": null
     },
     "MC.PA": {
-      "price": 56.05,
+      "price": 55.67,
       "change_pct": null
     },
     "ARM": {
-      "price": 302.56,
+      "price": 298.59,
       "change_pct": null
     },
     "MRVL": {
-      "price": 287.01,
+      "price": 281.91,
       "change_pct": null
     }
   }
