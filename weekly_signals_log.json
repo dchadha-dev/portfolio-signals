@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-08 02:21 UTC",
+  "last_updated": "2026-10-08 17:41 UTC",
   "entries": [
     {
       "ticker": "AMAT",
@@ -246,12 +246,12 @@
       "framework_score": 68,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 334.56,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-10-08 17:41"
     },
     {
       "ticker": "ACLS",
@@ -266,7 +266,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 138.4,
+      "current_price": 133.73,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -282,12 +282,12 @@
       "framework_score": 72,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 82.51,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 0",
+      "expired_at": "2026-10-08 17:41"
     },
     {
       "ticker": "CAT",
@@ -354,12 +354,12 @@
       "framework_score": 68,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 334.56,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-10-08 17:41"
     },
     {
       "ticker": "ACLS",
@@ -374,7 +374,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 138.4,
+      "current_price": 133.73,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -390,12 +390,12 @@
       "framework_score": 72,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 82.51,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 0",
+      "expired_at": "2026-10-08 17:41"
     },
     {
       "ticker": "CAT",
@@ -462,12 +462,12 @@
       "framework_score": 68,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 334.56,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-10-08 17:41"
     },
     {
       "ticker": "ACLS",
@@ -482,7 +482,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 138.4,
+      "current_price": 133.73,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -498,12 +498,12 @@
       "framework_score": 72,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 82.51,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 0",
+      "expired_at": "2026-10-08 17:41"
     },
     {
       "ticker": "CAT",
@@ -660,12 +660,12 @@
       "framework_score": 68,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 334.56,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-10-08 17:41"
     },
     {
       "ticker": "CAT",
@@ -696,12 +696,12 @@
       "framework_score": 72,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 82.51,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 0",
+      "expired_at": "2026-10-08 17:41"
     },
     {
       "ticker": "ACLS",
@@ -716,7 +716,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 138.4,
+      "current_price": 133.73,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -768,12 +768,12 @@
       "framework_score": 68,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 334.56,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-10-08 17:41"
     },
     {
       "ticker": "GLW",
@@ -806,7 +806,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 138.4,
+      "current_price": 133.73,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -822,12 +822,12 @@
       "framework_score": 72,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 82.51,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 0",
+      "expired_at": "2026-10-08 17:41"
     },
     {
       "ticker": "TSEM",
@@ -840,12 +840,12 @@
       "framework_score": 68,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 248.25,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-10-08 17:41"
     },
     {
       "ticker": "TSEM",
@@ -858,12 +858,12 @@
       "framework_score": 68,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 248.25,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-10-08 17:41"
     },
     {
       "ticker": "COHR",
@@ -876,12 +876,12 @@
       "framework_score": 68,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 334.56,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-10-08 17:41"
     },
     {
       "ticker": "ACLS",
@@ -896,7 +896,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 138.4,
+      "current_price": 133.73,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -912,12 +912,12 @@
       "framework_score": 72,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 82.51,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 0",
+      "expired_at": "2026-10-08 17:41"
     }
   ]
 }
