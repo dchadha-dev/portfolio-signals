@@ -1,78 +1,6 @@
 {
-  "last_updated": "2026-10-08 17:41 UTC",
+  "last_updated": "2026-10-09 02:38 UTC",
   "entries": [
-    {
-      "ticker": "AMAT",
-      "signal_type": "WATCH",
-      "score": 76,
-      "sell_score": 0.0,
-      "timestamp": "2026-10-02 01:53",
-      "price": 529.3,
-      "dist_252h": -26.8,
-      "framework_score": 82,
-      "fdfv3": true,
-      "is_holding": true,
-      "status": "expired",
-      "current_score": 76,
-      "current_price": 522.2,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 51",
-      "expired_at": "2026-10-08 02:21"
-    },
-    {
-      "ticker": "ALAB",
-      "signal_type": "WATCH",
-      "score": 75,
-      "sell_score": 0.0,
-      "timestamp": "2026-10-02 01:53",
-      "price": 356.42,
-      "dist_252h": -26.2,
-      "framework_score": 72,
-      "fdfv3": true,
-      "is_holding": true,
-      "status": "expired",
-      "current_score": 75,
-      "current_price": 356.42,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 50",
-      "expired_at": "2026-10-03 15:00"
-    },
-    {
-      "ticker": "KLAC",
-      "signal_type": "WATCH",
-      "score": 73,
-      "sell_score": 0.0,
-      "timestamp": "2026-10-02 01:53",
-      "price": 200.33,
-      "dist_252h": -33.6,
-      "framework_score": 84,
-      "fdfv3": true,
-      "is_holding": true,
-      "status": "expired",
-      "current_score": 73,
-      "current_price": 206.85,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
-      "expired_at": "2026-10-06 17:01"
-    },
-    {
-      "ticker": "LRCX",
-      "signal_type": "WATCH",
-      "score": 73,
-      "sell_score": 0.0,
-      "timestamp": "2026-10-02 01:53",
-      "price": 340.1,
-      "dist_252h": -21.5,
-      "framework_score": 83,
-      "fdfv3": true,
-      "is_holding": true,
-      "status": "expired",
-      "current_score": 73,
-      "current_price": 340.1,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
-      "expired_at": "2026-10-02 16:26"
-    },
     {
       "ticker": "COHR",
       "signal_type": "WATCH",
@@ -266,7 +194,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 133.73,
+      "current_price": 133.48,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -374,7 +302,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 133.73,
+      "current_price": 133.48,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -482,7 +410,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 133.73,
+      "current_price": 133.48,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -716,7 +644,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 133.73,
+      "current_price": 133.48,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -806,7 +734,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 133.73,
+      "current_price": 133.48,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -896,7 +824,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 133.73,
+      "current_price": 133.48,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -918,6 +846,24 @@
       "expire_reason": "dfv3_faded",
       "expire_detail": "DFV V3 lift dropped \u00b7 score 0",
       "expired_at": "2026-10-08 17:41"
+    },
+    {
+      "ticker": "ACLS",
+      "signal_type": "WATCH",
+      "score": 65,
+      "sell_score": 0.0,
+      "timestamp": "2026-10-09 02:38",
+      "price": 133.48,
+      "dist_252h": -30.3,
+      "framework_score": 68,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 65,
+      "current_price": 133.48,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
     }
   ]
 }
