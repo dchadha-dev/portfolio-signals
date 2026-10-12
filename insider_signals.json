@@ -1,17 +1,17 @@
 {
   "health": {
-    "timestamp": "2026-10-05 06:34 UTC",
+    "timestamp": "2026-10-12 06:57 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
     "n_insider_signals": 5,
     "n_politician_signals": 0,
     "n_combined_signals": 5,
-    "elapsed_seconds": 213.0,
+    "elapsed_seconds": 255.9,
     "retry_required": false,
     "retry_reason": []
   },
   "signals": {
-    "MSCI": {
+    "UBER": {
       "buy_score_boost": 10,
       "insider_score": 10,
       "politician_score": 0,
@@ -22,18 +22,42 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "MSCI",
-          "date": "2026-09-04",
-          "value_usd": 1000160,
-          "shares": 1786,
-          "price": 560.0,
-          "name": "Taneja Rajat",
+          "ticker": "UBER",
+          "date": "2026-09-10",
+          "value_usd": 10005952,
+          "shares": 141000,
+          "price": 70.96,
+          "name": "KHOSROWSHAHI DARA",
+          "title": "Director, Officer, Chief Executive Officer",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-10-12"
+    },
+    "CRM": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "CRM",
+          "date": "2026-09-21",
+          "value_usd": 999451,
+          "shares": 4176,
+          "price": 239.33,
+          "name": "Kirk David Blair",
           "title": "Director",
           "is_cluster": false
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-10-05"
+      "as_of": "2026-10-12"
     },
     "KEEL": {
       "buy_score_boost": 20,
@@ -87,7 +111,7 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-10-05"
+      "as_of": "2026-10-12"
     },
     "GRAB": {
       "buy_score_boost": 20,
@@ -121,9 +145,9 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-10-05"
+      "as_of": "2026-10-12"
     },
-    "CRM": {
+    "MSCI": {
       "buy_score_boost": 10,
       "insider_score": 10,
       "politician_score": 0,
@@ -134,42 +158,18 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "CRM",
-          "date": "2026-09-21",
-          "value_usd": 999451,
-          "shares": 4176,
-          "price": 239.33,
-          "name": "Kirk David Blair",
+          "ticker": "MSCI",
+          "date": "2026-09-04",
+          "value_usd": 1000160,
+          "shares": 1786,
+          "price": 560.0,
+          "name": "Taneja Rajat",
           "title": "Director",
           "is_cluster": false
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-10-05"
-    },
-    "UBER": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "UBER",
-          "date": "2026-09-10",
-          "value_usd": 10005952,
-          "shares": 141000,
-          "price": 70.96,
-          "name": "KHOSROWSHAHI DARA",
-          "title": "Director, Officer, Chief Executive Officer",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-10-05"
+      "as_of": "2026-10-12"
     }
   }
 }
