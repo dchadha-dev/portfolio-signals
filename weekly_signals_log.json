@@ -1,60 +1,6 @@
 {
-  "last_updated": "2026-10-12 01:55 UTC",
+  "last_updated": "2026-10-12 20:05 UTC",
   "entries": [
-    {
-      "ticker": "LRCX",
-      "signal_type": "WATCH",
-      "score": 73,
-      "sell_score": 0.0,
-      "timestamp": "2026-10-05 19:38",
-      "price": 345.32,
-      "dist_252h": -20.3,
-      "framework_score": 83,
-      "fdfv3": true,
-      "is_holding": true,
-      "status": "expired",
-      "current_score": 73,
-      "current_price": 345.8,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
-      "expired_at": "2026-10-06 17:01"
-    },
-    {
-      "ticker": "VICR",
-      "signal_type": "WATCH",
-      "score": 73,
-      "sell_score": 0.2,
-      "timestamp": "2026-10-05 19:38",
-      "price": 302.65,
-      "dist_252h": -20.3,
-      "framework_score": 58,
-      "fdfv3": true,
-      "is_holding": false,
-      "status": "expired",
-      "current_score": 73,
-      "current_price": 302.65,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
-      "expired_at": "2026-10-06 02:35"
-    },
-    {
-      "ticker": "TSEM",
-      "signal_type": "WATCH",
-      "score": 63,
-      "sell_score": 0.0,
-      "timestamp": "2026-10-05 19:38",
-      "price": 247.71,
-      "dist_252h": -21.8,
-      "framework_score": 68,
-      "fdfv3": true,
-      "is_holding": false,
-      "status": "expired",
-      "current_score": 73,
-      "current_price": 249.57,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 23",
-      "expired_at": "2026-10-06 17:01"
-    },
     {
       "ticker": "AMAT",
       "signal_type": "WATCH",
@@ -426,12 +372,12 @@
       "framework_score": 52,
       "fdfv3": false,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 67.2,
       "current_price": 219.43,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "sell_cleared",
+      "expire_detail": "sell score dropped to 14",
+      "expired_at": "2026-10-12 20:05"
     }
   ]
 }
