@@ -1,24 +1,6 @@
 {
-  "last_updated": "2026-10-14 15:39 UTC",
+  "last_updated": "2026-10-15 01:03 UTC",
   "entries": [
-    {
-      "ticker": "TSEM",
-      "signal_type": "WATCH",
-      "score": 73,
-      "sell_score": 0.0,
-      "timestamp": "2026-10-07 17:38",
-      "price": 248.03,
-      "dist_252h": -21.7,
-      "framework_score": 68,
-      "fdfv3": true,
-      "is_holding": false,
-      "status": "expired",
-      "current_score": 73,
-      "current_price": 248.25,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
-      "expired_at": "2026-10-08 17:41"
-    },
     {
       "ticker": "TSEM",
       "signal_type": "WATCH",
