@@ -1,24 +1,6 @@
 {
-  "last_updated": "2026-10-16 00:52 UTC",
+  "last_updated": "2026-10-16 15:06 UTC",
   "entries": [
-    {
-      "ticker": "ACLS",
-      "signal_type": "WATCH",
-      "score": 65,
-      "sell_score": 0.0,
-      "timestamp": "2026-10-09 02:38",
-      "price": 133.48,
-      "dist_252h": -30.3,
-      "framework_score": 68,
-      "fdfv3": true,
-      "is_holding": false,
-      "status": "expired",
-      "current_score": 65,
-      "current_price": 133.48,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 40",
-      "expired_at": "2026-10-09 17:16"
-    },
     {
       "ticker": "MRNA",
       "signal_type": "SELL",
