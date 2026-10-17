@@ -1,23 +1,4 @@
 {
-  "last_updated": "2026-10-16 15:06 UTC",
-  "entries": [
-    {
-      "ticker": "MRNA",
-      "signal_type": "SELL",
-      "score": 67.2,
-      "sell_score": 67.2,
-      "timestamp": "2026-10-09 17:16",
-      "price": 219.43,
-      "dist_252h": 7.9,
-      "framework_score": 52,
-      "fdfv3": false,
-      "is_holding": true,
-      "status": "expired",
-      "current_score": 67.2,
-      "current_price": 219.43,
-      "expire_reason": "sell_cleared",
-      "expire_detail": "sell score dropped to 14",
-      "expired_at": "2026-10-12 20:05"
-    }
-  ]
+  "last_updated": "2026-10-17 00:53 UTC",
+  "entries": []
 }
