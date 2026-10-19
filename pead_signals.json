@@ -1,29 +1,15 @@
 {
   "health": {
-    "timestamp": "2026-10-12 06:52 UTC",
-    "tickers_checked": 16,
-    "new_signals": 5,
-    "total_signals": 6,
-    "expired_removed": 5,
+    "timestamp": "2026-10-19 05:36 UTC",
+    "tickers_checked": 3,
+    "new_signals": 0,
+    "total_signals": 5,
+    "expired_removed": 0,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 134.5
+    "elapsed_seconds": 118.4
   },
   "signals": {
-    "ONDS": {
-      "ticker": "ONDS",
-      "announce_date": "2026-08-13",
-      "expires_at": "2026-10-12",
-      "sue": 2.92,
-      "surprise": 0.0584,
-      "actual_eps": -0.03,
-      "estimate_eps": -0.0884,
-      "std_dev": 0.02,
-      "std_dev_floored": true,
-      "history_quarters": 3,
-      "buy_score_boost": 10,
-      "as_of": "2026-08-24"
-    },
     "CRM": {
       "ticker": "CRM",
       "announce_date": "2026-09-30",
