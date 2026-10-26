@@ -1,108 +1,16 @@
 {
   "health": {
-    "timestamp": "2026-10-19 05:40 UTC",
+    "timestamp": "2026-10-26 05:48 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
     "n_insider_signals": 5,
     "n_politician_signals": 0,
     "n_combined_signals": 5,
-    "elapsed_seconds": 274.7,
+    "elapsed_seconds": 328.2,
     "retry_required": false,
     "retry_reason": []
   },
   "signals": {
-    "KEEL": {
-      "buy_score_boost": 20,
-      "insider_score": 20,
-      "politician_score": 0,
-      "insider_n": 2,
-      "insider_cluster": true,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "KEEL",
-          "date": "2026-08-21",
-          "value_usd": 129497,
-          "shares": 38888,
-          "price": 3.33,
-          "name": "Gagnon Benjamin",
-          "title": "Director, Officer, Chief Executive Officer",
-          "is_cluster": true
-        },
-        {
-          "ticker": "KEEL",
-          "date": "2026-08-20",
-          "value_usd": 99999,
-          "shares": 30769,
-          "price": 3.25,
-          "name": "WILSON LIAM DANIEL",
-          "title": "Officer, Chief Operating Officer",
-          "is_cluster": true
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-10-19"
-    },
-    "MSCI": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "MSCI",
-          "date": "2026-09-04",
-          "value_usd": 1000160,
-          "shares": 1786,
-          "price": 560.0,
-          "name": "Taneja Rajat",
-          "title": "Director",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-10-19"
-    },
-    "NBIS": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "NBIS",
-          "date": "2026-10-16",
-          "value_usd": 25159,
-          "shares": 148,
-          "price": 169.99,
-          "name": "Grimme Arne",
-          "title": "Director",
-          "is_cluster": false
-        },
-        {
-          "ticker": "NBIS",
-          "date": "2026-10-16",
-          "value_usd": 25159,
-          "shares": 148,
-          "price": 169.99,
-          "name": "Grimme Arne",
-          "title": "Director",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-10-19"
-    },
     "GRAB": {
       "buy_score_boost": 20,
       "insider_score": 20,
@@ -135,7 +43,41 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-10-19"
+      "as_of": "2026-10-26"
+    },
+    "APLD": {
+      "buy_score_boost": 20,
+      "insider_score": 20,
+      "politician_score": 0,
+      "insider_n": 2,
+      "insider_cluster": true,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "APLD",
+          "date": "2026-10-19",
+          "value_usd": 1006686,
+          "shares": 55803,
+          "price": 18.04,
+          "name": "Cummins Wes",
+          "title": "Director, Officer, CEO; Chairman",
+          "is_cluster": true
+        },
+        {
+          "ticker": "APLD",
+          "date": "2026-10-19",
+          "value_usd": 5658000,
+          "shares": 300000,
+          "price": 18.86,
+          "name": "Zhang Jason Gechen",
+          "title": "Officer, President",
+          "is_cluster": true
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-10-26"
     },
     "CRM": {
       "buy_score_boost": 10,
@@ -159,7 +101,95 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-10-19"
+      "as_of": "2026-10-26"
+    },
+    "MSCI": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "MSCI",
+          "date": "2026-09-04",
+          "value_usd": 1000160,
+          "shares": 1786,
+          "price": 560.0,
+          "name": "Taneja Rajat",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-10-26"
+    },
+    "NBIS": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "NBIS",
+          "date": "2026-10-21",
+          "value_usd": 24858,
+          "shares": 151,
+          "price": 164.62,
+          "name": "Grimme Arne",
+          "title": "Director",
+          "is_cluster": false
+        },
+        {
+          "ticker": "NBIS",
+          "date": "2026-10-21",
+          "value_usd": 24855,
+          "shares": 148,
+          "price": 167.94,
+          "name": "Grimme Arne",
+          "title": "Director",
+          "is_cluster": false
+        },
+        {
+          "ticker": "NBIS",
+          "date": "2026-10-20",
+          "value_usd": 25159,
+          "shares": 148,
+          "price": 169.99,
+          "name": "Grimme Arne",
+          "title": "Director",
+          "is_cluster": false
+        },
+        {
+          "ticker": "NBIS",
+          "date": "2026-10-16",
+          "value_usd": 25159,
+          "shares": 148,
+          "price": 169.99,
+          "name": "Grimme Arne",
+          "title": "Director",
+          "is_cluster": false
+        },
+        {
+          "ticker": "NBIS",
+          "date": "2026-10-16",
+          "value_usd": 25159,
+          "shares": 148,
+          "price": 169.99,
+          "name": "Grimme Arne",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-10-26"
     }
   }
 }

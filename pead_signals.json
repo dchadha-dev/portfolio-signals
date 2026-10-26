@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-10-19 05:36 UTC",
-    "tickers_checked": 3,
-    "new_signals": 0,
-    "total_signals": 5,
+    "timestamp": "2026-10-26 05:42 UTC",
+    "tickers_checked": 12,
+    "new_signals": 6,
+    "total_signals": 11,
     "expired_removed": 0,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 118.4
+    "elapsed_seconds": 112.4
   },
   "signals": {
     "CRM": {
@@ -79,6 +79,90 @@
       "history_quarters": 3,
       "buy_score_boost": 10,
       "as_of": "2026-10-12"
+    },
+    "NBIS": {
+      "ticker": "NBIS",
+      "announce_date": "2026-10-22",
+      "expires_at": "2026-12-21",
+      "sue": 2.763,
+      "surprise": 0.5158,
+      "actual_eps": -0.12,
+      "estimate_eps": -0.6358,
+      "std_dev": 0.1867,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-10-26"
+    },
+    "PG": {
+      "ticker": "PG",
+      "announce_date": "2026-10-22",
+      "expires_at": "2026-12-21",
+      "sue": 3.0,
+      "surprise": 0.06,
+      "actual_eps": 2.0,
+      "estimate_eps": 1.94,
+      "std_dev": 0.02,
+      "std_dev_floored": true,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-10-26"
+    },
+    "META": {
+      "ticker": "META",
+      "announce_date": "2026-10-21",
+      "expires_at": "2026-12-20",
+      "sue": 1.728,
+      "surprise": 1.6111,
+      "actual_eps": 7.4,
+      "estimate_eps": 5.7889,
+      "std_dev": 0.9326,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-10-26"
+    },
+    "TMO": {
+      "ticker": "TMO",
+      "announce_date": "2026-10-21",
+      "expires_at": "2026-12-20",
+      "sue": 2.1,
+      "surprise": 0.2127,
+      "actual_eps": 6.68,
+      "estimate_eps": 6.4673,
+      "std_dev": 0.1013,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-10-26"
+    },
+    "ISRG": {
+      "ticker": "ISRG",
+      "announce_date": "2026-10-20",
+      "expires_at": "2026-12-19",
+      "sue": 4.31,
+      "surprise": 0.3044,
+      "actual_eps": 3.0,
+      "estimate_eps": 2.6956,
+      "std_dev": 0.0706,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-10-26"
+    },
+    "PGR": {
+      "ticker": "PGR",
+      "announce_date": "2026-10-14",
+      "expires_at": "2026-12-13",
+      "sue": 1.508,
+      "surprise": 0.1818,
+      "actual_eps": 4.6,
+      "estimate_eps": 4.4182,
+      "std_dev": 0.1205,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-10-26"
     }
   }
 }
