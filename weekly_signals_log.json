@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-29 17:13 UTC",
+  "last_updated": "2026-10-30 02:13 UTC",
   "entries": [
     {
       "ticker": "MRVL",
@@ -68,7 +68,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 73,
-      "current_price": 703.68,
+      "current_price": 700.47,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -126,6 +126,24 @@
       "expire_reason": "dfv3_faded",
       "expire_detail": "DFV V3 lift dropped \u00b7 score 40",
       "expired_at": "2026-10-29 17:13"
+    },
+    {
+      "ticker": "STX",
+      "signal_type": "WATCH",
+      "score": 73,
+      "sell_score": 0.9,
+      "timestamp": "2026-10-30 02:13",
+      "price": 700.47,
+      "dist_252h": -36.0,
+      "framework_score": 60,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 73,
+      "current_price": 700.47,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
     }
   ]
 }
