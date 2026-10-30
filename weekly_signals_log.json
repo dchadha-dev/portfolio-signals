@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-30 02:13 UTC",
+  "last_updated": "2026-10-30 16:54 UTC",
   "entries": [
     {
       "ticker": "MRVL",
@@ -66,12 +66,12 @@
       "framework_score": 60,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 700.47,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 8",
+      "expired_at": "2026-10-30 16:54"
     },
     {
       "ticker": "INTC",
@@ -138,12 +138,12 @@
       "framework_score": 60,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 700.47,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 8",
+      "expired_at": "2026-10-30 16:54"
     }
   ]
 }
