@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-03 03:46 UTC",
+  "last_updated": "2026-11-03 18:11 UTC",
   "entries": [
     {
       "ticker": "MRVL",
@@ -144,6 +144,24 @@
       "expire_reason": "dfv3_faded",
       "expire_detail": "DFV V3 lift dropped \u00b7 score 8",
       "expired_at": "2026-10-30 16:54"
+    },
+    {
+      "ticker": "MPWR",
+      "signal_type": "WATCH",
+      "score": 65,
+      "sell_score": 0.0,
+      "timestamp": "2026-11-03 18:11",
+      "price": 1345.57,
+      "dist_252h": -20.4,
+      "framework_score": 79,
+      "fdfv3": true,
+      "is_holding": false,
+      "status": "active",
+      "current_score": 65,
+      "current_price": 1345.57,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
     }
   ]
 }
