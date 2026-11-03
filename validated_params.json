@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-01T23:40:45Z",
+  "generated_at": "2026-11-03T02:34:18Z",
   "p_threshold": 0.15,
   "n_cv_windows": 12,
   "universe_size": 160,
@@ -21,11 +21,11 @@
   },
   "signal_results_252d": {
     "f": {
-      "mean_sep": 0.1218,
+      "mean_sep": 0.1219,
       "std": 0.1995,
       "ci_lo": 0.0131,
       "ci_hi": 0.2316,
-      "p_value": 0.0678,
+      "p_value": 0.0677,
       "significant": true,
       "n_wins": 9,
       "n_windows": 12,
