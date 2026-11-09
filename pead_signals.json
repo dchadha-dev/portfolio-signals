@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-11-02 07:04 UTC",
-    "tickers_checked": 26,
-    "new_signals": 7,
-    "total_signals": 16,
-    "expired_removed": 2,
+    "timestamp": "2026-11-09 07:33 UTC",
+    "tickers_checked": 15,
+    "new_signals": 3,
+    "total_signals": 19,
+    "expired_removed": 0,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 112.6
+    "elapsed_seconds": 112.7
   },
   "signals": {
     "CRM": {
@@ -233,6 +233,48 @@
       "history_quarters": 3,
       "buy_score_boost": 10,
       "as_of": "2026-11-02"
+    },
+    "DDOG": {
+      "ticker": "DDOG",
+      "announce_date": "2026-11-04",
+      "expires_at": "2027-01-03",
+      "sue": 5.334,
+      "surprise": 0.1436,
+      "actual_eps": 0.81,
+      "estimate_eps": 0.6664,
+      "std_dev": 0.0269,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-11-09"
+    },
+    "EXPE": {
+      "ticker": "EXPE",
+      "announce_date": "2026-11-04",
+      "expires_at": "2027-01-03",
+      "sue": 3.007,
+      "surprise": 0.321,
+      "actual_eps": 9.39,
+      "estimate_eps": 9.069,
+      "std_dev": 0.1067,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-11-09"
+    },
+    "SEDG": {
+      "ticker": "SEDG",
+      "announce_date": "2026-11-04",
+      "expires_at": "2027-01-03",
+      "sue": 1.792,
+      "surprise": 0.2502,
+      "actual_eps": 0.29,
+      "estimate_eps": 0.0398,
+      "std_dev": 0.1396,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-11-09"
     }
   }
 }

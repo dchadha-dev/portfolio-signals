@@ -1,16 +1,132 @@
 {
   "health": {
-    "timestamp": "2026-11-02 07:08 UTC",
+    "timestamp": "2026-11-09 07:36 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
-    "n_insider_signals": 5,
+    "n_insider_signals": 6,
     "n_politician_signals": 0,
-    "n_combined_signals": 5,
-    "elapsed_seconds": 265.6,
+    "n_combined_signals": 6,
+    "elapsed_seconds": 190.0,
     "retry_required": false,
     "retry_reason": []
   },
   "signals": {
+    "TSM": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "TSM",
+          "date": "2026-11-03",
+          "value_usd": 71490,
+          "shares": 1000,
+          "price": 71.49,
+          "name": "Yuan Lipen",
+          "title": "Officer, VP",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-11-09"
+    },
+    "ENPH": {
+      "buy_score_boost": 20,
+      "insider_score": 20,
+      "politician_score": 0,
+      "insider_n": 2,
+      "insider_cluster": true,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "ENPH",
+          "date": "2026-11-03",
+          "value_usd": 30590,
+          "shares": 1000,
+          "price": 30.59,
+          "name": "Trivedi Shanker",
+          "title": "Director",
+          "is_cluster": true
+        },
+        {
+          "ticker": "ENPH",
+          "date": "2026-11-02",
+          "value_usd": 267514,
+          "shares": 10000,
+          "price": 26.75,
+          "name": "Kothandaraman Badrinarayanan",
+          "title": "Director, Officer, President & CEO",
+          "is_cluster": true
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-11-09"
+    },
+    "CRM": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "CRM",
+          "date": "2026-09-21",
+          "value_usd": 999451,
+          "shares": 4176,
+          "price": 239.33,
+          "name": "Kirk David Blair",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-11-09"
+    },
+    "APLD": {
+      "buy_score_boost": 20,
+      "insider_score": 20,
+      "politician_score": 0,
+      "insider_n": 2,
+      "insider_cluster": true,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "APLD",
+          "date": "2026-10-19",
+          "value_usd": 1006686,
+          "shares": 55803,
+          "price": 18.04,
+          "name": "Cummins Wes",
+          "title": "Director, Officer, CEO; Chairman",
+          "is_cluster": true
+        },
+        {
+          "ticker": "APLD",
+          "date": "2026-10-19",
+          "value_usd": 5658000,
+          "shares": 300000,
+          "price": 18.86,
+          "name": "Zhang Jason Gechen",
+          "title": "Officer, President",
+          "is_cluster": true
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-11-09"
+    },
     "GRAB": {
       "buy_score_boost": 20,
       "insider_score": 20,
@@ -43,7 +159,7 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-11-02"
+      "as_of": "2026-11-09"
     },
     "NBIS": {
       "buy_score_boost": 10,
@@ -107,89 +223,7 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-11-02"
-    },
-    "CRM": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "CRM",
-          "date": "2026-09-21",
-          "value_usd": 999451,
-          "shares": 4176,
-          "price": 239.33,
-          "name": "Kirk David Blair",
-          "title": "Director",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-11-02"
-    },
-    "MSCI": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "MSCI",
-          "date": "2026-09-04",
-          "value_usd": 1000160,
-          "shares": 1786,
-          "price": 560.0,
-          "name": "Taneja Rajat",
-          "title": "Director",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-11-02"
-    },
-    "APLD": {
-      "buy_score_boost": 20,
-      "insider_score": 20,
-      "politician_score": 0,
-      "insider_n": 2,
-      "insider_cluster": true,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "APLD",
-          "date": "2026-10-19",
-          "value_usd": 1006686,
-          "shares": 55803,
-          "price": 18.04,
-          "name": "Cummins Wes",
-          "title": "Director, Officer, CEO; Chairman",
-          "is_cluster": true
-        },
-        {
-          "ticker": "APLD",
-          "date": "2026-10-19",
-          "value_usd": 5658000,
-          "shares": 300000,
-          "price": 18.86,
-          "name": "Zhang Jason Gechen",
-          "title": "Officer, President",
-          "is_cluster": true
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-11-02"
+      "as_of": "2026-11-09"
     }
   }
 }
