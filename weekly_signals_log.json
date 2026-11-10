@@ -1,24 +1,6 @@
 {
-  "last_updated": "2026-11-10 04:24 UTC",
+  "last_updated": "2026-11-10 18:25 UTC",
   "entries": [
-    {
-      "ticker": "MPWR",
-      "signal_type": "WATCH",
-      "score": 65,
-      "sell_score": 0.0,
-      "timestamp": "2026-11-03 18:11",
-      "price": 1345.57,
-      "dist_252h": -20.4,
-      "framework_score": 79,
-      "fdfv3": true,
-      "is_holding": false,
-      "status": "expired",
-      "current_score": 65,
-      "current_price": 1345.57,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 5",
-      "expired_at": "2026-11-04 02:48"
-    },
     {
       "ticker": "AMD",
       "signal_type": "WATCH",
@@ -32,7 +14,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 73,
-      "current_price": 508.58,
+      "current_price": 507.26,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -50,7 +32,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 73,
-      "current_price": 508.58,
+      "current_price": 507.26,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
