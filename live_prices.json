@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-09 21:13 UTC",
+  "timestamp": "2026-11-10 04:24 UTC",
   "run_date": "Tuesday 10 Nov 2026",
   "prices": {
     "BKNG": {
@@ -103,7 +103,7 @@
       "change_pct": null
     },
     "MU": {
-      "price": 733.33,
+      "price": 733.15,
       "change_pct": null
     },
     "BABA": {
@@ -179,7 +179,7 @@
       "change_pct": null
     },
     "QQQ": {
-      "price": 678.68,
+      "price": 679.35,
       "change_pct": null
     },
     "GLD": {
@@ -230,44 +230,100 @@
       "price": 154.6,
       "change_pct": null
     },
+    "LIT": {
+      "price": 61.35,
+      "change_pct": null
+    },
+    "BEP": {
+      "price": 31.19,
+      "change_pct": null
+    },
+    "DNN": {
+      "price": 2.34,
+      "change_pct": null
+    },
+    "AAL": {
+      "price": 14.16,
+      "change_pct": null
+    },
+    "OWL": {
+      "price": 10.37,
+      "change_pct": null
+    },
+    "PI": {
+      "price": 174.73,
+      "change_pct": null
+    },
+    "ALGN": {
+      "price": 174.26,
+      "change_pct": null
+    },
     "KWEB": {
       "price": 24.31,
-      "change_pct": null
-    },
-    "IVV": {
-      "price": 756.05,
-      "change_pct": null
-    },
-    "IWF": {
-      "price": 115.01,
-      "change_pct": null
-    },
-    "DRIV": {
-      "price": 29.38,
       "change_pct": null
     },
     "SMH": {
       "price": 487.41,
       "change_pct": null
     },
-    "DIA": {
-      "price": 523.33,
+    "EWJ": {
+      "price": 91.48,
+      "change_pct": null
+    },
+    "ACWV": {
+      "price": 130.04,
+      "change_pct": null
+    },
+    "BLOK": {
+      "price": 50.85,
+      "change_pct": null
+    },
+    "IWF": {
+      "price": 115.01,
+      "change_pct": null
+    },
+    "ARKG": {
+      "price": 48.25,
+      "change_pct": null
+    },
+    "FINX": {
+      "price": 24.54,
       "change_pct": null
     },
     "ARKK": {
       "price": 78.98,
       "change_pct": null
     },
+    "AIQ": {
+      "price": 58.77,
+      "change_pct": null
+    },
+    "DIA": {
+      "price": 523.33,
+      "change_pct": null
+    },
     "BOTZ": {
       "price": 31.88,
+      "change_pct": null
+    },
+    "SPY": {
+      "price": 752.69,
+      "change_pct": null
+    },
+    "DRIV": {
+      "price": 29.45,
+      "change_pct": null
+    },
+    "IVV": {
+      "price": 756.05,
       "change_pct": null
     },
     "AAXJ": {
       "price": 105.34,
       "change_pct": null
     },
-    "ARKG": {
-      "price": 48.25,
+    "INDA": {
+      "price": 51.41,
       "change_pct": null
     }
   }
