@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-10 18:25 UTC",
+  "last_updated": "2026-11-11 02:21 UTC",
   "entries": [
     {
       "ticker": "AMD",
@@ -14,7 +14,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 73,
-      "current_price": 507.26,
+      "current_price": 515.21,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -32,7 +32,25 @@
       "is_holding": true,
       "status": "active",
       "current_score": 73,
-      "current_price": 507.26,
+      "current_price": 515.21,
+      "expire_reason": null,
+      "expire_detail": null,
+      "expired_at": null
+    },
+    {
+      "ticker": "AMD",
+      "signal_type": "WATCH",
+      "score": 73,
+      "sell_score": 6.0,
+      "timestamp": "2026-11-11 02:21",
+      "price": 515.21,
+      "dist_252h": -20.7,
+      "framework_score": 86,
+      "fdfv3": true,
+      "is_holding": true,
+      "status": "active",
+      "current_score": 73,
+      "current_price": 515.21,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
