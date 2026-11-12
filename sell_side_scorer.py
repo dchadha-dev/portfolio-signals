@@ -345,7 +345,7 @@ def score_ticker(ticker, sell_sigs, market, sector_states, framework_score=None)
         dist_pct = dist
         if dist_pct > -10:  # within 10% of high
             # Linear: 0% below = 35pts, 10% below = 0pts
-            near_score = max(0, 35 * (1 + dist_pct / 10))
+            near_score = min(35, max(0, 35 * (1 + dist_pct / 10)))
             score += near_score
             if near_score >= 20:
                 flags.append(f"near_high({dist_pct:+.1f}%)+{near_score:.0f}")
@@ -418,10 +418,12 @@ def score_ticker(ticker, sell_sigs, market, sector_states, framework_score=None)
     sector_boost = 0
     for sector in TICKER_SECTORS.get(ticker, []):
         sector_data = sector_states.get(sector, {})
-        # Handle both old bool format and new dict format
+        # Legacy bool format meant "sector extended" and adds to the sell score.
+        # The dict format carries 'entry_signal', which is a BUY tailwind (a dip
+        # in an outperforming sector) and must never raise a sell score — it is
+        # consumed on the buy side in signal_scanner.build_payload().
         if isinstance(sector_data, dict):
-            if sector_data.get('entry_signal'):
-                sector_boost = 5; flags.append(f"{sector}_entry+5"); break
+            continue
         elif sector_data:
             sector_boost = 5; flags.append(f"{sector}_ext+5"); break
 

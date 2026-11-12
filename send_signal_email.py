@@ -47,6 +47,62 @@ def load_weekly_log(): return load_json('weekly_signals_log.json')
 def load_insider():    return load_json('insider_signals.json')
 def load_pead():       return load_json('pead_signals.json')
 
+# ── LABELS — same single source of truth as the dashboard ────────────
+# The scanner writes a final `label` per row (after caps). The emails print
+# that label; they never re-derive a state from buy_score / sell_score.
+SELL_LABELS = ('EXIT', 'REDUCE', 'TRIM')
+BUY_LABELS  = ('STRONG BUY', 'BUY')
+DEFAULT_THRESHOLDS = {'buy': 80, 'watch': 60, 'strong': 95, 'fw_min_buy': 70,
+                      'trim': 52, 'reduce': 65, 'exit': 78}
+
+def label_of(row):
+    """Scanner label, with the same fallback the dashboard uses for payloads
+    written before `label` existed (mirrors display_label in signal_scanner)."""
+    if row.get('label'):
+        return row['label']
+    if row.get('signal') == 'NO_DATA':
+        return 'NO DATA'
+    if row.get('is_holding') and row.get('sell_action') in SELL_LABELS:
+        return row['sell_action']
+    sig = row.get('signal')
+    if sig == 'BUY':
+        return 'STRONG BUY' if row.get('signal_tier') == 'STRONG' else 'BUY'
+    if sig == 'WEAK_BUY':
+        return 'FW BLOCKED'
+    if sig == 'WATCH':
+        return 'WATCH'
+    return 'HOLD'
+
+def thresholds(payload):
+    return {**DEFAULT_THRESHOLDS, **(payload.get('thresholds') or {})}
+
+def counts(signals):
+    labels = [label_of(r) for r in signals]
+    return {
+        'buys':       sum(l in BUY_LABELS for l in labels),
+        'watch':      labels.count('WATCH'),
+        'fw_blocked': labels.count('FW BLOCKED'),
+        'sell_flags': sum(l in SELL_LABELS for l in labels),
+        'exit':       labels.count('EXIT'),
+        'reduce':     labels.count('REDUCE'),
+        'trim':       labels.count('TRIM'),
+    }
+
+def macro_ok(payload):
+    """SPY above its 200d SMA. (The emails used `not sp500_extended`, which is
+    a different thing: extended = more than 15% ABOVE the 200d.)"""
+    m = payload.get('market', {})
+    if 'macro_ok' in m:
+        return bool(m['macro_ok'])
+    for r in payload.get('analytics', {}).get('signals', []):
+        if 'macro_ok' in r:
+            return bool(r['macro_ok'])
+    return True
+
+def footer_thresholds(th):
+    return (f'Buy ≥{th["buy"]} · FW ≥{th["fw_min_buy"]} · TRIM ≥{th["trim"]}<br>'
+            f'REDUCE ≥{th["reduce"]} · EXIT ≥{th["exit"]}')
+
 # ── HTML PRIMITIVES ──────────────────────────────────────────────────
 def wrap(content, title='Portfolio Signals'):
     return f"""<!DOCTYPE html>
@@ -173,13 +229,15 @@ def build_daily(payload, insider_data, pead_data):
     vix_cur = market.get('vix_current', 20)
     vix_lbl = 'Fear' if vix_z > 1 else 'Greed' if vix_z < -1 else 'Neutral'
     vix_col = GREEN if vix_z > 1 else AMBER if vix_z < -1 else BLUE
-    spy_ok  = not market.get('sp500_extended', False)
+    spy_ok  = macro_ok(payload)
+    th      = thresholds(payload)
+    c       = counts(signals)
     s_cap   = market.get('strong_cap', 3)
     r_cap   = market.get('regular_cap', 3)
-    n_strong= summary.get('strong_buy', 0)
-    n_watch = summary.get('watch', 0)
+    n_strong= c['buys']            # all buys (strong + regular), as labelled
+    n_watch = c['watch']
     n_factor= summary.get('factor_zone', 0)
-    n_sell  = market.get('sell_cap', 0)
+    n_sell  = c['sell_flags']      # held positions with TRIM/REDUCE/EXIT — not the cap
     n_pead  = len(pead_data.get('signals', {})) if pead_data else 0
     n_ins   = len(insider_data.get('signals', {})) if insider_data else 0
 
@@ -196,25 +254,29 @@ def build_daily(payload, insider_data, pead_data):
     ])
 
     # Summary
-    top_watch = sorted([s for s in signals if s.get('fdfv3') and s.get('buy_score',0) < 80],
-                       key=lambda x: (-x.get('buy_score',0), -(x.get('framework_score') or 0)))
+    by_buy = lambda x: (-x.get('buy_score',0), -(x.get('framework_score') or 0))
+    top_watch  = sorted([s for s in signals if label_of(s) == 'WATCH'], key=by_buy)
+    fw_blocked = sorted([s for s in signals if label_of(s) == 'FW BLOCKED'], key=by_buy)
     sum_bullets = []
     if n_strong == 0:
-        sum_bullets.append(f'No signals cleared the {b("80-point buy threshold")} today')
+        sum_bullets.append(f'No buy signals today (needs score ≥{b(str(th["buy"]))} and FW ≥{th["fw_min_buy"]})')
+    if fw_blocked:
+        names = ', '.join(f'{x["ticker"]} ({x["buy_score"]}, FW {x.get("framework_score","?")})' for x in fw_blocked[:3])
+        sum_bullets.append(f'Score qualifies but framework blocks: {b(names)} — not a buy')
     if top_watch:
         tw = top_watch[0]
         sum_bullets.append(f'Highest quality watch: {b(tw["ticker"])} score {tw["buy_score"]} · FW {tw.get("framework_score","?")}')
-    no_action = not any(s.get('sell_score',0) >= 52 and s.get('is_holding') for s in signals)
-    if no_action:
+    if n_sell == 0:
         sum_bullets.append(f'{hi("No action required", GREEN)} on any held position today')
 
     html += section('Summary',
         stat_grid([
-            (n_strong or '0', 'Strong Buys', GREEN if n_strong else TXT3),
+            (n_strong or '0', 'Buys', GREEN if n_strong else TXT3),
             (n_watch,  'Watch Zone', BLUE),
             (n_sell,   'Sell Flags', AMBER if n_sell else TXT3),
         ]) + bullet_list(sum_bullets)
     )
+    html += '<!--BUYS-->'
 
     # Watch list
     watches = top_watch[:4]
@@ -223,30 +285,33 @@ def build_daily(payload, insider_data, pead_data):
         for s in watches:
             dist = s.get('dist_252h', 0)
             fw   = s.get('framework_score', '?')
-            gap  = 80 - s.get('buy_score', 0)
+            gap  = th['buy'] - s.get('buy_score', 0)
             dfv  = s.get('dfv_lift', 0) or 0
             bs   = [
                 f'Down {b(f"{abs(dist):.1f}%")} from 252d high · DFV lift {hi(f"{dfv:.1f}")} · FW {fw}',
-                f'{hi(f"{gap} more points", AMBER)} needed to trigger buy signal',
+                (hi('Qualified as a buy — held back by today\'s buy cap', AMBER) if s.get('buy_capped')
+                 else f'{hi(f"{gap} more points", AMBER)} needed to trigger buy signal'),
             ]
             if isinstance(fw, int) and fw < 50:
                 bs.append(f'{hi("Caution: FW " + str(fw) + " — speculative", AMBER)} · size small if entering')
             cards += card(s['ticker'], '', f'WATCH · {s["buy_score"]}', BLUE, '#0c1a3a', bs,
                          'MONITOR — CLOSE TO TRIGGER' if gap <= 8 else 'MONITOR', BLUE)
-        html += section('★★ Watch — Factor+DFV V3 Active', cards)
+        html += section('Watch — Not Yet a Buy', cards)
 
-    # Strong buys
-    strong_buys = [s for s in signals if s.get('signal') == 'BUY' and s.get('fdfv3')]
-    if strong_buys:
+    # Buys — every row labelled BUY / STRONG BUY, exactly as on the dashboard
+    buys = sorted([s for s in signals if label_of(s) in BUY_LABELS], key=by_buy)
+    if buys:
         cards = ''
-        for s in strong_buys:
+        for s in buys:
             dist = s.get('dist_252h', 0)
             fw   = s.get('framework_score', '?')
-            cards += card(s['ticker'], f'${s.get("price",0):,.2f}', f'BUY · {s["buy_score"]}', GREEN, '#041a0f',
-                         [f'Factor+DFV V3 · down {b(f"{abs(dist):.1f}%")} from 252d high · FW {fw}',
+            lbl  = label_of(s)
+            cards += card(s['ticker'], f'${s.get("price") or 0:,.2f}', f'{lbl} · {s["buy_score"]}', GREEN, '#041a0f',
+                         [f'Down {b(f"{abs(dist):.1f}%")} from 252d high · FW {fw}',
                           s.get('guidance','')[:120]],
-                         '★★ CONSIDER ENTRY', GREEN)
-        html += section('★★ New Buy Signals', cards)
+                         'CONSIDER ENTRY', GREEN)
+        html = html.replace('<!--BUYS-->', section('Buy Signals', cards))
+    html = html.replace('<!--BUYS-->', '')
 
     # Insider signals
     ins_sigs = insider_data.get('signals', {}) if insider_data else {}
@@ -263,7 +328,7 @@ def build_daily(payload, insider_data, pead_data):
                 val   = bv.get('value_usd', 0)
                 dt    = bv.get('date', '')
                 bs.append(f'{title} bought {hi(f"${val:,.0f}", AMBER)} on {dt}')
-            ins_sc = ins.get('insider_score', 0)
+            ins_sc = ins.get('buy_score_boost', ins.get('insider_score', 0))
             bs.append(f'Buy score boost: {hi(f"+{ins_sc}pts", AMBER)} · Watch for factor gate opening')
             ins_lbl = 'CLUSTER' if is_cluster else 'INSIDER'
             cards += card(ticker, 'INSIDER', f'{ins_lbl} · +{ins_sc}pts',
@@ -285,7 +350,7 @@ def build_daily(payload, insider_data, pead_data):
                 'PEAD drift expected for up to 60 days post-earnings',
             ]
             if is_held:
-                bs.append(f'{hi("HELD", GREEN)} · sell score {sell_sc:.0f} — FW damping holding sell below TRIM')
+                bs.append(f'{hi("HELD", GREEN)} · sell score {sell_sc:.0f} · {label_of(sig_)}')
             else:
                 bs.append('Not a held position')
             cards += card(ticker, f'SUE {sue:.2f}', f'PEAD · EXP {expires}', PURPLE, '#12082a',
@@ -302,22 +367,27 @@ def build_daily(payload, insider_data, pead_data):
             sc   = s.get('sell_score', 0)
             fw   = s.get('framework_score', '?')
             dist = s.get('dist_252h', 0)
-            act  = 'EXIT' if sc>=78 else 'REDUCE' if sc>=65 else 'TRIM' if sc>=52 else 'HOLD'
+            # Action comes from the scanner (post-damping, post-cap) — never
+            # recomputed from the score here.
+            lbl  = label_of(s)
+            act  = lbl if lbl in SELL_LABELS else 'HOLD'
             acol = RED if act=='EXIT' else AMBER if act in ('REDUCE','TRIM') else TXT3
             bs   = [
                 f'Sell score {b(f"{sc:.0f}")} · Action: {hi(act, acol)} · FW {fw}',
                 f'Dist from 252d high: {dist:+.1f}%',
             ]
-            if sc < 52:
-                bs.append(f'{hi("FW damping keeps score below TRIM — hold", GREEN)}')
-            cards += card(s['ticker'], f'${s.get("price",0):,.2f}',
-                         f'{act} · {sc:.0f}', acol, '#1a0a0a' if sc>=78 else '#1a1200' if sc>=52 else BG2,
+            if act == 'HOLD':
+                why = ('held back by the portfolio sell cap' if s.get('sell_capped')
+                       else f'below TRIM threshold ({th["trim"]})')
+                bs.append(hi(f'No action — {why}', GREEN))
+            cards += card(s['ticker'], f'${s.get("price") or 0:,.2f}',
+                         f'{act} · {sc:.0f}', acol, '#1a0a0a' if act=='EXIT' else '#1a1200' if act!='HOLD' else BG2,
                          bs, act, acol)
         html += section('📊 Held Positions — Sell Monitor', cards)
 
     html += note_bar('📋 Weekly summary sent every Monday — insider signals, PEAD, regime review, watchlist')
     html += footer(f'portfolio-signals · {run_date}<br>2× daily · 06:00 + 18:00 BKK',
-                   'Buy ≥80 · TRIM ≥52<br>REDUCE ≥65 · EXIT ≥78')
+                   footer_thresholds(th))
     return wrap(html, f'Portfolio Signals · {run_date}')
 
 
@@ -332,14 +402,16 @@ def build_weekly(payload, insider_data, pead_data):
     vix_z   = market.get('vix_zscore', 0)
     vix_cur = market.get('vix_current', 20)
     vix_lbl = 'Neutral' if abs(vix_z) < 1 else ('Fear' if vix_z > 1 else 'Greed')
-    spy_ok  = not market.get('sp500_extended', False)
+    spy_ok  = macro_ok(payload)
+    th      = thresholds(payload)
+    c       = counts(signals)
     ins_sigs = insider_data.get('signals', {}) if insider_data else {}
     pead_sigs= pead_data.get('signals', {}) if pead_data else {}
     held     = [s for s in signals if s.get('is_holding')]
-    exits    = sum(1 for s in held if s.get('sell_score',0) >= 78)
-    reduces  = sum(1 for s in held if 65 <= s.get('sell_score',0) < 78)
-    new_buys = sum(1 for s in signals if s.get('signal') == 'BUY')
-    top_score= max((s.get('buy_score',0) for s in signals if s.get('fdfv3')), default=0)
+    exits    = c['exit']
+    reduces  = c['reduce']
+    new_buys = c['buys']
+    top_score= max((s.get('buy_score',0) for s in signals if label_of(s) == 'WATCH'), default=0)
 
     headline = f'{exits} exits · {reduces} reduces · {len(ins_sigs)} insider signals · {len(pead_sigs)} PEAD active'
     subline  = f'Regime: {vix_lbl} all week · SPY {"above" if spy_ok else "below"} 200d MA'
@@ -379,10 +451,14 @@ def build_weekly(payload, insider_data, pead_data):
             seen.add(tk)
             sig_type   = e.get('signal_type', 'WATCH')
             fired_date = e.get('timestamp', '')[:10]
-            score_fire = e.get('score_at_fire', 0)
-            expired    = e.get('expired', False)
-            reason     = e.get('expire_reason', '')
-            price_chg  = e.get('price_change_pct', 0) or 0
+            # Field names as written by update_weekly_signal_log(). The email
+            # read 'score_at_fire' / 'expired' / 'price_change_pct', none of
+            # which exist — so it always showed score 0, never expired, +0.0%.
+            score_fire = e.get('score', 0)
+            expired    = e.get('status') == 'expired'
+            reason     = e.get('expire_reason') or ''
+            p0, p1     = e.get('price'), e.get('current_price')
+            price_chg  = ((p1 / p0 - 1) * 100) if (p0 and p1) else 0
             is_held    = e.get('is_holding', False)
             fw         = e.get('framework_score', '?')
 
@@ -446,7 +522,8 @@ def build_weekly(payload, insider_data, pead_data):
         rows = ''
         for s in sorted(held, key=lambda x: -x.get('sell_score',0))[:8]:
             sc   = s.get('sell_score', 0)
-            act  = 'EXIT' if sc>=78 else 'REDUCE' if sc>=65 else 'TRIM' if sc>=52 else 'HOLD'
+            lbl  = label_of(s)
+            act  = lbl if lbl in SELL_LABELS else 'HOLD'
             acol = RED if act=='EXIT' else AMBER if act in ('REDUCE','TRIM') else GREEN
             note = s.get('guidance','')[:55]
             rows += f"""<tr>
@@ -468,14 +545,14 @@ def build_weekly(payload, insider_data, pead_data):
         html += section('📋 Held Positions — Weekly Review', tbl + note)
 
     # Priority watch
-    top_watch = sorted([s for s in signals if s.get('fdfv3')],
+    top_watch = sorted([s for s in signals if label_of(s) == 'WATCH'],
                        key=lambda x: (-x.get('buy_score',0), -(x.get('framework_score') or 0)))[:2]
     if top_watch:
         cards = ''
         for s in top_watch:
             fw   = s.get('framework_score', '?')
             dist = s.get('dist_252h', 0)
-            gap  = 80 - s.get('buy_score', 0)
+            gap  = max(0, th['buy'] - s.get('buy_score', 0))
             dfv  = s.get('dfv_lift', 0) or 0
             cards += card(s['ticker'], f'FW {fw} · Score {s["buy_score"]}',
                          f'{gap} PTS FROM TRIGGER', BLUE, '#0c1a3a',
@@ -486,7 +563,7 @@ def build_weekly(payload, insider_data, pead_data):
 
     html += note_bar(f'📊 Daily digest sent 18:00 Bangkok · Next weekly: Mon {run_date}')
     html += footer(f'portfolio-signals · Weekly · {run_date}<br>Monday 07:00 BKK',
-                   'Buy ≥80 · TRIM ≥52<br>REDUCE ≥65 · EXIT ≥78')
+                   footer_thresholds(th))
     return wrap(html, f'Portfolio Signals · Weekly · {run_date}')
 
 
@@ -555,8 +632,9 @@ def main():
 
     if args.mode == 'daily':
         html    = build_daily(payload, insider_data, pead_data)
-        n_buys  = payload.get('summary', {}).get('strong_buy', 0)
-        n_sells = payload.get('market', {}).get('sell_cap', 0)
+        _c      = counts(payload.get('analytics', {}).get('signals', []))
+        n_buys  = _c['buys']
+        n_sells = _c['sell_flags']
         subject = f'📊 Portfolio Signals · {run_date} · {n_buys} buy{"s" if n_buys!=1 else ""} · {n_sells} sell flags'
     else:
         html    = build_weekly(payload, insider_data, pead_data)
