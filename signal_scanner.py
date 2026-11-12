@@ -17,13 +17,14 @@ try:
     from sell_side_scorer import (
         compute_sell_signals, fetch_sector_signals,
         fetch_market_signals, score_ticker, apply_portfolio_cap,
-        EXIT_T, REDUCE_T, TRIM_T, TICKER_SECTORS
+        sell_ceiling, EXIT_T, REDUCE_T, TRIM_T, TICKER_SECTORS
     )
     SELL_SCORER_AVAILABLE = True
 except ImportError:
     SELL_SCORER_AVAILABLE = False
     EXIT_T = 78; REDUCE_T = 65; TRIM_T = 52   # keep identical to sell_side_scorer.py
     TICKER_SECTORS = {}
+    def sell_ceiling(_fs): return 'HOLD'
     print("sell_side_scorer.py not found -- sell signals disabled")
 
 # ── SIGNAL THRESHOLDS — single source of truth ────────────────────────
@@ -58,6 +59,16 @@ def technical_buy_score(last):
     if last['banker_weak']: buy -= 20
     if last['rbear']:       buy -= 10
     return buy
+
+
+def technical_buy_frame(df):
+    """Vectorised technical_buy_score() over a whole compute_signals() frame.
+    Used by validate_signals.py so the backtest scores history with exactly the
+    weights that run live. Keep the two functions in lockstep (tested in CI)."""
+    b = lambda c: df[c].astype(bool)
+    buy = (40 * b('f') + 25 * b('fdfv3') + 8 * b('pfd') + 10 * b('triple')
+           + 5 * (b('dfv3') & ~b('f')) - 20 * b('banker_weak') - 10 * b('rbear'))
+    return buy.clip(0, 100)
 
 
 def classify_buy(buy, factor, fs, fw_min=FW_MIN_BUY):
@@ -265,6 +276,10 @@ try:
                   f"(updated {_hj.get('updated_at','?')})")
 except Exception as _e:
     print(f"holdings.json not applied ({_e}) — using built-in MY_HOLDINGS")
+
+# Funds whose proxy is only a placeholder. They stay in the holdings list but get
+# no buy/sell signal: a SPY-derived "buy" on a Thai SET50 fund is not information.
+NO_SIGNAL_FUNDS = {'SCB_SET50'}
 
 PROXY_TICKERS = list(set(TICKER_PROXY_MAP.values()))
 # Tickers kept in holdings but excluded from signal computation
@@ -668,8 +683,10 @@ def build_guidance(t, last, ta, fs):
     elif last['pfd']:
         parts.append("PFD signal: price compressed vs own trend.")
 
-    if last['triple'] and not last['f']:
-        parts.append("Caution: up >20% in 63 days — mean reversion risk short-term.")
+    if last['triple']:
+        # The score ADDS 10 for this. The old text called the same condition a
+        # mean-reversion "Caution" — score and guidance contradicted each other.
+        parts.append("Up >20% in 63 days (momentum, +10 to score).")
     if last['banker_weak']:
         parts.append("Banker Weak: RSI47 institutional signal dropping from max.")
     if last['rbear']:
@@ -957,6 +974,7 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
             'sell_weekly_rsi': sell_sigs_data.get('weekly_rsi'),
             'near_high':       sell_sigs_data.get('near_high', False),
             'sell_atr_dist':   sell_sigs_data.get('sma_atr_dist'),
+            'sell_ceiling':    sell_ceiling(fs),   # strongest action this FW score can ever reach
             'is_holding':      is_holding,
             'dist_252h':       round(float(last['dist'])*100, 1),
             'vs_200ma':        round(float(last['trend'])*100, 1),
@@ -1011,6 +1029,9 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         # PFD was still +20 (direct: +8) and the RBear -10 penalty was missing,
         # so a fund and its own proxy ETF could show different scores.
         buy = max(0, min(100, technical_buy_score(last)))
+        no_signal = fund in NO_SIGNAL_FUNDS
+        if no_signal:
+            buy = 0
 
         sell_score = 0; sell_action = 'HOLD'; sell_flags = '—'; sell_caution = '—'
         sell_score_raw = 0
@@ -1023,10 +1044,12 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         signal = classify_buy(buy, bool(last['f']), fs, FUND_FW_MIN_BUY)
 
         guidance = build_guidance(proxy, last, ta, fs)
+        guidance = (f"No signal: {proxy} is a placeholder, not a valid proxy for this fund."
+                    if no_signal else f"[via {proxy}] {guidance}")
 
         row = {
             'ticker': fund, 'price': price, 'change_pct': 0.0,
-            'signal': signal, 'guidance': f"[via {proxy}] {guidance}",
+            'signal': signal, 'guidance': guidance,
             'buy_score': buy, 'sell_score': sell_score,
             'sell_score_raw': sell_score_raw,
             'sell_action': sell_action, 'sell_flags': sell_flags,
@@ -1048,8 +1071,12 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
             'factor_sep': None if not fa_valid else round(float(fa)*100, 1),
             'framework_score': fs,
             'fw_min_buy': FUND_FW_MIN_BUY,
-            'buy_breakdown': buy_breakdown(last, 0, 0, 0),
+            'buy_breakdown': [] if no_signal else buy_breakdown(last, 0, 0, 0),
+            'sell_ceiling': 'HOLD',   # sell scoring is disabled for proxy funds
         }
+        if no_signal:
+            row.update(factor=False, dfv3=False, fdfv3=False, pfd=False,
+                       triple=False, banker_weak=False, rbear=False)
         signals_list.append(row)
 
     # ── Add stub rows for failed tickers so they appear in Rankings ──
@@ -1155,6 +1182,8 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         'market': {
             'cnn_score':       sell_market.get('cnn_score', 50),
             'cnn_label':       sell_market.get('cnn_label', 'Neutral'),
+            'cnn_ok':          bool(sell_market.get('cnn_ok', False)),   # False = default 50, fetch failed
+            'vix_ok':          bool(sell_market.get('vix_ok', False)),
             'vix_current':     sell_market.get('vix_current', 20.0),
             'vix_zscore':      sell_market.get('vix_zscore', 0.0),
             'vix_label':       sell_market.get('vix_label', 'Neutral'),
@@ -1291,6 +1320,17 @@ def main():
     # Used by the weekly email to show "signals that fired this week"
     # with freshness status (still active vs expired + reason).
     update_weekly_signal_log(payload)
+
+    # ── Live out-of-sample ledger ────────────────────────────────────
+    # Every label the model issues is recorded with its date and price, then
+    # scored against the average stock in the same universe at 21/63/126/252
+    # trading days. This is the only evidence that cannot be contaminated by
+    # hindsight: the universe and the rule are both fixed before the outcome.
+    try:
+        from signal_ledger import update_ledger
+        update_ledger(payload, closes, list(all_signals.keys()))
+    except Exception as e:
+        print(f'signal ledger not updated: {str(e)[:120]}')
 
     print(f'Written: {out} ({os.path.getsize(out):,} bytes)')
     print(f"Summary: {payload['summary']}")

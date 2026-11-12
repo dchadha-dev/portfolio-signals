@@ -1,4 +1,12 @@
 """
+DEPRECATED FOR DECISIONS — see validate_signals.py and MODEL_AUDIT.md.
+The statistics this script prints (annual excess, t-stat, DSR, PBO) are inflated
+by construction: each observation is counted 22 times, overlapping 252-day
+windows are treated as independent, Sharpe is annualised twice, PBO is 0.50 by
+definition, and returns are measured against VOO on a hindsight-selected universe.
+Kept only so earlier reports remain reproducible.
+
+
 signal_scanner_validation_cpcv.py
 ══════════════════════════════════════════════════════════════════════
 Combinatorial Purged Cross-Validation (CPCV) harness.

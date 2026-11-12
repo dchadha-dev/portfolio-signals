@@ -2490,7 +2490,9 @@ function renderRankings() {
         <div>
           <div style="font-size:15px;font-weight:700;font-family:'Space Grotesk',sans-serif">${rows.length} positions · ${runDate}</div>
           <div style="font-size:11px;color:var(--text3);margin-top:2px;font-family:'DM Mono',monospace">
-            CNN F&G: <span style="color:${cnnColor};font-weight:600">${cnnScore.toFixed(0)} (${cnnLabel})</span>
+            CNN F&G: ${market.cnn_ok === false
+              ? '<span style="color:var(--amber)" title="The CNN endpoint did not answer. 50 is a placeholder, and the sell cap is sized from it.">n/a (fetch failed — default 50 in use)</span>'
+              : `<span style="color:${cnnColor};font-weight:600">${cnnScore.toFixed(0)} (${cnnLabel})</span>`}
             &nbsp;·&nbsp; VIX: <span style="color:${vixColor2};font-weight:600">${vixCur2.toFixed(1)} z=${vixZ2.toFixed(1)} (${vixLbl2})</span>
             &nbsp;·&nbsp; S&P500 ext: ${market.sp500_extended||false}
             &nbsp;·&nbsp; Buffett: ${market.buffett_extended||false}
@@ -2580,7 +2582,7 @@ function renderRankings() {
                   ${isHeld ? '<span style="background:var(--red);color:#fff;font-size:8px;padding:1px 4px;border-radius:2px;margin-left:4px;font-family:monospace">HELD</span>' : '<span style="border:1px solid var(--border);color:var(--text3);font-size:8px;padding:1px 4px;border-radius:2px;margin-left:4px;font-family:monospace">CAND</span>'}
                 </td>
                 <td style="padding:7px 10px">${buyBar(s.buy_score || 0)}</td>
-                <td style="padding:7px 10px">${sellBadge(s.sell_action, s.sell_score)}</td>
+                <td style="padding:7px 10px" title="${s.sell_ceiling ? 'Strongest sell action this framework score can ever reach: ' + s.sell_ceiling : ''}">${sellBadge(s.sell_action, s.sell_score)}</td>
                 <td style="padding:7px 10px">${fw(s)}</td>
                 <td style="padding:7px 10px">${signalDots(s)}</td>
                 <td style="padding:7px 10px">${distCell(s)}</td>
@@ -3453,7 +3455,7 @@ function renderBuysFromPayload(payload) {
   let html = `<div style="margin-bottom:6px;font-size:11px;color:var(--text3);font-family:'DM Mono',monospace">
     ${runDate}
     · VIX: <span style="color:${vixZ > 1 ? 'var(--green)' : vixZ < -1 ? 'var(--red)' : 'var(--text3)'};font-weight:600">${vixCur.toFixed(1)} z=${vixZ.toFixed(1)} (${vixLabel})</span>
-    · CNN: ${cnnScore.toFixed(0)}
+    · CNN: ${market.cnn_ok === false ? 'n/a' : cnnScore.toFixed(0)}
     · Buy cap: ${market.strong_cap ?? '—'} strong + ${market.regular_cap ?? '—'} regular
     · Buy = score ≥${th.buy} and FW ≥${th.fw_min_buy}
   </div>`;
@@ -3482,7 +3484,15 @@ function renderSellsFromPayload(payload) {
     .filter(s => SELL_LABELS.includes(sigLabel(s)))
     .sort((a, b) => (order[sigLabel(b)] - order[sigLabel(a)]) || (b.sell_score||0) - (a.sell_score||0));
 
-  const legend = `TRIM ≥${th.trim} · REDUCE ≥${th.reduce} · EXIT ≥${th.exit} (after framework damping) · sell cap ${market.sell_cap ?? '—'} held positions`;
+  // Framework damping multiplies a 0-100 score, so a high framework score puts
+  // REDUCE/EXIT out of reach no matter what the price does. Say so plainly.
+  const heldDirect = allSigs.filter(s => s.is_holding && s.sell_ceiling && !s.proxy && sigLabel(s) !== 'NO DATA');
+  const nNoReduce  = heldDirect.filter(s => ['HOLD', 'TRIM'].includes(s.sell_ceiling)).length;
+  const nNoTrim    = heldDirect.filter(s => s.sell_ceiling === 'HOLD').length;
+  const ceilNote   = heldDirect.length
+    ? `<br>Reach of this model: ${nNoReduce} of ${heldDirect.length} held stocks can never score REDUCE or EXIT (framework damping caps them)${nNoTrim ? `, ${nNoTrim} can never score TRIM` : ''}. It does not look at position size.`
+    : '';
+  const legend = `TRIM ≥${th.trim} · REDUCE ≥${th.reduce} · EXIT ≥${th.exit} (after framework damping) · sell cap ${market.sell_cap ?? '—'} held positions${ceilNote}`;
 
   if (!sells.length) {
     document.getElementById('sellContent').innerHTML =

@@ -43,6 +43,11 @@ jobs:
         if: steps.gate.outputs.run == 'true'
         run: python signal_scanner_validation.py
 
+      - name: Run signal validation (calendar-time, universe-relative)
+        if: steps.gate.outputs.run == 'true'
+        run: python validate_signals.py
+        continue-on-error: true
+
       - name: Commit validated_params.json
         if: steps.gate.outputs.run == 'true'
         run: |
@@ -52,6 +57,7 @@ jobs:
           git pull --rebase origin main
           git stash pop || true
           git add validated_params.json
+          if [ -f validation_honest.json ]; then git add validation_honest.json; fi
           if git diff --staged --quiet; then
             echo "No changes"
           else
