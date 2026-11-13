@@ -33,8 +33,9 @@ except ImportError:
 BUY_T           = 80   # buy score needed for BUY
 WATCH_T         = 60   # buy score needed for WATCH (factor gate must also be open)
 STRONG_T        = 95   # BUY at/above this score = STRONG tier (deep dip + overlay, or +15 of overlays)
-FW_MIN_BUY      = 70   # framework score below this blocks a BUY (-> WEAK_BUY)
-FUND_FW_MIN_BUY = 55   # same gate for Thai proxy funds (their FW scale tops out ~72)
+import framework_scorer
+FW_MIN_BUY      = framework_scorer.BUY_MIN        # 62 = band 'Good' or better (70 on the pre-rebuild scale)
+FUND_FW_MIN_BUY = framework_scorer.FUND_BUY_MIN   # 48 for funds/ETFs (was 55)
 
 # Display label for each final state. `label` is the ONLY thing a page or
 # email should print for a row — never re-derive it from buy_score/flags.
@@ -345,138 +346,32 @@ YEARS     =  5
 FWD_DAYS  =  252
 TEST_YRS  =  2
 
-FRAMEWORK_SCORES = {
-    # ≥85 Core keepers
-    'NVDA':93,'CRDO':93,'ASML':93,'AVGO':92,'ANET':91,'DDOG':90,
-    'MELI':90,'LLY':90,'TSM':89,'MA':88,'V':88,'NBIS':87,
-    'AMD':86,'NOW':86,'MSCI':86,'BKNG':85,'ISRG':85,'SPGI':85,
-    # 70–84 Good
-    'AMZN':84,'CRWD':84,'KLAC':84,'TMO':84,'GOOG':83,'PANW':83,
-    'LRCX':83,'ZTS':83,'MSFT':82,'META':82,'AMAT':82,'RMS.PA':82,
-    'CDNS':82,'SNPS':82,'AXON':82,'ICE':82,'IDXX':82,'COST':82,
-    'CMG':82,'FICO':81,'CME':81,'AAPL':80,'CPRT':80,'NVO':80,
-    'MC.PA':80,'CRM':80,'NDAQ':80,'ADI':80,'TXN':80,'BX':80,
-    'MCD':80,'RACE':79,'INTU':79,'MPWR':79,'MRVL':79,'SPOT':79,
-    'HD':79,'SHOP':78,'PGR':78,'BRKB':78,'ORCL':78,'AXP':78,
-    'KKR':78,'MSI':78,'TTD':77,'NET':77,'VRT':77,'NFLX':76,
-    'MU':76,'ITX.MC':76,'VEEV':76,'HEI':76,'QCOM':76,'JPM':76,
-    'JNJ':76,'ABT':76,'ABNB':76,'MAR':76,'CEG':76,'DE':76,
-    'WMT':76,'ARM':76,'UNH':75,'TEAM':75,'KNSL':75,'BSX':75,
-    'FISV':74,'APP':74,'IBKR':74,'GS':74,'ABBV':74,'ELV':74,
-    'NVS':74,'PODD':74,'UBER':74,'LOW':74,'PG':74,'CAT':74,
-    'WM':74,'MS':73,'CRWV':72,'RELX':72,'ALAB':72,'SMH':72,
-    'ON':72,'SCHW':72,'UTHR':72,'MEDP':72,'ONON':72,'NKE':72,
-    'LULU':72,'KO':72,'PEP':72,'MNST':72,'DECK':72,'NEE':72,
-    'GEV':72,'CB':72,'LSCC':71,'CSCO':70,'DASH':70,'GE':70,
-    'LMT':70,
-    # 55–69 Marginal
+# Framework scores are no longer a hand-typed table in this file.
+# Inputs live in framework_scores.json (moat judgement, hand sub-scores, the old
+# totals) and fundamentals.json (weekly Finnhub fetch); framework_scorer.py turns
+# them into a 0-100 score per ticker. See FRAMEWORK.md.
+FRAMEWORK_DETAIL = framework_scorer.score_all()
+FRAMEWORK_SCORES = {t: d['score'] for t, d in FRAMEWORK_DETAIL.items()}
 
-    # ── ETF FRAMEWORK SCORES ─────────────────────────────────────────────
-    # ETF scores reflect quality of underlying exposure, not single-company moat.
-    # Broad diversified index ETFs score highest (structural quality, low cost).
-    # Thematic/leveraged ETFs score lower (concentration, vol, decay risk).
-    # US broad market
-    'VOO':82,   # S&P 500 — gold standard, lowest cost, maximum diversification
-    'SPY':82,   # S&P 500 — same exposure as VOO, slightly higher fees
-    'IVV':82,   # S&P 500 iShares — equivalent to VOO/SPY
-    'QQQ':78,   # Nasdaq-100 — quality tilt but tech concentration risk
-    'DIA':72,   # Dow Jones — 30 large caps, price-weighted, less optimal
-    'VXF':70,   # Vanguard Extended Market — US small/mid, higher vol
-    'VXUS':68,  # Vanguard Total International — broad but EM drag
-    # Sector ETFs (US listed)
-    'XLK':76,   # Technology sector — quality but concentration
-    'XLV':74,   # Healthcare sector — defensive quality
-    'XLF':68,   # Financials — cyclical, regulatory risk
-    'XLI':68,   # Industrials — cyclical
-    'XLY':70,   # Consumer discretionary — quality names but cyclical
-    'XLE':58,   # Energy — commodity-dependent, ESG headwinds
-    # International
-    'IEV':65,   # iShares Europe ETF — Europe quality drag vs US
-    'EWJ':64,   # Japan — structural quality, yen risk
-    'URTH':72,  # MSCI World — global diversification, US-heavy
-    'EWY':60,   # South Korea — Samsung-heavy, EM premium
-    'EWZ':52,   # Brazil — EM political/commodity risk
-    # Commodities
-    'GLD':65,   # Gold — inflation hedge, no yield, no moat
-    # Bond ETFs
-    'IEF':60,   # 7-10yr Treasuries — rate duration risk
-    'TLT':55,   # 20yr+ Treasuries — high duration, volatile
-    # Leveraged (decay risk, short hold only)
-    'TQQQ':48,  # 3× Nasdaq — severe decay on sideways markets
-    # Asia/EM thematic
-    'FLAX':62,  # Franklin FTSE Asia ex-Japan — broad Asia quality
-    # US Broad / Large Cap additional
-    'VTI':82,   # Vanguard Total Market — max diversification
-    'IWF':76,   # iShares Russell 1000 Growth — quality growth tilt
-    'XLG':74,   # Invesco S&P Top 50 — mega-cap concentration
-    'SCHB':81,  # Schwab US Broad — VTI equivalent
-    'ITOT':81,  # iShares Total US — VTI equivalent
-    'VIG':78,   # Vanguard Dividend Appreciation — quality dividend growth
-    'DGRO':76,  # iShares Core Dividend Growth
-    'VYM':72,   # Vanguard High Dividend — value tilt, lower growth
-    'SCHD':76,  # Schwab US Dividend — quality/value filter, low cost
-    'NOBL':74,  # S&P 500 Dividend Aristocrats
-    'DGRW':75,  # WisdomTree Quality Dividend Growth
-    # Thematic / AI / Tech
-    'AIQ':65,   # Global X AI & Technology — broad AI, quality holdings
-    'QTUM':62,  # Defiance Quantum — quantum/AI thesis, early stage
-    'BOTZ':63,  # Global X Robotics & AI — cyclical
-    'WCLD':60,  # WisdomTree Cloud Computing
-    'CLOU':58,  # Global X Cloud Computing — elevated valuation risk
-    'FIVG':60,  # Defiance 5G
-    # ARK funds — high conviction, high vol, poor recent track record
-    'ARKG':44,  # ARK Genomic Revolution — speculative biotech
-    'ARKK':42,  # ARK Innovation — aggressive, concentration risk
-    'ARKW':44,  # ARK Next Gen Internet
-    'ARKF':44,  # ARK Fintech Innovation
-    # Asia / EM
-    'AAXJ':62,  # iShares Asia ex Japan — broad Asia, EM discount
-    'INDA':68,  # iShares India — structural growth, higher valuation
-    'KWEB':52,  # KraneShares China Internet — regulatory + geopolitical
-    'FXI':50,   # iShares China Large Cap — SOE-heavy
-    'VWO':60,   # Vanguard EM — broad, commodity/political drag
-    # Fixed Income
-    'BND':62,   # Vanguard Total Bond
-    'AGG':62,   # iShares Core US Agg
-    'HYG':55,   # iShares High Yield — credit + cyclical risk
-    'LQD':60,   # iShares IG Corporate
-    # Previously unscored holdings — added Aug 2026
-    'JEPI':70,  # JPM Equity Premium Income — quality income, upside capped by covered calls
-    'VSS':68,   # Vanguard Intl Small Cap — broad diversification, higher vol than large cap
-    'XLB':62,   # Materials Select Sector — cyclical, commodity-linked, no structural moat
-    'CQQQ':52,  # Invesco China Tech — regulatory + geopolitical risk, same profile as KWEB
-    'AIQG':65,  # Global X AI UCITS — mirrors AIQ exposure, UCITS wrapper
-    'QNTM.L':58,# VanEck Quantum UCITS — early-stage theme, thinner liquidity than QTUM
-    'GME':25,   # GameStop — no durable moat, weak fundamentals, sentiment-driven
 
-    'ACLS':68,'COHR':68,'GLW':68,'TSEM':68,'DELL':68,'BAC':68,
-    'OWL':68,'MDT':68,'ALGN':68,'RCL':68,'SBUX':68,'CL':68,
-    'ULTA':68,'CCJ':68,'XOM':68,'RTX':68,'AER':68,'PDD':68,
-    'HDB':68,'CVX':67,'GILD':66,'UL':66,'CAVA':66,'SONY':66,
-    'TM':65,'O':65,'SNOW':65,'IBM':65,'TOST':65,'DIS':65,
-    'RMBS':64,'FSLR':64,'UPS':64,'PI':64,'C':62,'UHS':62,
-    'CELH':62,'SE':62,'TCOM':62,'EXPE':62,'SHEL':62,'EQNR':62,
-    'VLO':62,'OXY':62,'FDX':62,'BABA':62,'INFY':62,'FIVN':62,
-    'ADBE':61,'STX':60,'BIIB':60,'DKNG':60,'HIMS':60,'EQT':60,
-    'BKR':60,'BEP':60,'RIO':60,'FCX':60,'COIN':58,'WDC':58,
-    'PFE':58,'CVNA':58,'PLNT':58,'HAL':58,'FORM':58,'HSBC':58,
-    'SNDK':58,'VICR':58,'GDX':58,'SLV':55,'LIT':60,'TSLA':56,'RDDT':56,'BP':56,
-    'MMM':56,'JD':56,'FUTU':55,
-    # <55 Weak / sell candidates
-    'SOFI':54,'ENPH':54,'BIDU':54,'NVTS':52,'HPE':52,'HOOD':52,
-    'MRNA':52,'SMCI':52,'NXE':52,'T':52,'VZ':52,'RKLB':52,
-    'GRAB':50,'SYM':50,'TQQQ':48,'HIMX':48,'BE':48,'BA':48,
-    'IREN':48,'ASTS':46,'SOUN':44,'SEDG':44,'SERV':42,'INTC':42,
-    'DNN':42,'APLD':42,'AAL':40,'EOSE':38,'MSTR':38,'IONQ':36,
-    'NEXT':35,'KEEL':32,'QBTS':28,'RGTI':28,'QUBT':24,'QUCY':20,
-    # Thai mutual funds — same 5-axis framework [Moat/30, Earnings/25, Runway/20, Val/15, Redundancy/10]
-    'SCB_SP500':63, 'SCB_NDQ':61,  'SCB_SEMI':72,  'SCB_WORLD':68, 'SCB_GOLD':65,
-    'SCB_NK225':62, 'SCB_SET50':55, 'SCB_DJ':56,   'SCB_AIEM':64,  'SCB_FINTECH':60,
-    'SCB_AUTO':52,  'SCB_INNOV':47, 'SCB_GENO':48,  'SCB_CHINA':54, 'SCB_EV':58,
-    'SCB_BUSAA':62,
-    'KT_INDIA':70,  'KT_WORLD':65,  'KT_WTAI':68,   'KT_BLOCK':55,
-    'KT_TECH':64,   'KT_ESG':58,
-}
+def refresh_framework_scores(closes):
+    """Re-score with today's closes so the valuation axis moves with price.
+    Mutates the two dicts in place; every later lookup sees the fresh values."""
+    try:
+        prices = {t: float(closes[t].dropna().iloc[-1]) for t in closes.columns if closes[t].notna().any()}
+    except Exception:
+        prices = {}
+    FRAMEWORK_DETAIL.clear(); FRAMEWORK_DETAIL.update(framework_scorer.score_all(prices=prices))
+    FRAMEWORK_SCORES.clear(); FRAMEWORK_SCORES.update({t: d['score'] for t, d in FRAMEWORK_DETAIL.items()})
+
+
+def framework_row(t):
+    """Compact per-row framework detail for the payload."""
+    d = FRAMEWORK_DETAIL.get(t)
+    if not d:
+        return None
+    return {'band': d['band'], 'parts': d['parts'], 'sources': d['sources'], 'legacy': d['legacy'], 'kind': d['kind'],
+            'provisional': d['provisional'], 'moat_date': d['moat_date'], 'moat_stale': d['moat_stale'], 'pe': d['pe']}
 
 # ── SIGNAL ENGINE ─────────────────────────────────────────────────────
 def calc_rsi(series, period):
@@ -734,7 +629,7 @@ def build_guidance(t, last, ta, fs):
     else:
         parts.append(f"No dip: {facts}. The score needs a 20%+ drop from the high in a stock that is still strong.")
     if fs:
-        verdict = "Strong keeper." if fs >= 85 else "Monitor." if fs >= 70 else "Below the framework minimum for a buy."
+        verdict = {"Core": "Core holding.", "Good": "Good business; monitor."}.get(framework_scorer.band_of(fs), "Below the framework minimum for a buy.")
         parts.append(f"Framework: {fs}/100. {verdict}")
     return " ".join(parts)
 
@@ -882,6 +777,7 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
                   sell_market, sell_sectors, failed_tickers=None):
     signals_list = []
     if failed_tickers is None: failed_tickers = {}
+    refresh_framework_scores(closes)   # valuation axis at today's prices
 
     # Load weekly alternative data signals
     insider_signals = load_insider_signals()
@@ -1027,6 +923,7 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
             'factor_sep':      None if not fa_valid else round(float(fa)*100, 1),
             'framework_score': fs,
             'fw_min_buy':      FW_MIN_BUY,
+            'framework':       framework_row(t),
             'buy_breakdown':   buy_breakdown(last, insider_boost, pead_boost, sector_buy_boost),
             # Insider & politician signals
             'insider_boost':     insider_boost,
@@ -1120,6 +1017,7 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
             'factor_sep': None if not fa_valid else round(float(fa)*100, 1),
             'framework_score': fs,
             'fw_min_buy': FUND_FW_MIN_BUY,
+            'framework': framework_row(fund),
             'buy_breakdown': [] if no_signal else buy_breakdown(last, 0, 0, 0),
             'sell_ceiling': 'HOLD',   # sell scoring is disabled for proxy funds
         }
@@ -1159,6 +1057,7 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
             'banker_weak':     False,
             'factor_sep':      None,
             'framework_score': FRAMEWORK_SCORES.get(t),
+            'framework': framework_row(t),
         })
 
     signals_list.sort(key=lambda x: -x['buy_score'])
@@ -1249,6 +1148,17 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         # Every surface reads thresholds from here — no hard-coded copies.
         'schema_version': 3,
         'model_version': MODEL_VERSION,
+        'framework': (lambda rows, fa: {
+            'fundamentals_as_of': fa,
+            'axes': framework_scorer.AXES,
+            'bands': [list(b) for b in framework_scorer.BANDS],
+            'stale_days': framework_scorer.STALE_DAYS,
+            'scored': len(rows),
+            'with_data': sum(1 for r in rows if 'data' in r['framework']['sources'].values()),
+            'provisional': sum(1 for r in rows if r['framework']['provisional']),
+            'moat_needs_review': sum(1 for r in rows if r['framework']['moat_stale'] and r['framework']['sources']['moat'] != 'legacy'),
+            'moat_never_judged': sum(1 for r in rows if r['framework']['sources']['moat'] == 'legacy'),
+        })([r for r in signals_list if r.get('framework')], framework_scorer.load_fundamentals()[1]),
         'thresholds': {
             'buy': BUY_T, 'watch': WATCH_T, 'strong': STRONG_T,
             'fw_min_buy': FW_MIN_BUY, 'fund_fw_min_buy': FUND_FW_MIN_BUY,

@@ -2480,11 +2480,30 @@ function renderRankings() {
     return dots.join(' ') || '<span style="color:var(--text3);font-size:10px">—</span>';
   }
 
+  const FW_BAND_COLOR = {Core:'var(--green)', Good:'#0891b2', Marginal:'var(--amber)', Avoid:'var(--red)'};
+  function fwBand(s) {
+    const f = s.framework; if (f && f.band) return f.band;
+    const v = s.framework_score; if (!v) return null;
+    return v>=85?'Core':v>=70?'Good':v>=55?'Marginal':'Avoid';      // payloads from before the rebuild
+  }
+  function fwTitle(s) {
+    const f = s.framework; if (!f) return '';
+    const ax = [['moat','Moat',30],['quality','Quality',25],['growth','Growth',20],['valuation','Valuation',20]];
+    const src = {data:'from fundamentals', hand:'hand-scored', legacy:'placeholder from old total'};
+    const lines = ax.map(([k,n,m]) => `${n} ${f.parts[k]}/${m} (${src[f.sources[k]] || f.sources[k]})`);
+    let t = `${f.band} · ` + lines.join(' · ');
+    if (f.pe != null) t += ` · P/E ${f.pe}`;
+    if (f.legacy != null) t += ` · old score ${f.legacy}`;
+    if (f.kind === 'fund') t = `${f.band} · fund/ETF, hand-scored · old score ${f.legacy}`;
+    else if (f.moat_stale) t += f.sources.moat === 'legacy' ? ' · moat never judged' : ' · moat judgement undated or older than 120 days';
+    return t;
+  }
   function fw(s) {
     const v = s.framework_score;
     if (!v) return '<span style="color:var(--text3)">—</span>';
-    const c = v>=85?'var(--green)':v>=70?'#0891b2':v>=55?'var(--amber)':'var(--red)';
-    return `<span style="color:${c};font-weight:700;font-family:'DM Mono',monospace">${v}</span>`;
+    const f = s.framework, c = FW_BAND_COLOR[fwBand(s)] || 'var(--text2)';
+    const mark = f && f.kind !== 'fund' && (f.provisional || f.moat_stale) ? '<span style="color:var(--text3);font-weight:400" aria-hidden="true">*</span>' : '';
+    return `<span title="${fwTitle(s)}" style="color:${c};font-weight:700;font-family:'DM Mono',monospace;cursor:help">${v}${mark}</span>`;
   }
 
   function distCell(s) {
@@ -2606,7 +2625,7 @@ function renderRankings() {
         </table>
       </div>
       <div style="margin-top:8px;font-size:10px;color:var(--text3);font-family:'DM Mono',monospace">
-        SIGNAL is the scanner's final label after caps — identical on every tab and in the emails · Icons are score inputs, not labels: ▼▼=gate open, 25%+ dip · ▼=gate open · ▽=dip, gate closed · 🔑=Insider · 🔑🔑=Cluster · 🏛=Politician · 🏛🏛=Pol.cluster · ⚡=PEAD · 📡=Sector entry · ⚠H=near high · ⚠C=CMF · ⚠A=ATR
+        SIGNAL is the scanner's final label after caps — identical on every tab and in the emails · Icons are score inputs, not labels: ▼▼=gate open, 25%+ dip · ▼=gate open · ▽=dip, gate closed · FW: hover for breakdown, *=part placeholder or moat undated${payload.framework ? ` (${payload.framework.with_data} of ${payload.framework.scored} use fundamentals${payload.framework.with_data ? ' as of ' + payload.framework.fundamentals_as_of : ', none fetched yet'})` : ''} · 🔑=Insider · 🔑🔑=Cluster · 🏛=Politician · 🏛🏛=Pol.cluster · ⚡=PEAD · 📡=Sector entry · ⚠H=near high · ⚠C=CMF · ⚠A=ATR
       </div>
     </div>`;
 
@@ -2721,7 +2740,7 @@ const REFERENCE_MD = `# Portfolio Signal & Framework Reference
 ## Table of Contents
 1. [Overview](#1-overview)
 2. [System Performance Summary](#2-performance)
-3. [Framework Score — 5 Axes](#3-framework-score)
+3. [Framework Score — 4 Axes](#3-framework-score)
 4. [Current Framework Scores](#4-current-scores)
 5. [Buy-Side Signal Models](#5-buy-side)
 6. [Sell-Side Signal Models](#6-sell-side)
@@ -2782,7 +2801,9 @@ DIST_T = −0.15 · DFV_LIFT = 2.5 · QUALITY_T = 0.20 · p_threshold = 0.15
 
 ---
 
-## 3. Framework Score — 5 Axes
+## 3. Framework Score — 4 Axes
+
+> **Rebuilt November 2026.** The score is now Moat 30 + Quality 25 + Growth 20 + Valuation 20 = 95, rescaled to 100. Quality, Growth and Valuation are computed from company fundamentals (weekly Finnhub fetch; Valuation is repriced on every scanner run). Moat stays a judgement: five yes/no questions, 6 points each, with a date. Portfolio Fit is no longer scored. Bands: **Core 76+ · Good 62–75 · Marginal 48–61 · Avoid below 48**; a BUY needs Good or better. These cut-offs are the old 85 / 70 / 55 carried onto the new scale. Hover any FW number for its breakdown and where each part came from; an asterisk means part of it is still a placeholder or the moat judgement is undated. Full method: FRAMEWORK.md in the repo. The axis descriptions below are the original rubric and still describe what each axis means.
 
 ### Axis 1 — Competitive Moat (30 pts)
 
@@ -2822,19 +2843,15 @@ This axis is deliberately separate from growth. Apple scores 22 (exceptional qua
 
 *This axis was raised from 15pts to 20pts in the current version. The price you pay for a great business determines your return, not just the quality of the business itself.*
 
-### Axis 5 — Portfolio Fit (5 pts)
+### Portfolio Fit — no longer scored
 
-**What it measures:** Does this position add something genuinely different to the portfolio, or does it duplicate exposure you already have?
-
-**High score (4–5):** Unique geographic or sector exposure not covered elsewhere. KTAM India is the only India exposure in the portfolio.
-
-**Low score (0–1):** Owning both QQQ and SCB Nasdaq is near-pure redundancy. Owning NVDA, AVGO, AMAT, and ASML means adding MU adds limited new exposure to the semiconductor thesis.
-
-*Note: This score is portfolio-dependent and changes when you add or remove positions.*
+Fit describes the portfolio, not the business, so it does not belong in a score that decides whether a business is worth owning. In the old table it had also drifted into a balancing figure: documented as 5 points, it ran from 5 to 18. Overlap with existing holdings is a position-sizing question; use the Overlap tab.
 
 ---
 
-## 4. Current Framework Scores
+## 4. Framework Scores — original hand table (superseded)
+
+*Kept for reference. These are the pre-rebuild hand scores; the live score for each ticker is the FW column on the Signals tab. The Moat column here still feeds the live score until each moat is re-judged with the five questions.*
 
 | Ticker | Moat | Quality | Growth | Valuation | Fit | **Total** |
 |---|---|---|---|---|---|---|
@@ -3421,7 +3438,7 @@ function renderBuysFromPayload(payload) {
     const st = LABEL_STYLE[sigLabel(s)] || LABEL_STYLE.HOLD;
     const accentColor = st.color;
     const fw = s.framework_score;
-    const fwColor = fw >= 85 ? 'var(--green)' : fw >= 70 ? '#0891b2' : 'var(--amber)';
+    const fwColor = ({Core:'var(--green)', Good:'#0891b2'})[(s.framework && s.framework.band) || (fw >= 85 ? 'Core' : fw >= 70 ? 'Good' : '')] || 'var(--amber)';
     const dayChg = s.change_pct || 0;
     const dayColor = dayChg >= 0 ? 'var(--green)' : 'var(--red)';
     const bd = buyBreakdown(s);

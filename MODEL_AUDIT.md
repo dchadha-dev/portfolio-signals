@@ -134,3 +134,19 @@ Extreme readings (25%+ dip together with 10%+ cushion) returned +37.5 on the rep
 
 **Not tested: insider, politician and PEAD overlays.** There is no historical archive of those inputs in the repo, so they could not be backtested. They remain in the live score on the strength of the published literature only, which is why they are capped. Two data issues to fix before trusting them: PEAD surprise scores are computed from as few as three quarters (CRM showed an SUE of 12), and the insider feed contains at least one implausible record (a TSM purchase at $71).
 
+
+## 8. Framework score rebuild (13 November 2026)
+
+**What was wrong.** The framework score gates every BUY and damps every sell, and was a hand-typed number per ticker.
+
+- Sub-scores existed for 41 of 315 tickers. Their Portfolio Fit column, documented as 5 points, ran from 5 to 18 and made the parts add up to a total chosen first.
+- The scanner and the table disagreed on 7 of those 41.
+- Moat and quality correlated 0.88; valuation correlated +0.63 with moat, the opposite of what a valuation measure should do.
+- 81% of scores were even numbers, clumped at 68 and 72 on either side of the gate at 70.
+- Valuation was hand-scored quarterly, and no score carried a date.
+
+**What changed.** Four axes (Moat 30, Quality 25, Growth 20, Valuation 20), rescaled to 100. Quality, growth and valuation are computed from fundamentals; valuation is repriced on every run. Moat is five dated yes/no questions. Fit is removed. Every score records the source of each part. Method and limits: `FRAMEWORK.md`.
+
+**Scale.** Removing the fit padding lowers scores by about 8 points, so the cut-offs were carried across with the fitted line `new = −3.6 + 0.94 × old`: gate 70 → 62, Core 85 → 76, Marginal 55 → 48. Before any fundamentals arrive, one stock changes side of the gate (CRWV, 72 old, 60 new; its 72 included 12 points of fit above the documented maximum).
+
+**Not done.** The fetcher has not run against the live API; expect field-name fixes after the first Actions run. The score is still unvalidated against returns. The sell damping formula now receives scores about 8 points lower, which weakens damping slightly (a score of 86 damps to ×0.60 where 93 gave ×0.55); sell thresholds were not re-tuned.

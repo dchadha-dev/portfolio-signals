@@ -461,7 +461,7 @@ def score_ticker(ticker, sell_sigs, market, sector_states, framework_score=None)
     # FW=100:×0.50
     fw = framework_score
     damp = fw_damp(fw)
-    if fw is not None and fw >= 70:
+    if fw is not None and fw >= 62:   # band 'Good' or better
         caution.append(f"FW{fw}(×{damp:.2f})")
 
     score_raw = score  # save pre-damp for payload

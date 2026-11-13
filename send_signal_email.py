@@ -303,7 +303,7 @@ def build_daily(payload, insider_data, pead_data):
                 (hi('Qualified as a buy — held back by today\'s buy cap', AMBER) if s.get('buy_capped')
                  else f'{hi(f"{gap} more points", AMBER)} needed to trigger buy signal'),
             ]
-            if isinstance(fw, int) and fw < 50:
+            if isinstance(fw, int) and fw < 48:
                 bs.append(f'{hi("Caution: FW " + str(fw) + " — speculative", AMBER)} · size small if entering')
             cards += card(s['ticker'], '', f'WATCH · {s["buy_score"]}', BLUE, '#0c1a3a', bs,
                          'MONITOR — CLOSE TO TRIGGER' if gap <= 8 else 'MONITOR', BLUE)
