@@ -45,9 +45,10 @@ HOLDS = (5, 63, 252)   # 5d = entry timing, 63/252d = does it forecast
 # name -> (which frame, column/expr, direction the model assumes: +1 buy, -1 sell)
 BUY_TESTS = {
     # v3 — the live model
-    'v3 gate = BUY (>=80)':     lambda b, s: b['f'] & (b['buy'] >= sc.BUY_T),
+    'v3 gate = BUY (>=80)':     lambda b, s: b['gate'] & (b['buy'] >= sc.BUY_T),
     'v3 deep dip (>=90)':       lambda b, s: b['deepdip'],
-    'v3 WATCH (60-79)':         lambda b, s: b['near'] & ~b['f'] & (b['buy'] >= sc.WATCH_T),
+    'v3 WATCH (60-79)':         lambda b, s: b['near'] & ~b['gate'] & (b['buy'] >= sc.WATCH_T),
+    'old gate, 0-5% above MA':  lambda b, s: b['f'] & ~b['gate'],
     'dip, below 200d MA':       lambda b, s: b['dip'] & ~b['up'],
     'dip, weak 12m run':        lambda b, s: b['dip'] & b['up'] & ~b['qual'],
     # retired v2 component, kept as a reference line

@@ -2133,11 +2133,12 @@ quality     = vol252 > 0 ? math.max(math.min(ret252 / vol252 / 3, 1), 0) : 0
 factor_gate = dist < dist_t and trend > 0 and quality > quality_t
 
 // -- BUY SCORE v3: dip in a strong stock (same formula as signal_scanner.py) --
-up_trend  = trend > 0
+up_trend  = trend > 0.05
 strong    = quality > quality_t
 dip       = dist < dist_t
 near      = dist < -0.15
-deep      = factor_gate and dist < -0.25
+buy_gate  = dip and up_trend and strong
+deep      = buy_gate and dist < -0.25
 
 var float buy_score = 0
 buy_score := (strong ? 25 : quality > 0.10 ? 15 : 0) + (up_trend ? 25 : trend > -0.05 ? 15 : 0) + (dip ? 30 : near ? 15 : 0) + (deep ? 10 : 0)
@@ -2167,16 +2168,16 @@ sell_score := math.round(math.min(100.0, near_pts + cmf_pts + atr_pts + rv_pts) 
 
 // -- CONDITIONS --
 fw_ok       = fw_score == 0 or fw_score >= fw_min
-buy_sig     = factor_gate and buy_score >= buy_thresh and fw_ok
-fw_blocked  = factor_gate and buy_score >= buy_thresh and not fw_ok
-watch_sig   = near and not factor_gate and buy_score >= 60
+buy_sig     = buy_gate and buy_score >= buy_thresh and fw_ok
+fw_blocked  = buy_gate and buy_score >= buy_thresh and not fw_ok
+watch_sig   = near and not buy_gate and buy_score >= 60
 sell_trim   = sell_score >= 52 and sell_score < 65
 sell_reduce = sell_score >= 65 and sell_score < 78
 sell_exit   = sell_score >= 78
 
 // -- BACKGROUNDS (must be global scope in Pine v5, not inside if block) --
-bgcolor(show_zones and near and not factor_gate ? color.new(color.blue, 94) : na, title="Dip, one condition short")
-bgcolor(show_zones and factor_gate ? color.new(color.green, 88) : na, title="Dip in a strong stock (gate)")
+bgcolor(show_zones and near and not buy_gate ? color.new(color.blue, 94) : na, title="Dip, one condition short")
+bgcolor(show_zones and buy_gate ? color.new(color.green, 88) : na, title="Dip in a strong stock (gate)")
 bgcolor(show_zones and near_high ? color.new(color.red, 92) : na, title="Near 252d high")
 
 // -- REFERENCE LINES --
@@ -2220,7 +2221,7 @@ alertcondition(banker_weak,              "Banker Weak",          "Institutional 
     <div style="background:var(--s2);border-radius:8px;padding:14px 16px;margin-bottom:16px;">
       <div style="font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;margin-bottom:10px;color:var(--text)">Signals included:</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;font-family:'DM Mono',monospace;">
-        <div style="color:var(--green)">BUY — 20%+ dip in a strong stock above its 200d MA (score ≥80)</div>
+        <div style="color:var(--green)">BUY — 20%+ dip in a strong stock still 5%+ above its 200d MA (score ≥80)</div>
         <div style="color:var(--red)">EXIT / REDUCE / TRIM — continuous sell score</div>
         <div style="color:#0891b2">WATCH — two conditions met, the third close (score 60–79)</div>
         <div style="color:var(--amber)">FW BLOCKED — score qualifies, framework below minimum</div>
@@ -2286,7 +2287,7 @@ function labelTitle(s, th) {
   const l = sigLabel(s);
   const fwMin = s.fw_min_buy || th.fw_min_buy;
   if (l === 'STRONG BUY') return `Dip in a strong stock, plus a deep dip or insider/PEAD/sector support (score ≥${th.strong}), FW ≥${fwMin}, inside the buy cap`;
-  if (l === 'BUY')        return `20%+ below its high, above the 200d MA, strong 12-month run (score ≥${th.buy}), FW ≥${fwMin}, inside the buy cap`;
+  if (l === 'BUY')        return `20%+ below its high, 5%+ above the 200d MA, strong 12-month run (score ≥${th.buy}), FW ≥${fwMin}, inside the buy cap`;
   if (l === 'FW BLOCKED') return `Buy score ≥${th.buy} but framework score is below ${fwMin} — not a buy`;
   if (l === 'WATCH')      return s.buy_capped ? `Qualified as a buy but today's buy cap is full`
                                               : `Two of the three buy conditions met and the third close (score ${th.watch}–${th.buy - 1})`;
@@ -2316,8 +2317,8 @@ function buyBreakdown(s) {
     if (s.trend_up !== undefined) {           // v3 payload without buy_breakdown
       if (s.strong_run)      parts.push(['Strong 12m run', 25]);
       else if (s.run_near)   parts.push(['Fair 12m run', 15]);
-      if (s.trend_up)        parts.push(['Uptrend', 25]);
-      else if (s.trend_near) parts.push(['Just below 200d MA', 15]);
+      if (s.trend_up)        parts.push(['5%+ above 200d MA', 25]);
+      else if (s.trend_near) parts.push(['Within 5% of 200d MA', 15]);
       if (s.dip)             parts.push(['Dip 20%+', 30]);
       else if (s.dip_near)   parts.push(['Dip 15-20%', 15]);
       if (s.deep_dip)      parts.push(['Deep dip 25%+', 10]);
@@ -2454,7 +2455,7 @@ function renderRankings() {
     // Buy signals
     if (s.trend_up !== undefined) {
       if (s.deep_dip)       dots.push('<span style="color:var(--green);font-size:10px;font-weight:700" title="Gate open, 25%+ below the 252d high">▼▼</span>');
-      else if (s.gate)      dots.push('<span style="color:var(--green);font-size:10px" title="Gate open: 20%+ below the high, above the 200d MA, strong 12-month run">▼</span>');
+      else if (s.gate)      dots.push('<span style="color:var(--green);font-size:10px" title="Gate open: 20%+ below the high, 5%+ above the 200d MA, strong 12-month run">▼</span>');
       else if (s.dip_near)  dots.push('<span style="color:var(--text3);font-size:10px" title="15%+ below the high but trend or 12-month run is missing">▽</span>');
     } else {
       if (s.fdfv3)        dots.push('<span style="color:var(--green);font-size:10px;font-weight:700" title="Factor+DFV V3 (v2 model)">★★</span>');
@@ -2552,7 +2553,7 @@ function renderRankings() {
           <span style="color:var(--text3)" title="15%+ below the 252d high with at least one buy condition missing. An input to the score, not a label.">${isV3 ? 'Dip, gate closed' : 'Factor+DFV'}</span> <b>${nDFV}</b>
         </div>
         <div style="background:var(--s2);border-radius:6px;padding:6px 12px;font-size:11px;font-family:'DM Mono',monospace">
-          <span style="color:var(--text3)" title="20%+ below the 252d high, above the 200d MA, 12-month return/volatility above 0.6. Needed for any BUY.">${isV3 ? 'Gate open' : 'Factor zone'}</span> <b>${nFactor}</b>
+          <span style="color:var(--text3)" title="20%+ below the 252d high, 5%+ above the 200d MA, 12-month return/volatility above 0.6. Needed for any BUY.">${isV3 ? 'Gate open' : 'Factor zone'}</span> <b>${nFactor}</b>
         </div>
         <div style="background:var(--s2);border-radius:6px;padding:6px 12px;font-size:11px;font-family:'DM Mono',monospace">
           <span style="color:var(--red)">Sell flag</span> <b style="color:var(--red)">${nSellFlag}</b>
@@ -2715,7 +2716,7 @@ function renderMarkdown(md) {
 // Inline fallback if FRAMEWORK_SCORE_README.md not on same server
 const REFERENCE_MD = `# Portfolio Signal & Framework Reference
 
-> **Model v3 (November 2026).** The buy score keeps the factor gate and drops what did not survive re-testing: Strong 12m run +25, Uptrend +25, Dip 20%+ +30 (near-misses +15 each), Deep dip 25%+ +10, overlays capped at +25. All three = 80 = BUY; WATCH = two met and the third close. DFV V3, PFD, Triple and both penalties no longer score. The sections below still describe v2 and its statistics, which did not survive re-testing. See MODEL_AUDIT.md in the repo.
+> **Model v3 (November 2026).** The buy score keeps the factor gate and drops what did not survive re-testing: Strong 12m run +25, 5%+ above 200d MA +25, Dip 20%+ +30 (near-misses +15 each), Deep dip 25%+ +10, overlays capped at +25. All three = 80 = BUY; WATCH = two met and the third close. DFV V3, PFD, Triple and both penalties no longer score. The sections below still describe v2 and its statistics, which did not survive re-testing. See MODEL_AUDIT.md in the repo.
 
 ## Table of Contents
 1. [Overview](#1-overview)

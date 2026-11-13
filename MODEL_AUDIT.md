@@ -116,7 +116,21 @@ Read honestly: positive in every cell, significant only on lists built with hind
 - RSI timing, "first 21 days only", PFD, Triple, Banker Weak and RSI Bear: no effect or too rare to measure.
 - Volatility-scaled drawdowns and the pullback-in-a-leader score were worse than the fixed 20% rule everywhere.
 
-**The score.** Strong run +25, Uptrend +25, Dip 20%+ +30: all three = 80 = BUY. Deep dip (25%+) +10. Near-misses score 15 instead (run 0.3–0.6, within 5% below the 200d MA, dip of 15–20%), so WATCH (60–79) means two conditions met and the third close. Insider/PEAD/sector overlays share a +25 cap and cannot move a score across a label boundary. v2 required gate + DFV V3 + an overlay to reach 80 and fired on 0.01% of S&P stock-days; the gate alone is open on about 1% of stock-days on this list.
+**The score.** Strong run +25, 5%+ above the 200d MA +25, Dip 20%+ +30: all three = 80 = BUY. Deep dip (25%+) +10. Near-misses score 15 instead (run 0.3–0.6, within 5% of the 200d MA either side, dip of 15–20%), so WATCH (60–79) means two conditions met and the third close. Insider/PEAD/sector overlays share a +25 cap and cannot move a score across a label boundary. v2 required gate + DFV V3 + an overlay to reach 80 and fired on 0.01% of S&P stock-days; the gate alone is open on about 1% of stock-days on this list.
+
+**Second pass: five more features, tested inside the gate** (13 Nov). Each splits gate days in two; a feature earns a place only if the split points the same way on this repo's tickers, on random survivors and on point-in-time S&P members. 252d hold, vol-matched excess %/yr.
+
+| Split of gate days | Repo tickers | Random survivors | PIT S&P 1997–2026 | Verdict |
+|---|---|---|---|---|
+| 5%+ above 200d MA vs 0–5% | +11.9 vs +3.5 | +11.4 vs +5.0 | +5.6 vs −0.7 | **Adopted** |
+| Market 10%+ off its high vs not | +13.8 vs +9.2 | +2.5 vs +14.9 | +2.9 vs +1.3 | Inconsistent |
+| Heavy volume vs normal | +6.2 vs +8.6 | +10.9 vs +8.2 | +2.1 vs +1.9 | Nothing |
+| 1-day drop of 10%+ vs none | +19.3 vs +7.4 | +26.7 vs +4.9 | +0.6 vs +0.8 | Hindsight only |
+| Fast dip (high < 63d ago) vs slow | +10.7 vs +8.3 | +7.9 vs +7.9 | not run | Nothing |
+
+The one adopted change: the uptrend condition now needs the close to be 5% or more above the 200d MA. A stock that has dipped 20% and sits within 5% of its 200d MA tested at zero in all three lists and is now a WATCH. That removes roughly a quarter of the old gate's signals. The 1-day-shock result is the instructive failure: buying after an earnings-style gap looks excellent on any list of survivors and is worthless on the unbiased list, because the names that gapped down and never recovered are missing from the first two.
+
+Extreme readings (25%+ dip together with 10%+ cushion) returned +37.5 on the repo's tickers and −4.6 on PIT members. The deeper the setup, the more the outcome depends on the stock being a long-run winner, which is the framework score's job, not the signal's.
 
 **Not tested: insider, politician and PEAD overlays.** There is no historical archive of those inputs in the repo, so they could not be backtested. They remain in the live score on the strength of the published literature only, which is why they are capped. Two data issues to fix before trusting them: PEAD surprise scores are computed from as few as three quarters (CRM showed an SUE of 12), and the insider feed contains at least one implausible record (a TSM purchase at $71).
 
