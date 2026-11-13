@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-13 03:01 UTC",
+  "last_updated": "2026-11-13 18:19 UTC",
   "entries": [
     {
       "ticker": "AMD",
@@ -66,12 +66,12 @@
       "framework_score": 68,
       "fdfv3": true,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 83,
       "current_price": 371.17,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 18",
+      "expired_at": "2026-11-13 18:19"
     },
     {
       "ticker": "MU",
@@ -84,12 +84,12 @@
       "framework_score": 76,
       "fdfv3": true,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 798.44,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
+      "expired_at": "2026-11-13 18:19"
     },
     {
       "ticker": "HPE",
@@ -102,12 +102,12 @@
       "framework_score": 52,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 50.16,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-11-13 18:19"
     },
     {
       "ticker": "LSCC",
@@ -120,12 +120,12 @@
       "framework_score": 71,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 118.85,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 5",
+      "expired_at": "2026-11-13 18:19"
     },
     {
       "ticker": "DELL",
@@ -138,12 +138,12 @@
       "framework_score": 68,
       "fdfv3": true,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 83,
       "current_price": 371.17,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 18",
+      "expired_at": "2026-11-13 18:19"
     },
     {
       "ticker": "MU",
@@ -156,12 +156,12 @@
       "framework_score": 76,
       "fdfv3": true,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 798.44,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
+      "expired_at": "2026-11-13 18:19"
     },
     {
       "ticker": "HPE",
@@ -174,12 +174,12 @@
       "framework_score": 52,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 50.16,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-11-13 18:19"
     },
     {
       "ticker": "LSCC",
@@ -192,12 +192,12 @@
       "framework_score": 71,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 118.85,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 5",
+      "expired_at": "2026-11-13 18:19"
     },
     {
       "ticker": "DELL",
@@ -210,12 +210,12 @@
       "framework_score": 68,
       "fdfv3": true,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 83,
       "current_price": 371.17,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 18",
+      "expired_at": "2026-11-13 18:19"
     },
     {
       "ticker": "MU",
@@ -228,12 +228,12 @@
       "framework_score": 76,
       "fdfv3": true,
       "is_holding": true,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 798.44,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
+      "expired_at": "2026-11-13 18:19"
     },
     {
       "ticker": "LSCC",
@@ -246,12 +246,12 @@
       "framework_score": 71,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 118.85,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 5",
+      "expired_at": "2026-11-13 18:19"
     },
     {
       "ticker": "HPE",
@@ -264,12 +264,12 @@
       "framework_score": 52,
       "fdfv3": true,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 73,
       "current_price": 50.16,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dfv3_faded",
+      "expire_detail": "DFV V3 lift dropped \u00b7 score 48",
+      "expired_at": "2026-11-13 18:19"
     }
   ]
 }
