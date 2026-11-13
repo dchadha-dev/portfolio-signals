@@ -99,6 +99,17 @@ def macro_ok(payload):
             return bool(r['macro_ok'])
     return True
 
+def setup_line(s):
+    """One-line description of the v3 setup for a card (falls back to v2 fields
+    for payloads written before the v3 score)."""
+    fw = s.get('framework_score', '?')
+    if 'run_12m' in s:
+        dist = s.get('dist_252h', 0) or 0; ma = s.get('vs_200ma', 0) or 0; run = s.get('run_12m')
+        return (f'Down {b(f"{abs(dist):.0f}%")} from 252d high · {ma:+.1f}% vs 200d MA · '
+                f'12m run {hi(str(run if run is not None else "?"))} · FW {fw}')
+    dist = s.get('dist_252h', 0) or 0
+    return f'Down {b(f"{abs(dist):.1f}%")} from 252d high · FW {fw}'
+
 def footer_thresholds(th):
     return (f'Buy ≥{th["buy"]} · FW ≥{th["fw_min_buy"]} · TRIM ≥{th["trim"]}<br>'
             f'REDUCE ≥{th["reduce"]} · EXIT ≥{th["exit"]}')
@@ -236,13 +247,13 @@ def build_daily(payload, insider_data, pead_data):
     r_cap   = market.get('regular_cap', 3)
     n_strong= c['buys']            # all buys (strong + regular), as labelled
     n_watch = c['watch']
-    n_factor= summary.get('factor_zone', 0)
+    n_factor= summary.get('gates', summary.get('factor_zone', 0))
     n_sell  = c['sell_flags']      # held positions with TRIM/REDUCE/EXIT — not the cap
     n_pead  = len(pead_data.get('signals', {})) if pead_data else 0
     n_ins   = len(insider_data.get('signals', {})) if insider_data else 0
 
     headline = (f'{n_strong} new buy{"s" if n_strong!=1 else ""} · {n_watch} watch · Market {vix_lbl.lower()}'
-                if n_strong else f'No new buys · {n_watch} watch · {n_factor} factor zone · Market {vix_lbl.lower()}')
+                if n_strong else f'No new buys · {n_watch} watch · {n_factor} gate open · Market {vix_lbl.lower()}')
     subline  = f'Buy cap {s_cap} strong · {r_cap} regular · {n_ins} insider · {n_pead} PEAD active'
 
     html  = header(f'Daily Digest · {run_date}', headline, subline)
@@ -288,7 +299,7 @@ def build_daily(payload, insider_data, pead_data):
             gap  = th['buy'] - s.get('buy_score', 0)
             dfv  = s.get('dfv_lift', 0) or 0
             bs   = [
-                f'Down {b(f"{abs(dist):.1f}%")} from 252d high · DFV lift {hi(f"{dfv:.1f}")} · FW {fw}',
+                setup_line(s),
                 (hi('Qualified as a buy — held back by today\'s buy cap', AMBER) if s.get('buy_capped')
                  else f'{hi(f"{gap} more points", AMBER)} needed to trigger buy signal'),
             ]
@@ -307,8 +318,7 @@ def build_daily(payload, insider_data, pead_data):
             fw   = s.get('framework_score', '?')
             lbl  = label_of(s)
             cards += card(s['ticker'], f'${s.get("price") or 0:,.2f}', f'{lbl} · {s["buy_score"]}', GREEN, '#041a0f',
-                         [f'Down {b(f"{abs(dist):.1f}%")} from 252d high · FW {fw}',
-                          s.get('guidance','')[:120]],
+                         [setup_line(s), s.get('guidance','')[:160]],
                          'CONSIDER ENTRY', GREEN)
         html = html.replace('<!--BUYS-->', section('Buy Signals', cards))
     html = html.replace('<!--BUYS-->', '')
@@ -440,6 +450,9 @@ def build_weekly(payload, insider_data, pead_data):
         EXPIRY_LABELS = {
             'price_recovered': ('DO NOT CHASE', TXT3, 'Price recovered — gate closed'),
             'dfv3_faded':      ('WAIT FOR CONFIRMATION', AMBER, 'Factor gate open but DFV momentum faded'),
+            'dip_recovered':   ('DO NOT CHASE', AMBER, 'The dip has closed — price is back near its high'),
+            'trend_broken':    ('AVOID', RED, 'Closed below the 200d MA — setup no longer valid'),
+            'score_dropped':   ('REASSESS', AMBER, 'Buy score fell by more than 10 points'),
             'penalty_active':  ('AVOID', RED, 'Signal overridden by penalty'),
             'sell_cleared':    ('SELL SIGNAL CLEARED', BLUE, 'No longer flagged — reassess hold'),
         }
@@ -556,7 +569,7 @@ def build_weekly(payload, insider_data, pead_data):
             dfv  = s.get('dfv_lift', 0) or 0
             cards += card(s['ticker'], f'FW {fw} · Score {s["buy_score"]}',
                          f'{gap} PTS FROM TRIGGER', BLUE, '#0c1a3a',
-                         [f'Down {b(f"{abs(dist):.1f}%")} from 252d high · DFV lift {hi(f"{dfv:.1f}")}',
+                         [setup_line(s),
                           f'{hi(str(gap) + " points", AMBER)} below buy trigger'],
                          'PRIMARY WATCHLIST ENTRY FOR COMING WEEK', BLUE)
         html += section('👀 Priority Watch — Coming Week', cards)

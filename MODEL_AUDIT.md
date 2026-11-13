@@ -5,7 +5,7 @@ What the signal model can and cannot be shown to do, how that was tested, and wh
 ## Summary
 
 1. **The published validation numbers are artefacts.** 70% annual excess, t-statistics of 40–120 and deflated Sharpe ratios in the dozens come from five defects in `signal_scanner_validation_cpcv.py`, not from the signals.
-2. **Measured properly, no buy or sell component shows a detectable edge** — not on a neutral universe of ~2,300 liquid US stocks, not on point-in-time S&P 500 members, and not on this repo's own tickers (where hindsight works in the model's favour).
+2. **On unbiased data no buy or sell component shows a detectable edge** — not on ~2,300 liquid US stocks (2010–2017), not on point-in-time S&P 500 members (1996–2026). On this repo's own tickers the factor gate does look good over 2011–2026, but at least half of that is hindsight in the ticker list (section 7).
 3. **What the backtests were really measuring is the ticker list.** The stocks in this repo's universe beat the average liquid stock by about 6–7 points a year over 2010–2017 *before any signal is applied*.
 4. **The sell model is close to switched off.** Framework damping makes EXIT mathematically unreachable for 56 of 63 held stocks, and REDUCE for 28.
 
@@ -83,10 +83,40 @@ On the current book of 63 directly held stocks, 56 can never reach EXIT and 28 c
 - Guidance text no longer calls a 63-day run-up a "Caution" while the score adds 10 points for it.
 - `signal_scanner_validation_cpcv.py` is marked deprecated for decisions.
 
-Weights and thresholds were **not** changed. Re-weighting on this evidence would be fitting noise.
+The buy score was then rebuilt around the one rule that held up — see section 7. Sell weights and thresholds are unchanged.
 
 ## 6. Open decisions
 
-1. **What the buy score is for.** Evidence supports treating it as a description of the setup, not a forecast.
+1. **Whether the buy score works going forward.** Section 7 is the best available evidence and it is not conclusive. `signal_ledger.json` will answer it; expect 12–24 months before the sample means anything.
 2. **The sell model.** Either accept that it is informational, or replace it with rules that do not depend on forecasting — position-size bands and a thesis check.
 3. **The framework score.** It is the only input that could carry real information and it has never been tested. The ledger will start measuring it; hand scores should be dated when changed.
+
+## 7. Buy score v3 (12 November 2026)
+
+**Data.** Survivorship-free S&P 500 daily prices and membership, 1996 to 10 Nov 2026 (`Johnbrick123/sp500-data`), which closes the 2017–2026 gap in the first pass. Method as in section 2: enter the day after a signal, hold 63 or 252 trading days, equal weight, compare with the equal-weight average of the same list. "Vol-matched" compares each signal name only with names in the same volatility third, because dipped stocks are volatile stocks and volatile stocks on a hand-picked list are mostly its winners.
+
+**What was tested.** Twelve dip rules (fixed and volatility-scaled drawdowns, with and without the 200d MA, RSI and 12-month-run filters), a "pullback in a leader" score, and seventeen variants of the existing factor gate, on four lists: this repo's tickers, the 150 best S&P performers of each period (pure hindsight), 150 random survivors, and point-in-time S&P members.
+
+**Result.** The existing gate — 20%+ below the 252d high, above the 200d MA, 12-month return/volatility above 0.6 — was the best rule tested. Nothing designed to replace it beat it.
+
+| Gate, 252d hold, vol-matched excess %/yr (t) | 2011–2018 | 2019–2026 | 1997–2010 |
+|---|---|---|---|
+| This repo's tickers | +5.9 (1.0) | +17.0 (3.4) | n/a |
+| Hindsight top 150 | +2.9 (0.7) | +11.4 (2.5) | +4.8 (1.6) |
+| Random survivors | +2.3 (0.4) | +18.3 (3.2) | +2.6 (0.7) |
+| Point-in-time S&P 500 | +0.9 (0.2) | +5.6 (1.1) | +0.9 (0.3) |
+
+Read honestly: positive in every cell, significant only on lists built with hindsight and only in 2019–2026, small and not significant on the unbiased universe. On this repo's tickers it was positive in 12 of 16 calendar years, but 51% of the total came from five names (MRNA, GME, ENPH, BE, AMD). The rule is worth keeping as a timing aid for names already chosen; it is not proof of a tradable edge.
+
+**What the refinement tests showed** (repo tickers, 2011–2026, 252d, vol-matched):
+
+- The conjunction is the signal. Dip + uptrend without the strong run: +2.6 (t 1.3). Dip + strong run below the 200d MA: +0.4 (0.2). Strong run + uptrend with no dip: +0.1.
+- Depth helps: 15% dip +2.9, 20% +9.2, 25% +28.0 (t 4.2). Same ordering on random survivors.
+- DFV V3 adds nothing: gate with DFV V3 +8.7, gate without +10.2. v2 gave it 25 of the 80 points needed for a BUY.
+- RSI timing, "first 21 days only", PFD, Triple, Banker Weak and RSI Bear: no effect or too rare to measure.
+- Volatility-scaled drawdowns and the pullback-in-a-leader score were worse than the fixed 20% rule everywhere.
+
+**The score.** Strong run +25, Uptrend +25, Dip 20%+ +30: all three = 80 = BUY. Deep dip (25%+) +10. Near-misses score 15 instead (run 0.3–0.6, within 5% below the 200d MA, dip of 15–20%), so WATCH (60–79) means two conditions met and the third close. Insider/PEAD/sector overlays share a +25 cap and cannot move a score across a label boundary. v2 required gate + DFV V3 + an overlay to reach 80 and fired on 0.01% of S&P stock-days; the gate alone is open on about 1% of stock-days on this list.
+
+**Not tested: insider, politician and PEAD overlays.** There is no historical archive of those inputs in the repo, so they could not be backtested. They remain in the live score on the strength of the published literature only, which is why they are capped. Two data issues to fix before trusting them: PEAD surprise scores are computed from as few as three quarters (CRM showed an SUE of 12), and the insider feed contains at least one implausible record (a TSM purchase at $71).
+

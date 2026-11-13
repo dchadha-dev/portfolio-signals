@@ -41,20 +41,19 @@ warnings.filterwarnings('ignore')
 import signal_scanner as sc
 import sell_side_scorer as ss
 
-HOLDS = (63, 252)
+HOLDS = (5, 63, 252)   # 5d = entry timing, 63/252d = does it forecast
 # name -> (which frame, column/expr, direction the model assumes: +1 buy, -1 sell)
 BUY_TESTS = {
-    'factor gate (+40)':        lambda b, s: b['f'],
-    'factor + DFV V3 (+25)':    lambda b, s: b['fdfv3'],
-    'PFD (+8)':                 lambda b, s: b['pfd'],
-    'triple (+10)':             lambda b, s: b['triple'],
-    'buy score >= WATCH':       lambda b, s: (b['buy'] >= sc.WATCH_T) & b['f'],
-    'buy score >= BUY':         lambda b, s: b['buy'] >= sc.BUY_T,
+    # v3 — the live model
+    'v3 gate = BUY (>=80)':     lambda b, s: b['f'] & (b['buy'] >= sc.BUY_T),
+    'v3 deep dip (>=90)':       lambda b, s: b['deepdip'],
+    'v3 WATCH (60-79)':         lambda b, s: b['near'] & ~b['f'] & (b['buy'] >= sc.WATCH_T),
+    'dip, below 200d MA':       lambda b, s: b['dip'] & ~b['up'],
+    'dip, weak 12m run':        lambda b, s: b['dip'] & b['up'] & ~b['qual'],
+    # retired v2 component, kept as a reference line
+    'gate + DFV V3 (v2 +25)':   lambda b, s: b['fdfv3'],
 }
-PENALTY_TESTS = {
-    'banker weak (-20)':        lambda b, s: b['banker_weak'],
-    'rbear (-10)':              lambda b, s: b['rbear'],
-}
+PENALTY_TESTS = {}
 SELL_TESTS = {
     'near 252d high':           lambda b, s: s['near_high'],
     'CMF<0 near high':          lambda b, s: s['cmf_neg_near_high'],
