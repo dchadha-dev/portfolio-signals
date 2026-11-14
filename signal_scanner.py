@@ -371,7 +371,8 @@ def framework_row(t):
     if not d:
         return None
     return {'band': d['band'], 'parts': d['parts'], 'sources': d['sources'], 'legacy': d['legacy'], 'kind': d['kind'],
-            'provisional': d['provisional'], 'moat_date': d['moat_date'], 'moat_stale': d['moat_stale'], 'pe': d['pe']}
+            'provisional': d['provisional'], 'moat_date': d['moat_date'], 'moat_stale': d['moat_stale'], 'pe': d['pe'],
+            'industry': d.get('industry'), 'scaling': d.get('scaling', False)}
 
 # ── SIGNAL ENGINE ─────────────────────────────────────────────────────
 def calc_rsi(series, period):

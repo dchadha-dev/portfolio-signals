@@ -5,7 +5,8 @@
   "hand: hand sub-scores on the ORIGINAL rubric scale (moat /30, quality /25, growth /20, valuation /20). The scorer converts them pro rata to the live weights (moat /40, quality /30, growth /20, valuation /10). quality, growth and valuation are overridden by fundamentals when available.",
   "moat_answers: five true/false answers to the moat questions in FRAMEWORK.md, 8 points each. When set, replaces hand.moat.",
   "moat_date: YYYY-MM-DD the moat was last judged. null or older than 120 days is flagged on the dashboard.",
-  "kind \"fund\": ETFs and funds keep their legacy score; no fundamentals are applied."
+  "kind \"fund\": ETFs and funds keep their legacy score; no fundamentals are applied.",
+  "industry: optional override of Finnhub's industry label, used to compare gross and free-cash-flow margins with true peers (Finnhub puts hardware makers in \"Technology\" with software). Needs 5+ peers with data."
  ],
  "tickers": {
   "NVDA": {
@@ -314,7 +315,8 @@
     "valuation": 11
    },
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "industry": "Technology Hardware"
   },
   "CPRT": {
    "legacy": 80,
@@ -1266,7 +1268,8 @@
   "DELL": {
    "legacy": 68,
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "industry": "Technology Hardware"
   },
   "BAC": {
    "legacy": 68,
@@ -1509,7 +1512,8 @@
   "STX": {
    "legacy": 60,
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "industry": "Technology Hardware"
   },
   "BIIB": {
    "legacy": 60,
@@ -1565,7 +1569,8 @@
   "WDC": {
    "legacy": 58,
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "industry": "Technology Hardware"
   },
   "PFE": {
    "legacy": 58,
@@ -1600,7 +1605,8 @@
   "SNDK": {
    "legacy": 58,
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "industry": "Technology Hardware"
   },
   "VICR": {
    "legacy": 58,
@@ -1684,7 +1690,8 @@
   "HPE": {
    "legacy": 52,
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "industry": "Technology Hardware"
   },
   "HOOD": {
    "legacy": 52,
@@ -1699,7 +1706,8 @@
   "SMCI": {
    "legacy": 52,
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "industry": "Technology Hardware"
   },
   "NXE": {
    "legacy": 52,
