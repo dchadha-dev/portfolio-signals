@@ -2216,8 +2216,23 @@ bgcolor(show_bg and st_watch ? color.new(color.teal, 93) : na, title="WATCH: one
 bgcolor(show_bg and near_high ? color.new(color.red, 93) : na, title="Within 5% of 252d high")
 plotshape(use_pead and not na(eps_act) and not na(last_sue) and last_sue > 1.5, "Earnings surprise", shape.diamond, location.belowbar, color.new(color.purple, 0), size=size.tiny, text="PEAD")
 
-plot(ma200,   "200d MA",   color=color.new(color.gray, 40), linewidth=1)
-plot(high252, "252d high", color=color.new(color.orange, 50), style=plot.style_stepline, linewidth=1)
+plot(ma200,   "200d MA",   color=color.new(color.gray, 40), linewidth=1, display=display.pane)
+
+// Values for the bar under the cursor: shown in the indicator's status line and
+// the Data Window as you hover, not drawn on the chart. The table (top right)
+// always shows the latest bar.
+// State: 6 STRONG BUY, 5 BUY, 4 FW BLOCKED, 3 WATCH, 0 HOLD, -1 TRIM, -2 REDUCE, -3 EXIT
+state_code = label_now == "STRONG BUY" ? 6 : label_now == "BUY" ? 5 : label_now == "FW BLOCKED" ? 4 : label_now == "WATCH" ? 3 : label_now == "TRIM" ? -1 : label_now == "REDUCE" ? -2 : label_now == "EXIT" ? -3 : 0
+hover = display.status_line + display.data_window
+plot(buy_score,   "Buy score",   color=color.green,  display=hover)
+plot(sell_score,  "Sell score",  color=color.red,    display=hover)
+plot(state_code,  "State",       color=color.gray,   display=hover)
+plot(tech_score,  "Technical",   color=color.teal,   display=display.data_window)
+plot(overlay,     "Insider+PEAD",color=color.purple, display=display.data_window)
+plot(dist * 100,  "% vs 252d high", color=color.orange, display=display.data_window)
+plot(trend * 100, "% vs 200d MA",   color=color.gray,   display=display.data_window)
+plot(quality * 3, "12m run",        color=color.blue,   display=display.data_window)
+plot(high252, "252d high", color=color.new(color.orange, 50), style=plot.style_stepline, linewidth=1, display=display.pane)
 
 // A label only when the state changes, so the chart shows entries, not one label per day.
 if changed and show_buy and label_now == "STRONG BUY"
