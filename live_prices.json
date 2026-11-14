@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-14 02:04 UTC",
+  "timestamp": "2026-11-14 02:46 UTC",
   "run_date": "Saturday 14 Nov 2026",
   "prices": {
     "BKNG": {
@@ -145,6 +145,102 @@
     "IREN": {
       "price": 18.17,
       "change_pct": -6.72
+    },
+    "GDX": {
+      "price": 81.64,
+      "change_pct": -0.24
+    },
+    "CRWV": {
+      "price": 53.13,
+      "change_pct": -6.13
+    },
+    "TEAM": {
+      "price": 149.99,
+      "change_pct": -1.51
+    },
+    "ORCL": {
+      "price": 125.35,
+      "change_pct": -1.38
+    },
+    "QCOM": {
+      "price": 172.47,
+      "change_pct": -2.64
+    },
+    "MSTR": {
+      "price": 111.62,
+      "change_pct": -2.44
+    },
+    "GME": {
+      "price": 25.85,
+      "change_pct": 0.9
+    },
+    "CCJ": {
+      "price": 70.73,
+      "change_pct": -1.46
+    },
+    "VTI": {
+      "price": 371.11,
+      "change_pct": -0.41
+    },
+    "QQQ": {
+      "price": 679.89,
+      "change_pct": -1.2
+    },
+    "GLD": {
+      "price": 355.45,
+      "change_pct": 0.16
+    },
+    "IEV": {
+      "price": 73.12,
+      "change_pct": 0.01
+    },
+    "VSS": {
+      "price": 148.07,
+      "change_pct": -0.38
+    },
+    "URTH": {
+      "price": 204.56,
+      "change_pct": -0.27
+    },
+    "XLG": {
+      "price": 61.1,
+      "change_pct": -0.62
+    },
+    "QTUM": {
+      "price": 130.1,
+      "change_pct": -1.8
+    },
+    "JEPI": {
+      "price": 57.96,
+      "change_pct": -0.14
+    },
+    "XLB": {
+      "price": 52.23,
+      "change_pct": -0.21
+    },
+    "CQQQ": {
+      "price": 38.42,
+      "change_pct": -1.79
+    },
+    "ARM": {
+      "price": 190.53,
+      "change_pct": -4.63
+    },
+    "MRVL": {
+      "price": 156.76,
+      "change_pct": -4.68
+    },
+    "ALAB": {
+      "price": 221.83,
+      "change_pct": -2.62
+    },
+    "MRNA": {
+      "price": 223.37,
+      "change_pct": -3.45
+    },
+    "LRCX": {
+      "price": 225.92,
+      "change_pct": -3.36
     }
   }
 }
