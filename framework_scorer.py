@@ -3,12 +3,17 @@ framework_scorer.py
 ═══════════════════
 Framework score = "is this business worth owning?", 0-100.
 
-Four axes, 95 points, rescaled to 100:
+Four axes, 100 points:
 
-    Moat               30   judgement — five yes/no questions, 6 points each
-    Financial quality  25   computed  — gross margin, FCF margin, ROIC, leverage
+    Moat               40   judgement — five yes/no questions, 8 points each
+    Financial quality  30   computed  — return on capital, FCF margin, gross margin, leverage
     Growth             20   computed  — 3y revenue CAGR, TTM revenue growth, 3y EPS growth
-    Valuation          20   computed  — P/E against the stock's own 5y median, and P/E to growth
+    Valuation          10   computed  — P/E and P/S against the stock's own 5y medians, P/E to growth
+
+Valuation is deliberately small. This score asks whether a business is worth
+owning; whether today's price is a good entry is the buy score's job. At 20
+points, valuation scored almost every large tech company near zero and made the
+framework score track the share price.
 
 Portfolio Fit is no longer part of the score. It describes the portfolio, not
 the business, and in the old table it had become a balancing figure (documented
@@ -31,19 +36,22 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SCORES_FILE = os.path.join(HERE, 'framework_scores.json')
 FUNDAMENTALS_FILE = os.path.join(HERE, 'fundamentals.json')
 
-AXES = {'moat': 30, 'quality': 25, 'growth': 20, 'valuation': 20}
-AXIS_TOTAL = sum(AXES.values())          # 95
+AXES = {'moat': 40, 'quality': 30, 'growth': 20, 'valuation': 10}
+AXIS_TOTAL = sum(AXES.values())          # 100
+# Hand sub-scores in framework_scores.json were written on the original rubric's
+# scale; they are converted pro rata (a hand moat of 24/30 becomes 32/40).
+HAND_MAX = {'moat': 30, 'quality': 25, 'growth': 20, 'valuation': 20}
 STALE_DAYS = 120                          # a moat judgement older than this is flagged
 FUNDAMENTALS_MAX_AGE_DAYS = 45            # older fundamentals are ignored, not trusted
 
 # The old totals carried about 8 points of "portfolio fit" padding. Across the 40
-# tickers that have hand sub-scores, the four real axes relate to the old total as
-#     new = -3.6 + 0.94 x old      (r = 0.97, residual sd 2.1)
-# That line is used to (a) place tickers that only have an old total on the new
-# scale, and (b) carry the old band cut-offs across: 85 -> 76, 70 -> 62, 55 -> 48.
-LEGACY_A, LEGACY_B = -3.6, 0.94
-BANDS = (('Core', 76), ('Good', 62), ('Marginal', 48), ('Avoid', 0))
-BUY_MIN = 62          # "Good" or better: the BUY gate (was 70 on the old scale)
+# tickers with hand sub-scores, the four real axes (on the weights above) relate
+# to the old total by the line below. It (a) places tickers that only have an old
+# total on the new scale and (b) carries the old cut-offs across (85 / 70 / 55).
+# Refit with `python framework_scorer.py --calibrate` if the weights change.
+LEGACY_A, LEGACY_B = -6.92, 0.994
+BANDS = (('Core', 78), ('Good', 63), ('Marginal', 48), ('Avoid', 0))
+BUY_MIN = 63          # "Good" or better: the BUY gate (was 70 on the old scale)
 FUND_BUY_MIN = 48     # funds and ETFs (was 55)
 
 
@@ -103,14 +111,38 @@ def _profitable(m):
 
 
 def _is_financial(m):
-    """Banks, brokers and insurers report no gross margin or free-cash-flow margin,
-    and their leverage is the business model. The quality rubric does not apply."""
+    """Banks, brokers and insurers report no gross margin or free-cash-flow margin;
+    their leverage is the business model and their 'revenue' is mostly interest.
+    Neither the quality nor the growth rubric applies, so both fall back to hand
+    or legacy values."""
     return _num(m.get('gross_margin')) is None and _num(m.get('fcf_margin')) is None
 
 
+def _fcf_margin(m):
+    """Above 100% is a unit or tiny-revenue artefact (NBIS showed 3,571%), not a
+    real margin. Treated as unknown."""
+    v = _num(m.get('fcf_margin'))
+    return v if v is not None and v <= 100 else None
+
+
+def _leverage_points(m, pts):
+    """Debt to equity, full points at 0, none at 1.5. Finnhub's figure is gross
+    debt over book equity, so companies that have bought back most of their
+    equity (MCD 41x, LOW 52x, HD 3x) look insolvent when they are not. When the
+    ratio is above 3 but the business earns 15%+ on capital with real free cash
+    flow, the ratio says more about buybacks than risk: half points."""
+    de = _num(m.get('net_debt_to_equity'))
+    if de is None:
+        return None
+    roic, fcf = _num(m.get('roic')), _fcf_margin(m)
+    if de > 3 and roic is not None and roic >= 15 and fcf is not None and fcf >= 10:
+        return pts / 2
+    return _lin(de, 1.5, 0.0, pts)
+
+
 def quality_points(m):
-    """Financial quality, 0-25. Return on capital carries most weight because it
-    is the one measure that works across retailers, software and industrials;
+    """Financial quality, 0-30. Return on capital carries the most weight because
+    it is the one measure that works across retailers, software and industrials;
     gross margin is down-weighted so low-margin, high-turnover models (COST) are
     not punished for their business model. Missing inputs score zero rather than
     being rescaled away, and loss-makers keep at most 60%."""
@@ -118,9 +150,9 @@ def quality_points(m):
         return None
     parts = [
         (_lin(m.get('roic'),          5, 25, 10), 10),
-        (_lin(m.get('fcf_margin'),    0, 20,  6),  6),
+        (_lin(_fcf_margin(m),         0, 20,  6),  6),
         (_lin(m.get('gross_margin'), 20, 60,  4),  4),
-        (_lin(m.get('net_debt_to_equity'), 1.5, 0.0, 5), 5),
+        (_leverage_points(m, 5),                   5),
     ]
     if sum(p is not None for p, _ in parts) < 3:
         return None
@@ -132,8 +164,11 @@ def quality_points(m):
 
 def growth_points(m):
     """Growth, 0-20. Realised growth only — it cannot see the size of the market
-    ahead. Loss-makers keep at most 60%: fast growth from a tiny, unprofitable
-    base is not the same thing as a growing business."""
+    ahead, and it judges a cyclical at the point of the cycle it is in.
+    Loss-makers keep at most 60%: fast growth from a tiny, unprofitable base is
+    not the same thing as a growing business."""
+    if not m or _is_financial(m):
+        return None
     rev3, rev1 = m.get('rev_growth_3y'), m.get('rev_growth_ttm')
     if _num(rev3) is None and _num(rev1) is None:
         return None
@@ -148,21 +183,45 @@ def growth_points(m):
 
 
 def current_pe(m, price=None):
+    """Finnhub's weekly P/E, moved to today's price when that is safe. price/EPS
+    is only trusted when it lands within a factor of two of Finnhub's own P/E:
+    for ADRs EPS is often reported in the home currency (one showed EPS 59,668),
+    which would make the stock look absurdly cheap."""
+    pe = _num(m.get('pe_ttm'))
+    pe = pe if pe and pe > 0 else None
     eps = _num(m.get('eps_ttm')); price = _num(price)
     if price and eps and eps > 0:
-        return price / eps
-    pe = _num(m.get('pe_ttm'))
-    return pe if pe and pe > 0 else None
+        live = price / eps
+        if pe is None or 0.5 <= live / pe <= 2.0:
+            return live
+    return pe
+
+
+def current_ps(m, price=None, pe_used=None):
+    """P/S moved by the same price change as P/E, when P/E was repriced."""
+    ps = _num(m.get('ps_ttm'))
+    base = _num(m.get('pe_ttm'))
+    if ps and pe_used and base and base > 0:
+        return ps * pe_used / base
+    return ps
 
 
 def valuation_points(m, price=None):
-    """Valuation, 0-20; higher = cheaper. Half from P/E against the stock's own
-    5-year median, half from P/E divided by growth.
+    """Valuation, 0-10; higher = cheaper. Three equal parts:
+      - P/E against the stock's own 5-year median (1.3x -> 0, 0.7x -> full)
+      - P/S against its own 5-year median, same scale. Sales move far less than
+        earnings through a cycle, so this keeps a cyclical at a trough (DE: P/E
+        37 against a median of 17 on depressed earnings) from looking dear only
+        because profits are temporarily low
+      - P/E divided by growth (3 -> 0, 1 -> full), growth capped at 50%
 
-    Loss-makers have no earnings to value, so they get at most 5: price/sales
-    against its own history, and nothing at all above 15x sales. A stock that has
+    Loss-makers have no earnings to value: at most a quarter of the axis, from
+    P/S against its own history, and nothing above 15x sales. A stock that has
     fallen from a bubble valuation is not cheap just because it is cheaper."""
     pe = current_pe(m, price)
+    ps = current_ps(m, price, pe)
+    ps_med = _num(m.get('ps_5y_median'))
+    rel_ps = _lin(ps / ps_med, 1.3, 0.7, 10) if ps and ps_med and ps_med > 0 else None
     if pe:
         rel = peg = None
         med = _num(m.get('pe_5y_median'))
@@ -172,14 +231,13 @@ def valuation_points(m, price=None):
         if g is None or g <= 0:
             g = _num(m.get('rev_growth_3y'))
         if g and g > 0:
-            peg = _lin(pe / min(g, 50.0), 3.0, 1.0, 10)   # cap growth at 50%: no stock is cheap on 300% growth
-        return _blend([(rel, 10), (peg, 10)], AXES['valuation'], need=1)
-    ps, med = _num(m.get('ps_ttm')), _num(m.get('ps_5y_median'))
+            peg = _lin(pe / min(g, 50.0), 3.0, 1.0, 10)
+        return _blend([(rel, 10), (rel_ps, 10), (peg, 10)], AXES['valuation'], need=1)
     if ps is None:
         return None
-    if ps > 15:
+    if ps > 15 or rel_ps is None:
         return 0.0
-    return round(_lin(ps / med, 1.3, 0.7, 5), 1) if med and med > 0 else 0.0
+    return round(rel_ps / 10 * 0.25 * AXES['valuation'], 1)
 
 
 COMPUTED = {'quality': lambda m, p: quality_points(m),
@@ -191,10 +249,10 @@ COMPUTED = {'quality': lambda m, p: quality_points(m),
 def moat_points(entry):
     ans = entry.get('moat_answers')
     if isinstance(ans, list) and len(ans) == len(MOAT_QUESTIONS):
-        return 6.0 * sum(1 for a in ans if a), 'hand'
+        return AXES['moat'] / len(MOAT_QUESTIONS) * sum(1 for a in ans if a), 'hand'
     hand = _num((entry.get('hand') or {}).get('moat'))
     if hand is not None:
-        return hand, 'hand'
+        return hand * AXES['moat'] / HAND_MAX['moat'], 'hand'
     return None, None
 
 
@@ -229,7 +287,7 @@ def score_ticker(entry, metrics=None, price=None, today=None):
             if val is not None:
                 src = 'data'
             elif _num(hand.get(axis)) is not None:
-                val, src = _num(hand.get(axis)), 'hand'
+                val, src = _num(hand.get(axis)) * axis_max / HAND_MAX[axis], 'hand'
         if val is None:
             if legacy is None:
                 return None
@@ -296,7 +354,31 @@ def score_all(prices=None, today=None, entries=None, fundamentals=None):
     return out
 
 
+def calibrate(entries=None):
+    """Refit LEGACY_A/B on tickers with hand sub-scores and print the old cut-offs
+    on the new scale. Run after changing AXES."""
+    entries = load_entries() if entries is None else entries
+    xs, ys = [], []
+    for e in entries.values():
+        h = e.get('hand') or {}
+        if e.get('legacy') is not None and all(_num(h.get(a)) is not None for a in AXES):
+            xs.append(float(e['legacy']))
+            ys.append(sum(_num(h[a]) * AXES[a] / HAND_MAX[a] for a in AXES) * 100.0 / AXIS_TOTAL)
+    n = len(xs); mx = sum(xs) / n; my = sum(ys) / n
+    b = sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / sum((x - mx) ** 2 for x in xs)
+    a = my - b * mx
+    r = (sum((x - mx) * (y - my) for x, y in zip(xs, ys))
+         / (sum((x - mx) ** 2 for x in xs) * sum((y - my) ** 2 for y in ys)) ** 0.5)
+    print(f"{n} tickers: new = {a:.2f} + {b:.3f} x old  (r = {r:.2f})")
+    for old in (85, 70, 55):
+        print(f'  old {old} -> new {a + b * old:.1f}')
+    return a, b
+
+
 if __name__ == '__main__':
+    import sys
+    if '--calibrate' in sys.argv:
+        calibrate(); sys.exit(0)
     det = score_all()
     fund, as_of = load_fundamentals()
     n = len(det)

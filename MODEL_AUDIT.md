@@ -135,7 +135,7 @@ Extreme readings (25%+ dip together with 10%+ cushion) returned +37.5 on the rep
 **Not tested: insider, politician and PEAD overlays.** There is no historical archive of those inputs in the repo, so they could not be backtested. They remain in the live score on the strength of the published literature only, which is why they are capped. Two data issues to fix before trusting them: PEAD surprise scores are computed from as few as three quarters (CRM showed an SUE of 12), and the insider feed contains at least one implausible record (a TSM purchase at $71).
 
 
-## 8. Framework score rebuild (13 November 2026)
+## 8. Framework score rebuild (13–14 November 2026)
 
 **What was wrong.** The framework score gates every BUY and damps every sell, and was a hand-typed number per ticker.
 
@@ -145,8 +145,24 @@ Extreme readings (25%+ dip together with 10%+ cushion) returned +37.5 on the rep
 - 81% of scores were even numbers, clumped at 68 and 72 on either side of the gate at 70.
 - Valuation was hand-scored quarterly, and no score carried a date.
 
-**What changed.** Four axes (Moat 30, Quality 25, Growth 20, Valuation 20), rescaled to 100. Quality, growth and valuation are computed from fundamentals; valuation is repriced on every run. Moat is five dated yes/no questions. Fit is removed. Every score records the source of each part. Method and limits: `FRAMEWORK.md`.
+**What changed.** Moat 40 + Quality 30 + Growth 20 + Valuation 10 = 100. Quality, growth and valuation are computed from Finnhub fundamentals (weekly `fundamentals_fetcher.py`); valuation is repriced on every scanner run. Moat is five dated yes/no questions. Fit is removed. Every score records the source of each part. Method and every threshold: `FRAMEWORK.md`.
 
-**Scale.** Removing the fit padding lowers scores by about 8 points, so the cut-offs were carried across with the fitted line `new = −3.6 + 0.94 × old`: gate 70 → 62, Core 85 → 76, Marginal 55 → 48. Before any fundamentals arrive, one stock changes side of the gate (CRWV, 72 old, 60 new; its 72 included 12 points of fit above the documented maximum).
+**First live fetch (14 Nov): what it exposed.** Finnhub returned data for all 227 US stocks and Apple's figures passed the sanity check. The first scoring was wrong in ways the data made obvious, and each fix is now in the scorer and tested:
 
-**Not done.** The fetcher has not run against the live API; expect field-name fixes after the first Actions run. The score is still unvalidated against returns. The sell damping formula now receives scores about 8 points lower, which weakens damping slightly (a score of 86 damps to ×0.60 where 93 gave ×0.55); sell thresholds were not re-tuned.
+| Problem seen | Example | Fix |
+|---|---|---|
+| Missing inputs were rescaled away, so loss-makers scored on their good figures only | IONQ 36 → 65 | Missing inputs score zero; loss-makers capped at 60% on quality and growth |
+| Price/sales below a bubble-era median scored as cheap | IONQ at 51× sales vs a 122× median | Loss-makers get at most a quarter of valuation, zero above 15× sales |
+| Banks scored on gross margin and leverage, which they do not have | JPM quality 0 | Financials fall back to hand scores for quality and growth |
+| Gross margin punished low-margin, high-turnover models | COST | Return on capital weighted 10, gross margin 4 |
+| Debt/equity punished buyback companies with tiny book equity | MCD 41×, LOW 52× | Half points when return on capital and cash flow are strong |
+| P/E against its own history punished cyclicals at a trough | DE P/E 37 vs median 17 | P/S against its own history added as a third valuation part |
+| EPS reported in home currency for some listings | EPS 59,668 | Live P/E used only within 2× of Finnhub's P/E |
+| Free-cash-flow margin unit errors | NBIS 3,571% | Above 100% treated as unknown |
+| Valuation at 20 points scored most large tech near zero | AAPL, AMD, KLAC | Valuation cut to 10, moat raised to 40 |
+
+**Scale.** Cut-offs carried across with the fitted line `new = −6.92 + 0.994 × old` (r 0.95 on the 40 hand-scored tickers): gate 70 → 63, Core 85 → 78, Marginal 55 → 48.
+
+**Effect with live data.** 120 stocks passed the old gate; 87 pass the new one. 50 fall below it and 17 rise above it. Holdings that fall below: NBIS (87 → 52), AMAT (82 → 59), CPRT (80 → 61), MRVL (79 → 61), BRKB (78 → 49), TEAM (75 → 54), CRWV (72 → 40). The largest falls are slow growers and cyclicals near a trough (DE, TMO, HD); the largest rises are profitable fast growers the old hand scores had underrated (RDDT, SNDK).
+
+**Not done.** The score is still unvalidated against returns. 190 stocks have no real moat judgement, so 40% of their score is still the old number. Growth rewards growth companies by design (full marks at 25% a year). Sell thresholds were not re-tuned for the new scale.

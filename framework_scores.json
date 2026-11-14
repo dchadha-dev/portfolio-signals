@@ -2,8 +2,8 @@
  "_readme": [
   "Framework score inputs. See FRAMEWORK.md.",
   "legacy: the old single hand total. Used only as a placeholder for axes that have neither data nor a hand value.",
-  "hand: hand sub-scores (moat /30, quality /25, growth /20, valuation /20). quality, growth and valuation are overridden by fundamentals when available.",
-  "moat_answers: five true/false answers to the moat questions in FRAMEWORK.md, 6 points each. When set, replaces hand.moat.",
+  "hand: hand sub-scores on the ORIGINAL rubric scale (moat /30, quality /25, growth /20, valuation /20). The scorer converts them pro rata to the live weights (moat /40, quality /30, growth /20, valuation /10). quality, growth and valuation are overridden by fundamentals when available.",
+  "moat_answers: five true/false answers to the moat questions in FRAMEWORK.md, 8 points each. When set, replaces hand.moat.",
   "moat_date: YYYY-MM-DD the moat was last judged. null or older than 120 days is flagged on the dashboard.",
   "kind \"fund\": ETFs and funds keep their legacy score; no fundamentals are applied."
  ],

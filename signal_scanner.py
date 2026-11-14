@@ -34,7 +34,7 @@ BUY_T           = 80   # buy score needed for BUY
 WATCH_T         = 60   # buy score needed for WATCH (factor gate must also be open)
 STRONG_T        = 95   # BUY at/above this score = STRONG tier (deep dip + overlay, or +15 of overlays)
 import framework_scorer
-FW_MIN_BUY      = framework_scorer.BUY_MIN        # 62 = band 'Good' or better (70 on the pre-rebuild scale)
+FW_MIN_BUY      = framework_scorer.BUY_MIN        # band 'Good' or better; 70 on the pre-rebuild scale
 FUND_FW_MIN_BUY = framework_scorer.FUND_BUY_MIN   # 48 for funds/ETFs (was 55)
 
 # Display label for each final state. `label` is the ONLY thing a page or
