@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-11-09 07:33 UTC",
-    "tickers_checked": 15,
-    "new_signals": 3,
-    "total_signals": 19,
-    "expired_removed": 0,
+    "timestamp": "2026-11-14 01:19 UTC",
+    "tickers_checked": 9,
+    "new_signals": 4,
+    "total_signals": 22,
+    "expired_removed": 1,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 112.7
+    "elapsed_seconds": 115.7
   },
   "signals": {
     "CRM": {
@@ -82,17 +82,17 @@
     },
     "NBIS": {
       "ticker": "NBIS",
-      "announce_date": "2026-10-22",
-      "expires_at": "2026-12-21",
-      "sue": 2.763,
-      "surprise": 0.5158,
-      "actual_eps": -0.12,
-      "estimate_eps": -0.6358,
-      "std_dev": 0.1867,
+      "announce_date": "2026-11-12",
+      "expires_at": "2027-01-11",
+      "sue": 33.629,
+      "surprise": 1.0071,
+      "actual_eps": 0.305,
+      "estimate_eps": -0.7021,
+      "std_dev": 0.0299,
       "std_dev_floored": false,
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-10-26"
+      "as_of": "2026-11-14"
     },
     "PG": {
       "ticker": "PG",
@@ -275,6 +275,48 @@
       "history_quarters": 3,
       "buy_score_boost": 10,
       "as_of": "2026-11-09"
+    },
+    "CSCO": {
+      "ticker": "CSCO",
+      "announce_date": "2026-11-12",
+      "expires_at": "2027-01-11",
+      "sue": 2.38,
+      "surprise": 0.0476,
+      "actual_eps": 1.4,
+      "estimate_eps": 1.3524,
+      "std_dev": 0.02,
+      "std_dev_floored": true,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-11-14"
+    },
+    "ONDS": {
+      "ticker": "ONDS",
+      "announce_date": "2026-11-12",
+      "expires_at": "2027-01-11",
+      "sue": 1.787,
+      "surprise": 0.0405,
+      "actual_eps": -0.1,
+      "estimate_eps": -0.1405,
+      "std_dev": 0.0227,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-11-14"
+    },
+    "TTD": {
+      "ticker": "TTD",
+      "announce_date": "2026-11-09",
+      "expires_at": "2027-01-08",
+      "sue": 2.305,
+      "surprise": 0.0738,
+      "actual_eps": 0.33,
+      "estimate_eps": 0.2562,
+      "std_dev": 0.032,
+      "std_dev_floored": false,
+      "history_quarters": 3,
+      "buy_score_boost": 10,
+      "as_of": "2026-11-14"
     }
   }
 }
