@@ -83,16 +83,20 @@ Other rules:
 
 ### Moat (40): the five questions
 
-1. Would a typical customer face real cost, risk or disruption in switching away?
-2. Does the product get better or cheaper as more customers use it (network or scale effects)?
-3. Does it own technology, IP, data or licences a well-funded rival could not replicate in five years?
-4. Has it held or gained market share and pricing power over the last five years?
-5. Is it number one or two in its core market?
+The first four are the four sources of a durable competitive advantage (the standard moat framework used in equity research). The fifth asks whether the advantage will last. Market share and pricing power are deliberately absent: they are what a moat produces, and the quality and growth axes already measure them from data, so asking about them again would count the same thing twice.
+
+1. **Switching costs:** would a typical customer face real cost, risk or disruption in leaving?
+2. **Network effects:** does the product become more valuable to each user as more users join?
+3. **Intangibles:** does it own brands, patents, data, licences or permits a well-funded rival could not replicate in five years?
+4. **Cost advantage:** can it make or deliver its product structurally cheaper than rivals, through scale, process know-how, location, or a market that only supports one or two players?
+5. **Durability:** is it on the right side of the main technology shift in its market, as the disruptor or clearly immune, rather than the one being disrupted?
+
+Question 5 is where innovation and disruption enter the score. It is two-sided: it rewards being the disruptor and marks down the disrupted. It is worth one question and no more, because a framework that paid extra for being on a hot theme would stop being a check on the themes.
 
 Record the answers in `framework_scores.json`:
 
 ```json
-"ANET": { "legacy": 91, "moat_answers": [true, false, true, true, true], "moat_date": "2026-11-20",
+"ANET": { "legacy": 91, "moat_answers": [true, false, false, true, true], "moat_date": "2026-11-20",
           "moat_reason": "EOS lock-in with hyperscalers; no network effect" }
 ```
 

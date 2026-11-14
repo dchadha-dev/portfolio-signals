@@ -3,10 +3,11 @@
   "Framework score inputs. See FRAMEWORK.md.",
   "legacy: the old single hand total. Used only as a placeholder for axes that have neither data nor a hand value.",
   "hand: hand sub-scores on the ORIGINAL rubric scale (moat /30, quality /25, growth /20, valuation /20). The scorer converts them pro rata to the live weights (moat /40, quality /30, growth /20, valuation /10). quality, growth and valuation are overridden by fundamentals when available.",
-  "moat_answers: five true/false answers to the moat questions in FRAMEWORK.md, 8 points each. When set, replaces hand.moat.",
+  "moat_answers: five true/false answers to the moat questions in FRAMEWORK.md, 8 points each (switching costs, network effects, intangibles, cost advantage, durability). When set, replaces hand.moat.",
   "moat_date: YYYY-MM-DD the moat was last judged. null or older than 120 days is flagged on the dashboard.",
   "kind \"fund\": ETFs and funds keep their legacy score; no fundamentals are applied.",
-  "industry: optional override of Finnhub's industry label, used to compare gross and free-cash-flow margins with true peers (Finnhub puts hardware makers in \"Technology\" with software). Needs 5+ peers with data."
+  "industry: optional override of Finnhub's industry label, used to compare gross and free-cash-flow margins with true peers (Finnhub puts hardware makers in \"Technology\" with software). Needs 5+ peers with data.",
+  "moat_by: who set the moat answers. \"claude-draft\" = awaiting review; \"claude, accepted by Dharam <date>\" = drafted by Claude and accepted; your own name once you override."
  ],
  "tickers": {
   "NVDA": {
@@ -17,8 +18,16 @@
     "growth": 18,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "CUDA lock-in, developer ecosystem, scale in AI systems; the platform the AI shift runs on",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "CRDO": {
    "legacy": 93,
@@ -28,8 +37,16 @@
     "growth": 19,
     "valuation": 14
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "SerDes and active-cable IP; design wins reset each generation; rides AI networking growth",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ASML": {
    "legacy": 93,
@@ -39,8 +56,16 @@
     "growth": 18,
     "valuation": 15
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Sole EUV supplier, deeply embedded in fabs; demand rises with every node",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "AVGO": {
    "legacy": 92,
@@ -50,8 +75,16 @@
     "growth": 17,
     "valuation": 14
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Custom AI ASICs and VMware embedded with customers; broad IP; scale in networking silicon",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ANET": {
    "legacy": 91,
@@ -61,8 +94,16 @@
     "growth": 18,
     "valuation": 14
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "EOS embedded with hyperscalers; cost-efficient merchant-silicon model; AI back-end networking tailwind",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "DDOG": {
    "legacy": 90,
@@ -72,8 +113,16 @@
     "growth": 18,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Observability embedded in engineering workflows; more AI workloads to monitor",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "MELI": {
    "legacy": 90,
@@ -83,13 +132,29 @@
     "growth": 19,
     "valuation": 14
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Mercado Pago and logistics lock-in, marketplace network effects, Latin American scale",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "LLY": {
    "legacy": 90,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "GLP-1 patents, manufacturing scale and pipeline lead",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "TSM": {
    "legacy": 89,
@@ -99,18 +164,42 @@
     "growth": 18,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Leading-edge process know-how, yield learning and scale no rival matches; makes nearly every AI chip",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "MA": {
    "legacy": 88,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Global card network: both sides grow together; acceptance everywhere; scale",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "V": {
    "legacy": 88,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Largest card network: both sides grow together; acceptance everywhere; scale",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "NBIS": {
    "legacy": 87,
@@ -120,8 +209,16 @@
     "growth": 18,
     "valuation": 17
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Full-stack AI cloud on the right side of the shift; compute is rentable elsewhere, no lock-in yet",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "AMD": {
    "legacy": 86,
@@ -131,18 +228,42 @@
     "growth": 17,
     "valuation": 14
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "x86 licence duopoly; second source for AI GPUs; ROCm lock-in still weak",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "NOW": {
    "legacy": 86,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Workflow platform embedded in enterprise IT; adding AI agents on its own data",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "MSCI": {
    "legacy": 86,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Index benchmarks embedded in mandates; more assets tracked make the indices more valuable",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "BKNG": {
    "legacy": 85,
@@ -152,18 +273,42 @@
     "growth": 15,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Two-sided marketplace and scale in performance marketing",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ISRG": {
    "legacy": 85,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Surgical robot lock-in: hospitals and surgeons trained on its system; data and scale",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "SPGI": {
    "legacy": 85,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Ratings and index licences embedded in regulation and mandates",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "AMZN": {
    "legacy": 84,
@@ -173,23 +318,55 @@
     "growth": 17,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Prime and AWS lock-in, marketplace network, logistics scale; AWS central to AI compute",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "CRWD": {
    "legacy": 84,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Falcon agent embedded on endpoints; threat data improves with more customers; platform consolidation winner",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "KLAC": {
    "legacy": 84,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Process-control tools embedded in fab yield; ~50%+ share; efficient-scale niche",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "TMO": {
    "legacy": 84,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Lab equipment and consumables embedded in research and drug production",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "GOOG": {
    "legacy": 83,
@@ -199,23 +376,55 @@
     "growth": 17,
     "valuation": 12
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    true,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Search and YouTube data scale and low-cost infrastructure; AI answers threaten the search business",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "PANW": {
    "legacy": 83,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Security platform embedded in networks; consolidation and AI security tailwind",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "LRCX": {
    "legacy": 83,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Etch and deposition embedded in fab processes; benefits from 3D NAND and gate-all-around",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ZTS": {
    "legacy": 83,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Animal-health brands and vet relationships",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "MSFT": {
    "legacy": 82,
@@ -225,8 +434,16 @@
     "growth": 15,
     "valuation": 11
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Office/Windows/Azure enterprise lock-in, developer ecosystem, scale; well placed in AI",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "META": {
    "legacy": 82,
@@ -236,8 +453,16 @@
     "growth": 16,
     "valuation": 12
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "3bn+ user network effects and ad-targeting data; strong in AI recommendation",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "AMAT": {
    "legacy": 82,
@@ -247,8 +472,16 @@
     "growth": 17,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Process recipes and installed base embedded at fabs; broadest scale in equipment",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "RMS.PA": {
    "legacy": 82,
@@ -258,53 +491,133 @@
     "growth": 14,
     "valuation": 12
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Craft, scarcity and heritage that cannot be replicated",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "CDNS": {
    "legacy": 82,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "EDA duopoly: designers trained on its tools, IP libraries, foundry certifications; AI raises design complexity",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "SNPS": {
    "legacy": 82,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "EDA duopoly with Cadence; deep workflow lock-in and foundry ecosystem; AI chips need more design tools",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "AXON": {
    "legacy": 82,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Taser and body cameras embedded with police; evidence-cloud network",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ICE": {
    "legacy": 82,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Exchanges, clearing and mortgage-data software; liquidity attracts liquidity",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "IDXX": {
    "legacy": 82,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Veterinary diagnostic instruments with consumables; reference-lab network",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "COST": {
    "legacy": 82,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Membership loyalty and the lowest cost structure in retail",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "CMG": {
    "legacy": 82,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Brand and restaurant operating scale",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "FICO": {
    "legacy": 81,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "FICO score is embedded in US lending rules and models",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "CME": {
    "legacy": 81,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Dominant futures exchange; liquidity network effect; regulated clearing",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "AAPL": {
    "legacy": 80,
@@ -314,9 +627,17 @@
     "growth": 14,
     "valuation": 11
    },
-   "moat_answers": null,
-   "moat_date": null,
-   "industry": "Technology Hardware"
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "industry": "Technology Hardware",
+   "moat_reason": "iOS ecosystem lock-in, App Store network, brand, supply-chain scale; device layer for AI",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "CPRT": {
    "legacy": 80,
@@ -326,8 +647,16 @@
     "growth": 16,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Insurer integration, buyer-seller liquidity, zoned yards that cannot be replicated",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "NVO": {
    "legacy": 80,
@@ -337,8 +666,16 @@
     "growth": 17,
     "valuation": 12
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "GLP-1 patents, but losing to Lilly and next-generation drugs",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "MC.PA": {
    "legacy": 80,
@@ -348,38 +685,94 @@
     "growth": 14,
     "valuation": 12
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Portfolio of irreplaceable luxury brands with scale",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "CRM": {
    "legacy": 80,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "CRM data and workflow lock-in; AI agents threaten seat-based pricing",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "NDAQ": {
    "legacy": 80,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Exchange listings plus financial-crime and risk software",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ADI": {
    "legacy": 80,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Analog parts designed into long-lived industrial and auto products; broad catalogue and own fabs",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "TXN": {
    "legacy": 80,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Analog parts designed in for decades; 300mm cost lead; Chinese analog competition is eroding the low end",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "BX": {
    "legacy": 80,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Locked-up capital, brand with institutions, scale in alternatives",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "MCD": {
    "legacy": 80,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Global brand, prime real estate, purchasing scale",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "RACE": {
    "legacy": 79,
@@ -389,8 +782,16 @@
     "growth": 14,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Brand and heritage that cannot be replicated; immune to the EV shift so far",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "INTU": {
    "legacy": 79,
@@ -400,28 +801,68 @@
     "growth": 16,
     "valuation": 12
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "TurboTax/QuickBooks data lock-in, accountant network, scale; AI assistants built on its data",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "MPWR": {
    "legacy": 79,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Power-management IP designed into AI servers; fabless, no structural cost lead",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "MRVL": {
    "legacy": 79,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Custom ASIC and optical DSP IP; hyperscalers bringing chip design in-house is a real threat",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "SPOT": {
    "legacy": 79,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Personalisation data and two-sided creator network; listeners can switch freely",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "HD": {
    "legacy": 79,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Pro contractor relationships and supply scale",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "SHOP": {
    "legacy": 78,
@@ -431,8 +872,16 @@
     "growth": 16,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    false,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Merchants embed storefront, payments and apps; agentic commerce tailwind",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "PGR": {
    "legacy": 78,
@@ -442,8 +891,16 @@
     "growth": 15,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Telematics and pricing data; lowest-cost direct distribution",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "BRKB": {
    "legacy": 78,
@@ -453,28 +910,68 @@
     "growth": 13,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Insurance float, BNSF rail network and low cost of capital",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ORCL": {
    "legacy": 78,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Database lock-in; OCI gaining in AI training capacity",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "AXP": {
    "legacy": 78,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Closed-loop network and premium brand",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "KKR": {
    "legacy": 78,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Locked-up capital and long-standing institutional relationships",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "MSI": {
    "legacy": 78,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Public-safety radio networks embedded with governments",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "TTD": {
    "legacy": 77,
@@ -484,18 +981,42 @@
     "growth": 16,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Independent ad buying platform; Amazon and Google competing directly",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "NET": {
    "legacy": 77,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Global edge network with low unit costs; more traffic improves threat data; AI inference at the edge",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "VRT": {
    "legacy": 77,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Power and cooling designed into AI data centres",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "NFLX": {
    "legacy": 76,
@@ -505,8 +1026,16 @@
     "growth": 14,
     "valuation": 12
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Content library and global scale amortising content costs; leader in streaming",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "MU": {
    "legacy": 76,
@@ -516,8 +1045,16 @@
     "growth": 16,
     "valuation": 14
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "HBM technology in a three-player oligopoly; commodity DRAM has no lock-in; AI memory tailwind",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ITX.MC": {
    "legacy": 76,
@@ -527,68 +1064,172 @@
     "growth": 14,
     "valuation": 14
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Brand and fastest supply chain in apparel",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "VEEV": {
    "legacy": 76,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Life-sciences CRM and data embedded with pharma; regulatory know-how",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "HEI": {
    "legacy": 76,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "FAA-approved replacement parts at lower cost",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "QCOM": {
    "legacy": 76,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Standard-essential patents and modem integration; Apple and handset makers moving in-house",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "JPM": {
    "legacy": 76,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Deposit franchise, scale cost advantage, payments network; leading bank technology",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "JNJ": {
    "legacy": 76,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Med-tech surgeon lock-in and drug patents",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ABT": {
    "legacy": 76,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Diagnostics and medical devices embedded with clinicians",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ABNB": {
    "legacy": 76,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Two-sided marketplace network and brand",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "MAR": {
    "legacy": 76,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Loyalty programme and brand system with owners",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "CEG": {
    "legacy": 76,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Largest US nuclear fleet; licences; AI power contracts",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "DE": {
    "legacy": 76,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Dealer network and precision-agriculture technology",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "WMT": {
    "legacy": 76,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Lowest-cost scale in retail and growing ad business",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ARM": {
    "legacy": 76,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Instruction set embedded across the industry with a vast software ecosystem; gaining in data centre and AI",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "UNH": {
    "legacy": 75,
@@ -598,8 +1239,16 @@
     "growth": 14,
     "valuation": 12
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    true,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Scale in health insurance and Optum data; regulatory pressure",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "TEAM": {
    "legacy": 75,
@@ -609,18 +1258,42 @@
     "growth": 15,
     "valuation": 12
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Jira/Confluence embedded with a Marketplace ecosystem; AI coding agents threaten seat counts",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "KNSL": {
    "legacy": 75,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Excess and surplus underwriting with the lowest expense ratio",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "BSX": {
    "legacy": 75,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Cardiology devices with physician lock-in",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "FISV": {
    "legacy": 74,
@@ -630,73 +1303,185 @@
     "growth": 14,
     "valuation": 12
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Bank processing and Clover lock-in; losing ground to fintechs",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "APP": {
    "legacy": 74,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Ad network data improves with more apps and advertisers; AI targeting engine",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "IBKR": {
    "legacy": 74,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Automated low-cost brokerage with global reach",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "GS": {
    "legacy": 74,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Investment banking brand and relationships",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ABBV": {
    "legacy": 74,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Immunology and neuroscience patents",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ELV": {
    "legacy": 74,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Large insurer with Blue Cross brands; Medicaid and Medicare pressure",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "NVS": {
    "legacy": 74,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Innovative drug portfolio and patents",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "PODD": {
    "legacy": 74,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Tubeless insulin pump with patient lock-in",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "UBER": {
    "legacy": 74,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    false,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Rider-driver network effects and density; robotaxis could bypass the network",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "LOW": {
    "legacy": 74,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Home-improvement duopoly with scale",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "PG": {
    "legacy": 74,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Household brands with scale in advertising and retail",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "CAT": {
    "legacy": 74,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Dealer network and installed base",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "WM": {
    "legacy": 74,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Landfill permits that cannot be replicated; route density",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "MS": {
    "legacy": 73,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Wealth-management assets with sticky advisers; brand",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "CRWV": {
    "legacy": 72,
@@ -706,8 +1491,16 @@
     "growth": 17,
     "valuation": 10
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Specialist AI cloud with take-or-pay contracts and NVIDIA allocation; dependent on few customers",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "RELX": {
    "legacy": 72,
@@ -717,13 +1510,29 @@
     "growth": 15,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "LexisNexis and Elsevier embedded in workflows; proprietary data",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ALAB": {
    "legacy": 72,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Cosmos software embedded in hyperscaler stacks; competitors are closing in; AI connectivity tailwind",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "SMH": {
    "legacy": 72,
@@ -733,98 +1542,250 @@
   },
   "ON": {
    "legacy": 72,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Designed into auto and industrial; silicon-carbide lead eroded by Chinese capacity",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "SCHW": {
    "legacy": 72,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Lowest-cost scale in US brokerage and custody",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "UTHR": {
    "legacy": 72,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Pulmonary hypertension drugs and organ-manufacturing pipeline",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "MEDP": {
    "legacy": 72,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Clinical research for biotech with operational know-how",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ONON": {
    "legacy": 72,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Fast-growing premium running brand",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "NKE": {
    "legacy": 72,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Brand; losing share to ON, Hoka and others",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "LULU": {
    "legacy": 72,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Brand; facing competition and slowing in the US",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "KO": {
    "legacy": 72,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Global brand and bottling distribution scale",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "PEP": {
    "legacy": 72,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Snack brands and distribution; GLP-1 drugs reduce snack demand",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "MNST": {
    "legacy": 72,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Energy-drink brand with Coca-Cola distribution",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "DECK": {
    "legacy": 72,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Hoka and Ugg brands",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "NEE": {
    "legacy": 72,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Largest renewable developer with scale and cost of capital",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "GEV": {
    "legacy": 72,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Gas turbines and grid equipment; efficient-scale oligopoly; AI power demand",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "CB": {
    "legacy": 72,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Specialty underwriting expertise and broker relationships",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "LSCC": {
    "legacy": 71,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Low-power FPGAs designed in for years; niche efficient scale; edge AI tailwind",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "CSCO": {
    "legacy": 70,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Huge enterprise installed base; losing data-centre share to Arista and white-box",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "DASH": {
    "legacy": 70,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Local delivery network density; logistics scale",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "GE": {
    "legacy": 70,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Jet-engine installed base with decades of service revenue",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "LMT": {
    "legacy": 70,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Defence programmes; F-35 dependence",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "VOO": {
    "legacy": 82,
@@ -1241,130 +2202,330 @@
   },
   "GME": {
    "legacy": 25,
-   "moat_answers": null,
-   "moat_date": null,
-   "note": "GameStop — no durable moat, weak fundamentals, sentiment-driven"
+   "moat_answers": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "note": "GameStop — no durable moat, weak fundamentals, sentiment-driven",
+   "moat_reason": "Physical game retail in structural decline",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ACLS": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Ion-implant tools embedded at fabs; silicon-carbide demand slowing",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "COHR": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Optical transceivers and lasers designed into AI networks; fragmented competition",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "GLW": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Glass science and process know-how; optical fibre for AI data centres",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "TSEM": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Specialty analog foundry; process know-how in RF and silicon photonics",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "DELL": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null,
-   "industry": "Technology Hardware"
+   "moat_answers": [
+    true,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "industry": "Technology Hardware",
+   "moat_reason": "Enterprise relationships and supply-chain scale; AI server demand",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "BAC": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Low-cost deposit franchise and scale",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "OWL": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Permanent capital in private credit; fee-paying assets locked up for years",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "MDT": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Broad device franchises; slower innovation",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ALGN": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Clear-aligner brand; cheaper rivals",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "RCL": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Cruise brand and private destinations; scale",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "SBUX": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Brand; losing to cheaper and faster rivals",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "CL": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Toothpaste brand leadership and global distribution",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ULTA": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Beauty loyalty programme and store scale",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "CCJ": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Long-term contracts and tier-one deposits; nuclear revival",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "XOM": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Low-cost assets and integration; long-term oil demand risk",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "RTX": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Engines and defence systems embedded in programmes",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "AER": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Largest aircraft lessor; scale in purchasing and funding",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "PDD": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Consumer-to-manufacturer model with scale cost advantage",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "HDB": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Indian private bank with low-cost deposit franchise",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "CVX": {
    "legacy": 67,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Low-cost assets; long-term oil demand risk",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "GILD": {
    "legacy": 66,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "HIV franchise patents and long-acting prevention",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "UL": {
    "legacy": 66,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Global brands; being restructured",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "CAVA": {
    "legacy": 66,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Fast-growing Mediterranean restaurant brand",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "SONY": {
    "legacy": 66,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "PlayStation network and ecosystem, image-sensor IP, music and film catalogues",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "TM": {
    "legacy": 65,
@@ -1374,8 +2535,16 @@
     "growth": 11,
     "valuation": 14
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Production system and hybrid cost lead; slow in battery-electric and software",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "O": {
    "legacy": 65,
@@ -1385,118 +2554,302 @@
     "growth": 11,
     "valuation": 14
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Largest net-lease REIT with cost-of-capital advantage",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "SNOW": {
    "legacy": 65,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Data stored in its platform creates lock-in; open formats and Databricks compete hard",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "IBM": {
    "legacy": 65,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Mainframe and consulting lock-in; losing relevance in cloud and AI platforms",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "TOST": {
    "legacy": 65,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    false,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Restaurant point-of-sale embedded with payments and payroll",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "DIS": {
    "legacy": 65,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Iconic franchises and parks; linear TV in decline",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "RMBS": {
    "legacy": 64,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Memory-interface IP and patents; DDR5 and HBM transitions raise content per server",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "FSLR": {
    "legacy": 64,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Thin-film technology; US manufacturing protected by tariffs and credits",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "UPS": {
    "legacy": 64,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Delivery network scale; losing Amazon volume",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "PI": {
    "legacy": 64,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "RAIN RFID chips and IP",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "C": {
    "legacy": 62,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Global transaction services lock-in; restructuring and losing ground",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "UHS": {
    "legacy": 62,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Hospital operator with local scale",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "CELH": {
    "legacy": 62,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Fast-growing energy-drink brand with PepsiCo distribution",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "SE": {
    "legacy": 62,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Shopee, SeaMoney and Garena ecosystem in Southeast Asia with scale",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "TCOM": {
    "legacy": 62,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Leading Chinese travel marketplace with scale",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "EXPE": {
    "legacy": 62,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    false,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Marketplace with weaker network than Booking; AI agents may disintermediate",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "SHEL": {
    "legacy": 62,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "LNG portfolio and trading scale; oil demand risk",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "EQNR": {
    "legacy": 62,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "North Sea gas and low-cost assets",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "VLO": {
    "legacy": 62,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Refining scale; long-term demand risk",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "OXY": {
    "legacy": 62,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Permian scale",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "FDX": {
    "legacy": 62,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Express network scale; restructuring",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "BABA": {
    "legacy": 62,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    false,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Marketplace network in China but losing share; cloud unit is an AI option",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "INFY": {
    "legacy": 62,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Long-term IT services contracts and offshore cost base; AI coding threatens labour-based model",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "FIVN": {
    "legacy": 62,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Contact-centre software lock-in; AI agents reduce seat demand",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ADBE": {
    "legacy": 61,
@@ -1506,54 +2859,134 @@
     "growth": 11,
     "valuation": 8
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Creative workflow and file-format lock-in; generative AI tools lower the barrier for rivals",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "STX": {
    "legacy": 60,
-   "moat_answers": null,
-   "moat_date": null,
-   "industry": "Technology Hardware"
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "industry": "Technology Hardware",
+   "moat_reason": "Hard-drive duopoly; HAMR technology lead; AI data storage demand",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "BIIB": {
    "legacy": 60,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Neurology patents; key drugs facing generics",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "DKNG": {
    "legacy": 60,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Licences in regulated states and brand; prediction markets are an emerging threat",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "HIMS": {
    "legacy": 60,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Consumer telehealth brand; low barriers to entry",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "EQT": {
    "legacy": 60,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Lowest-cost US natural gas; AI power demand",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "BKR": {
    "legacy": 60,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "LNG and gas turbines; energy-transition equipment",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "BEP": {
    "legacy": 60,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Global renewable portfolio with long contracts",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "RIO": {
    "legacy": 60,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Tier-one iron ore and copper assets",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "FCX": {
    "legacy": 60,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Large copper reserves; electrification demand",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "COIN": {
    "legacy": 58,
@@ -1563,55 +2996,135 @@
     "growth": 16,
     "valuation": 8
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Regulated US crypto exchange; liquidity and custody",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "WDC": {
    "legacy": 58,
-   "moat_answers": null,
-   "moat_date": null,
-   "industry": "Technology Hardware"
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "industry": "Technology Hardware",
+   "moat_reason": "Hard-drive duopoly; scale and areal-density know-how; AI storage demand",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "PFE": {
    "legacy": 58,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Patents, but large patent expiries ahead",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "CVNA": {
    "legacy": 58,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Reconditioning and logistics scale in online used cars",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "PLNT": {
    "legacy": 58,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Low-cost gym brand with franchise scale",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "HAL": {
    "legacy": 58,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Oilfield services; cyclical",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "FORM": {
    "legacy": 58,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Probe cards custom to each chip; HBM and advanced packaging raise demand",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "HSBC": {
    "legacy": 58,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Global trade-finance and deposit franchise; restructuring",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "SNDK": {
    "legacy": 58,
-   "moat_answers": null,
-   "moat_date": null,
-   "industry": "Technology Hardware"
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "industry": "Technology Hardware",
+   "moat_reason": "NAND scale and joint-venture fabs with Kioxia; enterprise SSD demand from AI",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "VICR": {
    "legacy": 58,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Power-module IP and patents; high-density power for AI racks",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "GDX": {
    "legacy": 58,
@@ -1639,210 +3152,538 @@
     "growth": 13,
     "valuation": 7
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Brand, charging network and autonomy data; EV technology matched by BYD",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "RDDT": {
    "legacy": 56,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Community network effects; its conversation data is licensed for AI training",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "BP": {
    "legacy": 56,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Integrated oil with weaker assets; strategy reversals",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "MMM": {
    "legacy": 56,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Materials know-how; restructuring",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "JD": {
    "legacy": 56,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Own logistics network gives a cost edge; losing share in Chinese e-commerce",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "FUTU": {
    "legacy": 55,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Low-cost cross-border brokerage; regulatory risk",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "SOFI": {
    "legacy": 54,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Bank charter and member ecosystem",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ENPH": {
    "legacy": 54,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Microinverter IP; cheaper rivals and weak solar demand",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "BIDU": {
    "legacy": 54,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Chinese search data and AI models; search losing to apps and rival models",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "NVTS": {
    "legacy": 52,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "GaN power IP; small player in a fast-growing niche; no lock-in yet",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "HPE": {
    "legacy": 52,
-   "moat_answers": null,
-   "moat_date": null,
-   "industry": "Technology Hardware"
+   "moat_answers": [
+    true,
+    false,
+    false,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "industry": "Technology Hardware",
+   "moat_reason": "Enterprise installed base; commoditised hardware, losing ground in AI servers",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "HOOD": {
    "legacy": 52,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Low-cost, mobile-first brokerage; product velocity",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "MRNA": {
    "legacy": 52,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "mRNA IP; vaccine demand collapsed",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "SMCI": {
    "legacy": 52,
-   "moat_answers": null,
-   "moat_date": null,
-   "industry": "Technology Hardware"
+   "moat_answers": [
+    false,
+    false,
+    false,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "industry": "Technology Hardware",
+   "moat_reason": "Fast server assembly; easily replicated; rides AI demand without structural advantage",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "NXE": {
    "legacy": 52,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "High-grade uranium deposit; pre-production",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "T": {
    "legacy": 52,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Wireless and fibre network scale; mature industry",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "VZ": {
    "legacy": 52,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Wireless network scale; mature industry",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "RKLB": {
    "legacy": 52,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Launch and spacecraft capability",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "GRAB": {
    "legacy": 50,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Super-app network density in Southeast Asia",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "SYM": {
    "legacy": 50,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Warehouse automation embedded at Walmart; customer concentration",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "HIMX": {
    "legacy": 48,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Display drivers designed in; low-margin, commoditising",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "BE": {
    "legacy": 48,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Fuel-cell technology; AI data-centre power demand",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "BA": {
    "legacy": 48,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Commercial aircraft duopoly; production and quality problems",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "IREN": {
    "legacy": 48,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Low-cost renewable power sites; pivoting from bitcoin mining to AI compute",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "ASTS": {
    "legacy": 46,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Spectrum and patents for direct-to-phone satellites; unproven",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "SOUN": {
    "legacy": 44,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Voice AI start-up; big platforms offer equivalent technology",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "SEDG": {
    "legacy": 44,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Optimizer IP; losing share",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "SERV": {
    "legacy": 42,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Sidewalk delivery robots; early stage",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "INTC": {
    "legacy": 42,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "x86 installed base and own fabs, but losing the process race and the AI shift",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "DNN": {
    "legacy": 42,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Uranium deposits with in-situ mining; pre-production",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "APLD": {
    "legacy": 42,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "AI data-centre developer; power sites are its edge but replicable; contract-driven",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "AAL": {
    "legacy": 40,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Airline with weak cost position",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "EOSE": {
    "legacy": 38,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Zinc battery technology; unproven at scale",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "MSTR": {
    "legacy": 38,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Bitcoin treasury vehicle, not an operating moat",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "IONQ": {
    "legacy": 36,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Trapped-ion quantum IP; pre-commercial",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "NEXT": {
    "legacy": 35,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "20-year LNG contracts and export permits; pre-revenue",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "KEEL": {
    "legacy": 32,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Small-cap infrastructure company; insufficient evidence of durable advantage",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "QBTS": {
    "legacy": 28,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Annealing quantum IP; pre-commercial",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "RGTI": {
    "legacy": 28,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Superconducting quantum; behind IBM and Google",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "QUBT": {
    "legacy": 24,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Photonic quantum; unproven",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "QUCY": {
    "legacy": 20,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Speculative small cap; insufficient evidence of durable advantage",
+   "moat_by": "claude, accepted by Dharam 2026-11-14"
   },
   "SCB_SP500": {
    "legacy": 63,
