@@ -328,14 +328,47 @@ COMPUTED = {'quality': lambda m, p: quality_points(m),
 
 
 # ── MOAT ──────────────────────────────────────────────────────────────
+_YES = {'y', 'yes', 'true', '1'}
+_NO = {'n', 'no', 'false', '0'}
+_UNSURE = {'?', 'u', 'uncertain', 'unsure', 'partial', 'half', '0.5'}
+
+
+def moat_answer_value(a):
+    """1 for yes, 0 for no, 0.5 for uncertain; None for anything unreadable.
+    Accepts JSON booleans or the strings Y / N / ? (any case). An unreadable
+    answer is not guessed at: the whole set is rejected so a typo can never
+    count as a yes."""
+    if isinstance(a, bool):
+        return 1.0 if a else 0.0
+    if isinstance(a, (int, float)) and a in (0, 0.5, 1):
+        return float(a)
+    if isinstance(a, str):
+        k = a.strip().lower()
+        if k in _YES: return 1.0
+        if k in _NO: return 0.0
+        if k in _UNSURE: return 0.5
+    return None
+
+
 def moat_points(entry):
+    """Each question is worth AXES['moat'] / 5 = 8 points: yes 8, uncertain 4, no 0.
+    Uncertain is for a genuine judgement call, not a default; the review sheet
+    shows how many each stock has."""
     ans = entry.get('moat_answers')
     if isinstance(ans, list) and len(ans) == len(MOAT_QUESTIONS):
-        return AXES['moat'] / len(MOAT_QUESTIONS) * sum(1 for a in ans if a), 'hand'
+        vals = [moat_answer_value(a) for a in ans]
+        if all(v is not None for v in vals):
+            return AXES['moat'] / len(MOAT_QUESTIONS) * sum(vals), 'hand'
+        print(f"moat_answers unreadable {ans!r}: ignored")
     hand = _num((entry.get('hand') or {}).get('moat'))
     if hand is not None:
         return hand * AXES['moat'] / HAND_MAX['moat'], 'hand'
     return None, None
+
+
+def moat_uncertain(entry):
+    ans = entry.get('moat_answers') or []
+    return sum(1 for a in ans if moat_answer_value(a) == 0.5)
 
 
 def _age_days(d, today):
@@ -390,6 +423,7 @@ def score_ticker(entry, metrics=None, price=None, today=None):
         'moat_date': entry.get('moat_date'),
         'moat_stale': (not is_fund) and (sources['moat'] != 'hand' or moat_age is None or moat_age > STALE_DAYS),
         'moat_reason': entry.get('moat_reason'),
+        'moat_uncertain': moat_uncertain(entry),
         'pe': (lambda v: None if v is None else round(v, 1))(current_pe(metrics, price)),
         'industry': metrics.get('industry'),
         'scaling': bool(metrics) and is_scaling(metrics),
