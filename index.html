@@ -2497,7 +2497,15 @@ function renderRankings() {
     if (f.industry) t += ` · vs ${f.industry} peers`;
     if (f.scaling) t += ' · judged as a scaling loss-maker';
     if (f.legacy != null) t += ` · old score ${f.legacy}`;
-    if (f.kind === 'fund') t = `${f.band} · fund/ETF, hand-scored · old score ${f.legacy}`;
+    if (f.kind === 'fund') {
+      const FA = (window._lastPayload && window._lastPayload.framework && window._lastPayload.framework.fund_axes) || {cost:25, track:35, consistency:15, concentration:10, conviction:15};
+      const fsrc = {data:'from prices', hand:'set by hand', estimate:'estimated', legacy:'placeholder from old total'};
+      t = `${f.band} · fund · ` + [['cost','Cost'],['track','Track record'],['consistency','Consistency'],['concentration','Concentration'],['conviction','Conviction']]
+        .map(([k,n]) => `${n} ${f.parts[k]}/${FA[k]} (${fsrc[f.sources[k]] || f.sources[k]})`).join(' · ');
+      if (f.ter != null) t += ` · TER ${f.ter}%`;
+      if (f.excess_3y != null) t += ` · ${f.excess_3y > 0 ? '+' : ''}${f.excess_3y}%/yr vs ${f.benchmark} over 3y`;
+      if (f.beat_share != null) t += ` · beat it in ${Math.round(f.beat_share*100)}% of 1y windows`;
+    }
     else if (f.moat_stale) t += f.sources.moat === 'legacy' ? ' · moat never judged' : ' · moat judgement undated or older than 120 days';
     return t;
   }
@@ -2807,6 +2815,8 @@ DIST_T = −0.15 · DFV_LIFT = 2.5 · QUALITY_T = 0.20 · p_threshold = 0.15
 ## 3. Framework Score — 4 Axes
 
 > **Rebuilt November 2026.** The live score is **Moat 40 + Quality 30 + Growth 20 + Valuation 10 = 100**. Quality, Growth and Valuation are computed from company fundamentals (weekly Finnhub fetch; Valuation is repriced on every scanner run). Moat stays a judgement: five yes/no questions, 8 points each, with a date. Valuation is small on purpose: this score asks whether the business is worth owning, and the buy score handles whether the price is right. Portfolio Fit is no longer scored. Bands: **Core 78+ · Good 63–77 · Marginal 48–62 · Avoid below 48**; a BUY needs Good or better. These are the old 85 / 70 / 55 carried onto the new scale. Hover any FW number for its breakdown and where each part came from; an asterisk means part of it is still a placeholder or the moat judgement is undated. Full method: FRAMEWORK.md in the repo. The axis descriptions below are the original rubric (with its original point values) and still describe what each axis means.
+>
+> **Funds and ETFs** have their own score, because moat, quality and growth describe one business, not a basket: **Cost 25** (expense ratio) + **Track record 35** (3-year return vs its benchmark, after fees) + **Consistency 15** (how often it beat the benchmark over rolling 1-year windows) + **Concentration 10** (top-10 holdings weight) + **Conviction 15** (your view of the theme). A fund BUY needs 48+. Hover a fund's FW number for its breakdown.
 
 ### Axis 1 — Competitive Moat (30 pts)
 

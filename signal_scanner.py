@@ -354,14 +354,26 @@ FRAMEWORK_DETAIL = framework_scorer.score_all()
 FRAMEWORK_SCORES = {t: d['score'] for t, d in FRAMEWORK_DETAIL.items()}
 
 
+# Benchmarks for fund track records that are not otherwise in the universe.
+FUND_BENCHMARKS = ['SPY', 'QQQ', 'URTH', 'GLD', 'AGG']
+ADJ_CLOSES = {}   # filled by the price fetch: dividend-adjusted closes for fund track records
+
+
 def refresh_framework_scores(closes):
-    """Re-score with today's closes so the valuation axis moves with price.
+    """Re-score with today's closes so the valuation axis moves with price, and
+    funds' track records use the latest dividend-adjusted history.
     Mutates the two dicts in place; every later lookup sees the fresh values."""
     try:
         prices = {t: float(closes[t].dropna().iloc[-1]) for t in closes.columns if closes[t].notna().any()}
     except Exception:
         prices = {}
-    FRAMEWORK_DETAIL.clear(); FRAMEWORK_DETAIL.update(framework_scorer.score_all(prices=prices))
+    adj = ADJ_CLOSES.get('df')
+    src = adj if adj is not None else closes
+    try:
+        series = {t: src[t].dropna() for t in src.columns}
+    except Exception:
+        series = {}
+    FRAMEWORK_DETAIL.clear(); FRAMEWORK_DETAIL.update(framework_scorer.score_all(prices=prices, series=series))
     FRAMEWORK_SCORES.clear(); FRAMEWORK_SCORES.update({t: d['score'] for t, d in FRAMEWORK_DETAIL.items()})
 
 
@@ -372,7 +384,9 @@ def framework_row(t):
         return None
     return {'band': d['band'], 'parts': d['parts'], 'sources': d['sources'], 'legacy': d['legacy'], 'kind': d['kind'],
             'provisional': d['provisional'], 'moat_date': d['moat_date'], 'moat_stale': d['moat_stale'], 'pe': d['pe'],
-            'industry': d.get('industry'), 'scaling': d.get('scaling', False)}
+            'industry': d.get('industry'), 'scaling': d.get('scaling', False),
+            'ter': d.get('ter'), 'benchmark': d.get('benchmark'), 'excess_3y': d.get('excess_3y'),
+            'beat_share': d.get('beat_share')}
 
 # ── SIGNAL ENGINE ─────────────────────────────────────────────────────
 def calc_rsi(series, period):
@@ -493,7 +507,7 @@ def fetch_history():
     start = end - timedelta(days=YEARS*365 + 60)
 
     # Apply aliases for batch fetch
-    all_t = list(dict.fromkeys([BENCHMARK] + UNIVERSE))
+    all_t = list(dict.fromkeys([BENCHMARK] + UNIVERSE + FUND_BENCHMARKS))
     fetch_t = [TICKER_ALIASES.get(t, t) for t in all_t]
     fetch_t = list(dict.fromkeys(fetch_t))  # dedupe after alias
 
@@ -507,6 +521,8 @@ def fetch_history():
 
     if isinstance(raw.columns, pd.MultiIndex):
         closes = raw['Close'].dropna(how='all')
+        if 'Adj Close' in raw.columns.get_level_values(0):
+            ADJ_CLOSES['df'] = raw['Adj Close'].dropna(how='all')
         try:
             highs   = raw['High'].dropna(how='all')
             lows    = raw['Low'].dropna(how='all')
@@ -519,6 +535,8 @@ def fetch_history():
 
     # Rename aliased columns back to canonical ticker names
     closes  = closes.rename(columns=ALIAS_REVERSE)
+    if 'df' in ADJ_CLOSES:
+        ADJ_CLOSES['df'] = ADJ_CLOSES['df'].rename(columns=ALIAS_REVERSE)
     highs   = highs.rename(columns=ALIAS_REVERSE)
     lows    = lows.rename(columns=ALIAS_REVERSE)
     volumes = volumes.rename(columns=ALIAS_REVERSE)
@@ -1152,13 +1170,15 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         'framework': (lambda rows, fa: {
             'fundamentals_as_of': fa,
             'axes': framework_scorer.AXES,
+            'fund_axes': framework_scorer.FUND_AXES,
             'bands': [list(b) for b in framework_scorer.BANDS],
             'stale_days': framework_scorer.STALE_DAYS,
             'scored': len(rows),
             'with_data': sum(1 for r in rows if 'data' in r['framework']['sources'].values()),
             'provisional': sum(1 for r in rows if r['framework']['provisional']),
-            'moat_needs_review': sum(1 for r in rows if r['framework']['moat_stale'] and r['framework']['sources']['moat'] != 'legacy'),
-            'moat_never_judged': sum(1 for r in rows if r['framework']['sources']['moat'] == 'legacy'),
+            'moat_needs_review': sum(1 for r in rows if r['framework']['moat_stale'] and r['framework']['sources'].get('moat') not in (None, 'legacy')),
+            'moat_never_judged': sum(1 for r in rows if r['framework']['sources'].get('moat') == 'legacy'),
+            'funds_scored_from_prices': sum(1 for r in rows if r['framework']['sources'].get('track') == 'data'),
         })([r for r in signals_list if r.get('framework')], framework_scorer.load_fundamentals()[1]),
         'thresholds': {
             'buy': BUY_T, 'watch': WATCH_T, 'strong': STRONG_T,
@@ -1238,6 +1258,7 @@ def main():
     for t in ok:
         if t == BENCHMARK: continue
         if t in failed_tickers: continue
+        if t not in UNIVERSE: continue   # fetched only as a fund benchmark
         try:
             sig = compute_signals(closes[t])
             if len(sig) >= 50:

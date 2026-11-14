@@ -7,7 +7,8 @@
   "moat_date: YYYY-MM-DD the moat was last judged. null or older than 120 days is flagged on the dashboard.",
   "kind \"fund\": ETFs and funds keep their legacy score; no fundamentals are applied.",
   "industry: optional override of Finnhub's industry label, used to compare gross and free-cash-flow margins with true peers (Finnhub puts hardware makers in \"Technology\" with software). Needs 5+ peers with data.",
-  "moat_by: who set the moat answers. \"claude-draft\" = awaiting review; \"claude, accepted by Dharam <date>\" = drafted by Claude and accepted; your own name once you override."
+  "moat_by: who set the moat answers. \"claude-draft\" = awaiting review; \"claude, accepted by Dharam <date>\" = drafted by Claude and accepted; your own name once you override.",
+  "Funds (kind \"fund\"): ter = total expense ratio %, ter_source \"estimate\" for Thai funds until checked against the factsheet; top10 = top-10 holdings weight %; benchmark = ETF the track record is measured against; proxy = ETF used to price a Thai feeder fund; leveraged / single_asset flags; conviction = your view of the theme, Y / ? / N."
  ],
  "tickers": {
   "NVDA": {
@@ -1538,7 +1539,12 @@
    "legacy": 72,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 0.35,
+   "ter_source": "hand",
+   "benchmark": "QQQ",
+   "top10": 75,
+   "conviction": "?"
   },
   "ON": {
    "legacy": 72,
@@ -1792,413 +1798,708 @@
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "S&P 500 — gold standard, lowest cost, maximum diversification"
+   "note": "S&P 500 — gold standard, lowest cost, maximum diversification",
+   "ter": 0.03,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 38,
+   "conviction": "?"
   },
   "SPY": {
    "legacy": 82,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "S&P 500 — same exposure as VOO, slightly higher fees"
+   "note": "S&P 500 — same exposure as VOO, slightly higher fees",
+   "ter": 0.09,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 38,
+   "conviction": "?"
   },
   "IVV": {
    "legacy": 82,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "S&P 500 iShares — equivalent to VOO/SPY"
+   "note": "S&P 500 iShares — equivalent to VOO/SPY",
+   "ter": 0.03,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 38,
+   "conviction": "?"
   },
   "QQQ": {
    "legacy": 78,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Nasdaq-100 — quality tilt but tech concentration risk"
+   "note": "Nasdaq-100 — quality tilt but tech concentration risk",
+   "ter": 0.2,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 52,
+   "conviction": "?"
   },
   "DIA": {
    "legacy": 72,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Dow Jones — 30 large caps, price-weighted, less optimal"
+   "note": "Dow Jones — 30 large caps, price-weighted, less optimal",
+   "ter": 0.16,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 55,
+   "conviction": "?"
   },
   "VXF": {
    "legacy": 70,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Vanguard Extended Market — US small/mid, higher vol"
+   "note": "Vanguard Extended Market — US small/mid, higher vol",
+   "ter": 0.05,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 10,
+   "conviction": "?"
   },
   "VXUS": {
    "legacy": 68,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Vanguard Total International — broad but EM drag"
+   "note": "Vanguard Total International — broad but EM drag",
+   "ter": 0.05,
+   "ter_source": "hand",
+   "benchmark": "URTH",
+   "top10": 10,
+   "conviction": "?"
   },
   "XLK": {
    "legacy": 76,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Technology sector — quality but concentration"
+   "note": "Technology sector — quality but concentration",
+   "ter": 0.08,
+   "ter_source": "hand",
+   "benchmark": "QQQ",
+   "top10": 70,
+   "conviction": "?"
   },
   "XLV": {
    "legacy": 74,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Healthcare sector — defensive quality"
+   "note": "Healthcare sector — defensive quality",
+   "ter": 0.08,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 55,
+   "conviction": "?"
   },
   "XLF": {
    "legacy": 68,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Financials — cyclical, regulatory risk"
+   "note": "Financials — cyclical, regulatory risk",
+   "ter": 0.08,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 55,
+   "conviction": "?"
   },
   "XLI": {
    "legacy": 68,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Industrials — cyclical"
+   "note": "Industrials — cyclical",
+   "ter": 0.08,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 35,
+   "conviction": "?"
   },
   "XLY": {
    "legacy": 70,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Consumer discretionary — quality names but cyclical"
+   "note": "Consumer discretionary — quality names but cyclical",
+   "ter": 0.08,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 70,
+   "conviction": "?"
   },
   "XLE": {
    "legacy": 58,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Energy — commodity-dependent, ESG headwinds"
+   "note": "Energy — commodity-dependent, ESG headwinds",
+   "ter": 0.08,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 75,
+   "conviction": "?"
   },
   "IEV": {
    "legacy": 65,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "iShares Europe ETF — Europe quality drag vs US"
+   "note": "iShares Europe ETF — Europe quality drag vs US",
+   "ter": 0.67,
+   "ter_source": "hand",
+   "benchmark": "URTH",
+   "top10": 20,
+   "conviction": "?"
   },
   "EWJ": {
    "legacy": 64,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Japan — structural quality, yen risk"
+   "note": "Japan — structural quality, yen risk",
+   "ter": 0.5,
+   "ter_source": "hand",
+   "benchmark": "URTH",
+   "top10": 23,
+   "conviction": "?"
   },
   "URTH": {
    "legacy": 72,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "MSCI World — global diversification, US-heavy"
+   "note": "MSCI World — global diversification, US-heavy",
+   "ter": 0.24,
+   "ter_source": "hand",
+   "benchmark": "URTH",
+   "top10": 25,
+   "conviction": "?"
   },
   "EWY": {
    "legacy": 60,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "South Korea — Samsung-heavy, EM premium"
+   "note": "South Korea — Samsung-heavy, EM premium",
+   "ter": 0.59,
+   "ter_source": "hand",
+   "benchmark": "URTH",
+   "top10": 45,
+   "conviction": "?"
   },
   "EWZ": {
    "legacy": 52,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Brazil — EM political/commodity risk"
+   "note": "Brazil — EM political/commodity risk",
+   "ter": 0.59,
+   "ter_source": "hand",
+   "benchmark": "URTH",
+   "top10": 50,
+   "conviction": "?"
   },
   "GLD": {
    "legacy": 65,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Gold — inflation hedge, no yield, no moat"
+   "note": "Gold — inflation hedge, no yield, no moat",
+   "ter": 0.4,
+   "ter_source": "hand",
+   "benchmark": "GLD",
+   "single_asset": true,
+   "conviction": "?"
   },
   "IEF": {
    "legacy": 60,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "7-10yr Treasuries — rate duration risk"
+   "note": "7-10yr Treasuries — rate duration risk",
+   "ter": 0.15,
+   "ter_source": "hand",
+   "benchmark": "AGG",
+   "single_asset": true,
+   "conviction": "?"
   },
   "TLT": {
    "legacy": 55,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "20yr+ Treasuries — high duration, volatile"
+   "note": "20yr+ Treasuries — high duration, volatile",
+   "ter": 0.15,
+   "ter_source": "hand",
+   "benchmark": "AGG",
+   "single_asset": true,
+   "conviction": "?"
   },
   "TQQQ": {
    "legacy": 48,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "3× Nasdaq — severe decay on sideways markets"
+   "note": "3× Nasdaq — severe decay on sideways markets",
+   "ter": 0.84,
+   "ter_source": "hand",
+   "benchmark": "QQQ",
+   "leveraged": true,
+   "conviction": "?"
   },
   "FLAX": {
    "legacy": 62,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Franklin FTSE Asia ex-Japan — broad Asia quality"
+   "note": "Franklin FTSE Asia ex-Japan — broad Asia quality",
+   "ter": 0.19,
+   "ter_source": "hand",
+   "benchmark": "URTH",
+   "top10": 40,
+   "conviction": "?"
   },
   "VTI": {
    "legacy": 82,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Vanguard Total Market — max diversification"
+   "note": "Vanguard Total Market — max diversification",
+   "ter": 0.03,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 33,
+   "conviction": "?"
   },
   "IWF": {
    "legacy": 76,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "iShares Russell 1000 Growth — quality growth tilt"
+   "note": "iShares Russell 1000 Growth — quality growth tilt",
+   "ter": 0.19,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 60,
+   "conviction": "?"
   },
   "XLG": {
    "legacy": 74,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Invesco S&P Top 50 — mega-cap concentration"
+   "note": "Invesco S&P Top 50 — mega-cap concentration",
+   "ter": 0.2,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 70,
+   "conviction": "?"
   },
   "SCHB": {
    "legacy": 81,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Schwab US Broad — VTI equivalent"
+   "note": "Schwab US Broad — VTI equivalent",
+   "ter": 0.03,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 33,
+   "conviction": "?"
   },
   "ITOT": {
    "legacy": 81,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "iShares Total US — VTI equivalent"
+   "note": "iShares Total US — VTI equivalent",
+   "ter": 0.03,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 33,
+   "conviction": "?"
   },
   "VIG": {
    "legacy": 78,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Vanguard Dividend Appreciation — quality dividend growth"
+   "note": "Vanguard Dividend Appreciation — quality dividend growth",
+   "ter": 0.05,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 30,
+   "conviction": "?"
   },
   "DGRO": {
    "legacy": 76,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "iShares Core Dividend Growth"
+   "note": "iShares Core Dividend Growth",
+   "ter": 0.08,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 25,
+   "conviction": "?"
   },
   "VYM": {
    "legacy": 72,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Vanguard High Dividend — value tilt, lower growth"
+   "note": "Vanguard High Dividend — value tilt, lower growth",
+   "ter": 0.06,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 25,
+   "conviction": "?"
   },
   "SCHD": {
    "legacy": 76,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Schwab US Dividend — quality/value filter, low cost"
+   "note": "Schwab US Dividend — quality/value filter, low cost",
+   "ter": 0.06,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 40,
+   "conviction": "?"
   },
   "NOBL": {
    "legacy": 74,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "S&P 500 Dividend Aristocrats"
+   "note": "S&P 500 Dividend Aristocrats",
+   "ter": 0.35,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 15,
+   "conviction": "?"
   },
   "DGRW": {
    "legacy": 75,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "WisdomTree Quality Dividend Growth"
+   "note": "WisdomTree Quality Dividend Growth",
+   "ter": 0.28,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 40,
+   "conviction": "?"
   },
   "AIQ": {
    "legacy": 65,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Global X AI & Technology — broad AI, quality holdings"
+   "note": "Global X AI & Technology — broad AI, quality holdings",
+   "ter": 0.68,
+   "ter_source": "hand",
+   "benchmark": "QQQ",
+   "top10": 35,
+   "conviction": "?"
   },
   "QTUM": {
    "legacy": 62,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Defiance Quantum — quantum/AI thesis, early stage"
+   "note": "Defiance Quantum — quantum/AI thesis, early stage",
+   "ter": 0.4,
+   "ter_source": "hand",
+   "benchmark": "QQQ",
+   "top10": 20,
+   "conviction": "?"
   },
   "BOTZ": {
    "legacy": 63,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Global X Robotics & AI — cyclical"
+   "note": "Global X Robotics & AI — cyclical",
+   "ter": 0.68,
+   "ter_source": "hand",
+   "benchmark": "QQQ",
+   "top10": 65,
+   "conviction": "?"
   },
   "WCLD": {
    "legacy": 60,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "WisdomTree Cloud Computing"
+   "note": "WisdomTree Cloud Computing",
+   "ter": 0.45,
+   "ter_source": "hand",
+   "benchmark": "QQQ",
+   "top10": 25,
+   "conviction": "?"
   },
   "CLOU": {
    "legacy": 58,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Global X Cloud Computing — elevated valuation risk"
+   "note": "Global X Cloud Computing — elevated valuation risk",
+   "ter": 0.68,
+   "ter_source": "hand",
+   "benchmark": "QQQ",
+   "top10": 45,
+   "conviction": "?"
   },
   "FIVG": {
    "legacy": 60,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Defiance 5G"
+   "note": "Defiance 5G",
+   "ter": 0.3,
+   "ter_source": "hand",
+   "benchmark": "QQQ",
+   "top10": 35,
+   "conviction": "?"
   },
   "ARKG": {
    "legacy": 44,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "ARK Genomic Revolution — speculative biotech"
+   "note": "ARK Genomic Revolution — speculative biotech",
+   "ter": 0.75,
+   "ter_source": "hand",
+   "benchmark": "QQQ",
+   "top10": 55,
+   "conviction": "?"
   },
   "ARKK": {
    "legacy": 42,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "ARK Innovation — aggressive, concentration risk"
+   "note": "ARK Innovation — aggressive, concentration risk",
+   "ter": 0.75,
+   "ter_source": "hand",
+   "benchmark": "QQQ",
+   "top10": 60,
+   "conviction": "?"
   },
   "ARKW": {
    "legacy": 44,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "ARK Next Gen Internet"
+   "note": "ARK Next Gen Internet",
+   "ter": 0.82,
+   "ter_source": "hand",
+   "benchmark": "QQQ",
+   "top10": 60,
+   "conviction": "?"
   },
   "ARKF": {
    "legacy": 44,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "ARK Fintech Innovation"
+   "note": "ARK Fintech Innovation",
+   "ter": 0.75,
+   "ter_source": "hand",
+   "benchmark": "QQQ",
+   "top10": 60,
+   "conviction": "?"
   },
   "AAXJ": {
    "legacy": 62,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "iShares Asia ex Japan — broad Asia, EM discount"
+   "note": "iShares Asia ex Japan — broad Asia, EM discount",
+   "ter": 0.7,
+   "ter_source": "hand",
+   "benchmark": "URTH",
+   "top10": 40,
+   "conviction": "?"
   },
   "INDA": {
    "legacy": 68,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "iShares India — structural growth, higher valuation"
+   "note": "iShares India — structural growth, higher valuation",
+   "ter": 0.64,
+   "ter_source": "hand",
+   "benchmark": "URTH",
+   "top10": 35,
+   "conviction": "?"
   },
   "KWEB": {
    "legacy": 52,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "KraneShares China Internet — regulatory + geopolitical"
+   "note": "KraneShares China Internet — regulatory + geopolitical",
+   "ter": 0.7,
+   "ter_source": "hand",
+   "benchmark": "URTH",
+   "top10": 60,
+   "conviction": "?"
   },
   "FXI": {
    "legacy": 50,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "iShares China Large Cap — SOE-heavy"
+   "note": "iShares China Large Cap — SOE-heavy",
+   "ter": 0.74,
+   "ter_source": "hand",
+   "benchmark": "URTH",
+   "top10": 60,
+   "conviction": "?"
   },
   "VWO": {
    "legacy": 60,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Vanguard EM — broad, commodity/political drag"
+   "note": "Vanguard EM — broad, commodity/political drag",
+   "ter": 0.07,
+   "ter_source": "hand",
+   "benchmark": "URTH",
+   "top10": 25,
+   "conviction": "?"
   },
   "BND": {
    "legacy": 62,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Vanguard Total Bond"
+   "note": "Vanguard Total Bond",
+   "ter": 0.03,
+   "ter_source": "hand",
+   "benchmark": "AGG",
+   "single_asset": true,
+   "conviction": "?"
   },
   "AGG": {
    "legacy": 62,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "iShares Core US Agg"
+   "note": "iShares Core US Agg",
+   "ter": 0.03,
+   "ter_source": "hand",
+   "benchmark": "AGG",
+   "single_asset": true,
+   "conviction": "?"
   },
   "HYG": {
    "legacy": 55,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "iShares High Yield — credit + cyclical risk"
+   "note": "iShares High Yield — credit + cyclical risk",
+   "ter": 0.49,
+   "ter_source": "hand",
+   "benchmark": "AGG",
+   "single_asset": true,
+   "conviction": "?"
   },
   "LQD": {
    "legacy": 60,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "iShares IG Corporate"
+   "note": "iShares IG Corporate",
+   "ter": 0.14,
+   "ter_source": "hand",
+   "benchmark": "AGG",
+   "single_asset": true,
+   "conviction": "?"
   },
   "JEPI": {
    "legacy": 70,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "JPM Equity Premium Income — quality income, upside capped by covered calls"
+   "note": "JPM Equity Premium Income — quality income, upside capped by covered calls",
+   "ter": 0.35,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 20,
+   "conviction": "?"
   },
   "VSS": {
    "legacy": 68,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Vanguard Intl Small Cap — broad diversification, higher vol than large cap"
+   "note": "Vanguard Intl Small Cap — broad diversification, higher vol than large cap",
+   "ter": 0.07,
+   "ter_source": "hand",
+   "benchmark": "URTH",
+   "top10": 5,
+   "conviction": "?"
   },
   "XLB": {
    "legacy": 62,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Materials Select Sector — cyclical, commodity-linked, no structural moat"
+   "note": "Materials Select Sector — cyclical, commodity-linked, no structural moat",
+   "ter": 0.08,
+   "ter_source": "hand",
+   "benchmark": "SPY",
+   "top10": 60,
+   "conviction": "?"
   },
   "CQQQ": {
    "legacy": 52,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Invesco China Tech — regulatory + geopolitical risk, same profile as KWEB"
+   "note": "Invesco China Tech — regulatory + geopolitical risk, same profile as KWEB",
+   "ter": 0.65,
+   "ter_source": "hand",
+   "benchmark": "URTH",
+   "top10": 65,
+   "conviction": "?"
   },
   "AIQG": {
    "legacy": 65,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "Global X AI UCITS — mirrors AIQ exposure, UCITS wrapper"
+   "note": "Global X AI UCITS — mirrors AIQ exposure, UCITS wrapper",
+   "ter": 0.68,
+   "ter_source": "hand",
+   "benchmark": "QQQ",
+   "top10": 35,
+   "conviction": "?"
   },
   "QNTM.L": {
    "legacy": 58,
    "kind": "fund",
    "moat_answers": null,
    "moat_date": null,
-   "note": "VanEck Quantum UCITS — early-stage theme, thinner liquidity than QTUM"
+   "note": "VanEck Quantum UCITS — early-stage theme, thinner liquidity than QTUM",
+   "ter": 0.5,
+   "ter_source": "hand",
+   "benchmark": "QQQ",
+   "top10": 30,
+   "conviction": "?"
   },
   "GME": {
    "legacy": 25,
@@ -3130,19 +3431,34 @@
    "legacy": 58,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 0.51,
+   "ter_source": "hand",
+   "benchmark": "GLD",
+   "top10": 60,
+   "conviction": "?"
   },
   "SLV": {
    "legacy": 55,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 0.5,
+   "ter_source": "hand",
+   "benchmark": "GLD",
+   "single_asset": true,
+   "conviction": "?"
   },
   "LIT": {
    "legacy": 60,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 0.75,
+   "ter_source": "hand",
+   "benchmark": "QQQ",
+   "top10": 55,
+   "conviction": "?"
   },
   "TSLA": {
    "legacy": 56,
@@ -3689,133 +4005,265 @@
    "legacy": 63,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 0.65,
+   "ter_source": "estimate",
+   "benchmark": "SPY",
+   "top10": 38,
+   "proxy": "IVV",
+   "conviction": "?"
   },
   "SCB_NDQ": {
    "legacy": 61,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 0.75,
+   "ter_source": "estimate",
+   "benchmark": "SPY",
+   "top10": 52,
+   "proxy": "QQQ",
+   "conviction": "?"
   },
   "SCB_SEMI": {
    "legacy": 72,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 1.6,
+   "ter_source": "estimate",
+   "benchmark": "QQQ",
+   "top10": 75,
+   "proxy": "SMH",
+   "conviction": "?"
   },
   "SCB_WORLD": {
    "legacy": 68,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 1.4,
+   "ter_source": "estimate",
+   "benchmark": "URTH",
+   "top10": 25,
+   "proxy": "URTH",
+   "conviction": "?"
   },
   "SCB_GOLD": {
    "legacy": 65,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 1.0,
+   "ter_source": "estimate",
+   "benchmark": "GLD",
+   "single_asset": true,
+   "proxy": "GLD",
+   "conviction": "?"
   },
   "SCB_NK225": {
    "legacy": 62,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 0.8,
+   "ter_source": "estimate",
+   "benchmark": "URTH",
+   "top10": 40,
+   "proxy": "EWJ",
+   "conviction": "?"
   },
   "SCB_SET50": {
    "legacy": 55,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 0.6,
+   "ter_source": "estimate",
+   "benchmark": "URTH",
+   "top10": 60,
+   "proxy": "SPY",
+   "conviction": "?"
   },
   "SCB_DJ": {
    "legacy": 56,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 0.75,
+   "ter_source": "estimate",
+   "benchmark": "SPY",
+   "top10": 55,
+   "proxy": "DIA",
+   "conviction": "?"
   },
   "SCB_AIEM": {
    "legacy": 64,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 1.7,
+   "ter_source": "estimate",
+   "benchmark": "URTH",
+   "top10": 40,
+   "proxy": "AAXJ",
+   "conviction": "?"
   },
   "SCB_FINTECH": {
    "legacy": 60,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 1.8,
+   "ter_source": "estimate",
+   "benchmark": "QQQ",
+   "top10": 50,
+   "proxy": "FINX",
+   "conviction": "?"
   },
   "SCB_AUTO": {
    "legacy": 52,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 1.8,
+   "ter_source": "estimate",
+   "benchmark": "QQQ",
+   "top10": 60,
+   "proxy": "BOTZ",
+   "conviction": "?"
   },
   "SCB_INNOV": {
    "legacy": 47,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 1.8,
+   "ter_source": "estimate",
+   "benchmark": "QQQ",
+   "top10": 60,
+   "proxy": "ARKK",
+   "conviction": "?"
   },
   "SCB_GENO": {
    "legacy": 48,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 1.8,
+   "ter_source": "estimate",
+   "benchmark": "QQQ",
+   "top10": 55,
+   "proxy": "ARKG",
+   "conviction": "?"
   },
   "SCB_CHINA": {
    "legacy": 54,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 1.6,
+   "ter_source": "estimate",
+   "benchmark": "URTH",
+   "top10": 60,
+   "proxy": "KWEB",
+   "conviction": "?"
   },
   "SCB_EV": {
    "legacy": 58,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 1.8,
+   "ter_source": "estimate",
+   "benchmark": "QQQ",
+   "top10": 50,
+   "proxy": "DRIV",
+   "conviction": "?"
   },
   "SCB_BUSAA": {
    "legacy": 62,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 1.5,
+   "ter_source": "estimate",
+   "benchmark": "SPY",
+   "top10": 60,
+   "proxy": "IWF",
+   "conviction": "?"
   },
   "KT_INDIA": {
    "legacy": 70,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 1.6,
+   "ter_source": "estimate",
+   "benchmark": "URTH",
+   "top10": 35,
+   "proxy": "INDA",
+   "conviction": "?"
   },
   "KT_WORLD": {
    "legacy": 65,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 1.5,
+   "ter_source": "estimate",
+   "benchmark": "URTH",
+   "top10": 20,
+   "proxy": "ACWV",
+   "conviction": "?"
   },
   "KT_WTAI": {
    "legacy": 68,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 1.7,
+   "ter_source": "estimate",
+   "benchmark": "QQQ",
+   "top10": 35,
+   "proxy": "AIQ",
+   "conviction": "?"
   },
   "KT_BLOCK": {
    "legacy": 55,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 1.8,
+   "ter_source": "estimate",
+   "benchmark": "QQQ",
+   "top10": 60,
+   "proxy": "BLOK",
+   "conviction": "?"
   },
   "KT_TECH": {
    "legacy": 64,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 1.6,
+   "ter_source": "estimate",
+   "benchmark": "QQQ",
+   "top10": 60,
+   "proxy": "IWF",
+   "conviction": "?"
   },
   "KT_ESG": {
    "legacy": 58,
    "kind": "fund",
    "moat_answers": null,
-   "moat_date": null
+   "moat_date": null,
+   "ter": 1.5,
+   "ter_source": "estimate",
+   "benchmark": "URTH",
+   "top10": 20,
+   "proxy": "ACWV",
+   "conviction": "?"
   }
  }
 }
