@@ -6,7 +6,8 @@
   "moat_answers: five true/false answers to the moat questions in FRAMEWORK.md, 8 points each. When set, replaces hand.moat.",
   "moat_date: YYYY-MM-DD the moat was last judged. null or older than 120 days is flagged on the dashboard.",
   "kind \"fund\": ETFs and funds keep their legacy score; no fundamentals are applied.",
-  "industry: optional override of Finnhub's industry label, used to compare gross and free-cash-flow margins with true peers (Finnhub puts hardware makers in \"Technology\" with software). Needs 5+ peers with data."
+  "industry: optional override of Finnhub's industry label, used to compare gross and free-cash-flow margins with true peers (Finnhub puts hardware makers in \"Technology\" with software). Needs 5+ peers with data.",
+  "moat_by: \"claude-draft\" marks answers drafted by Claude for review; change to \"dharam\" (or delete the field) once reviewed."
  ],
  "tickers": {
   "NVDA": {
@@ -17,8 +18,16 @@
     "growth": 18,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "CUDA lock-in and developer ecosystem; full-stack AI platform; dominant share with strong pricing power",
+   "moat_by": "claude-draft"
   },
   "CRDO": {
    "legacy": 93,
@@ -28,8 +37,16 @@
     "growth": 19,
     "valuation": 14
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "#1 in active electrical cables with share gains; design wins reset each generation and Marvell/Broadcom can compete",
+   "moat_by": "claude-draft"
   },
   "ASML": {
    "legacy": 93,
@@ -39,8 +56,16 @@
     "growth": 18,
     "valuation": 15
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "EUV monopoly no rival can match within five years; deep fab integration; no network effect",
+   "moat_by": "claude-draft"
   },
   "AVGO": {
    "legacy": 92,
@@ -50,8 +75,16 @@
     "growth": 17,
     "valuation": 14
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Custom AI ASICs and VMware embedded in customers; broad IP portfolio; #1 in custom accelerators and networking silicon",
+   "moat_by": "claude-draft"
   },
   "ANET": {
    "legacy": 91,
@@ -61,8 +94,16 @@
     "growth": 18,
     "valuation": 14
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "EOS embedded with hyperscalers; gained data-centre switching share; Cisco and NVIDIA can compete",
+   "moat_by": "claude-draft"
   },
   "DDOG": {
    "legacy": 90,
@@ -72,8 +113,16 @@
     "growth": 18,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Observability embedded in engineering workflows; #1/#2 in cloud monitoring; product replicable by large rivals",
+   "moat_by": "claude-draft"
   },
   "MELI": {
    "legacy": 90,
@@ -83,8 +132,16 @@
     "growth": 19,
     "valuation": 14
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Mercado Pago and logistics lock-in, marketplace network effects, #1 in Latin America",
+   "moat_by": "claude-draft"
   },
   "LLY": {
    "legacy": 90,
@@ -99,8 +156,16 @@
     "growth": 18,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Leading-edge process lead, yield learning curve that improves with volume, ~90% of advanced foundry",
+   "moat_by": "claude-draft"
   },
   "MA": {
    "legacy": 88,
@@ -120,8 +185,16 @@
     "growth": 18,
     "valuation": 17
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Fast-growing AI cloud but compute is rentable elsewhere; no lock-in yet; not a top-two player",
+   "moat_by": "claude-draft"
   },
   "AMD": {
    "legacy": 86,
@@ -131,13 +204,29 @@
     "growth": 17,
     "valuation": 14
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "x86 licence duopoly; took server CPU share from Intel; #2 in CPUs and AI GPUs; low switching costs",
+   "moat_by": "claude-draft"
   },
   "NOW": {
    "legacy": 86,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Workflow platform deeply embedded in enterprise IT; #1 in ITSM; share gains; product replicable in principle",
+   "moat_by": "claude-draft"
   },
   "MSCI": {
    "legacy": 86,
@@ -152,8 +241,16 @@
     "growth": 15,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Two-sided marketplace with direct-traffic edge and share gains vs Expedia; travellers switch freely and the tech is replicable",
+   "moat_by": "claude-draft"
   },
   "ISRG": {
    "legacy": 85,
@@ -173,8 +270,16 @@
     "growth": 17,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Prime and AWS lock-in, marketplace scale; core retail/cloud tech has been replicated by rivals",
+   "moat_by": "claude-draft"
   },
   "CRWD": {
    "legacy": 84,
@@ -183,8 +288,16 @@
   },
   "KLAC": {
    "legacy": 84,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Process control embedded in fab yield; ~50%+ share of inspection and metrology",
+   "moat_by": "claude-draft"
   },
   "TMO": {
    "legacy": 84,
@@ -199,8 +312,16 @@
     "growth": 17,
     "valuation": 12
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Search and YouTube data scale; held ~90% search share and ad pricing; switching is one click",
+   "moat_by": "claude-draft"
   },
   "PANW": {
    "legacy": 83,
@@ -209,8 +330,16 @@
   },
   "LRCX": {
    "legacy": 83,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Etch and deposition tools embedded in fab processes; #1 in etch with share gains in advanced nodes",
+   "moat_by": "claude-draft"
   },
   "ZTS": {
    "legacy": 83,
@@ -225,8 +354,16 @@
     "growth": 15,
     "valuation": 11
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Office/Windows/Azure enterprise lock-in, developer ecosystem, share gains in cloud, #1/#2 in its markets",
+   "moat_by": "claude-draft"
   },
   "META": {
    "legacy": 82,
@@ -236,8 +373,16 @@
     "growth": 16,
     "valuation": 12
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "3bn+ user network effects and ad-targeting data; users can leave at no cost",
+   "moat_by": "claude-draft"
   },
   "AMAT": {
    "legacy": 82,
@@ -247,8 +392,16 @@
     "growth": 17,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Process recipes and installed base embedded at fabs; #1 in wafer fab equipment",
+   "moat_by": "claude-draft"
   },
   "RMS.PA": {
    "legacy": 82,
@@ -258,8 +411,16 @@
     "growth": 14,
     "valuation": 12
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Craft, scarcity and brand heritage that cannot be replicated; strongest pricing power in luxury",
+   "moat_by": "claude-draft"
   },
   "CDNS": {
    "legacy": 82,
@@ -314,9 +475,17 @@
     "growth": 14,
     "valuation": 11
    },
-   "moat_answers": null,
-   "moat_date": null,
-   "industry": "Technology Hardware"
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "industry": "Technology Hardware",
+   "moat_reason": "iOS ecosystem lock-in, App Store network effects, premium pricing power, #1/#2 in smartphones",
+   "moat_by": "claude-draft"
   },
   "CPRT": {
    "legacy": 80,
@@ -326,8 +495,16 @@
     "growth": 16,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Insurer integration, buyer-seller liquidity, zoned yard land that cannot be replicated, #1 in salvage auctions",
+   "moat_by": "claude-draft"
   },
   "NVO": {
    "legacy": 80,
@@ -337,8 +514,16 @@
     "growth": 17,
     "valuation": 12
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "GLP-1 patents and manufacturing; lost share and pricing to Lilly; #2 in obesity/diabetes",
+   "moat_by": "claude-draft"
   },
   "MC.PA": {
    "legacy": 80,
@@ -348,8 +533,16 @@
     "growth": 14,
     "valuation": 12
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Portfolio of irreplaceable brands with scale in advertising and retail; #1 in luxury",
+   "moat_by": "claude-draft"
   },
   "CRM": {
    "legacy": 80,
@@ -389,8 +582,16 @@
     "growth": 14,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Brand and heritage cannot be replicated; consistent price increases; customers face no switching cost",
+   "moat_by": "claude-draft"
   },
   "INTU": {
    "legacy": 79,
@@ -400,8 +601,16 @@
     "growth": 16,
     "valuation": 12
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "TurboTax/QuickBooks data lock-in, accountant network, #1 in US tax and SMB accounting",
+   "moat_by": "claude-draft"
   },
   "MPWR": {
    "legacy": 79,
@@ -410,8 +619,16 @@
   },
   "MRVL": {
    "legacy": 79,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Custom ASIC design wins embed it with customers; lost some hyperscaler programmes; #2 in custom silicon",
+   "moat_by": "claude-draft"
   },
   "SPOT": {
    "legacy": 79,
@@ -431,8 +648,16 @@
     "growth": 16,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Merchants embed storefront, payments and apps; app ecosystem; #2 US e-commerce platform; software replicable",
+   "moat_by": "claude-draft"
   },
   "PGR": {
    "legacy": 78,
@@ -442,8 +667,16 @@
     "growth": 15,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Telematics and pricing data at scale; large share gains; #2 US auto insurer; policyholders switch easily",
+   "moat_by": "claude-draft"
   },
   "BRKB": {
    "legacy": 78,
@@ -453,13 +686,29 @@
     "growth": 13,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Insurance float and scale; BNSF rail network irreplaceable; GEICO lost ground to Progressive; conglomerate with no single #1 market",
+   "moat_by": "claude-draft"
   },
   "ORCL": {
    "legacy": 78,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Database lock-in; OCI share gains and pricing power; #1 in enterprise databases",
+   "moat_by": "claude-draft"
   },
   "AXP": {
    "legacy": 78,
@@ -505,8 +754,16 @@
     "growth": 14,
     "valuation": 12
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Content scale amortised over the largest subscriber base; repeated price rises; subscribers can cancel any time",
+   "moat_by": "claude-draft"
   },
   "MU": {
    "legacy": 76,
@@ -516,8 +773,16 @@
     "growth": 16,
     "valuation": 14
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "HBM technology in a three-player oligopoly with recent share gains; commodity DRAM has no lock-in; #3 behind SK Hynix and Samsung",
+   "moat_by": "claude-draft"
   },
   "ITX.MC": {
    "legacy": 76,
@@ -527,8 +792,16 @@
     "growth": 14,
     "valuation": 14
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Supply-chain speed and scale; #1/#2 global apparel retailer with share gains; customers switch freely",
+   "moat_by": "claude-draft"
   },
   "VEEV": {
    "legacy": 76,
@@ -542,8 +815,16 @@
   },
   "QCOM": {
    "legacy": 76,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Standard-essential patents and modem integration; losing Apple modem business; #1 in premium Android SoCs",
+   "moat_by": "claude-draft"
   },
   "JPM": {
    "legacy": 76,
@@ -587,8 +868,16 @@
   },
   "ARM": {
    "legacy": 76,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Instruction set embedded across the industry, ecosystem network effects, rising royalties, #1 in mobile CPUs",
+   "moat_by": "claude-draft"
   },
   "UNH": {
    "legacy": 75,
@@ -609,8 +898,16 @@
     "growth": 15,
     "valuation": 12
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Jira/Confluence embedded in engineering teams; Marketplace ecosystem; #1 in developer collaboration",
+   "moat_by": "claude-draft"
   },
   "KNSL": {
    "legacy": 75,
@@ -706,8 +1003,16 @@
     "growth": 17,
     "valuation": 10
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "#1 specialist AI cloud with fast share gains; take-or-pay contracts are contractual, not structural lock-in",
+   "moat_by": "claude-draft"
   },
   "RELX": {
    "legacy": 72,
@@ -717,13 +1022,29 @@
     "growth": 15,
     "valuation": 13
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "LexisNexis and Elsevier embedded in legal/academic workflows, proprietary data, steady pricing, #1 in its niches",
+   "moat_by": "claude-draft"
   },
   "ALAB": {
    "legacy": 72,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Cosmos software embedded in hyperscaler stacks; #1 in PCIe retimers; competitors are closing in",
+   "moat_by": "claude-draft"
   },
   "SMH": {
    "legacy": 72,
@@ -1241,9 +1562,17 @@
   },
   "GME": {
    "legacy": 25,
-   "moat_answers": null,
-   "moat_date": null,
-   "note": "GameStop — no durable moat, weak fundamentals, sentiment-driven"
+   "moat_answers": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "note": "GameStop — no durable moat, weak fundamentals, sentiment-driven",
+   "moat_reason": "No durable moat; physical game retail in structural decline",
+   "moat_by": "claude-draft"
   },
   "ACLS": {
    "legacy": 68,
@@ -1267,9 +1596,17 @@
   },
   "DELL": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null,
-   "industry": "Technology Hardware"
+   "moat_answers": [
+    false,
+    true,
+    false,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "industry": "Technology Hardware",
+   "moat_reason": "Supply-chain scale; #1/#2 in PCs and servers; low lock-in and weak pricing power in hardware",
+   "moat_by": "claude-draft"
   },
   "BAC": {
    "legacy": 68,
@@ -1313,8 +1650,16 @@
   },
   "CCJ": {
    "legacy": 68,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Long-term utility contracts and tier-one deposits that take decades to permit; improving pricing; #2 uranium producer",
+   "moat_by": "claude-draft"
   },
   "XOM": {
    "legacy": 68,
@@ -1374,8 +1719,16 @@
     "growth": 11,
     "valuation": 14
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    false,
+    true,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Manufacturing scale and hybrid lead; #1 global automaker by volume; no lock-in or proprietary moat",
+   "moat_by": "claude-draft"
   },
   "O": {
    "legacy": 65,
@@ -1385,8 +1738,16 @@
     "growth": 11,
     "valuation": 14
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    false,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Largest net-lease REIT with cost-of-capital scale advantage; leases are contractual, not a moat; little pricing power",
+   "moat_by": "claude-draft"
   },
   "SNOW": {
    "legacy": 65,
@@ -1485,8 +1846,16 @@
   },
   "BABA": {
    "legacy": 62,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    true,
+    false,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Marketplace network effects and #1/#2 in China e-commerce, but lost share to PDD and JD",
+   "moat_by": "claude-draft"
   },
   "INFY": {
    "legacy": 62,
@@ -1639,8 +2008,16 @@
     "growth": 13,
     "valuation": 7
    },
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "EV technology matched by BYD and others; lost share and cut prices; still #1/#2 in EVs",
+   "moat_by": "claude-draft"
   },
   "RDDT": {
    "legacy": 56,
@@ -1700,8 +2077,16 @@
   },
   "MRNA": {
    "legacy": 52,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "mRNA IP and platform, but lost vaccine share and pricing; not a top-two player outside COVID",
+   "moat_by": "claude-draft"
   },
   "SMCI": {
    "legacy": 52,
@@ -1756,8 +2141,16 @@
   },
   "IREN": {
    "legacy": 48,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    true,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Power-rich sites and fast capacity growth, but compute and hosting are contestable; not a top-two player",
+   "moat_by": "claude-draft"
   },
   "ASTS": {
    "legacy": 46,
@@ -1806,8 +2199,16 @@
   },
   "MSTR": {
    "legacy": 38,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    false,
+    false,
+    false,
+    false,
+    true
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "Bitcoin treasury vehicle; the largest corporate holder but no business moat",
+   "moat_by": "claude-draft"
   },
   "IONQ": {
    "legacy": 36,
@@ -1816,8 +2217,16 @@
   },
   "NEXT": {
    "legacy": 35,
-   "moat_answers": null,
-   "moat_date": null
+   "moat_answers": [
+    true,
+    false,
+    true,
+    false,
+    false
+   ],
+   "moat_date": "2026-11-14",
+   "moat_reason": "20-year LNG offtake contracts and export permits hard to replicate; pre-revenue with no market position yet",
+   "moat_by": "claude-draft"
   },
   "KEEL": {
    "legacy": 32,
