@@ -102,6 +102,28 @@ Record the answers in `framework_scores.json`:
 
 A moat with no date, or a date older than 120 days, is marked with an asterisk on the dashboard.
 
+## Funds and ETFs: a separate score
+
+Moat, quality and growth describe a single business, not a basket of them. A fund is scored on a different question: is this the best way to own this exposure?
+
+| Axis | Points | Source | Zero at | Full at |
+|---|---|---|---|---|
+| Cost | 25 | Expense ratio (TER) | 1.5% | 0.1% |
+| Track record | 35 | 3-year annualised return against its benchmark, after fees | −6%/yr | +4%/yr |
+| Consistency | 15 | Share of rolling 1-year windows (sampled monthly, last 3 years) that beat the benchmark | 30% | 70% |
+| Concentration | 10 | Weight of the top 10 holdings | 70% | 30% |
+| Conviction | 15 | Your view of the theme: Y 15, ? 7.5, N 0 | | |
+
+The fund gate is 48, as before.
+
+- **Track record** uses dividend-adjusted prices, so income funds (JEPI, SCHD) are not penalised for paying out. A window within half a percentage point of the benchmark counts as half a win, so an index fund tracking its own benchmark scores a neutral 7.5 on consistency.
+- **Benchmarks** are the cheap alternative for the same money: SPY for US equity, QQQ for tech and thematic funds, URTH for global and regional equity, GLD for gold and miners, AGG for bonds. A thematic fund that has lagged QQQ for three years scores low on track record. That is the point: it has not paid for its higher fees and risk.
+- **Thai feeder funds** are priced through their proxy ETF (SCB_GENO through ARKG, for example), and their own expense ratio is deducted from the proxy's return, because the feeder fund charges it on top.
+- **Leveraged products** (TQQQ) score zero on concentration. Single-asset funds (gold, silver, bonds) score half.
+- **Expense ratios for Thai funds are estimates** (`ter_source: "estimate"`) from typical SCB and KTAM fees. Replace them with the figure from each factsheet; ETF expense ratios are the published figures.
+- **Conviction** starts at "?" for every fund. Set Y or N in `framework_scores.json` for the themes you hold a view on.
+- Funds without enough price history (fewer than two years) or not in the scan fall back to the old total for those axes, marked provisional.
+
 ## Where each number comes from
 
 For each axis the scorer uses the best source available and records which one it used:
@@ -110,7 +132,7 @@ For each axis the scorer uses the best source available and records which one it
 - **hand:** a hand sub-score in `framework_scores.json` (40 tickers have these from the original table), or the moat answers. Hand sub-scores are stored on the original rubric's scale (moat /30, quality /25, growth /20, valuation /20) and converted pro rata: a hand moat of 24/30 counts as 32/40.
 - **legacy:** a placeholder derived from the old single total. The score is marked provisional.
 
-Funds and ETFs (`"kind": "fund"`) have no business to analyse; they keep their old hand score, moved onto the new scale.
+Funds and ETFs (`"kind": "fund"`) use the fund score above.
 
 Hover any FW number on the dashboard to see the four parts and their sources.
 

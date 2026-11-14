@@ -174,3 +174,7 @@ Extreme readings (25%+ dip together with 10%+ cushion) returned +37.5 on the rep
 - *Debt/equity is distorted by buybacks.* Interest coverage now leads where Finnhub reports it (209 of 227 stocks); a negative figure on a profitable company is read as net interest income.
 - DELL moves only 47 → 49. Against hardware peers its margins are still well below the median (gross 20% against 49%, free cash flow 8% against 25%), and revenue grew 3.5% a year over three years. That is the data, not the template.
 
+**Moat questions and funds (14 Nov).** The moat now asks the four sources of competitive advantage (switching costs, network effects, intangibles, cost advantage) plus durability: whether the company is on the right side of its market's technology shift. Market share and pricing power were dropped from the moat because the data axes already measure them. Answers for all 230 stocks were drafted by Claude and accepted; an "uncertain" answer scores half, and an unreadable one is rejected rather than counted as yes (previously any non-empty text counted as yes).
+
+Funds no longer reuse the old single total. They have their own score (cost 25, track record against a benchmark 35, consistency 15, concentration 10, conviction 15), computed from dividend-adjusted prices on every scan. Expense ratios for Thai feeder funds are estimates until checked against factsheets.
+

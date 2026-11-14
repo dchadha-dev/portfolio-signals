@@ -457,9 +457,103 @@ def load_fundamentals(path=FUNDAMENTALS_FILE, today=None):
     return d.get('tickers', {}), as_of
 
 
-def score_all(prices=None, today=None, entries=None, fundamentals=None):
+# ── FUNDS AND ETFs ────────────────────────────────────────────────────
+# Moat, quality and growth describe one business, not a basket. Funds get their
+# own 100-point score answering "is this the best way to own this exposure?":
+#
+#     Cost           25   total expense ratio: 0.1% -> full, 1.5% -> zero
+#     Track record   35   3-year annualised return vs its benchmark, after fees:
+#                         -6%/yr -> zero, +4%/yr -> full
+#     Consistency    15   share of rolling 1-year windows (monthly, last 3 years)
+#                         that beat the benchmark: 30% -> zero, 70% -> full
+#     Concentration  10   top-10 holdings weight: 30% -> full, 70% -> zero;
+#                         leveraged products score zero; single-asset funds
+#                         (gold, bonds) score half
+#     Conviction     15   your call on the theme: Y 15, ? 7.5, N 0
+#
+# Track record uses dividend-adjusted prices. Thai feeder funds are priced through
+# their proxy ETF, so the fund's own expense ratio is deducted from the proxy's
+# return. Same gate as before (FUND_BUY_MIN).
+FUND_AXES = {'cost': 25, 'track': 35, 'consistency': 15, 'concentration': 10, 'conviction': 15}
+FUND_TRACK_DAYS = 756
+FUND_MIN_DAYS = 504
+
+
+def _fund_excess(series, bench, ter_drag=0.0):
+    """(annualised excess return %, share of rolling 1y windows beating the
+    benchmark) over the last three years, or (None, None) with too little data."""
+    try:
+        import pandas as pd
+        df = pd.concat([series, bench], axis=1, join='inner').dropna()
+    except Exception:
+        return None, None
+    if len(df) < FUND_MIN_DAYS:
+        return None, None
+    df = df.iloc[-FUND_TRACK_DAYS:]
+    yrs = len(df) / 252.0
+    f, b = df.iloc[:, 0], df.iloc[:, 1]
+    cagr_f = (f.iloc[-1] / f.iloc[0]) ** (1 / yrs) - 1 - ter_drag / 100.0
+    cagr_b = (b.iloc[-1] / b.iloc[0]) ** (1 / yrs) - 1
+    rf = f / f.shift(252) - 1 - ter_drag / 100.0
+    rb = b / b.shift(252) - 1
+    ex = (rf - rb).dropna().iloc[::21]
+    # A window within half a percentage point of the benchmark is a tie and counts
+    # half: an index fund tracking its own benchmark should not score zero here.
+    share = float(((ex > 0.005) * 1.0 + (ex.abs() <= 0.005) * 0.5).mean()) if len(ex) >= 6 else None
+    return round((cagr_f - cagr_b) * 100, 2), share
+
+
+def score_fund(entry, series=None, bench=None, today=None):
+    """Score a fund. Inputs that are missing fall back to the old hand total
+    (moved onto the new scale), and the result is marked provisional."""
+    legacy = _num(entry.get('legacy'))
+    base = legacy_on_new_scale(legacy) / 100.0 if legacy is not None else None
+    parts, sources = {}, {}
+
+    ter = _num(entry.get('ter'))
+    parts['cost'], sources['cost'] = (_lin(ter, 1.5, 0.1, 25), entry.get('ter_source', 'hand')) if ter is not None else (None, None)
+
+    excess = share = None
+    if series is not None and bench is not None:
+        drag = ter if (entry.get('proxy') and ter is not None) else 0.0
+        excess, share = _fund_excess(series, bench, drag)
+    parts['track'], sources['track'] = (_lin(excess, -6, 4, 35), 'data') if excess is not None else (None, None)
+    parts['consistency'], sources['consistency'] = (_lin(share, 0.3, 0.7, 15), 'data') if share is not None else (None, None)
+
+    if entry.get('leveraged'):
+        parts['concentration'], sources['concentration'] = 0.0, 'hand'
+    elif entry.get('single_asset'):
+        parts['concentration'], sources['concentration'] = 5.0, 'hand'
+    elif _num(entry.get('top10')) is not None:
+        parts['concentration'], sources['concentration'] = _lin(entry['top10'], 70, 30, 10), 'hand'
+    else:
+        parts['concentration'], sources['concentration'] = None, None
+
+    conv = moat_answer_value(entry.get('conviction', '?'))
+    parts['conviction'], sources['conviction'] = 15.0 * (0.5 if conv is None else conv), 'hand'
+
+    for k, mx in FUND_AXES.items():
+        if parts[k] is None:
+            if base is None:
+                return None
+            parts[k], sources[k] = mx * base, 'legacy'
+        parts[k] = round(max(0.0, min(float(mx), parts[k])), 1)
+    score = int(round(sum(parts.values())))
+    return {
+        'score': score, 'band': band_of(score), 'parts': parts, 'sources': sources,
+        'legacy': None if legacy is None else int(legacy), 'kind': 'fund',
+        'provisional': 'legacy' in sources.values(),
+        'moat_date': None, 'moat_stale': False, 'moat_reason': None, 'moat_uncertain': 0,
+        'pe': None, 'industry': None, 'scaling': False,
+        'ter': ter, 'benchmark': entry.get('benchmark'), 'excess_3y': excess,
+        'beat_share': None if share is None else round(share, 2), 'proxy': entry.get('proxy'),
+    }
+
+
+def score_all(prices=None, today=None, entries=None, fundamentals=None, series=None):
     """{ticker: detail}. prices: optional {ticker: last close} so the valuation
-    axis uses today's price rather than last week's P/E."""
+    axis uses today's price rather than last week's P/E. series: optional
+    {ticker: dividend-adjusted price series} for fund track records."""
     entries = load_entries() if entries is None else entries
     if fundamentals is None:
         fundamentals, _ = load_fundamentals(today=today)
@@ -470,8 +564,13 @@ def score_all(prices=None, today=None, entries=None, fundamentals=None):
                     for t, m in fundamentals.items()}
     meds = industry_medians(fundamentals)
     out = {}
+    series = series or {}
     for t, e in entries.items():
-        d = score_ticker(e, with_industry(fundamentals.get(t), meds), prices.get(t), today)
+        if e.get('kind') == 'fund':
+            src = e.get('proxy') or t
+            d = score_fund(e, series.get(src), series.get(e.get('benchmark')), today)
+        else:
+            d = score_ticker(e, with_industry(fundamentals.get(t), meds), prices.get(t), today)
         if d:
             out[t] = d
     return out
