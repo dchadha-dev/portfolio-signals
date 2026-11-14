@@ -17,14 +17,152 @@ try:
     from sell_side_scorer import (
         compute_sell_signals, fetch_sector_signals,
         fetch_market_signals, score_ticker, apply_portfolio_cap,
-        EXIT_T, REDUCE_T, TRIM_T, TICKER_SECTORS
+        sell_ceiling, EXIT_T, REDUCE_T, TRIM_T, TICKER_SECTORS
     )
     SELL_SCORER_AVAILABLE = True
 except ImportError:
     SELL_SCORER_AVAILABLE = False
-    EXIT_T = 70; REDUCE_T = 55; TRIM_T = 35
+    EXIT_T = 78; REDUCE_T = 65; TRIM_T = 52   # keep identical to sell_side_scorer.py
     TICKER_SECTORS = {}
+    def sell_ceiling(_fs): return 'HOLD'
     print("sell_side_scorer.py not found -- sell signals disabled")
+
+# ── SIGNAL THRESHOLDS — single source of truth ────────────────────────
+# Every surface (dashboard tabs, daily/weekly email, weekly log) reads these
+# from the payload's `thresholds` block instead of hard-coding its own copy.
+BUY_T           = 80   # buy score needed for BUY
+WATCH_T         = 60   # buy score needed for WATCH (factor gate must also be open)
+STRONG_T        = 95   # BUY at/above this score = STRONG tier (deep dip + overlay, or +15 of overlays)
+import framework_scorer
+FW_MIN_BUY      = framework_scorer.BUY_MIN        # band 'Good' or better; 70 on the pre-rebuild scale
+FUND_FW_MIN_BUY = framework_scorer.FUND_BUY_MIN   # 48 for funds/ETFs (was 55)
+
+# Display label for each final state. `label` is the ONLY thing a page or
+# email should print for a row — never re-derive it from buy_score/flags.
+LABEL_NO_DATA    = 'NO DATA'
+LABEL_STRONG_BUY = 'STRONG BUY'
+LABEL_BUY        = 'BUY'
+LABEL_FW_BLOCKED = 'FW BLOCKED'
+LABEL_WATCH      = 'WATCH'
+LABEL_HOLD       = 'HOLD'
+SELL_LABELS      = ('EXIT', 'REDUCE', 'TRIM')
+
+
+# ── BUY SCORE v3 ──────────────────────────────────────────────────────
+# Same purpose as before: flag a good moment to add to a name you already rate.
+# The setup is unchanged in spirit — "a strong stock on sale" — but the score is
+# now built only from the parts that held up when re-tested (MODEL_AUDIT.md):
+#
+#   Strong run   12-month return / volatility > 0.6 (quality > 0.2)   +25  (0.3-0.6: +15)
+#   Uptrend      close 5%+ above the 200d MA                          +25  (within 5% either side: +15)
+#   Dip          20%+ below the 252d closing high                     +30  (15-20% below: +15)
+#                                                          all three  = 80 = BUY
+#   Deep dip     25%+ below, with the two conditions above            +10
+#   Overlays     insider / PEAD / sector, combined cap                +25
+#
+# All three of strong run + uptrend + dip (the "gate") are needed for a BUY.
+# Any two without the third tested at zero, so that scores 50-55 = HOLD. WATCH
+# (60-79) means two are met and the third is close, i.e. one move from a BUY.
+# Removed because they added nothing in any universe or period: DFV V3 (the gate
+# did as well or better without it), PFD, Triple, RSI timing, both penalties.
+# v2 needed gate + DFV V3 + an overlay to reach 80, which happened on 0.01% of
+# stock-days; the gate alone is ~1% on this watch-list.
+MODEL_VERSION = 'v3'
+NEAR_DIST_T = -0.15   # "approaching" a dip
+NEAR_TREND_T = -0.05  # within 5% of the 200d MA, either side
+UP_TREND_T = 0.05     # a dip that leaves less than 5% of cushion over the 200d MA tested at zero
+NEAR_QUALITY_T = 0.10 # 12m return/vol 0.3-0.6
+DEEP_DIST_T = -0.25   # deep dip
+OVERLAY_CAP = 25
+
+
+def technical_buy_score(last):
+    """Price-derived part of the buy score (v3). Used for direct tickers AND
+    Thai proxy funds so the two can never drift apart."""
+    buy = 0
+    buy += 25 if last['qual'] else 15 if last['qualc'] else 0
+    buy += 25 if last['up']   else 15 if last['upc']   else 0
+    buy += 30 if last['dip']  else 15 if last['near']  else 0
+    if last['deepdip']: buy += 10
+    return buy
+
+
+def technical_buy_frame(df):
+    """Vectorised technical_buy_score() over a whole compute_signals() frame.
+    Used by validate_signals.py so the backtest scores history with exactly the
+    weights that run live. Keep the two functions in lockstep (tested)."""
+    b = lambda c: df[c].astype(bool)
+    return (25 * b('qual') + 15 * (b('qualc') & ~b('qual')) + 25 * b('up') + 15 * (b('upc') & ~b('up'))
+            + 30 * b('dip') + 15 * (b('near') & ~b('dip')) + 10 * b('deepdip')).clip(0, 100)
+
+
+def technical_buy_score_v2(last):
+    """The previous model, kept only so the payload can show both scores side by
+    side during the transition (`buy_score_v2`). It labels nothing."""
+    buy = 0
+    if last['f']:      buy += 40
+    if last['fdfv3']:  buy += 25
+    if last['pfd']:    buy += 8
+    if last['triple']: buy += 10
+    if last['dfv3'] and not last['f']: buy += 5
+    if last['banker_weak']: buy -= 20
+    if last['rbear']:       buy -= 10
+    return max(0, min(100, buy))
+
+
+def cap_overlays(insider, pead, sector, cap=OVERLAY_CAP):
+    """Insider, PEAD and sector boosts share one cap, applied in that order.
+    The README always said the combined boost was capped; the code let it reach 43."""
+    out = []; room = cap
+    for v in (insider, pead, sector):
+        v = max(0, min(v or 0, room)); out.append(v); room -= v
+    return out
+
+
+def classify_buy(buy, gate, near, fs, fw_min=FW_MIN_BUY):
+    """Buy-side state before caps: BUY | WEAK_BUY | WATCH | HOLD.
+    BUY needs the full gate (strong run + 5% over the 200d MA + 20% dip). WATCH needs at
+    least a 15% dip. Overlay boosts (insider/PEAD/sector) cannot create either
+    on their own."""
+    if gate and buy >= BUY_T:
+        return 'WEAK_BUY' if (fs is not None and fs < fw_min) else 'BUY'
+    if near and buy >= WATCH_T:
+        return 'WATCH'
+    return 'HOLD'
+
+
+def display_label(row):
+    """The one label every surface shows for a row. Sell actions on held
+    positions win over buy-side states (risk first)."""
+    if row.get('signal') == 'NO_DATA':
+        return LABEL_NO_DATA
+    if row.get('is_holding') and row.get('sell_action') in SELL_LABELS:
+        return row['sell_action']
+    sig = row.get('signal')
+    if sig == 'BUY':
+        return LABEL_STRONG_BUY if row.get('signal_tier') == 'STRONG' else LABEL_BUY
+    if sig == 'WEAK_BUY':
+        return LABEL_FW_BLOCKED
+    if sig == 'WATCH':
+        return LABEL_WATCH
+    return LABEL_HOLD
+
+
+def buy_breakdown(last, insider_boost=0, pead_boost=0, sector_boost=0):
+    """[name, points] pairs that sum to the (pre-clamp) buy score, so a card
+    can show exactly why a score is what it is."""
+    parts = []
+    if last['qual']:    parts.append(['Strong 12m run', 25])
+    elif last['qualc']: parts.append(['Fair 12m run', 15])
+    if last['up']:      parts.append(['5%+ above 200d MA', 25])
+    elif last['upc']:   parts.append(['Within 5% of 200d MA', 15])
+    if last['dip']:     parts.append(['Dip 20%+', 30])
+    elif last['near']:  parts.append(['Dip 15-20%', 15])
+    if last['deepdip']: parts.append(['Deep dip 25%+', 10])
+    if insider_boost and insider_boost > 0: parts.append(['Insider/Politician', insider_boost])
+    if pead_boost and pead_boost > 0:       parts.append(['PEAD', pead_boost])
+    if sector_boost and sector_boost > 0:   parts.append(['Sector', sector_boost])
+    return parts
 
 # ── INSIDER & POLITICIAN SIGNALS ──────────────────────────────────────
 def load_insider_signals():
@@ -37,7 +175,12 @@ def load_insider_signals():
         if ts_str:
             try:
                 age_days = (datetime.now() - datetime.strptime(ts_str[:16], '%Y-%m-%d %H:%M')).days
-                if age_days > 8:
+                if age_days > 14:
+                    # Two missed weekly fetches. Boosts from a 60d lookback that
+                    # is itself 2+ weeks old are no longer evidence — drop them.
+                    print(f'insider_signals.json is {age_days} days old — ignoring (no boosts applied)')
+                    return {}
+                elif age_days > 8:
                     print(f'Warning: insider_signals.json is {age_days} days old')
                 elif health.get('retry_required'):
                     print('Warning: insider_signals.json marked retry_required')
@@ -183,6 +326,10 @@ try:
 except Exception as _e:
     print(f"holdings.json not applied ({_e}) — using built-in MY_HOLDINGS")
 
+# Funds whose proxy is only a placeholder. They stay in the holdings list but get
+# no buy/sell signal: a SPY-derived "buy" on a Thai SET50 fund is not information.
+NO_SIGNAL_FUNDS = {'SCB_SET50'}
+
 PROXY_TICKERS = list(set(TICKER_PROXY_MAP.values()))
 # Tickers kept in holdings but excluded from signal computation
 # (LSE-listed or insufficient yfinance history — shown as NO_DATA with reason)
@@ -199,138 +346,32 @@ YEARS     =  5
 FWD_DAYS  =  252
 TEST_YRS  =  2
 
-FRAMEWORK_SCORES = {
-    # ≥85 Core keepers
-    'NVDA':93,'CRDO':93,'ASML':93,'AVGO':92,'ANET':91,'DDOG':90,
-    'MELI':90,'LLY':90,'TSM':89,'MA':88,'V':88,'NBIS':87,
-    'AMD':86,'NOW':86,'MSCI':86,'BKNG':85,'ISRG':85,'SPGI':85,
-    # 70–84 Good
-    'AMZN':84,'CRWD':84,'KLAC':84,'TMO':84,'GOOG':83,'PANW':83,
-    'LRCX':83,'ZTS':83,'MSFT':82,'META':82,'AMAT':82,'RMS.PA':82,
-    'CDNS':82,'SNPS':82,'AXON':82,'ICE':82,'IDXX':82,'COST':82,
-    'CMG':82,'FICO':81,'CME':81,'AAPL':80,'CPRT':80,'NVO':80,
-    'MC.PA':80,'CRM':80,'NDAQ':80,'ADI':80,'TXN':80,'BX':80,
-    'MCD':80,'RACE':79,'INTU':79,'MPWR':79,'MRVL':79,'SPOT':79,
-    'HD':79,'SHOP':78,'PGR':78,'BRKB':78,'ORCL':78,'AXP':78,
-    'KKR':78,'MSI':78,'TTD':77,'NET':77,'VRT':77,'NFLX':76,
-    'MU':76,'ITX.MC':76,'VEEV':76,'HEI':76,'QCOM':76,'JPM':76,
-    'JNJ':76,'ABT':76,'ABNB':76,'MAR':76,'CEG':76,'DE':76,
-    'WMT':76,'ARM':76,'UNH':75,'TEAM':75,'KNSL':75,'BSX':75,
-    'FISV':74,'APP':74,'IBKR':74,'GS':74,'ABBV':74,'ELV':74,
-    'NVS':74,'PODD':74,'UBER':74,'LOW':74,'PG':74,'CAT':74,
-    'WM':74,'MS':73,'CRWV':72,'RELX':72,'ALAB':72,'SMH':72,
-    'ON':72,'SCHW':72,'UTHR':72,'MEDP':72,'ONON':72,'NKE':72,
-    'LULU':72,'KO':72,'PEP':72,'MNST':72,'DECK':72,'NEE':72,
-    'GEV':72,'CB':72,'LSCC':71,'CSCO':70,'DASH':70,'GE':70,
-    'LMT':70,
-    # 55–69 Marginal
+# Framework scores are no longer a hand-typed table in this file.
+# Inputs live in framework_scores.json (moat judgement, hand sub-scores, the old
+# totals) and fundamentals.json (weekly Finnhub fetch); framework_scorer.py turns
+# them into a 0-100 score per ticker. See FRAMEWORK.md.
+FRAMEWORK_DETAIL = framework_scorer.score_all()
+FRAMEWORK_SCORES = {t: d['score'] for t, d in FRAMEWORK_DETAIL.items()}
 
-    # ── ETF FRAMEWORK SCORES ─────────────────────────────────────────────
-    # ETF scores reflect quality of underlying exposure, not single-company moat.
-    # Broad diversified index ETFs score highest (structural quality, low cost).
-    # Thematic/leveraged ETFs score lower (concentration, vol, decay risk).
-    # US broad market
-    'VOO':82,   # S&P 500 — gold standard, lowest cost, maximum diversification
-    'SPY':82,   # S&P 500 — same exposure as VOO, slightly higher fees
-    'IVV':82,   # S&P 500 iShares — equivalent to VOO/SPY
-    'QQQ':78,   # Nasdaq-100 — quality tilt but tech concentration risk
-    'DIA':72,   # Dow Jones — 30 large caps, price-weighted, less optimal
-    'VXF':70,   # Vanguard Extended Market — US small/mid, higher vol
-    'VXUS':68,  # Vanguard Total International — broad but EM drag
-    # Sector ETFs (US listed)
-    'XLK':76,   # Technology sector — quality but concentration
-    'XLV':74,   # Healthcare sector — defensive quality
-    'XLF':68,   # Financials — cyclical, regulatory risk
-    'XLI':68,   # Industrials — cyclical
-    'XLY':70,   # Consumer discretionary — quality names but cyclical
-    'XLE':58,   # Energy — commodity-dependent, ESG headwinds
-    # International
-    'IEV':65,   # iShares Europe ETF — Europe quality drag vs US
-    'EWJ':64,   # Japan — structural quality, yen risk
-    'URTH':72,  # MSCI World — global diversification, US-heavy
-    'EWY':60,   # South Korea — Samsung-heavy, EM premium
-    'EWZ':52,   # Brazil — EM political/commodity risk
-    # Commodities
-    'GLD':65,   # Gold — inflation hedge, no yield, no moat
-    # Bond ETFs
-    'IEF':60,   # 7-10yr Treasuries — rate duration risk
-    'TLT':55,   # 20yr+ Treasuries — high duration, volatile
-    # Leveraged (decay risk, short hold only)
-    'TQQQ':48,  # 3× Nasdaq — severe decay on sideways markets
-    # Asia/EM thematic
-    'FLAX':62,  # Franklin FTSE Asia ex-Japan — broad Asia quality
-    # US Broad / Large Cap additional
-    'VTI':82,   # Vanguard Total Market — max diversification
-    'IWF':76,   # iShares Russell 1000 Growth — quality growth tilt
-    'XLG':74,   # Invesco S&P Top 50 — mega-cap concentration
-    'SCHB':81,  # Schwab US Broad — VTI equivalent
-    'ITOT':81,  # iShares Total US — VTI equivalent
-    'VIG':78,   # Vanguard Dividend Appreciation — quality dividend growth
-    'DGRO':76,  # iShares Core Dividend Growth
-    'VYM':72,   # Vanguard High Dividend — value tilt, lower growth
-    'SCHD':76,  # Schwab US Dividend — quality/value filter, low cost
-    'NOBL':74,  # S&P 500 Dividend Aristocrats
-    'DGRW':75,  # WisdomTree Quality Dividend Growth
-    # Thematic / AI / Tech
-    'AIQ':65,   # Global X AI & Technology — broad AI, quality holdings
-    'QTUM':62,  # Defiance Quantum — quantum/AI thesis, early stage
-    'BOTZ':63,  # Global X Robotics & AI — cyclical
-    'WCLD':60,  # WisdomTree Cloud Computing
-    'CLOU':58,  # Global X Cloud Computing — elevated valuation risk
-    'FIVG':60,  # Defiance 5G
-    # ARK funds — high conviction, high vol, poor recent track record
-    'ARKG':44,  # ARK Genomic Revolution — speculative biotech
-    'ARKK':42,  # ARK Innovation — aggressive, concentration risk
-    'ARKW':44,  # ARK Next Gen Internet
-    'ARKF':44,  # ARK Fintech Innovation
-    # Asia / EM
-    'AAXJ':62,  # iShares Asia ex Japan — broad Asia, EM discount
-    'INDA':68,  # iShares India — structural growth, higher valuation
-    'KWEB':52,  # KraneShares China Internet — regulatory + geopolitical
-    'FXI':50,   # iShares China Large Cap — SOE-heavy
-    'VWO':60,   # Vanguard EM — broad, commodity/political drag
-    # Fixed Income
-    'BND':62,   # Vanguard Total Bond
-    'AGG':62,   # iShares Core US Agg
-    'HYG':55,   # iShares High Yield — credit + cyclical risk
-    'LQD':60,   # iShares IG Corporate
-    # Previously unscored holdings — added Aug 2026
-    'JEPI':70,  # JPM Equity Premium Income — quality income, upside capped by covered calls
-    'VSS':68,   # Vanguard Intl Small Cap — broad diversification, higher vol than large cap
-    'XLB':62,   # Materials Select Sector — cyclical, commodity-linked, no structural moat
-    'CQQQ':52,  # Invesco China Tech — regulatory + geopolitical risk, same profile as KWEB
-    'AIQG':65,  # Global X AI UCITS — mirrors AIQ exposure, UCITS wrapper
-    'QNTM.L':58,# VanEck Quantum UCITS — early-stage theme, thinner liquidity than QTUM
-    'GME':25,   # GameStop — no durable moat, weak fundamentals, sentiment-driven
 
-    'ACLS':68,'COHR':68,'GLW':68,'TSEM':68,'DELL':68,'BAC':68,
-    'OWL':68,'MDT':68,'ALGN':68,'RCL':68,'SBUX':68,'CL':68,
-    'ULTA':68,'CCJ':68,'XOM':68,'RTX':68,'AER':68,'PDD':68,
-    'HDB':68,'CVX':67,'GILD':66,'UL':66,'CAVA':66,'SONY':66,
-    'TM':65,'O':65,'SNOW':65,'IBM':65,'TOST':65,'DIS':65,
-    'RMBS':64,'FSLR':64,'UPS':64,'PI':64,'C':62,'UHS':62,
-    'CELH':62,'SE':62,'TCOM':62,'EXPE':62,'SHEL':62,'EQNR':62,
-    'VLO':62,'OXY':62,'FDX':62,'BABA':62,'INFY':62,'FIVN':62,
-    'ADBE':61,'STX':60,'BIIB':60,'DKNG':60,'HIMS':60,'EQT':60,
-    'BKR':60,'BEP':60,'RIO':60,'FCX':60,'COIN':58,'WDC':58,
-    'PFE':58,'CVNA':58,'PLNT':58,'HAL':58,'FORM':58,'HSBC':58,
-    'SNDK':58,'VICR':58,'GDX':58,'SLV':55,'LIT':60,'TSLA':56,'RDDT':56,'BP':56,
-    'MMM':56,'JD':56,'FUTU':55,
-    # <55 Weak / sell candidates
-    'SOFI':54,'ENPH':54,'BIDU':54,'NVTS':52,'HPE':52,'HOOD':52,
-    'MRNA':52,'SMCI':52,'NXE':52,'T':52,'VZ':52,'RKLB':52,
-    'GRAB':50,'SYM':50,'TQQQ':48,'HIMX':48,'BE':48,'BA':48,
-    'IREN':48,'ASTS':46,'SOUN':44,'SEDG':44,'SERV':42,'INTC':42,
-    'DNN':42,'APLD':42,'AAL':40,'EOSE':38,'MSTR':38,'IONQ':36,
-    'NEXT':35,'KEEL':32,'QBTS':28,'RGTI':28,'QUBT':24,'QUCY':20,
-    # Thai mutual funds — same 5-axis framework [Moat/30, Earnings/25, Runway/20, Val/15, Redundancy/10]
-    'SCB_SP500':63, 'SCB_NDQ':61,  'SCB_SEMI':72,  'SCB_WORLD':68, 'SCB_GOLD':65,
-    'SCB_NK225':62, 'SCB_SET50':55, 'SCB_DJ':56,   'SCB_AIEM':64,  'SCB_FINTECH':60,
-    'SCB_AUTO':52,  'SCB_INNOV':47, 'SCB_GENO':48,  'SCB_CHINA':54, 'SCB_EV':58,
-    'SCB_BUSAA':62,
-    'KT_INDIA':70,  'KT_WORLD':65,  'KT_WTAI':68,   'KT_BLOCK':55,
-    'KT_TECH':64,   'KT_ESG':58,
-}
+def refresh_framework_scores(closes):
+    """Re-score with today's closes so the valuation axis moves with price.
+    Mutates the two dicts in place; every later lookup sees the fresh values."""
+    try:
+        prices = {t: float(closes[t].dropna().iloc[-1]) for t in closes.columns if closes[t].notna().any()}
+    except Exception:
+        prices = {}
+    FRAMEWORK_DETAIL.clear(); FRAMEWORK_DETAIL.update(framework_scorer.score_all(prices=prices))
+    FRAMEWORK_SCORES.clear(); FRAMEWORK_SCORES.update({t: d['score'] for t, d in FRAMEWORK_DETAIL.items()})
+
+
+def framework_row(t):
+    """Compact per-row framework detail for the payload."""
+    d = FRAMEWORK_DETAIL.get(t)
+    if not d:
+        return None
+    return {'band': d['band'], 'parts': d['parts'], 'sources': d['sources'], 'legacy': d['legacy'], 'kind': d['kind'],
+            'provisional': d['provisional'], 'moat_date': d['moat_date'], 'moat_stale': d['moat_stale'], 'pe': d['pe']}
 
 # ── SIGNAL ENGINE ─────────────────────────────────────────────────────
 def calc_rsi(series, period):
@@ -427,11 +468,21 @@ def compute_signals(cl):
         (rsi_above < rsi_pk * 0.85) &
         (rsi_above > 0)
     )
+    # ── v3 buy-score inputs ──────────────────────────────────────────
+    df['up']          = df['trend'] > UP_TREND_T
+    df['qual']        = df['quality'] > QUALITY_T
+    df['upc']         = df['trend'] > NEAR_TREND_T
+    df['qualc']       = df['quality'] > NEAR_QUALITY_T
+    df['dip']         = df['dist'] < DIST_T
+    df['near']        = df['dist'] < NEAR_DIST_T
+    df['gate']        = df['dip'] & df['up'] & df['qual']
+    df['deepdip']     = df['gate'] & (df['dist'] < DEEP_DIST_T)
     return df.dropna(subset=['dist', 'hm_lift'])
 
 # ── TICKER ALIASES — yfinance uses different symbols for some tickers ──
 TICKER_ALIASES = {
-    'BRKB': 'BRK-B',   # Berkshire B — yfinance requires hyphen
+    'BRKB':   'BRK-B',      # Berkshire B — yfinance requires hyphen
+    '005930': '005930.KS',  # Samsung Electronics — KRX listing needs the .KS suffix
 }
 ALIAS_REVERSE = {v: k for k, v in TICKER_ALIASES.items()}
 
@@ -526,6 +577,19 @@ def compute_ticker_alpha(all_signals, closes, voo):
     return ticker_alpha
 
 # ── LIVE PRICES ───────────────────────────────────────────────────────
+FINNHUB_SYMBOLS = {'BRKB': 'BRK.B'}
+
+def finnhub_symbol(t):
+    """Map a scanner ticker to its Finnhub US symbol, or None if there isn't one.
+    The free Finnhub tier only quotes US listings. Stripping an exchange suffix
+    silently returns a DIFFERENT company (MC.PA -> 'MC' is Moelis & Co, not
+    LVMH), so non-US tickers are skipped rather than guessed."""
+    if t in FINNHUB_SYMBOLS:
+        return FINNHUB_SYMBOLS[t]
+    if '.' in t or t.isdigit() or '_' in t:
+        return None
+    return t
+
 def fetch_live_prices(tickers):
     if not FINNHUB_TOKEN:
         print('No FINNHUB_TOKEN — using yfinance last close')
@@ -533,7 +597,9 @@ def fetch_live_prices(tickers):
     live = {}
     print(f'Fetching live prices from Finnhub for {len(tickers)} tickers...')
     for t in tickers:
-        sym = t.replace('.L','').replace('.PA','').replace('.MC','')
+        sym = finnhub_symbol(t)
+        if sym is None:
+            continue   # non-US listing — keep the yfinance close in local currency
         try:
             r = requests.get(
                 f'https://finnhub.io/api/v1/quote?symbol={sym}&token={FINNHUB_TOKEN}',
@@ -549,40 +615,23 @@ def fetch_live_prices(tickers):
 # ── GUIDANCE TEXT ─────────────────────────────────────────────────────
 def build_guidance(t, last, ta, fs):
     parts = []
-    dist = last['dist']; trend = last['trend']; lift = last['hm_lift']
-    fa   = ta.get('factor_sep', float('nan'))
-    fa_valid = not (isinstance(fa, float) and fa != fa)
-
-    if last['fdfv3']:
-        parts.append(
-            f"Factor+DFV V3 active: {dist*100:.1f}% below 252d high, above 200d MA, "
-            f"DFV floor lift {lift:.1f}pts. Strongest entry signal (4/4 horizons).")
-    elif last['f'] and last['dfv1']:
-        parts.append(
-            f"Factor gate + DFV V1: value zone ({dist*100:.1f}% below 252d high) "
-            f"with hot money RSI turning up from floor.")
-    elif last['f']:
-        parts.append(
-            f"In factor value zone: {dist*100:.1f}% below 252d high, "
-            f"{trend*100:.1f}% above 200d MA. "
-            f"Waiting for DFV trigger (lift {lift:.1f}, need >{DFV_LIFT}).")
-    elif last['pfd']:
-        parts.append("PFD signal: price compressed vs own trend.")
-
-    if last['triple'] and not last['f']:
-        parts.append("Caution: up >20% in 63 days — mean reversion risk short-term.")
-    if last['banker_weak']:
-        parts.append("Banker Weak: RSI47 institutional signal dropping from max.")
-    if last['rbear']:
-        parts.append("RSI14 bearish divergence vs price.")
-    if fa_valid and abs(fa) > 0.03:
-        direction = "outperformed" if fa > 0 else "underperformed"
-        parts.append(f"Own-ticker historical alpha: {direction} VOO by {abs(fa*100):.1f}% at 252d.")
+    trend = float(last['trend']); dist = float(last['dist']); q = float(last['quality']) if last['quality'] == last['quality'] else 0.0
+    side = 'above' if trend >= 0 else 'below'
+    facts = f"{abs(dist)*100:.0f}% below the 252d high, {abs(trend)*100:.1f}% {side} the 200d MA, 12m return/vol {q*3:.1f}"
+    if last['gate']:
+        parts.append(("Deep dip" if last['deepdip'] else "Dip") + f" in a strong stock: {facts}. All three buy conditions are met.")
+    elif last['near']:
+        missing = []
+        if not last['dip']:  missing.append(f"dip is not yet {abs(DIST_T)*100:.0f}%")
+        if not last['up']:   missing.append(f"price is not {UP_TREND_T*100:.0f}%+ above the 200d MA")
+        if not last['qual']: missing.append(f"12m return/vol is below {QUALITY_T*3:.1f}")
+        parts.append(f"Not a buy: {facts}. Missing: {'; '.join(missing)}.")
+    else:
+        parts.append(f"No dip: {facts}. The score needs a 20%+ drop from the high in a stock that is still strong.")
     if fs:
-        verdict = "Strong keeper." if fs >= 85 else "Monitor." if fs >= 70 else "Sell candidate on framework."
+        verdict = {"Core": "Core holding.", "Good": "Good business; monitor."}.get(framework_scorer.band_of(fs), "Below the framework minimum for a buy.")
         parts.append(f"Framework: {fs}/100. {verdict}")
-
-    return " ".join(parts) if parts else "No active signal. Monitoring."
+    return " ".join(parts)
 
 # ── SCORE + BUILD PAYLOAD ─────────────────────────────────────────────
 def update_weekly_signal_log(payload):
@@ -631,8 +680,6 @@ def update_weekly_signal_log(payload):
         was_sell  = entry.get('signal_type') == 'SELL'
         cur_score = cur.get('buy_score', 0)
         cur_sell  = cur.get('sell_score', 0)
-        cur_dist  = cur.get('dist_252h', 0)
-        cur_fdfv3 = cur.get('fdfv3', False)
         cur_sig   = cur.get('signal', '')
 
         if was_buy:
@@ -641,25 +688,17 @@ def update_weekly_signal_log(payload):
                 entry['current_price'] = cur.get('price')
                 # stays active
             elif cur_score < entry.get('score', 80) - 10:
-                # Score dropped significantly
-                if cur_dist and cur_dist > -0.20:
-                    entry['status']       = 'expired'
-                    entry['expired_at']   = now.strftime('%Y-%m-%d %H:%M')
-                    entry['expire_reason'] = 'price_recovered'
-                    entry['expire_detail'] = f'dist now {cur_dist:+.1f}% — gate closed'
-                elif not cur_fdfv3:
-                    entry['status']       = 'expired'
-                    entry['expired_at']   = now.strftime('%Y-%m-%d %H:%M')
-                    entry['expire_reason'] = 'dfv3_faded'
-                    entry['expire_detail'] = f'DFV V3 lift dropped · score {cur_score}'
-                elif cur.get('banker_weak') or cur.get('rbear'):
-                    entry['status']       = 'expired'
-                    entry['expired_at']   = now.strftime('%Y-%m-%d %H:%M')
-                    entry['expire_reason'] = 'penalty_active'
-                    entry['expire_detail'] = 'Banker Weak or RBear penalty overriding'
+                # Score dropped materially — say which part of the setup went away.
+                if not cur.get('trend_up', True):
+                    reason, detail = 'trend_broken', 'closed below the 200d MA'
+                elif not cur.get('dip', False):
+                    reason, detail = 'dip_recovered', f'back within {abs(DIST_T)*100:.0f}% of the 252d high · score {cur_score}'
                 else:
-                    entry['current_score'] = cur_score
-                    entry['current_price'] = cur.get('price')
+                    reason, detail = 'score_dropped', f'score {cur_score}'
+                entry['status']        = 'expired'
+                entry['expired_at']    = now.strftime('%Y-%m-%d %H:%M')
+                entry['expire_reason'] = reason
+                entry['expire_detail'] = detail
             else:
                 entry['current_score'] = cur_score
                 entry['current_price'] = cur.get('price')
@@ -681,24 +720,31 @@ def update_weekly_signal_log(payload):
         buy_sc = s.get('buy_score', 0)
         sell_sc= s.get('sell_score', 0)
 
-        # Log BUY, WATCH (score ≥ 60), and SELL signals
-        is_notable_buy  = sig in ('BUY',) or (buy_sc >= 60 and s.get('fdfv3'))
-        is_notable_sell = sig == 'SELL' or sell_sc >= 65
+        # Log exactly what the dashboard labels: buy-side states and sell
+        # actions on held positions. Driven by `label`, never re-derived.
+        label = s.get('label') or display_label(s)
+        is_notable_buy  = label in (LABEL_STRONG_BUY, LABEL_BUY, LABEL_WATCH)
+        is_notable_sell = label in ('EXIT', 'REDUCE')
 
         if not (is_notable_buy or is_notable_sell):
             continue
         if t in logged_today:
             continue
-        # Don't re-log if already active from a previous day
+        # Don't re-log while an entry on the same side is still active.
+        # (Entries are stored as BUY/WATCH/SELL, so compare by side — comparing
+        # 'WATCH' to 'BUY' never matched and re-logged the ticker every run.)
+        side_types = ('BUY', 'WATCH') if is_notable_buy else ('SELL',)
         already_active = any(e['ticker'] == t and e.get('status') == 'active'
-                             and e.get('signal_type') == ('BUY' if is_notable_buy else 'SELL')
+                             and e.get('signal_type') in side_types
                              for e in entries)
         if already_active:
             continue
 
         entry = {
             'ticker':        t,
-            'signal_type':   'BUY' if sig == 'BUY' else 'WATCH' if is_notable_buy else 'SELL',
+            'signal_type':   ('BUY' if label in (LABEL_STRONG_BUY, LABEL_BUY)
+                              else 'WATCH' if is_notable_buy else 'SELL'),
+            'label':         label,
             'score':         buy_sc if is_notable_buy else sell_sc,
             'sell_score':    sell_sc,
             'timestamp':     now.strftime('%Y-%m-%d %H:%M'),
@@ -729,8 +775,9 @@ def update_weekly_signal_log(payload):
 
 def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, volumes,
                   sell_market, sell_sectors, failed_tickers=None):
-    signals_list = []; buy_ideas = []; sell_guidance = []
+    signals_list = []
     if failed_tickers is None: failed_tickers = {}
+    refresh_framework_scores(closes)   # valuation axis at today's prices
 
     # Load weekly alternative data signals
     insider_signals = load_insider_signals()
@@ -761,14 +808,7 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         # - DFV V3 full weight +25pts (DSR 8.84, ann 38.5% — do not demote)
         # - PFD reduced +20 → +8pts (valid but weaker: DSR 33.5, ann 11.3%)
         # - Triple unchanged +10pts
-        buy = 0
-        if last['f']:      buy += 40
-        if last['fdfv3']:  buy += 25   # DFV V3 — full weight, CPCV validated
-        if last['pfd']:    buy += 8    # PFD — reduced from 20, still valid
-        if last['triple']: buy += 10
-        if last['dfv3'] and not last['f']: buy += 5
-        if last['banker_weak']: buy -= 20
-        if last['rbear']:       buy -= 10
+        buy = technical_buy_score(last)
 
         # ── INSIDER / POLITICIAN BOOST ────────────────────────────────
         ins_data        = insider_signals.get(t, {})
@@ -778,15 +818,11 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         insider_cluster = ins_data.get('insider_cluster', False)
         pol_cluster     = ins_data.get('politician_cluster', False)
         reporting_lag   = ins_data.get('reporting_lag_days', None)
-        if insider_boost > 0:
-            buy += insider_boost
 
         # ── PEAD BOOST ────────────────────────────────────────────────
         pead_data  = pead_signals.get(t, {})
         pead_boost = pead_data.get('buy_score_boost', 0)
         pead_sue   = pead_data.get('sue', None)
-        if pead_boost > 0:
-            buy += pead_boost
 
         # ── SECTOR SENTIMENT BOOST ────────────────────────────────────
         # Uses the four-condition hierarchy from fetch_sector_signals():
@@ -804,13 +840,20 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
                 break
             elif sector_data.get('trend_ok') and sector_data.get('macro_ok'):
                 sector_buy_boost = max(sector_buy_boost, 3)  # trend only — mild
-        if sector_buy_boost > 0:
-            buy += sector_buy_boost
+        # Overlays can lift a score within its band but never across a label
+        # boundary: without the gate the score stops at 79 (WATCH), without at
+        # least a 15% dip at 59 (HOLD). Score and label can then never disagree.
+        ceiling = 100 if last['gate'] else (BUY_T - 1 if last['near'] else WATCH_T - 1)
+        insider_boost, pead_boost, sector_buy_boost = cap_overlays(
+            insider_boost, pead_boost, sector_buy_boost, cap=max(0, min(OVERLAY_CAP, ceiling - buy)))
+        buy += insider_boost + pead_boost + sector_buy_boost
 
         buy = max(0, min(100, buy))
 
         # ── SELL SCORE ────────────────────────────────────────────────
-        sell_score = 0; sell_action = 'HOLD'
+        # sell_score_raw must be reset per ticker: it used to be assigned only
+        # on success, so a failed ticker silently inherited the previous one's.
+        sell_score = 0; sell_score_raw = 0; sell_action = 'HOLD'
         sell_flags = '—'; sell_caution = '—'; sell_sigs_data = {}
 
         if SELL_SCORER_AVAILABLE:
@@ -829,12 +872,10 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
                 sell_caution = f'err:{str(sell_err)[:40]}'
 
         # ── SIGNAL CLASSIFICATION ─────────────────────────────────────
-        fw_blocks_buy = fs is not None and fs < 70  # raised FW minimum from 55 to 70
-        if sell_score >= EXIT_T and is_holding: signal = 'SELL'
-        elif buy >= 80 and fw_blocks_buy:    signal = 'WEAK_BUY'
-        elif buy >= 80:                      signal = 'BUY'
-        elif buy >= 60:                      signal = 'WATCH'   # factor zone but not full conviction
-        else:                                signal = 'HOLD'
+        # Buy-side state only. SELL and the final display `label` are assigned
+        # in finalize_signals() AFTER the sell/buy caps, so a capped signal can
+        # never be shown as live on one surface and capped on another.
+        signal = classify_buy(buy, bool(last['gate']), bool(last['near']), fs, FW_MIN_BUY)
 
         guidance = build_guidance(t, last, ta, fs)
 
@@ -856,6 +897,7 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
             'sell_weekly_rsi': sell_sigs_data.get('weekly_rsi'),
             'near_high':       sell_sigs_data.get('near_high', False),
             'sell_atr_dist':   sell_sigs_data.get('sma_atr_dist'),
+            'sell_ceiling':    sell_ceiling(fs),   # strongest action this FW score can ever reach
             'is_holding':      is_holding,
             'dist_252h':       round(float(last['dist'])*100, 1),
             'vs_200ma':        round(float(last['trend'])*100, 1),
@@ -866,8 +908,23 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
             'pfd':             bool(last['pfd']),
             'triple':          bool(last['triple']),
             'banker_weak':     bool(last['banker_weak']),
+            'rbear':           bool(last['rbear']),
+            'gate':            bool(last['gate']),
+            'trend_up':        bool(last['up']),
+            'strong_run':      bool(last['qual']),
+            'dip':             bool(last['dip']),
+            'dip_near':        bool(last['near']),
+            'trend_near':      bool(last['upc']),
+            'run_near':        bool(last['qualc']),
+            'deep_dip':        bool(last['deepdip']),
+            'run_12m':         None if last['quality'] != last['quality'] else round(float(last['quality']) * 3, 2),
+            'rsi14':           round(float(last['rsi14']), 1),
+            'buy_score_v2':    technical_buy_score_v2(last),
             'factor_sep':      None if not fa_valid else round(float(fa)*100, 1),
             'framework_score': fs,
+            'fw_min_buy':      FW_MIN_BUY,
+            'framework':       framework_row(t),
+            'buy_breakdown':   buy_breakdown(last, insider_boost, pead_boost, sector_buy_boost),
             # Insider & politician signals
             'insider_boost':     insider_boost,
             'insider_score':     insider_score,
@@ -885,11 +942,13 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         }
 
         signals_list.append(row)
-        if signal == 'BUY' or buy >= 30:                         buy_ideas.append(row)
-        if signal == 'SELL' or (sell_score >= 40 and is_holding): sell_guidance.append(row)
 
     # ── Add Thai fund rows using proxy signal data ───────────────────
     for fund, proxy in TICKER_PROXY_MAP.items():
+        # Only funds still held. Closed funds (all KT_*) used to be emitted
+        # with is_holding=True, which showed sold positions as HELD and
+        # inflated the held count that sizes the sell cap.
+        if fund not in MY_HOLDINGS: continue
         if proxy not in all_signals: continue
         sig = all_signals[proxy]
         if len(sig) == 0: continue
@@ -901,14 +960,13 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         fs   = FRAMEWORK_SCORES.get(fund)
         price  = round(float(last['close']), 2)
 
-        buy = 0
-        if last['f']:      buy += 40
-        if last['fdfv3']:  buy += 25
-        if last['pfd']:    buy += 20
-        if last['triple']: buy += 10
-        if last['dfv3'] and not last['f']: buy += 5
-        if last['banker_weak']: buy -= 20
-        buy = max(0, min(100, buy))
+        # Same technical score as direct tickers. This block had drifted:
+        # PFD was still +20 (direct: +8) and the RBear -10 penalty was missing,
+        # so a fund and its own proxy ETF could show different scores.
+        buy = max(0, min(100, technical_buy_score(last)))
+        no_signal = fund in NO_SIGNAL_FUNDS
+        if no_signal:
+            buy = 0
 
         sell_score = 0; sell_action = 'HOLD'; sell_flags = '—'; sell_caution = '—'
         sell_score_raw = 0
@@ -918,18 +976,15 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         # Sell scoring is skipped for all proxy-mapped funds.
         sell_caution = 'proxy_fund — sell scoring disabled'
 
-        fw_blocks_buy2 = fs is not None and fs < 55
-        if sell_score >= EXIT_T: signal = 'SELL'
-        elif buy >= 80 and fw_blocks_buy2: signal = 'WEAK_BUY'
-        elif buy >= 80:                    signal = 'BUY'
-        elif buy >= 60:                    signal = 'WATCH'
-        else:                              signal = 'HOLD'
+        signal = classify_buy(buy, bool(last['gate']), bool(last['near']), fs, FUND_FW_MIN_BUY)
 
         guidance = build_guidance(proxy, last, ta, fs)
+        guidance = (f"No signal: {proxy} is a placeholder, not a valid proxy for this fund."
+                    if no_signal else f"[via {proxy}] {guidance}")
 
         row = {
             'ticker': fund, 'price': price, 'change_pct': 0.0,
-            'signal': signal, 'guidance': f"[via {proxy}] {guidance}",
+            'signal': signal, 'guidance': guidance,
             'buy_score': buy, 'sell_score': sell_score,
             'sell_score_raw': sell_score_raw,
             'sell_action': sell_action, 'sell_flags': sell_flags,
@@ -947,12 +1002,32 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
             'factor': bool(last['f']), 'dfv3': bool(last['dfv3']),
             'fdfv3': bool(last['fdfv3']), 'pfd': bool(last['pfd']),
             'triple': bool(last['triple']), 'banker_weak': bool(last['banker_weak']),
+            'rbear': bool(last['rbear']),
+            'gate':            bool(last['gate']),
+            'trend_up':        bool(last['up']),
+            'strong_run':      bool(last['qual']),
+            'dip':             bool(last['dip']),
+            'dip_near':        bool(last['near']),
+            'trend_near':      bool(last['upc']),
+            'run_near':        bool(last['qualc']),
+            'deep_dip':        bool(last['deepdip']),
+            'run_12m':         None if last['quality'] != last['quality'] else round(float(last['quality']) * 3, 2),
+            'rsi14':           round(float(last['rsi14']), 1),
+            'buy_score_v2':    technical_buy_score_v2(last),
             'factor_sep': None if not fa_valid else round(float(fa)*100, 1),
             'framework_score': fs,
+            'fw_min_buy': FUND_FW_MIN_BUY,
+            'framework': framework_row(fund),
+            'buy_breakdown': [] if no_signal else buy_breakdown(last, 0, 0, 0),
+            'sell_ceiling': 'HOLD',   # sell scoring is disabled for proxy funds
         }
+        if no_signal:
+            row.update(factor=False, dfv3=False, fdfv3=False, pfd=False,
+                       triple=False, banker_weak=False, rbear=False,
+                       gate=False, trend_up=False, strong_run=False, dip=False,
+                       dip_near=False, trend_near=False, run_near=False,
+                       deep_dip=False, buy_score_v2=0)
         signals_list.append(row)
-        if signal == 'BUY' or buy >= 30:                          buy_ideas.append(row)
-        if signal == 'SELL' or (sell_score >= 40):                sell_guidance.append(row)
 
     # ── Add stub rows for failed tickers so they appear in Rankings ──
     for t, reason in (failed_tickers or {}).items():
@@ -965,6 +1040,7 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
             'guidance':        f'Data unavailable: {reason}',
             'buy_score':       0,
             'sell_score':      0,
+            'sell_score_raw':  0,
             'sell_action':     'HOLD',
             'sell_flags':      '—',
             'sell_caution':    reason,
@@ -981,6 +1057,7 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
             'banker_weak':     False,
             'factor_sep':      None,
             'framework_score': FRAMEWORK_SCORES.get(t),
+            'framework': framework_row(t),
         })
 
     signals_list.sort(key=lambda x: -x['buy_score'])
@@ -1012,10 +1089,16 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         regular_cap = max(1, regular_cap - 1)
         print(f'Macro filter: SPY below 200d SMA — buy caps tightened to {strong_cap}/{regular_cap}')
 
+    # A held position with a live sell action (after the sell cap) is a sell,
+    # not a buy: EXIT becomes signal=SELL, and none of them use a buy slot.
+    for row in signals_list:
+        if row.get('is_holding') and row.get('sell_action') == 'EXIT':
+            row['signal'] = 'SELL'
+
     strong_buy_count = 0; regular_buy_count = 0
     for row in signals_list:
-        if row['signal'] == 'BUY':
-            if row.get('fdfv3') and row['buy_score'] >= 95:
+        if row['signal'] == 'BUY' and not (row.get('is_holding') and row.get('sell_action') in SELL_LABELS):
+            if row.get('gate') and row['buy_score'] >= STRONG_T:
                 if strong_buy_count >= strong_cap:
                     row['signal'] = 'WATCH'; row['buy_capped'] = True
                 else:
@@ -1027,8 +1110,21 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
                     row['signal_tier'] = 'BUY'; regular_buy_count += 1
 
     print(f"VIX z={vix_z:.1f} → buy cap: {strong_buy_count}/{strong_cap} strong + {regular_buy_count}/{regular_cap} regular | CNN {cnn:.0f} → sell cap: {sell_cap}")
-    buy_ideas.sort(key=lambda x: -x['buy_score'])
-    sell_guidance.sort(key=lambda x: -x['sell_score'])
+
+    # ── FINAL LABEL — computed once, after every cap ──────────────────
+    for row in signals_list:
+        row['label'] = display_label(row)
+
+    def n_label(*labels):
+        return sum(1 for r in signals_list if r['label'] in labels)
+
+    buy_ideas = sorted(
+        [r for r in signals_list
+         if r['label'] in (LABEL_STRONG_BUY, LABEL_BUY, LABEL_FW_BLOCKED, LABEL_WATCH)],
+        key=lambda x: -x['buy_score'])
+    sell_guidance = sorted(
+        [r for r in signals_list if r['label'] in SELL_LABELS],
+        key=lambda x: -x['sell_score'])
 
     return {
         'generated_at':  datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'),
@@ -1037,29 +1133,60 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         'market': {
             'cnn_score':       sell_market.get('cnn_score', 50),
             'cnn_label':       sell_market.get('cnn_label', 'Neutral'),
+            'cnn_ok':          bool(sell_market.get('cnn_ok', False)),   # False = default 50, fetch failed
+            'vix_ok':          bool(sell_market.get('vix_ok', False)),
             'vix_current':     sell_market.get('vix_current', 20.0),
             'vix_zscore':      sell_market.get('vix_zscore', 0.0),
             'vix_label':       sell_market.get('vix_label', 'Neutral'),
             'sp500_extended':  sell_market.get('sp500_extended', False),
             'buffett_extended':sell_market.get('buffett_extended', False),
+            'macro_ok':        macro_ok,          # SPY above its 200d SMA
             'strong_cap':      strong_cap,
             'regular_cap':     regular_cap,
             'sell_cap':        sell_cap,
         },
+        # Every surface reads thresholds from here — no hard-coded copies.
+        'schema_version': 3,
+        'model_version': MODEL_VERSION,
+        'framework': (lambda rows, fa: {
+            'fundamentals_as_of': fa,
+            'axes': framework_scorer.AXES,
+            'bands': [list(b) for b in framework_scorer.BANDS],
+            'stale_days': framework_scorer.STALE_DAYS,
+            'scored': len(rows),
+            'with_data': sum(1 for r in rows if 'data' in r['framework']['sources'].values()),
+            'provisional': sum(1 for r in rows if r['framework']['provisional']),
+            'moat_needs_review': sum(1 for r in rows if r['framework']['moat_stale'] and r['framework']['sources']['moat'] != 'legacy'),
+            'moat_never_judged': sum(1 for r in rows if r['framework']['sources']['moat'] == 'legacy'),
+        })([r for r in signals_list if r.get('framework')], framework_scorer.load_fundamentals()[1]),
+        'thresholds': {
+            'buy': BUY_T, 'watch': WATCH_T, 'strong': STRONG_T,
+            'fw_min_buy': FW_MIN_BUY, 'fund_fw_min_buy': FUND_FW_MIN_BUY,
+            'trim': TRIM_T, 'reduce': REDUCE_T, 'exit': EXIT_T,
+        },
+        # All counts are counts of `label` — the same thing each row displays.
         'summary': {
-            'strong_buy':  sum(1 for s in signals_list if s['fdfv3']),
-            'buy':         sum(1 for s in signals_list if s['signal']=='BUY'),  # score>=80, FW>=70
-            'strong_buy':  sum(1 for s in signals_list if s['signal']=='BUY' and s.get('signal_tier')=='STRONG'),
-            'watch':       sum(1 for s in signals_list if s['signal']=='WATCH' and s['buy_score']>=60),
-            'weak_buy':    sum(1 for s in signals_list if s['signal']=='WEAK_BUY'),
-            'sell':        sum(1 for s in signals_list if s['signal']=='SELL'),
-            'factor_zone': sum(1 for s in signals_list if s['factor']),
+            'strong_buy':  n_label(LABEL_STRONG_BUY),
+            'buy':         n_label(LABEL_BUY),
+            'buy_total':   n_label(LABEL_STRONG_BUY, LABEL_BUY),
+            'watch':       n_label(LABEL_WATCH),
+            'weak_buy':    n_label(LABEL_FW_BLOCKED),
+            'exit':        n_label('EXIT'),
+            'reduce':      n_label('REDUCE'),
+            'trim':        n_label('TRIM'),
+            'sell_flags':  n_label(*SELL_LABELS),   # held positions with a live sell action
+            'sell':        n_label('EXIT'),
+            'gates':       sum(1 for s in signals_list if s.get('gate')),
+            'dips':        sum(1 for s in signals_list if s.get('dip')),
+            'factor_zone': sum(1 for s in signals_list if s['factor']),   # v2, reference only
+            'fdfv3':       sum(1 for s in signals_list if s['fdfv3']),
             'banker_weak': sum(1 for s in signals_list if s['banker_weak']),
+            'held':        n_held,
         },
         'analytics': {
             'signals':       signals_list,
-            'buy_ideas':     buy_ideas[:20],
-            'sell_guidance': sell_guidance[:15],
+            'buy_ideas':     buy_ideas,
+            'sell_guidance': sell_guidance,
         },
         'failed_tickers': failed_tickers,
         'failed_count':   len(failed_tickers),
@@ -1143,7 +1270,10 @@ def main():
     prices_out = {
         'timestamp':   datetime.now().strftime('%Y-%m-%d %H:%M UTC'),
         'run_date':    payload.get('run_date', ''),
-        'prices':      {t: {'price': v.get('price'), 'change_pct': v.get('change_pct')}
+        # fetch_live_prices() stores the day move under 'change'. Reading
+        # 'change_pct' here wrote null for every ticker, so the dashboard
+        # showed +0.00% whenever prices came from this file.
+        'prices':      {t: {'price': v.get('price'), 'change_pct': v.get('change')}
                         for t, v in live_prices.items() if v.get('price')},
     }
     with open('live_prices.json', 'w') as f:
@@ -1156,13 +1286,23 @@ def main():
     # with freshness status (still active vs expired + reason).
     update_weekly_signal_log(payload)
 
+    # ── Live out-of-sample ledger ────────────────────────────────────
+    # Every label the model issues is recorded with its date and price, then
+    # scored against the average stock in the same universe at 21/63/126/252
+    # trading days. This is the only evidence that cannot be contaminated by
+    # hindsight: the universe and the rule are both fixed before the outcome.
+    try:
+        from signal_ledger import update_ledger
+        update_ledger(payload, closes, list(all_signals.keys()))
+    except Exception as e:
+        print(f'signal ledger not updated: {str(e)[:120]}')
+
     print(f'Written: {out} ({os.path.getsize(out):,} bytes)')
     print(f"Summary: {payload['summary']}")
-    print(f"Sell signals: {sum(1 for s in payload['analytics']['signals'] if s.get('sell_action') not in ['HOLD','—'])}")
-
-    for b in payload['analytics']['buy_ideas'][:5]:
-        star = '★' if b['fdfv3'] else '↑' if b['factor'] else '·'
-        print(f"  {star} {b['ticker']:<8} buy={b['buy_score']} {'(held)' if b['is_holding'] else ''}")
+    for b in payload['analytics']['buy_ideas'][:8]:
+        print(f"  {b['label']:<11} {b['ticker']:<8} buy={b['buy_score']} {'(held)' if b['is_holding'] else ''}")
+    for b in payload['analytics']['sell_guidance'][:8]:
+        print(f"  {b['label']:<11} {b['ticker']:<8} sell={b['sell_score']} (held)")
 
 if __name__ == '__main__':
     main()

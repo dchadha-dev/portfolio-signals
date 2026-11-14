@@ -829,7 +829,7 @@ body .amt { transition: filter 0.18s ease; }
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
       <button class="refresh-btn" id="anaBtn" onclick="runAnalytics()" style="background:var(--text);color:var(--white);margin:0;">
         <div class="spinner" id="anaSpinner"></div>
-        <span id="anaLabel">Run Live Analysis</span>
+        <span id="anaLabel">Reload Signals</span>
       </button>
       <div style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;" id="anaUpdated"></div>
     </div>
@@ -840,19 +840,19 @@ body .amt { transition: filter 0.18s ease; }
       <div class="sub-tab" onclick="switchAnalytics('signals',this)">&#9889; Signals</div>
     </div>
     <div id="ana-buy" class="ana-panel active">
-      <div id="buyContent"><div class="placeholder">Signals auto-load from GitHub. Click "Run Live Analysis" for AI-enhanced analysis.</div></div>
+      <div id="buyContent"><div class="placeholder">Signals auto-load from GitHub. Click "Reload Signals" to refresh.</div></div>
     </div>
     <div id="ana-sell" class="ana-panel">
-      <div id="sellContent"><div class="placeholder">Sell guidance loads automatically. Click "Run Live Analysis" to refresh.</div></div>
+      <div id="sellContent"><div class="placeholder">Sell guidance loads automatically. Click "Reload Signals" to refresh.</div></div>
     </div>
     <div id="ana-signals" class="ana-panel">
-      <div id="signalsContent"><div class="placeholder">Click "Run Live Analysis" to generate signals based on current prices.</div></div>
+      <div id="signalsContent"><div class="placeholder">Signals load automatically from the scanner.</div></div>
     </div>
   </div>
 
   <!-- ── TAB: Rankings ─────────────────────────────────────────── -->
   <div class="tab-panel" id="tab-rankings">
-    <div id="rankContent"><div class="placeholder">Switch to this tab after running Live Analysis to see full ranked universe.</div></div>
+    <div id="rankContent"><div class="placeholder">Loading ranked universe…</div></div>
   </div>
 
   <!-- ── TAB: Tools ────────────────────────────────────────────── -->
@@ -2072,7 +2072,13 @@ async function loadPineScript() {
   if (el.dataset.loaded) return;
 
   const pine = `//@version=5
-indicator("Portfolio Signal Model v2", overlay=true, max_labels_count=500)
+indicator("Portfolio Signal Model v3", overlay=true, max_labels_count=500)
+
+// TECHNICAL SCORE ONLY. The dashboard label also uses inputs a chart cannot see:
+// framework score gate, insider/PEAD/sector boosts, VIX multiplier and the daily
+// buy/sell caps. A chart label is therefore "technically qualifies", and the
+// dashboard is the final word. Enter the framework score below to apply the
+// same FW gate and sell damping the scanner uses.
 
 // -- INPUTS --
 dist_t     = input.float(-0.20, "Factor DIST_T",      step=0.01)
@@ -2080,6 +2086,8 @@ dfv_lift   = input.float(2.5,   "DFV Lift Threshold", step=0.5)
 quality_t  = input.float(0.20,  "Quality Threshold",  step=0.05)
 atr_thresh = input.float(2.0,   "ATR Ext Threshold",  step=0.5)
 buy_thresh = input.int(80,      "BUY threshold",      minval=60, maxval=100)
+fw_score   = input.int(0,       "Framework score (0 = not set)", minval=0, maxval=100)
+fw_min     = input.int(70,      "Framework minimum for BUY",     minval=0, maxval=100)
 show_buy   = input.bool(true,   "Show Buy Signals")
 show_sell  = input.bool(true,   "Show Sell Signals")
 show_zones = input.bool(true,   "Show Background Zones")
@@ -2087,8 +2095,8 @@ show_zones = input.bool(true,   "Show Background Zones")
 // -- RSI HELPER --
 rsi_val(src, len) =>
     _d = ta.change(src)
-    _g = ta.ema(math.max(_d, 0), len)
-    _l = ta.ema(math.max(-_d, 0), len)
+    _g = ta.rma(math.max(_d, 0), len)
+    _l = ta.rma(math.max(-_d, 0), len)
     100 - 100 / (1 + _g / _l)
 
 rsi14 = rsi_val(close, 14)
@@ -2107,78 +2115,83 @@ banker_prev = banker_rsi[1]
 banker_weak = banker_prev >= 20 and banker_rsi < 20
 
 // -- RBEAR --
-rsi_above = math.max(rsi14 - 60, 0)
+rsi_above = ta.ema(math.max(rsi14 - 60, 0), 3)
 rsi_pk    = ta.highest(rsi_above, 20)[1]
 price_pk  = ta.highest(close, 20)[1]
 rbear     = close > price_pk * 1.01 and rsi_above < rsi_pk * 0.85 and rsi_above > 0
 
 // -- FACTOR GATE --
-high252     = ta.highest(high, 252)[1]
+high252     = ta.highest(close, 252)[1]
 dist        = (close - high252) / high252
 ma200       = ta.sma(close, 200)
 trend       = (close - ma200) / ma200
 log_ret     = math.log(close / close[1])
+pct_ret     = close / close[1] - 1
 ret252      = (close - close[252]) / close[252]
-vol252      = ta.stdev(log_ret, 252) * math.sqrt(252)
+vol252      = ta.stdev(pct_ret, 252) * math.sqrt(252)
 quality     = vol252 > 0 ? math.max(math.min(ret252 / vol252 / 3, 1), 0) : 0
 factor_gate = dist < dist_t and trend > 0 and quality > quality_t
 
-// -- BUY SIGNALS --
-fdfv3  = factor_gate and dfv3
-ret126 = (close - close[126]) / close[126]
-pfd    = (ret252 - 2 * ret126) > 0.05 and quality > quality_t * 2
-triple = (close - close[63]) / close[63] > 0.20
+// -- BUY SCORE v3: dip in a strong stock (same formula as signal_scanner.py) --
+up_trend  = trend > 0.05
+strong    = quality > quality_t
+dip       = dist < dist_t
+near      = dist < -0.15
+buy_gate  = dip and up_trend and strong
+deep      = buy_gate and dist < -0.25
 
-// -- BUY SCORE (single expression — avoids line continuation error) --
 var float buy_score = 0
-buy_score := math.max(0, math.min(100, (factor_gate ? 40 : 0) + (fdfv3 ? 25 : 0) + (pfd ? 8 : 0) + (triple ? 10 : 0) + (dfv3 and not factor_gate ? 5 : 0) + (banker_weak ? -20 : 0) + (rbear ? -10 : 0)))
+buy_score := (strong ? 25 : quality > 0.10 ? 15 : 0) + (up_trend ? 25 : trend > -0.05 ? 15 : 0) + (dip ? 30 : near ? 15 : 0) + (deep ? 10 : 0)
 
-// -- SELL SIGNALS --
-near_high = dist > -0.10
+// -- SELL SIGNALS (continuous, same curves as sell_side_scorer.py) --
+near_zone = dist > -0.10
+near_high = dist > -0.05
 tr_val    = math.max(high - low, math.abs(high - close[1]), math.abs(low - close[1]))
 atr14     = ta.sma(tr_val, 14)
 sma_atr   = atr14 > 0 ? (close - ma200) / atr14 : 0
-atr_ext   = sma_atr > atr_thresh
 hl_range  = high - low
 mfm       = hl_range > 0 ? ((close - low) - (high - close)) / hl_range : 0
 cmf20     = ta.sma(mfm * volume, 20) / ta.sma(volume, 20)
-cmf_dist  = cmf20 < 0 and near_high
 rv20      = ta.stdev(log_ret, 20) * math.sqrt(252)
-rv_mean   = ta.sma(rv20, 252)
-rv_std    = ta.stdev(rv20, 252)
+rv_mean   = ta.sma(rv20, 756)
+rv_std    = ta.stdev(rv20, 756)
 rv_z      = rv_std > 0 ? (rv20 - rv_mean) / rv_std : 0
-rv_z2     = rv_z > 1.0
 
-// -- SELL SCORE (single expression) --
-near_high_pts = near_high ? math.round(math.min(35.0, (1.0 + dist / 0.10) * 35.0)) : 0
+near_pts = near_zone ? math.min(35.0, math.max(0.0, (1.0 + dist / 0.10) * 35.0)) : 0.0
+cmf_pts  = near_high and cmf20 < 0 ? math.min(30.0, math.abs(cmf20) * 30.0) : 0.0
+atr_pts  = near_high and sma_atr > atr_thresh ? math.min(20.0, (sma_atr - atr_thresh) / 3.0 * 20.0) : 0.0
+rv_pts   = rv_z > 1.0 ? math.min(10.0, (rv_z - 1.0) / 2.0 * 10.0) : 0.0
+fw_damp  = fw_score > 0 ? 1.0 - 0.5 * math.pow(fw_score / 100.0, 1.5) : 1.0
+
 var float sell_score = 0
-sell_score := math.max(0, math.min(100, float(near_high_pts) + (cmf_dist ? 30.0 : 0.0) + (atr_ext ? 20.0 : 0.0) + (rv_z2 ? 10.0 : 0.0)))
+sell_score := math.round(math.min(100.0, near_pts + cmf_pts + atr_pts + rv_pts) * fw_damp)
 
 // -- CONDITIONS --
-strong_buy  = fdfv3 and buy_score >= buy_thresh
-factor_only = factor_gate and not dfv3 and buy_score >= 40
-pfd_signal  = pfd and not factor_gate
+fw_ok       = fw_score == 0 or fw_score >= fw_min
+buy_sig     = buy_gate and buy_score >= buy_thresh and fw_ok
+fw_blocked  = buy_gate and buy_score >= buy_thresh and not fw_ok
+watch_sig   = near and not buy_gate and buy_score >= 60
 sell_trim   = sell_score >= 52 and sell_score < 65
 sell_reduce = sell_score >= 65 and sell_score < 78
 sell_exit   = sell_score >= 78
 
 // -- BACKGROUNDS (must be global scope in Pine v5, not inside if block) --
-bgcolor(show_zones and factor_gate and not fdfv3 ? color.new(color.blue, 92) : na, title="Factor zone")
-bgcolor(show_zones and fdfv3 ? color.new(color.green, 88) : na, title="Factor+DFV V3")
+bgcolor(show_zones and near and not buy_gate ? color.new(color.blue, 94) : na, title="Dip, one condition short")
+bgcolor(show_zones and buy_gate ? color.new(color.green, 88) : na, title="Dip in a strong stock (gate)")
 bgcolor(show_zones and near_high ? color.new(color.red, 92) : na, title="Near 252d high")
 
 // -- REFERENCE LINES --
 plot(ma200,   "200d MA",   color=color.new(color.gray, 40),   linewidth=1)
 plot(high252, "252d High", color=color.new(color.orange, 50), style=plot.style_stepline, linewidth=1)
 
-// -- BUY LABELS --
+// -- BUY LABELS (same names as the dashboard) --
 if show_buy
-    if strong_buy
-        label.new(bar_index, low, "F+DFV3\\n" + str.tostring(buy_score), style=label.style_label_up, color=color.new(color.green, 0), textcolor=color.white, size=size.small)
-    else if factor_only
-        label.new(bar_index, low, "FACTOR\\n" + str.tostring(buy_score), style=label.style_label_up, color=color.new(color.teal, 20), textcolor=color.white, size=size.tiny)
-    else if pfd_signal
-        label.new(bar_index, low, "PFD\\n" + str.tostring(buy_score), style=label.style_label_up, color=color.new(color.blue, 20), textcolor=color.white, size=size.tiny)
+    if buy_sig
+        label.new(bar_index, low, "BUY\\n" + str.tostring(buy_score), style=label.style_label_up, color=color.new(color.green, 0), textcolor=color.white, size=size.small)
+    else if fw_blocked
+        label.new(bar_index, low, "FW BLOCKED\\n" + str.tostring(buy_score), style=label.style_label_up, color=color.new(color.orange, 20), textcolor=color.white, size=size.tiny)
+    else if watch_sig
+        label.new(bar_index, low, "WATCH\\n" + str.tostring(buy_score), style=label.style_label_up, color=color.new(color.teal, 20), textcolor=color.white, size=size.tiny)
 
 // -- SELL LABELS --
 if show_sell
@@ -2190,8 +2203,8 @@ if show_sell
         label.new(bar_index, high, "TRIM\\n" + str.tostring(sell_score), style=label.style_label_down, color=color.new(color.orange, 20), textcolor=color.white, size=size.tiny)
 
 // -- ALERTS --
-alertcondition(strong_buy,               "BUY: Factor+DFV V3",  "Factor+DFV V3 buy signal fired")
-alertcondition(factor_gate and not dfv3, "WATCH: Factor gate",   "Factor gate open, waiting for DFV V3")
+alertcondition(buy_sig,                  "BUY (technical)",     "Technical buy score at or above threshold — confirm on dashboard")
+alertcondition(watch_sig,                "WATCH: near setup",    "Two conditions met, third close, score 60-79")
 alertcondition(sell_exit,                "EXIT signal",          "Sell score >=78")
 alertcondition(sell_reduce,              "REDUCE signal",        "Sell score 65-77")
 alertcondition(sell_trim,                "TRIM signal",          "Sell score 52-64")
@@ -2201,20 +2214,17 @@ alertcondition(banker_weak,              "Banker Weak",          "Institutional 
   el.innerHTML = `<div style="padding:16px 0 40px">
     <h2 style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;margin:0 0 6px">Pine Script v5 — TradingView</h2>
     <p style="font-family:'Space Grotesk',sans-serif;font-size:12px;color:var(--text3);margin:0 0 16px">
-      Exact implementation of all validated buy and sell signals. Parameters match the daily scanner.
+      Technical buy and sell scores using the scanner's formulas and label names (BUY / WATCH / FW BLOCKED / TRIM / REDUCE / EXIT).
+      A chart cannot see insider, PEAD, sector, VIX or the daily caps, so the dashboard label is the final word. Set the framework score input to apply the FW gate and sell damping.
       <br>To use: Open TradingView → Pine Editor → paste → Add to chart.
     </p>
     <div style="background:var(--s2);border-radius:8px;padding:14px 16px;margin-bottom:16px;">
       <div style="font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;margin-bottom:10px;color:var(--text)">Signals included:</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;font-family:'DM Mono',monospace;">
-        <div style="color:var(--green)">★ Factor+DFV V3 BUY — +22.8% at 252d</div>
-        <div style="color:var(--red)">EXIT — near_high −15.8% at 252d</div>
-        <div style="color:#44dd99">↑ Factor Value — +23.7% at 252d</div>
-        <div style="color:var(--red)">REDUCE — CMF dist −9.1% at 252d</div>
-        <div style="color:var(--blue)">◆ PFD Buy — +5.1% at 252d</div>
-        <div style="color:var(--amber)">TRIM — SMA/ATR −13.4% at 252d</div>
-        <div style="color:var(--text3)">⚡ Triple — +9.1% at 252d</div>
-        <div style="color:var(--text3)">RV Z-score −1.4% at 30d (short)</div>
+        <div style="color:var(--green)">BUY — 20%+ dip in a strong stock still 5%+ above its 200d MA (score ≥80)</div>
+        <div style="color:var(--red)">EXIT / REDUCE / TRIM — continuous sell score</div>
+        <div style="color:#0891b2">WATCH — two conditions met, the third close (score 60–79)</div>
+        <div style="color:var(--amber)">FW BLOCKED — score qualifies, framework below minimum</div>
       </div>
     </div>
     <div style="position:relative">
@@ -2236,6 +2246,100 @@ function copyPine() {
 }
 
 
+// ── SIGNAL LABELS — one source of truth for every tab ─────────────────
+// The scanner computes `label` once, after all caps. Every tab prints that
+// label and nothing else. Do NOT re-derive buy/sell states from buy_score,
+// fdfv3 or sell_score inside a render function — that is what made the same
+// ticker read "STRONG BUY" on one tab and "WATCH" on another.
+const SELL_LABELS = ['EXIT', 'REDUCE', 'TRIM'];
+const BUY_LABELS  = ['STRONG BUY', 'BUY'];
+
+function sigLabel(s) {
+  if (s.label) return s.label;
+  // Fallback for payloads written before the scanner emitted `label`.
+  // Mirrors display_label() in signal_scanner.py exactly.
+  if (s.signal === 'NO_DATA') return 'NO DATA';
+  if (s.is_holding && SELL_LABELS.includes(s.sell_action)) return s.sell_action;
+  if (s.signal === 'BUY') return s.signal_tier === 'STRONG' ? 'STRONG BUY' : 'BUY';
+  if (s.signal === 'WEAK_BUY') return 'FW BLOCKED';
+  if (s.signal === 'WATCH') return 'WATCH';
+  return 'HOLD';
+}
+
+function sigThresholds(payload) {
+  return Object.assign({buy:80, watch:60, strong:95, fw_min_buy:70, fund_fw_min_buy:55,
+                        trim:52, reduce:65, exit:78}, (payload && payload.thresholds) || {});
+}
+
+const LABEL_STYLE = {
+  'STRONG BUY': { color:'var(--green)', solid:true,  bg:'rgba(22,163,74,0.12)', text:'★★ STRONG BUY' },
+  'BUY':        { color:'var(--green)', solid:false, bg:'rgba(22,163,74,0.06)', text:'BUY' },
+  'WATCH':      { color:'#0891b2',      solid:false, bg:'rgba(8,145,178,0.04)', text:'WATCH' },
+  'FW BLOCKED': { color:'var(--amber)', solid:false, bg:'rgba(217,119,6,0.06)', text:'FW BLOCKED' },
+  'TRIM':       { color:'#e67e22',      solid:true,  bg:'rgba(220,38,38,0.05)', text:'TRIM' },
+  'REDUCE':     { color:'#c0392b',      solid:true,  bg:'rgba(220,38,38,0.07)', text:'REDUCE' },
+  'EXIT':       { color:'#8b0000',      solid:true,  bg:'rgba(220,38,38,0.10)', text:'EXIT' },
+  'NO DATA':    { color:'var(--amber)', solid:false, bg:'rgba(217,119,6,0.10)', text:'⚠ NO DATA' },
+  'HOLD':       { color:'var(--text3)', solid:false, bg:'',                     text:'HOLD' },
+};
+
+function labelTitle(s, th) {
+  const l = sigLabel(s);
+  const fwMin = s.fw_min_buy || th.fw_min_buy;
+  if (l === 'STRONG BUY') return `Dip in a strong stock, plus a deep dip or insider/PEAD/sector support (score ≥${th.strong}), FW ≥${fwMin}, inside the buy cap`;
+  if (l === 'BUY')        return `20%+ below its high, 5%+ above the 200d MA, strong 12-month run (score ≥${th.buy}), FW ≥${fwMin}, inside the buy cap`;
+  if (l === 'FW BLOCKED') return `Buy score ≥${th.buy} but framework score is below ${fwMin} — not a buy`;
+  if (l === 'WATCH')      return s.buy_capped ? `Qualified as a buy but today's buy cap is full`
+                                              : `Two of the three buy conditions met and the third close (score ${th.watch}–${th.buy - 1})`;
+  if (l === 'TRIM')       return `Held · sell score ≥${th.trim}`;
+  if (l === 'REDUCE')     return `Held · sell score ≥${th.reduce}`;
+  if (l === 'EXIT')       return `Held · sell score ≥${th.exit}`;
+  if (l === 'NO DATA')    return s.data_error || 'No price data';
+  return 'No active signal';
+}
+
+function labelBadge(s, th, big) {
+  const l  = sigLabel(s);
+  const st = LABEL_STYLE[l] || LABEL_STYLE.HOLD;
+  const fs = big ? 12 : 10, pad = big ? '3px 10px' : '1px 6px';
+  const css = st.solid
+    ? `background:${st.color};color:#fff;padding:${pad};border-radius:3px`
+    : (l === 'HOLD' ? `color:${st.color}` : `color:${st.color};border:1px solid ${st.color};padding:${pad};border-radius:3px`);
+  return `<span data-sig-ticker="${s.ticker}" data-sig-label="${l}" style="${css};font-size:${fs}px;font-weight:700;white-space:nowrap" title="${labelTitle(s, th)}">${st.text}</span>`;
+}
+
+// Exact score breakdown from the scanner (sums to buy_score); falls back to
+// flags for payloads that predate `buy_breakdown`.
+function buyBreakdown(s) {
+  let parts = s.buy_breakdown;
+  if (!Array.isArray(parts)) {
+    parts = [];
+    if (s.trend_up !== undefined) {           // v3 payload without buy_breakdown
+      if (s.strong_run)      parts.push(['Strong 12m run', 25]);
+      else if (s.run_near)   parts.push(['Fair 12m run', 15]);
+      if (s.trend_up)        parts.push(['5%+ above 200d MA', 25]);
+      else if (s.trend_near) parts.push(['Within 5% of 200d MA', 15]);
+      if (s.dip)             parts.push(['Dip 20%+', 30]);
+      else if (s.dip_near)   parts.push(['Dip 15-20%', 15]);
+      if (s.deep_dip)      parts.push(['Deep dip 25%+', 10]);
+    } else {                                  // v2 payload (pre-November 2026)
+      if (s.factor) parts.push(['Factor', 40]);
+      if (s.fdfv3)  parts.push(['DFV V3', 25]);
+      if (s.pfd)    parts.push(['PFD', 8]);
+      if (s.triple) parts.push(['Triple', 10]);
+      if (s.dfv3 && !s.factor) parts.push(['DFV V3 (no factor)', 5]);
+      if (s.banker_weak) parts.push(['Banker Weak', -20]);
+      if (s.rbear)       parts.push(['RBear', -10]);
+    }
+    if (s.insider_boost > 0) parts.push(['Insider/Politician', s.insider_boost]);
+    if (s.pead_boost > 0)    parts.push(['PEAD', s.pead_boost]);
+    if (s.sector_boost > 0)  parts.push(['Sector', s.sector_boost]);
+  }
+  return parts.map(([n, v]) =>
+    `<span style="color:${v < 0 ? 'var(--amber)' : 'var(--text2)'}">${n} ${v > 0 ? '+' : '−'}${Math.abs(v)}</span>`
+  ).join(' &nbsp;·&nbsp; ');
+}
+
 // ── RANKINGS TABLE ────────────────────────────────────────────────────
 // Mirrors Colab output: full ranked table with all signals per ticker
 
@@ -2245,7 +2349,7 @@ function renderRankings() {
   if (!window._lastPayload) {
     el.innerHTML = '<div class="placeholder" style="color:var(--text3);font-size:12px;padding:20px">' +
       'Loading signal data from GitHub…<br><br>' +
-      'If this persists, click "Run Live Analysis" on the Analytics tab.' +
+      'If this persists, click "Reload Signals" on the Trading Advice tab.' +
       '</div>';
     // Retry after 2s in case auto-load is still in progress
     setTimeout(() => { if (window._lastPayload) renderRankings(); }, 2000);
@@ -2256,6 +2360,7 @@ function renderRankings() {
   const signals = payload.analytics?.signals || [];
   const market  = payload.market || {};
   const runDate = payload.run_date || '';
+  const th      = sigThresholds(payload);
 
   if (!signals.length) {
     el.innerHTML = '<div class="placeholder">No signal data available.</div>';
@@ -2280,12 +2385,13 @@ function renderRankings() {
   let rows = signals.filter(s => {
     if (filter === 'held'      && !s.is_holding) return false;
     if (filter === 'candidate' && s.is_holding)  return false;
-    if (filter === 'strong'    && !(s.signal === 'BUY' && s.signal_tier === 'STRONG')) return false;
-    if (filter === 'buy'       && s.signal !== 'BUY') return false;
-    if (filter === 'watch'     && s.signal !== 'WATCH') return false;
-    if (filter === 'sell'      && (!s.sell_action || s.sell_action === 'HOLD')) return false;
-    if (filter === 'signal'    && s.signal !== 'WEAK_BUY') return false;
-    if (filter === 'nodata'    && s.signal !== 'NO_DATA') return false;
+    const l = sigLabel(s);
+    if (filter === 'strong'    && l !== 'STRONG BUY') return false;
+    if (filter === 'buy'       && !BUY_LABELS.includes(l)) return false;
+    if (filter === 'watch'     && l !== 'WATCH') return false;
+    if (filter === 'sell'      && !SELL_LABELS.includes(l)) return false;
+    if (filter === 'fwblocked' && l !== 'FW BLOCKED') return false;
+    if (filter === 'nodata'    && l !== 'NO DATA') return false;
     if (search && !s.ticker.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
@@ -2304,13 +2410,17 @@ function renderRankings() {
 
   // Summary counts
   const nHeld       = signals.filter(s => s.is_holding).length;
-  const nBuy        = signals.filter(s => s.signal === 'BUY' && s.signal_tier !== 'STRONG').length;
-  const nFactor     = signals.filter(s => s.factor).length;
-  const nDFV        = signals.filter(s => s.fdfv3).length;
-  const nSellFlag   = signals.filter(s => s.sell_action && s.sell_action !== 'HOLD').length;
-  const nWeakBuy    = signals.filter(s => s.signal === 'WEAK_BUY').length;
-  const nStrongBuy  = signals.filter(s => s.signal === 'BUY' && s.signal_tier === 'STRONG').length;
-  const nWatch      = signals.filter(s => s.signal === 'WATCH' && s.buy_score >= 60).length;
+  const nLabel      = l => signals.filter(s => sigLabel(s) === l).length;
+  const nBuy        = nLabel('BUY');
+  const isV3        = signals.some(s => s.trend_up !== undefined);
+  const nFactor     = signals.filter(s => isV3 ? s.gate : s.factor).length;
+  const nDFV        = signals.filter(s => isV3 ? (s.dip_near && !s.gate) : s.fdfv3).length;
+  const nSellFlag   = signals.filter(s => SELL_LABELS.includes(sigLabel(s))).length;
+  const nWeakBuy    = nLabel('FW BLOCKED');
+  const nStrongBuy  = nLabel('STRONG BUY');
+  const nWatch      = nLabel('WATCH');
+  const strongCap   = market.strong_cap  != null ? market.strong_cap  : '—';
+  const regularCap  = market.regular_cap != null ? market.regular_cap : '—';
 
   function sortIcon(col) {
     if (sortKey !== col) return '<span style="opacity:0.3">↕</span>';
@@ -2322,7 +2432,7 @@ function renderRankings() {
   }
 
   function buyBar(score) {
-    const c = score >= 78 ? 'var(--green)' : score >= 60 ? '#44dd99' : score >= 30 ? 'var(--amber)' : 'var(--s2)';
+    const c = score >= th.buy ? 'var(--green)' : score >= th.watch ? '#44dd99' : score >= 30 ? 'var(--amber)' : 'var(--s2)';
     return `<div style="display:flex;align-items:center;gap:5px;">
       <div style="width:${Math.min(score,100)}px;max-width:80px;height:4px;background:${c};border-radius:2px;flex-shrink:0"></div>
       <span style="font-size:10px;font-family:'DM Mono',monospace;color:${c};font-weight:600">${score}</span>
@@ -2334,7 +2444,7 @@ function renderRankings() {
     // Trust the payload. No client-side recomputation.
     if (!action || action === 'HOLD') {
       if (!score) return '<span style="color:var(--text3);font-size:10px">—</span>';
-      return `<span style="color:var(--text3);font-size:10px;font-family:'DM Mono',monospace" title="Damped below TRIM threshold">${score} HOLD</span>`;
+      return `<span style="color:var(--text3);font-size:10px;font-family:'DM Mono',monospace" title="Sell score — no action (below TRIM ${th.trim}, capped, or not held)">${score}</span>`;
     }
     const c = action==='EXIT' ? '#8b0000' : action==='REDUCE' ? 'var(--red)' : 'var(--amber)';
     return `<span style="background:${c};color:#fff;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:700;font-family:'DM Mono',monospace">${action} ${score}</span>`;
@@ -2343,10 +2453,14 @@ function renderRankings() {
   function signalDots(s) {
     const dots = [];
     // Buy signals
-    if (s.fdfv3)        dots.push('<span style="color:var(--green);font-size:10px;font-weight:700" title="Factor+DFV V3 — strongest buy">★★</span>');
-    else if (s.factor)  dots.push('<span style="color:#0891b2;font-size:10px" title="Factor gate active">★</span>');
-    if (s.pfd)          dots.push('<span style="color:#8b5cf6;font-size:10px" title="PFD buy signal">◆</span>');
-    if (s.triple)       dots.push('<span style="color:#8b5cf6;font-size:10px" title="Up >20% in 63d — momentum">3x</span>');
+    if (s.trend_up !== undefined) {
+      if (s.deep_dip)       dots.push('<span style="color:var(--green);font-size:10px;font-weight:700" title="Gate open, 25%+ below the 252d high">▼▼</span>');
+      else if (s.gate)      dots.push('<span style="color:var(--green);font-size:10px" title="Gate open: 20%+ below the high, 5%+ above the 200d MA, strong 12-month run">▼</span>');
+      else if (s.dip_near)  dots.push('<span style="color:var(--text3);font-size:10px" title="15%+ below the high but trend or 12-month run is missing">▽</span>');
+    } else {
+      if (s.fdfv3)        dots.push('<span style="color:var(--green);font-size:10px;font-weight:700" title="Factor+DFV V3 (v2 model)">★★</span>');
+      else if (s.factor)  dots.push('<span style="color:#0891b2;font-size:10px" title="Factor gate (v2 model)">★</span>');
+    }
     // Insider & politician signals
     if (s.insider_cluster) dots.push('<span style="color:#f59e0b;font-size:10px;font-weight:700" title="Cluster insider buying (2+ insiders, 60d)">🔑🔑</span>');
     else if (s.insider_score > 0) dots.push('<span style="color:#f59e0b;font-size:10px" title="Insider buying (60d)">🔑</span>');
@@ -2363,16 +2477,34 @@ function renderRankings() {
     if (s.sell_cmf != null && s.sell_cmf < 0 && s.near_high) dots.push('<span style="color:var(--red);font-size:10px" title="CMF distribution at high">⚠C</span>');
     if (s.sell_atr_dist != null && s.sell_atr_dist > 3.5 && s.near_high) dots.push('<span style="color:var(--red);font-size:10px" title="ATR overextension">⚠A</span>');
     // Caution
-    if (s.banker_weak)  dots.push('<span style="color:var(--amber);font-size:10px" title="Banker Weak — institutional RSI dropping">WB</span>');
-    if (s.signal === 'WEAK_BUY') dots.push('<span style="color:var(--amber);font-size:9px;border:1px solid var(--amber);padding:0 3px;border-radius:2px" title="Signal fires but FW too low">FW⚠</span>');
     return dots.join(' ') || '<span style="color:var(--text3);font-size:10px">—</span>';
   }
 
+  const FW_BAND_COLOR = {Core:'var(--green)', Good:'#0891b2', Marginal:'var(--amber)', Avoid:'var(--red)'};
+  function fwBand(s) {
+    const f = s.framework; if (f && f.band) return f.band;
+    const v = s.framework_score; if (!v) return null;
+    return v>=85?'Core':v>=70?'Good':v>=55?'Marginal':'Avoid';      // payloads from before the rebuild
+  }
+  function fwTitle(s) {
+    const f = s.framework; if (!f) return '';
+    const W = (window._lastPayload && window._lastPayload.framework && window._lastPayload.framework.axes) || {moat:40, quality:30, growth:20, valuation:10};
+    const ax = [['moat','Moat',W.moat],['quality','Quality',W.quality],['growth','Growth',W.growth],['valuation','Valuation',W.valuation]];
+    const src = {data:'from fundamentals', hand:'hand-scored', legacy:'placeholder from old total'};
+    const lines = ax.map(([k,n,m]) => `${n} ${f.parts[k]}/${m} (${src[f.sources[k]] || f.sources[k]})`);
+    let t = `${f.band} · ` + lines.join(' · ');
+    if (f.pe != null) t += ` · P/E ${f.pe}`;
+    if (f.legacy != null) t += ` · old score ${f.legacy}`;
+    if (f.kind === 'fund') t = `${f.band} · fund/ETF, hand-scored · old score ${f.legacy}`;
+    else if (f.moat_stale) t += f.sources.moat === 'legacy' ? ' · moat never judged' : ' · moat judgement undated or older than 120 days';
+    return t;
+  }
   function fw(s) {
     const v = s.framework_score;
     if (!v) return '<span style="color:var(--text3)">—</span>';
-    const c = v>=85?'var(--green)':v>=70?'#0891b2':v>=55?'var(--amber)':'var(--red)';
-    return `<span style="color:${c};font-weight:700;font-family:'DM Mono',monospace">${v}</span>`;
+    const f = s.framework, c = FW_BAND_COLOR[fwBand(s)] || 'var(--text2)';
+    const mark = f && f.kind !== 'fund' && (f.provisional || f.moat_stale) ? '<span style="color:var(--text3);font-weight:400" aria-hidden="true">*</span>' : '';
+    return `<span title="${fwTitle(s)}" style="color:${c};font-weight:700;font-family:'DM Mono',monospace;cursor:help">${v}${mark}</span>`;
   }
 
   function distCell(s) {
@@ -2388,7 +2520,9 @@ function renderRankings() {
         <div>
           <div style="font-size:15px;font-weight:700;font-family:'Space Grotesk',sans-serif">${rows.length} positions · ${runDate}</div>
           <div style="font-size:11px;color:var(--text3);margin-top:2px;font-family:'DM Mono',monospace">
-            CNN F&G: <span style="color:${cnnColor};font-weight:600">${cnnScore.toFixed(0)} (${cnnLabel})</span>
+            CNN F&G: ${market.cnn_ok === false
+              ? '<span style="color:var(--amber)" title="The CNN endpoint did not answer. 50 is a placeholder, and the sell cap is sized from it.">n/a (fetch failed — default 50 in use)</span>'
+              : `<span style="color:${cnnColor};font-weight:600">${cnnScore.toFixed(0)} (${cnnLabel})</span>`}
             &nbsp;·&nbsp; VIX: <span style="color:${vixColor2};font-weight:600">${vixCur2.toFixed(1)} z=${vixZ2.toFixed(1)} (${vixLbl2})</span>
             &nbsp;·&nbsp; S&P500 ext: ${market.sp500_extended||false}
             &nbsp;·&nbsp; Buffett: ${market.buffett_extended||false}
@@ -2398,7 +2532,7 @@ function renderRankings() {
           <input type="text" placeholder="Search ticker..." value="${search}"
             oninput="rankSearch(this.value)"
             style="background:var(--s2);border:1px solid var(--border);color:var(--text);padding:4px 10px;border-radius:5px;font-size:11px;width:130px">
-          ${['all','held','candidate','strong','buy','watch','signal','sell','nodata'].map(f =>
+          ${['all','held','candidate','strong','buy','watch','fwblocked','sell','nodata'].map(f =>
             `<button onclick="rankFilter('${f}')" style="padding:3px 10px;border-radius:4px;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;border:1px solid var(--border);background:${filter===f?'var(--blue)':'transparent'};color:${filter===f?'#fff':'var(--text3)'}">${f.toUpperCase()}</button>`
           ).join('')}
         </div>
@@ -2424,22 +2558,22 @@ function renderRankings() {
           <span style="color:var(--text3)">Held</span> <b>${nHeld}</b>
         </div>
         <div style="background:rgba(22,163,74,0.15);border:1px solid var(--green);border-radius:6px;padding:6px 12px;font-size:11px;font-family:'DM Mono',monospace">
-          <span style="color:var(--green)">★★ Strong</span> <b style="color:var(--green)">${nStrongBuy}</b><span style="color:var(--text3)">/3</span>
+          <span style="color:var(--green)">★★ Strong</span> <b style="color:var(--green)">${nStrongBuy}</b><span style="color:var(--text3)">/${strongCap}</span>
         </div>
         <div style="background:var(--s2);border-radius:6px;padding:6px 12px;font-size:11px;font-family:'DM Mono',monospace">
-          <span style="color:var(--green)">Buy</span> <b style="color:var(--green)">${nBuy}</b><span style="color:var(--text3)">/3</span>
+          <span style="color:var(--green)">Buy</span> <b style="color:var(--green)">${nBuy}</b><span style="color:var(--text3)">/${regularCap}</span>
         </div>
         <div style="background:var(--s2);border-radius:6px;padding:6px 12px;font-size:11px;font-family:'DM Mono',monospace">
           <span style="color:#0891b2">Watch</span> <b style="color:#0891b2">${nWatch}</b>
         </div>
         <div style="background:var(--s2);border-radius:6px;padding:6px 12px;font-size:11px;font-family:'DM Mono',monospace">
-          <span style="color:var(--amber)">FW⚠</span> <b style="color:var(--amber)">${nWeakBuy}</b>
+          <span style="color:var(--amber)">FW blocked</span> <b style="color:var(--amber)">${nWeakBuy}</b>
         </div>
         <div style="background:var(--s2);border-radius:6px;padding:6px 12px;font-size:11px;font-family:'DM Mono',monospace">
-          <span style="color:var(--green)">★★ DFV</span> <b style="color:var(--green)">${nDFV}</b>
+          <span style="color:var(--text3)" title="15%+ below the 252d high with at least one buy condition missing. An input to the score, not a label.">${isV3 ? 'Dip, gate closed' : 'Factor+DFV'}</span> <b>${nDFV}</b>
         </div>
         <div style="background:var(--s2);border-radius:6px;padding:6px 12px;font-size:11px;font-family:'DM Mono',monospace">
-          <span style="color:var(--amber)">Factor</span> <b style="color:var(--amber)">${nFactor}</b>
+          <span style="color:var(--text3)" title="20%+ below the 252d high, 5%+ above the 200d MA, 12-month return/volatility above 0.6. Needed for any BUY.">${isV3 ? 'Gate open' : 'Factor zone'}</span> <b>${nFactor}</b>
         </div>
         <div style="background:var(--s2);border-radius:6px;padding:6px 12px;font-size:11px;font-family:'DM Mono',monospace">
           <span style="color:var(--red)">Sell flag</span> <b style="color:var(--red)">${nSellFlag}</b>
@@ -2459,20 +2593,18 @@ function renderRankings() {
               <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer;position:sticky;top:0;z-index:2;background:var(--bg)" ${thClick('dist_252h')}>DIST 252H ${sortIcon('dist_252h')}</th>
               <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer;position:sticky;top:0;z-index:2;background:var(--bg)" ${thClick('price')}>PRICE ${sortIcon('price')}</th>
               <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);cursor:pointer;position:sticky;top:0;z-index:2;background:var(--bg)" ${thClick('change_pct')}>DAY ${sortIcon('change_pct')}</th>
-              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);position:sticky;top:0;z-index:2;background:var(--bg)">DFV LIFT</th>
-              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);position:sticky;top:0;z-index:2;background:var(--bg)">TYPE</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);position:sticky;top:0;z-index:2;background:var(--bg)">12M RUN</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text3);position:sticky;top:0;z-index:2;background:var(--bg)">SIGNAL</th>
             </tr>
           </thead>
           <tbody>
             ${rows.map((s, i) => {
               const dayChg   = s.change_pct || 0;
               const dayColor = dayChg >= 0 ? 'var(--green)' : 'var(--red)';
-              const rowBg    = s.signal === 'NO_DATA'                              ? 'background:rgba(217,119,6,0.10);border-left:2px solid var(--amber)' :
-                               s.signal === 'WEAK_BUY'                  ? 'background:rgba(217,119,6,0.06)' :
-                               s.signal === 'BUY' && s.signal_tier === 'STRONG' ? 'background:rgba(22,163,74,0.12);border-left:2px solid var(--green)' :
-                               s.signal === 'BUY'                               ? 'background:rgba(22,163,74,0.06)' :
-                               s.signal === 'WATCH'                             ? 'background:rgba(8,145,178,0.04)' :
-                               s.sell_action && s.sell_action !== 'HOLD'        ? 'background:rgba(220,38,38,0.05)' : '';
+              const lbl      = sigLabel(s);
+              const lst      = LABEL_STYLE[lbl] || LABEL_STYLE.HOLD;
+              const rowBg    = (lst.bg ? `background:${lst.bg};` : '') +
+                               (lbl === 'NO DATA' || lbl === 'STRONG BUY' ? `border-left:2px solid ${lst.color}` : '');
               const isHeld   = s.is_holding;
               return `<tr style="border-bottom:1px solid var(--border);${rowBg}">
                 <td style="padding:7px 10px;white-space:nowrap">
@@ -2480,35 +2612,21 @@ function renderRankings() {
                   ${isHeld ? '<span style="background:var(--red);color:#fff;font-size:8px;padding:1px 4px;border-radius:2px;margin-left:4px;font-family:monospace">HELD</span>' : '<span style="border:1px solid var(--border);color:var(--text3);font-size:8px;padding:1px 4px;border-radius:2px;margin-left:4px;font-family:monospace">CAND</span>'}
                 </td>
                 <td style="padding:7px 10px">${buyBar(s.buy_score || 0)}</td>
-                <td style="padding:7px 10px">${sellBadge(s.sell_action, s.sell_score)}</td>
+                <td style="padding:7px 10px" title="${s.sell_ceiling ? 'Strongest sell action this framework score can ever reach: ' + s.sell_ceiling : ''}">${sellBadge(s.sell_action, s.sell_score)}</td>
                 <td style="padding:7px 10px">${fw(s)}</td>
                 <td style="padding:7px 10px">${signalDots(s)}</td>
                 <td style="padding:7px 10px">${distCell(s)}</td>
                 <td style="padding:7px 10px;font-family:'DM Mono',monospace;color:var(--text2)">${s.price != null ? '$' + s.price.toFixed(2) : '<span style="color:var(--amber);font-size:10px">NO DATA</span>'}</td>
-                <td style="padding:7px 10px;font-family:'DM Mono',monospace;color:${dayColor}">${s.signal === 'NO_DATA' ? '—' : (dayChg>=0?'+':'') + dayChg.toFixed(2) + '%'}</td>
-                <td style="padding:7px 10px;font-family:'DM Mono',monospace;color:var(--text3)">${s.dfv_lift != null ? s.dfv_lift.toFixed(1) : '—'}</td>
-                <td style="padding:7px 10px">
-                  ${s.signal === 'NO_DATA'
-                    ? `<span style="color:var(--amber);font-size:10px;font-weight:700;border:1px solid var(--amber);padding:1px 5px;border-radius:3px" title="${s.data_error || 'unknown'}">⚠ NO DATA</span>`
-                  : s.signal === 'BUY' && s.signal_tier === 'STRONG'
-                    ? '<span style="color:#fff;background:var(--green);font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px">★★ STRONG</span>'
-                  : s.signal === 'BUY'
-                    ? '<span style="color:var(--green);font-size:10px;font-weight:700">BUY</span>'
-                  : s.signal === 'WATCH'
-                    ? '<span style="color:#0891b2;font-size:10px;font-weight:600" title="Factor zone — score 60-79, not full conviction">WATCH</span>'
-                  : s.signal === 'SELL'
-                    ? '<span style="color:var(--red);font-size:10px;font-weight:700">SELL</span>'
-                  : s.signal === 'WEAK_BUY'
-                    ? '<span style="color:var(--amber);font-size:10px;font-weight:700" title="Signal fires but FW<55">SIGNAL</span>'
-                  : '<span style="color:var(--text3);font-size:10px">HOLD</span>'}
-                </td>
+                <td style="padding:7px 10px;font-family:'DM Mono',monospace;color:${dayColor}">${lbl === 'NO DATA' ? '—' : (dayChg>=0?'+':'') + dayChg.toFixed(2) + '%'}</td>
+                <td style="padding:7px 10px;font-family:'DM Mono',monospace;color:var(--text3)">${s.run_12m != null ? s.run_12m.toFixed(1) : (s.dfv_lift != null ? s.dfv_lift.toFixed(1) : '—')}</td>
+                <td style="padding:7px 10px">${labelBadge(s, th)}</td>
               </tr>`;
             }).join('')}
           </tbody>
         </table>
       </div>
       <div style="margin-top:8px;font-size:10px;color:var(--text3);font-family:'DM Mono',monospace">
-        Click column headers to sort · ★★=Factor+DFV3 · ★=Factor · ◆=PFD · 3x=63d momentum · 🔑=Insider · 🔑🔑=Cluster · 🏛=Politician · 🏛🏛=Pol.cluster · ⚡=PEAD · 📡=Sector entry · ⚠H=near high · ⚠C=CMF · ⚠A=ATR · WB=Banker Weak
+        SIGNAL is the scanner's final label after caps — identical on every tab and in the emails · Icons are score inputs, not labels: ▼▼=gate open, 25%+ dip · ▼=gate open · ▽=dip, gate closed · FW: hover for breakdown, *=part placeholder or moat undated${payload.framework ? ` (${payload.framework.with_data} of ${payload.framework.scored} use fundamentals${payload.framework.with_data ? ' as of ' + payload.framework.fundamentals_as_of : ', none fetched yet'})` : ''} · 🔑=Insider · 🔑🔑=Cluster · 🏛=Politician · 🏛🏛=Pol.cluster · ⚡=PEAD · 📡=Sector entry · ⚠H=near high · ⚠C=CMF · ⚠A=ATR
       </div>
     </div>`;
 
@@ -2618,10 +2736,12 @@ function renderMarkdown(md) {
 // Inline fallback if FRAMEWORK_SCORE_README.md not on same server
 const REFERENCE_MD = `# Portfolio Signal & Framework Reference
 
+> **Model v3 (November 2026).** The buy score keeps the factor gate and drops what did not survive re-testing: Strong 12m run +25, 5%+ above 200d MA +25, Dip 20%+ +30 (near-misses +15 each), Deep dip 25%+ +10, overlays capped at +25. All three = 80 = BUY; WATCH = two met and the third close. DFV V3, PFD, Triple and both penalties no longer score. The sections below still describe v2 and its statistics, which did not survive re-testing. See MODEL_AUDIT.md in the repo.
+
 ## Table of Contents
 1. [Overview](#1-overview)
 2. [System Performance Summary](#2-performance)
-3. [Framework Score — 5 Axes](#3-framework-score)
+3. [Framework Score — 4 Axes](#3-framework-score)
 4. [Current Framework Scores](#4-current-scores)
 5. [Buy-Side Signal Models](#5-buy-side)
 6. [Sell-Side Signal Models](#6-sell-side)
@@ -2682,7 +2802,9 @@ DIST_T = −0.15 · DFV_LIFT = 2.5 · QUALITY_T = 0.20 · p_threshold = 0.15
 
 ---
 
-## 3. Framework Score — 5 Axes
+## 3. Framework Score — 4 Axes
+
+> **Rebuilt November 2026.** The live score is **Moat 40 + Quality 30 + Growth 20 + Valuation 10 = 100**. Quality, Growth and Valuation are computed from company fundamentals (weekly Finnhub fetch; Valuation is repriced on every scanner run). Moat stays a judgement: five yes/no questions, 8 points each, with a date. Valuation is small on purpose: this score asks whether the business is worth owning, and the buy score handles whether the price is right. Portfolio Fit is no longer scored. Bands: **Core 78+ · Good 63–77 · Marginal 48–62 · Avoid below 48**; a BUY needs Good or better. These are the old 85 / 70 / 55 carried onto the new scale. Hover any FW number for its breakdown and where each part came from; an asterisk means part of it is still a placeholder or the moat judgement is undated. Full method: FRAMEWORK.md in the repo. The axis descriptions below are the original rubric (with its original point values) and still describe what each axis means.
 
 ### Axis 1 — Competitive Moat (30 pts)
 
@@ -2722,19 +2844,15 @@ This axis is deliberately separate from growth. Apple scores 22 (exceptional qua
 
 *This axis was raised from 15pts to 20pts in the current version. The price you pay for a great business determines your return, not just the quality of the business itself.*
 
-### Axis 5 — Portfolio Fit (5 pts)
+### Portfolio Fit — no longer scored
 
-**What it measures:** Does this position add something genuinely different to the portfolio, or does it duplicate exposure you already have?
-
-**High score (4–5):** Unique geographic or sector exposure not covered elsewhere. KTAM India is the only India exposure in the portfolio.
-
-**Low score (0–1):** Owning both QQQ and SCB Nasdaq is near-pure redundancy. Owning NVDA, AVGO, AMAT, and ASML means adding MU adds limited new exposure to the semiconductor thesis.
-
-*Note: This score is portfolio-dependent and changes when you add or remove positions.*
+Fit describes the portfolio, not the business, so it does not belong in a score that decides whether a business is worth owning. In the old table it had also drifted into a balancing figure: documented as 5 points, it ran from 5 to 18. Overlap with existing holdings is a position-sizing question; use the Overlap tab.
 
 ---
 
-## 4. Current Framework Scores
+## 4. Framework Scores — original hand table (superseded)
+
+*Kept for reference. These are the pre-rebuild hand scores; the live score for each ticker is the FW column on the Signals tab. The Moat column here still feeds the live score until each moat is re-judged with the five questions.*
 
 | Ticker | Moat | Quality | Growth | Valuation | Fit | **Total** |
 |---|---|---|---|---|---|---|
@@ -2780,7 +2898,7 @@ This axis is deliberately separate from growth. Apple scores 22 (exceptional qua
 | TSLA | 14 | 11 | 13 | 7 | 5 | **50** |
 | TQQQ | 7 | 5 | 9 | 4 | 9 | **34** |
 
-**Thresholds:** ≥85 = core keeper · 70–84 = good, monitor · 55–69 = marginal, consider rotating · <55 = sell candidate
+**Thresholds (live scale):** ≥78 = Core, keeper · 63–77 = Good, monitor · 48–62 = Marginal, consider rotating · <48 = Avoid, sell candidate. *(Original scale: 85 / 70 / 55.)*
 
 ---
 
@@ -3064,7 +3182,7 @@ Apply the 5 axes in order:
 
 5. **Portfolio Fit /5** — What does this add that the existing portfolio doesn't already cover?
 
-Score ≥85: core keeper, hold through weakness. 70–84: good position, monitor valuation. 55–69: marginal, consider replacing with higher-conviction name. <55: sell candidate — wait for a signal to time the exit efficiently.
+Score ≥78 (Core): keeper, hold through weakness. 63–77 (Good): good position, monitor valuation. 48–62 (Marginal): consider replacing with higher-conviction names. Below 48 (Avoid): exit candidate. *(Original scale: 85 / 70 / 55.)*
 
 Then overlay signal models. The strongest possible setup: framework ≥80 + Factor gate active + DFV V3 fired + positive fundamentals = full-size add.
 `;
@@ -3139,44 +3257,13 @@ function addRowClickHandlers() {
 }
 
 // ── Analytics engine ───────────────────────────────────────
-const INVESTMENT_PROFILE = `
-Dharam's investment profile (from Dime + US Stock Account analysis):
-- Director of Marketing at Agoda (Booking Holdings subsidiary), Bangkok-based
-- 10-year buy-and-hold framework with tactical liquidity needs by July 2026
-- Strong AI infrastructure thesis: NBIS, ANET, CRDO, AMD, ASML, TSM, NVDA
-- Prefers: High-quality compounders with durable moats, AI/tech secular tailwinds
-- Buys: On conviction dips, adds to winners, concentrated in high-conviction names
-- Avoids: PLTR (government/defence), speculative meme stocks
-- Portfolio has heavy BKNG concentration (career-linked) and NVDA (AI thesis)
-- Has US Stock Account (selling down by July 2026 for liquidity), GTN, Dime, SCB/KT Thai funds
-- Current sell priority: US Stock Account first
-- Scoring framework (5 axes, max 100): Moat Durability /30 · 3yr Earnings Potential /25 · Secular Runway /20 · Valuation & Peak Risk /15 · Redundancy in portfolio /10
-- Higher score = KEEP. Lower score = sell candidate. sellScore = 100 - framework score.
-- Current framework scores: NVDA(93), CRDO(93), ASML(93), AVGO(92), ANET(91), DDOG(90), MELI(90), NBIS(87), AMD(86), MSFT(82), META(82), TSM(89), ADBE(61), TSLA(56), TQQQ(48)
-- Backtested buy model: Conviction Add best (avg +82% 12m), DCF Proxy second (+79%). Framework alone underperforms (+33%) vs random (+40%)
-- Validated buy targets: NVDA/CRDO/ANET add-to on dips (avg 12m: +80-140%), CRWV/NOW new positions, SNOW buy on dips only
-- Avoid buying: SOUN/FIVN/PATH at current prices (avg 12m negative across periods)
-- Current date context: May 2026. US market tariff volatility has subsided. AI infrastructure spending accelerating.
-- Fund sell priority: SCBDJI(56) → SCBSP500(63) → SCBNDQ(61) → SCBGENOM(48) → SCBNNO(47) → KTGESG(58)
-`;
-
 async function runAnalytics() {
   const btn = document.getElementById('anaBtn');
   const spin = document.getElementById('anaSpinner');
   const lbl = document.getElementById('anaLabel');
   btn.disabled = true;
   spin.classList.add('on');
-  lbl.textContent = 'Analysing…';
-
-  // Build live portfolio snapshot
-  const snap = stocks
-    .filter(s => s.shares > 0 || s.direct > 0)
-    .map(s => {
-      const p = prices[s.t];
-      const val = p?.price && s.shares > 0 ? p.price * s.shares : s.direct;
-      return { t:s.t, n:s.n, val, pct:(val/lastTotal*100).toFixed(2), price:p?.price, chg:p?.change };
-    })
-    .sort((a,b) => b.val - a.val);
+  lbl.textContent = 'Loading…';
 
   // ── Load signals_payload.json ──────────────────────────────────────
   // ── DATA SOURCES ──────────────────────────────────────────────────
@@ -3246,794 +3333,82 @@ async function runAnalytics() {
           'Signals from GitHub Actions: ' + genAt;
         btn.disabled = false;
         spin.classList.remove('on');
-        lbl.textContent = 'Run Live Analysis';
-        return; // done — skip API and rule-based fallbacks
+        lbl.textContent = 'Reload Signals';
+        return;
       }
   } catch(e) {
     console.log('signals_payload.json not found — trying API...', e.message);
   }
 
-  // ── Priority 2: Anthropic API (works when hosted on https://) ────────
-  try {
-    lbl.textContent = 'Running AI analysis…';
-    const [signalsRes, buyRes, sellRes] = await Promise.all([
-      callClaude(buildSignalsPrompt(snap)),
-      callClaude(buildBuyPrompt(snap)),
-      callClaude(buildSellPrompt(snap))
-    ]);
-    renderSignals(signalsRes);
-    renderBuys(buyRes);
-    renderSells(sellRes);
-  } catch(e) {
-    // ── Priority 3: Rule-based fallback ──────────────────────────────
-    console.warn('API failed, using rule-based analysis:', e.message);
-    renderSignalsLocal(snap);
-    renderBuysLocal();
-    renderSellsLocal(snap);
-  }
-
-  document.getElementById('anaUpdated').textContent = 'Analysis: ' + new Date().toLocaleTimeString();
+  // No fallback model. This button used to fall through to a browser-side
+  // AI call and then to hard-coded "rule-based" cards (May-2026 prices, sold
+  // positions, different framework scores) whenever the payload failed to
+  // load — i.e. a second model that contradicted the scanner. If the scanner
+  // output is unavailable, say so instead of inventing signals.
+  const msg = '<div class="placeholder">Scanner output could not be loaded from GitHub or Netlify. ' +
+              'No signals are shown rather than stale ones — check the Daily Signal Scanner run in GitHub Actions, then retry.</div>';
+  ['buyContent','sellContent','signalsContent'].forEach(id => {
+    const n = document.getElementById(id); if (n) n.innerHTML = msg;
+  });
+  document.getElementById('anaUpdated').textContent = '⚠ Signals unavailable';
   btn.disabled = false;
   spin.classList.remove('on');
-  lbl.textContent = 'Run Live Analysis';
+  lbl.textContent = 'Reload Signals';
 }
 
-const FRAMEWORK_PROMPT = `
-SCORING FRAMEWORK — use ONLY these axes, no others:
-Moat Durability /30 | 3yr Earnings Potential /25 | Secular Runway /20 | Valuation/Peak Risk /15 | Redundancy /10
-Total /100. Higher = KEEP. sellScore = 100 - total.
-breakdown format MUST be: "Moat X/30 · 3yr Earnings X/25 · Runway X/20 · Valuation X/15 · Redundancy X/10 = TOTAL/100"
-`;
-
-function buildSignalsPrompt(snap) {
-  return `${INVESTMENT_PROFILE}\n\nLIVE PORTFOLIO:\n${snap.map(s=>`${s.t} (${s.n}): $${Math.round(s.val).toLocaleString()} = ${s.pct}% | $${s.price ?? 'N/A'} | ${s.chg!=null?(s.chg>=0?'+':'')+s.chg.toFixed(2)+'%':'N/A'}`).join('\n')}\n\nReturn ONLY JSON:\n{"signals":[{"ticker":"NVDA","type":"WATCH|MOMENTUM|RISK|OPPORTUNITY","headline":"one line","detail":"2-3 sentences","action":"Hold|Add|Reduce|Monitor"}]}\nInclude 8-12 signals. Be specific to current prices.`;
-}
-
-function buildBuyPrompt(snap) {
-  const held = snap.map(s=>s.t).join(',');
-  return `${INVESTMENT_PROFILE}\n\nCURRENT HOLDINGS: ${held}\n\nReturn ONLY JSON:\n{"buys":[{"ticker":"SNOW","name":"Snowflake","thesis":"2-3 sentences","entry":"$170-185","target":"$247","upside":"38%","size":"$1,500","account":"US Stock Account","score":82,"category":"AI Software"}]}\n6-8 ideas. Exclude PLTR and anything already held. Align to AI/tech thesis.`;
-}
-
-function buildSellPrompt(snap) {
-  const budget = Math.round(lastTotal * 0.10).toLocaleString();
-  return `${INVESTMENT_PROFILE}
-
-${FRAMEWORK_PROMPT}
-
-LIVE PORTFOLIO:
-${snap.map(s=>`${s.t}: $${Math.round(s.val).toLocaleString()} @ $${s.price ?? 'N/A'}`).join('\n')}
-
-Max sell value: $${budget} (10% of portfolio). Prioritise US Stock Account first. Include Thai mutual funds (SCB/KT) as sell candidates.
-
-Return ONLY JSON — field names must match EXACTLY:
-{"sells":[{
-  "type":"STOCK or FUND",
-  "ticker":"TSLA",
-  "name":"Tesla",
-  "action":"TRIM or SELL",
-  "shares":3,
-  "account":"US Stock Account",
-  "currentPrice":"$393",
-  "gtcTarget":"$440",
-  "val":1320,
-  "rationale":"2-3 sentences referencing specific axis scores",
-  "breakdown":"Moat 7/30 · 3yr Earnings 16/25 · Runway 14/20 · Valuation 9/15 · Redundancy 10/10 = 56/100",
-  "urgency":"HIGH",
-  "sellScore":44
-}],"total_sell_value":"$X","pct_of_portfolio":"X%"}`;
-}
-
-// ── Rule-based fallback analysis (works offline / from local file) ──────────
-function renderSignalsLocal(snap) {
-  // ── COMBINED MODEL: Factor Value + DFV + BRED ─────────────────────
-  // Backtest results (43,200 obs, 300 stocks, 10yr daily, VOO benchmark):
-  //   Rule: Factor Value          → 59.7% beat VOO, alpha +0.86%  ← BEST
-  //   ML:   Combined              → AUC 0.544, alpha +0.76%
-  //   Rule: Combined (fac+DFV)    → 56.1% beat VOO, alpha +0.55%
-  //   Rule: DFV Only              → 48.0% beat VOO, alpha −0.41%  ← WORST
-  //   Benchmark (hold all)        → alpha −0.45%
-  //
-  // KEY FINDING: Factor without DFV = 60.4% / +0.93%
-  //              Factor with DFV   = 54.1% / +0.36%
-  //              DFV improves TIMING but reduces accuracy as a filter.
-  //              BRED does not predict 63-day underperformance — use as TRIM signal only.
-  //
-  // COMBINED RULE (applied below):
-  //   STEP 1 — Factor gate: dist_52wk < −15% AND quality > 0.60 → worth owning
-  //   STEP 2 — DFV: hot_money_rsi emerging from 0-5 → confirms entry timing
-  //   STEP 3 — BRED: RSI/MACD divergence → trim 20-30%, not exit
-  //   STEP 4 — Banker RSI: falls from ceiling → reduce to 50% size
-
-  const get = t => snap.find(s=>s.t===t);
-  const px  = t => get(t)?.price ?? 0;
-  const chg = t => get(t)?.change ?? 0;
-
-  // ── Compute live proxy signals from available price data ─────────
-  // dist_52wk proxy: using day change as momentum proxy
-  // DFV proxy: price down >8% from position (approximated via negative change trend)
-  // BRED proxy: strong positive day change = potential momentum exhaustion
-
-  const mkt_chg = (chg('VOO') + chg('QQQ')) / 2;
-
-  // Per-ticker signal computation
-  function getSignal(t, frameworkScore, pfdBuy) {
-    const dayChg   = chg(t);
-    const price    = px(t);
-
-    // DFV proxy: position has pulled back (day down or recent weakness)
-    // DFV V3 (backtested best: factor+V3 beats VOO 61.2%, alpha +0.71%)
-    // Floor lift: hm_rsi must have risen >3pts off 21d floor
-    // Live proxy: recovering 0.3-2.5% AND gaining vs prior move (momentum building)
-    const prev_chg = prices[t]?.prevChange ?? (dayChg * 0.8);
-    const dfv_proxy = dayChg > 0.3 && dayChg < 2.5 && dayChg > prev_chg;
-
-    // BRED proxy: strong up day with high framework momentum = potential divergence
-    const bred_proxy = dayChg > 2.5 && frameworkScore < 80;
-
-    // Banker weak proxy: market up strongly, institutional selling likely into strength
-    const banker_weak = mkt_chg > 1.5;
-
-    // Factor gate
-    const factor_ok = frameworkScore < 80 && pfdBuy > 0.20;
-
-    // Combined signal
-    if (factor_ok && dfv_proxy)   return { signal:'COMBINED BUY (V3)', priority:1, color:'var(--green)' };
-    if (factor_ok)                 return { signal:'FACTOR BUY',   priority:2, color:'#44dd99' };
-    if (bred_proxy)                return { signal:'BRED TRIM',    priority:3, color:'var(--amber)' };
-    if (banker_weak && dayChg > 2) return { signal:'BANKER WEAK',  priority:4, color:'var(--amber)' };
-    return { signal:'HOLD', priority:5, color:'var(--t3)' };
-  }
-
-  // Build signal cards for each held position
-  const HELD = [
-    { t:'NVDA', score:93, pfdBuy:0.812, context:'AI infrastructure monopoly. Blackwell unabated. PFD Buy 0.812 — strongest in universe.' },
-    { t:'CRDO', score:93, pfdBuy:0.620, context:'Custom interconnect moat. 13 shares — undersized. Add on any dip to $62-65.' },
-    { t:'NBIS', score:87, pfdBuy:0.420, context:'EU AI cloud. Fastest ARR ramp in infra history. Val 14/15 still cheap vs forward ARR.' },
-    { t:'ANET', score:91, pfdBuy:0.480, context:'AI networking backbone. 10 shares — build on weakness toward $80.' },
-    { t:'TSLA', score:56, pfdBuy:0.522, context:'VOO excess +74% historically — never sell on quality alone. Only for July 2026 liquidity.' },
-    { t:'ADBE', score:61, pfdBuy:0.234, context:'AI threatens moat. PFD borderline. Factor buy only if dips further.' },
-    { t:'TQQQ', score:48, pfdBuy:0.369, context:'3x leverage — trim to target weight after any >75% run. BRED trim signal.' },
-    { t:'BKNG', score:75, pfdBuy:0.180, context:'Career + equity concentration risk. >18% of portfolio. Trim toward 10% target.' },
-    { t:'AMD',  score:86, pfdBuy:0.566, context:'GPU duopoly. PFD Buy 0.566 — price compressed vs fundamentals.' },
-    { t:'META', score:82, pfdBuy:0.440, context:'Social + AI moat. Strong 252d momentum. Hold — BRED watch on next ATH.' },
-    { t:'SHOP', score:79, pfdBuy:0.520, context:'Commerce infra. PFD Buy 0.520 — price lagging fundamentals.' },
-    { t:'VXUS', score:64, pfdBuy:0.104, context:'VOO excess −7% avg annual. Valid exit. No DFV entry basis.' },
-    { t:'GLD',  score:63, pfdBuy:0.000, context:'Near multi-year highs. BRED divergence risk. Hold — no factor buy basis.' },
-    { t:'URTH', score:61, pfdBuy:0.113, context:'VOO excess −3% avg annual. Structural underperformer. Exit on factor basis.' },
-  ];
-
-  const signals = HELD.map(h => {
-    const sig    = getSignal(h.t, h.score, h.pfdBuy);
-    const price  = px(h.t);
-    const dayChg = chg(h.t);
-
-    // Regime note
-    let regimeNote = '';
-    if (sig.signal === 'BRED TRIM')   regimeNote = 'BRED: RSI/MACD divergence proxy active — consider trimming 20-30%';
-    if (sig.signal === 'COMBINED BUY') regimeNote = 'DFV + Factor both active — highest confidence entry signal';
-    if (sig.signal === 'BANKER WEAK') regimeNote = 'Market running hard — institutional selling into strength likely';
-
-    return {
-      ticker: h.t,
-      type: sig.signal,
-      color: sig.color,
-      priority: sig.priority,
-      headline: `${sig.signal} · Framework ${h.score}/100 · PFD Buy ${h.pfdBuy.toFixed(3)}`,
-      detail: h.context + (regimeNote ? ` ‖ ${regimeNote}` : ''),
-      action: sig.signal.includes('BUY') ? 'Add' : sig.signal.includes('TRIM') ? 'Trim' : sig.priority <= 3 ? 'Watch' : 'Hold',
-      price: price ? '$'+price.toFixed(2) : '—',
-      chg: dayChg,
-    };
-  })
-  .filter(s => s.priority <= 4)  // only show actionable signals
-  .sort((a,b) => a.priority - b.priority || b.chg - a.chg)
-  .slice(0, 8);
-
-  // Add macro signal
-  signals.unshift({
-    ticker: 'REGIME',
-    type: mkt_chg > 0.5 ? 'BULL DAY' : mkt_chg < -0.5 ? 'BEAR DAY' : 'NEUTRAL',
-    color: mkt_chg > 0.5 ? 'var(--green)' : mkt_chg < -0.5 ? 'var(--red)' : 'var(--t3)',
-    priority: 0,
-    headline: `Market regime · VOO+QQQ avg ${mkt_chg >= 0 ? '+' : ''}${mkt_chg.toFixed(2)}% today`,
-    detail: mkt_chg > 0.5
-      ? 'Bull day. BRED trim signals elevated — momentum stocks approaching exhaustion. TSLA/TQQQ sell signals suppressed (backtest: both run hard in bull markets).'
-      : mkt_chg < -0.5
-      ? 'Bear/correcting day. Factor buy signals most reliable in this regime (backtest accuracy 60.4%). BRED divergence less relevant — momentum has already turned.'
-      : 'Neutral. Factor signals valid. Use DFV as secondary confirmation for any entry. Monitor for BRED divergence on extended positions.',
-    action: mkt_chg > 0.5 ? 'Watch' : mkt_chg < -0.5 ? 'Buy' : 'Hold',
-    price: get('VOO')?.price ? '$'+get('VOO').price.toFixed(2) : '—',
-    chg: mkt_chg,
-  });
-
-  renderSignals({ signals });
-}
-
-function renderBuysLocal() {
-  // ── BACKTESTED HYBRID BUY MODEL (40,000 simulations, 5 periods) ──
-  // Key findings:
-  //   #1 Conviction Add (+82% avg 12m): add to NVDA/CRDO/ANET on dips — best model
-  //   #2 DCF Proxy (moat × earnings) (+79%): framework_score × earn_score best pure signal
-  //   #3 Comps (+74%): earnings + runway combination
-  //   Framework Score alone only +33% — underperforms random
-  //   Reason: framework picks CRWV/NOW/SNOW which are unproven; Conviction Add
-  //           picks NVDA/CRDO/ANET which have actual earnings momentum
-  //
-  // HYBRID RULE:
-  //   Priority 1: add-to existing positions if val score >= 12 (not at peak)
-  //   Priority 2: new names with DCF score (moat × earn) > 540 (22×25 threshold)
-  //   Valuation gate: skip if val score < 12 (too expensive)
-  //   Concentration guard: max 2 new names per cycle
-
-  // ── BUY FRAMEWORK SCORES (same axes as sell model) ────────────────
-  // [Moat/30, 3yr Earnings/25, Runway/20, Valuation/15, Redundancy/10]
-  const BUY_UNIVERSE = {
-    // ── Add-to existing (Conviction Add — best backtest model) ────────
-    NVDA: { moat:30, earn:24, runway:20, val:10, redund:0, type:'ADD',  acct:'US Stock Account or Dime',
-      why:'PFD Buy: 0.812 (strongest buy signal in universe — fundamentals running far ahead of price). Conviction Add — best backtest model (+82% avg 12m). Blackwell demand unabated. Every AI data centre build runs on NVDA. Buy any dip >8% from recent high. DCF score: 720/750.',
-      entry:'On 8%+ dip from recent high', target:'+35% 12m', size:'$2,000' },
-    CRDO: { moat:27, earn:23, runway:20, val:13, redund:0, type:'ADD',  acct:'Dime',
-      why:'Conviction Add — avg +73% across periods. Custom interconnect for AI data centres. Only 13 shares — strong case to add 5-7 more on any pullback. Earnings momentum accelerating Q2 2026.',
-      entry:'On pullback to $62-65', target:'+45% 12m', size:'$1,500' },
-    ANET: { moat:27, earn:22, runway:20, val:12, redund:0, type:'ADD',  acct:'Dime',
-      why:'Conviction Add — avg +48% across periods. AI networking backbone. Current 10 shares undersized for a position this high-conviction. Add on weakness toward $80.',
-      entry:'On pullback to $80-84', target:'+40% 12m', size:'$1,500' },
-    NBIS: { moat:22, earn:21, runway:20, val:14, redund:0, type:'ADD',  acct:'Dime',
-      why:'PFD Buy: 0.420 (fundamentals accelerating ahead of price). Conviction Add — avg +46% across periods. European AI cloud, fastest ARR ramp in infrastructure history. Val score 14/15 — still cheap relative to forward ARR. $7-9B ARR target for 2026.',
-      entry:'On pullback to $165-170', target:'+55% 12m', size:'$2,000' },
-    // ── New positions (DCF Proxy + Comps model validated) ─────────────
-    CRWV: { moat:20, earn:25, runway:20, val:15, redund:10, type:'NEW', acct:'US Stock Account',
-      why:'DCF Proxy score: 500. $66B backlog, guiding $17-19B 2026 revenue. Val 15/15 — down 56% from highs = entry point. NVIDIA HGX B300 deployment imminent. Comps: trades at 3x revenue vs SNOW at 8x.',
-      entry:'$80-90', target:'$130', size:'$1,500' },
-    NOW:  { moat:26, earn:24, runway:20, val:10, redund:10, type:'NEW', acct:'Dime',
-      why:'DCF Proxy score: 624. ServiceNow — every enterprise AI workflow runs through it. 44% FCF margin. Val 10/15 — expensive but justified by FCF compounding. Comps: premium to peers but earns it.',
-      entry:'On 10%+ pullback only', target:'+35% 12m', size:'$1,000' },
-    PANW: { moat:24, earn:22, runway:20, val:11, redund:10, type:'NEW', acct:'Dime',
-      why:'DCF Proxy score: 528. Cybersecurity + AI integration. 25%+ ARR growth. Platformisation strategy creating sticky revenue. Val 11/15 — priced for growth but not excessive.',
-      entry:'$310-330', target:'+30% 12m', size:'$1,000' },
-    // ── Watchlist only (valuation gate fails or too speculative) ──────
-    SNOW: { moat:22, earn:22, runway:20, val:14, redund:10, type:'WATCH', acct:'Watchlist',
-      why:'Backtest: avg +1.6% across periods — wide variance. Val 14/15 currently but rallied hard. Only buy on a 15%+ dip toward $155-165. Data infrastructure moat is real but priced in at current levels.',
-      entry:'$155-165 only (wait for dip)', target:'+38% from entry', size:'$1,000' },
-  };
-
-  // Sort: ADD first (Conviction Add model), then NEW by DCF score (moat×earn)
-  const dcfScore = d => d.moat * d.earn;
-
-  const buys = Object.entries(BUY_UNIVERSE)
-    .filter(([t, d]) => d.type !== 'WATCH')
-    .sort(([ta,da],[tb,db]) => {
-      if (da.type === 'ADD' && db.type !== 'ADD') return -1;
-      if (db.type === 'ADD' && da.type !== 'ADD') return 1;
-      return dcfScore(db) - dcfScore(da);
-    })
-    .map(([ticker, d]) => ({
-      ticker,
-      name: ticker,
-      thesis: d.why,
-      entry: d.entry,
-      target: d.target,
-      upside: d.target,
-      size: d.size,
-      account: d.acct,
-      score: d.moat + d.earn + d.runway + d.val + d.redund,
-      category: d.type === 'ADD' ? 'Add to existing' : 'New position',
-      dcf: dcfScore(d),
-    }));
-
-  // Add watchlist separately
-  const watchlist = Object.entries(BUY_UNIVERSE)
-    .filter(([t, d]) => d.type === 'WATCH')
-    .map(([ticker, d]) => ({
-      ticker, name:ticker, thesis:d.why, entry:d.entry,
-      target:d.target, upside:d.target, size:d.size, account:d.acct,
-      score: d.moat + d.earn + d.runway + d.val + d.redund,
-      category:'Watchlist (val gate)',
-    }));
-
-  renderBuys({ buys: [...buys, ...watchlist], backtest_note: true });
-}
-
-function renderSellsLocal(snap) {
-  const budget = lastTotal * 0.10;
-
-  // ── Framework — 5 axes, max 100 ──────────────────────────────────
-  // Moat Durability /30  — pure competitive advantage, no redundancy conflation
-  // 3yr Earnings /25     — near-term realistic earnings/NAV growth trajectory
-  // Secular Runway /20   — 10yr structural tailwind strength
-  // Valuation/Peak /15   — is it expensive or near a 12-month price/NAV peak?
-  //                        High score = cheap/fair; Low score = expensive/peaked
-  // Redundancy /10       — small penalty: how much does it duplicate your direct book?
-  //                        10 = fully unique; 0 = entirely duplicated by direct holdings
-  //
-  // Higher total = KEEP. Lower = sell candidate.
-  // sellScore = 100 - total (used for sorting, higher = more urgent sell)
-
-  const FRAMEWORK = {
-    // ticker: [Moat/30, 3yr Earnings/25, Runway/20, Valuation/15, Redundancy/10]
-    NVDA: [30, 24, 20, 10, 9],  // 93 — monopoly; slightly pricey; near-unique
-    ASML: [29, 23, 20, 11, 10], // 93 — EUV monopoly; fair value; fully unique
-    AVGO: [28, 23, 20, 12, 9],  // 92 — custom silicon moat; fair; near-unique
-    CRDO: [27, 23, 20, 13, 10], // 93 — interconnect moat; not expensive; unique
-    DDOG: [26, 23, 20, 11, 10], // 90 — AI observability moat; fairly valued; unique
-    ANET: [27, 22, 20, 12, 10], // 91 — AI networking; fair; fully unique
-    MELI: [27, 22, 19, 12, 10], // 90 — LatAm fintech monopoly; fair; fully unique
-    TSM:  [26, 23, 19, 12,  9], // 89 — fab monopoly; fair; unique
-    META: [23, 23, 19, 10,  7], // 82 — social moat + AI; pricey; in VOO/VTI
-    AMD:  [23, 22, 20, 12,  9], // 86 — GPU duopoly; fair; near-unique
-    MSFT: [24, 22, 19, 10,  7], // 82 — cloud+AI moat; pricey; partially in funds
-    NBIS: [22, 21, 20, 14,  10],// 87 — EU AI cloud; cheap; fully unique
-    BRKB: [24, 19, 17, 13,  10],// 83 — compounder; fair; fully unique
-    AMZN: [22, 21, 18, 11,  7], // 79 — AWS moat; pricey; in VOO/VTI
-    SHOP: [20, 21, 18, 11,  9], // 79 — commerce infra; fair; near-unique
-    RACE: [24, 18, 17, 10,  10],// 79 — luxury monopoly; expensive always; unique
-    AAPL: [21, 20, 17, 10,  7], // 75 — ecosystem moat; pricey; in VOO/VTI
-    SCHD: [18, 19, 17, 14,  10],// 78 — dividend quality; fair; unique ballast role
-    NFLX: [18, 21, 18, 11,  10],// 78 — content+AI moat; fair; unique
-    GOOG: [20, 20, 18, 11,  7], // 76 — search moat; DOJ risk; in funds
-    VOO:  [18, 20, 17, 12,  6], // 73 — S&P 500; fair; partially redundant
-    VTI:  [17, 20, 17, 12,  5], // 71 — total market; fair; more redundant than VOO
-    O:    [18, 16, 17, 13,  10],// 74 — REIT income; fair; unique
-    VSS:  [15, 16, 17, 12,  9], // 69 — intl small cap; unique vs others
-    FLAX: [15, 16, 16, 12,  9], // 68 — Asia ex-Japan; partially unique
-    GLD:  [18, 11, 16, 8,   10],// 63 — macro hedge; expensive (near peak); unique
-    JEPI: [16, 14, 15, 13,  9], // 67 — income ETF; fair; unique income role
-    VXUS: [14, 17, 16, 12,  5], // 64 — intl; redundant with IEV+VSS+FLAX
-    URTH: [13, 17, 16, 11,  4], // 61 — MSCI World; redundant with VOO+IEV
-    IEV:  [13, 15, 16, 12,  7], // 63 — Europe ETF; partially unique
-    ADBE: [14, 14, 15, 8,   10],// 61 — AI erodes moat; stock near recent lows so val OK
-    TSLA: [7,  16, 14, 9,   10],// 56 — no moat; brand damage; GTC working; unique
-    TQQQ: [5,  13, 13, 7,   10],// 48 — 3x decay; expensive vs fair value; unique
-    // ── Funds ────────────────────────────────────────────────────────
-    // SCBDJI: tracks Dow Jones 30 — you own those stocks directly
-    SCBDJI:   [14, 16, 15, 10,  1], // 56 — some moat in DIA holdings; Redundancy 1 (you own all DIA stocks)
-    SCBSP500: [16, 18, 16, 10,  3], // 63 — S&P 500 tail adds some uniqueness; but near-peak market
-    SCBNDQ:   [16, 18, 16, 9,   2], // 61 — Nasdaq; QQQ in GTN + direct = 4x; near-peak tech
-    KTGESG:   [14, 14, 14, 11,  5], // 58 — ESG excludes your best AI names; fair value
-    SCBNNO:   [10,  8, 11, 10,  8], // 47 — ARK-style peaked; 3yr earnings poor; partially unique
-    SCBGENOM: [12,  6, 10, 11,  9], // 48 — unique; but thesis failed; 3yr earnings very poor
-    SCBEV:    [12, 10, 13,  9,  8], // 52 — EV theme pressured; partially unique
-    SCBWORLD: [14, 17, 15, 10,  4], // 60 — MSCI World; URTH duplicate; near-peak
-    SCBAEM:   [16, 15, 14, 11,  6], // 62 — Asian EM; overlaps FLAX; fair value
-    SCBBUSAA: [14, 18, 15,  9,  3], // 59 — US growth; highly redundant with direct names; pricey
-  };
-
-
-  // ── PFD SCORES (Price/Fundamental Divergence — update quarterly) ──────
-  // sell: higher = regime change risk (price >> fundamentals)
-  // buy:  higher = undervalued recovery (fundamentals >> price)
-  // Derived from 10,000 backtested windows, 2015-2024, VOO benchmark
-  const PFD = {
-    NVDA: {sell:-0.652, buy:0.812}, CRDO: {sell:-0.310, buy:0.620},
-    ASML: {sell:-0.123, buy:0.349}, AVGO: {sell:-0.116, buy:0.330},
-    AMD:  {sell:-0.278, buy:0.566}, ANET: {sell:-0.220, buy:0.480},
-    NBIS: {sell:-0.180, buy:0.420}, META: {sell:-0.343, buy:0.440},
-    AMZN: {sell:-0.277, buy:0.360}, SHOP: {sell:-0.438, buy:0.520},
-    NFLX: {sell:-0.256, buy:0.335}, MSFT: {sell:-0.169, buy:0.304},
-    GOOG: {sell:-0.207, buy:0.283}, AAPL: {sell:-0.102, buy:0.210},
-    ADBE: {sell:-0.179, buy:0.234}, TSLA: {sell:-0.350, buy:0.522},
-    TQQQ: {sell:-0.289, buy:0.369}, SCHD: {sell:-0.037, buy:0.137},
-    GLD:  {sell:+0.043, buy:0.000}, VXUS: {sell:-0.050, buy:0.104},
-    URTH: {sell:-0.058, buy:0.113}, VTI:  {sell:-0.099, buy:0.176},
-    VOO:  {sell:+0.000, buy:0.100}, QQQ:  {sell:-0.100, buy:0.200},
-  };
-  // PFD regime change threshold: sell > 0.40 AND framework < 80
-  // PFD undervalued threshold:   buy  > 0.15 AND rev_growth > 10% AND framework > 70
-
-  const score = t => {
-    const f = FRAMEWORK[t];
-    return f ? f[0]+f[1]+f[2]+f[3]+f[4] : 65;
-  };
-
-  const axisLabel = t => {
-    const f = FRAMEWORK[t];
-    if (!f) return 'Not yet scored in framework';
-    const total = f[0]+f[1]+f[2]+f[3]+f[4];
-    return `Moat ${f[0]}/30 · 3yr Earnings ${f[1]}/25 · Runway ${f[2]}/20 · Valuation ${f[3]}/15 · Redundancy ${f[4]}/10 = ${total}/100`;
-  };
-
-  // ── BACKTESTED HYBRID MODEL (45,000 simulations, 5 historical periods) ──
-  // Key findings:
-  //   ADBE: avg 12m return -16.2% — most consistently correct sell in universe
-  //   URTH/VXUS/JEPI: low returns, correct sells across regimes
-  //   TSLA/TQQQ: correct in bear markets, catastrophically wrong in bull runs
-  //     (TSLA +102%, TQQQ +188% in 2023 AI boom)
-  //   Framework v3 (composite score) beats v1 by 5 percentage points
-  //   Best rule: scale sell urgency down when position has positive momentum
-  //              add hard guard: never sell if today's move > +2%
-
-  // Market regime: use live VOO + QQQ day change
-  const vooChg = prices['VOO']?.change ?? 0;
-  const qqqChg = prices['QQQ']?.change ?? 0;
-  const mktMomentum = (vooChg + qqqChg) / 2;
-  const isBull = mktMomentum > -0.5; // bear only if market down >0.5% today
-
-  // ── TRIPLE COMPOSITE (backtested best model) ─────────────────────
-  // sell_score = 0.40 × momentum + 0.35 × quality + 0.25 × VOO_excess
-  // Validated: wins in 2018, 2019, 2023 vs random and pure framework
-  // Action: use for SIZING decisions (trim ≠ exit)
-
-  // Day change as momentum proxy (normalised)
-  const allDayChgs = Object.values(prices).map(p=>p?.change??0);
-  const maxDayChg = Math.max(...allDayChgs.map(Math.abs), 1);
-
-  const tripleComposite = (t, frameworkScore) => {
-    const dayChg    = prices[t]?.change ?? 0;
-    const momentum  = Math.max(0, dayChg) / maxDayChg;        // 0-1, positive runs only
-    const quality   = (100 - frameworkScore) / 100;            // 0-1, 0=highest quality
-    const vooExcess = Math.max(0, dayChg - (prices['VOO']?.change??0)) / maxDayChg; // beats VOO today
-    const raw = 0.40 * momentum + 0.35 * quality + 0.25 * vooExcess;
-    return raw * 100; // scale back to 0-100
-  };
-
-  // Keep compositeUrgency as alias for backward compat
-  const compositeUrgency = tripleComposite;
-
-  // Hard guards from backtest findings
-  const momentumGuard = t => (prices[t]?.change ?? 0) > 2.0; // never sell if up >2% today
-  const HIGH_VOL = new Set(['TSLA','TQQQ']); // only sell these in bear markets
-  const regimeGuard = t => HIGH_VOL.has(t) && isBull && mktMomentum > 0;
-
-  // Regime badge for display
-  const regimeBadge = isBull
-    ? `<span style="font-size:10px;color:var(--green);font-family:'DM Mono',monospace;">
-        ● Market up today — TSLA &amp; TQQQ sell signals suppressed. Backtest (10yr, VOO benchmark): both beat VOO by +54-74% annually. Selling them costs you market-beating alpha.
-        Backtest: both ran +100%+ in bull markets. Sell signals reinstated when market turns.
-       </span>`
-    : `<span style="font-size:10px;color:var(--amber);font-family:'DM Mono',monospace;">
-        ● Market down today — all sell signals active. In bear markets TSLA/TQQQ underperform VOO significantly (-65%, -82% in 2022). Framework sells are most accurate in declining markets.
-        Bear/correcting regime: framework quality scores take priority over momentum.
-       </span>`;
-
-  const candidates = [];
-
-  // ── STOCK CANDIDATES ───────────────────────────────────────────
-  const stockDefs = [
-    { t:'TSLA', n:'Tesla', shares:5, acct:'US Stock Account',
-      why:'VOO excess: +74% avg annual — backtest says never sell on quality alone. PFD 2021 sell signal was +3.13 (TSLA regime change confirmed) — that was the right time. Current PFD sell: -0.350 (no active regime change signal). Only sell for July 2026 liquidity. Only sell TSLA when raising specific July 2026 cash. Moat 7/30 — no durable moat as BYD and legacy OEMs close the EV gap. 3yr Earnings 16/25 — delivery growth stalled, robotaxi missed every deadline since 2019. Valuation 9/15 — not cheap given execution risk. Brand damage from Musk accumulating. Trim 3 shares into any strength above $440. Keep 2 as optionality on humanoid robots.',
-      action:'TRIM', trimShares:3, gtcPct:1.12 },
-    { t:'TQQQ', n:'ProShares 3x QQQ', shares:28, acct:'US Stock Account',
-      why:'VOO excess: +54% avg annual — backtest says NEVER sell on quality alone. Only trim for July 2026 liquidity. Moat 5/30, 3yr Earnings 13/25 — 3x leverage structurally incompatible with buy-and-hold. Daily rebalancing decay erodes value in flat markets. Valuation 7/15 — expensive relative to NAV fair value. Trim 15 of 30 shares — keeps the bullish Nasdaq thesis without the structural decay.',
-      action:'TRIM', trimShares:15, gtcPct:1.18 },
-    { t:'ADBE', n:'Adobe Inc', shares:1, acct:'US Stock Account',
-      why:'VOO excess: +7% avg annual — borderline, moat eroding fast. PFD Buy: 0.234 (price compressed vs fundamentals — borderline hold not exit). Moat 14/30 — AI (Sora, Runway, Midjourney) structurally threatens the creative software moat. 3yr Earnings 14/25 — revenue growth decelerating as AI alternatives commoditise design tools. GTC at $350 is 38% above current — lower to $290 or exit. Redundancy 10/10 — fully unique, but uniqueness of a declining moat is not a reason to hold.',
-      action:'TRIM', trimShares:1, gtcPct:1.14 },
-    { t:'VXUS', n:'Vanguard Total International', shares:25, acct:'US Stock Account',
-      why:'VOO excess: -7% avg annual — consistently underperforms VOO. One of only 4 positions in universe with negative VOO-relative returns. Valid sell. Redundancy 5/10 — four separate international ETFs (IEV, VSS, FLAX, VXUS) doing the same job. If raising cash for July 2026, VXUS is most redundant — you retain full international exposure via the other three. 3yr Earnings 17/25 — international underperforming US persistently.',
-      action:'TRIM', trimShares:10, gtcPct:1.05 },
-  ];
-
-  for (const s of stockDefs) {
-    const p = snap.find(x=>x.t===s.t);
-    if (!p) continue;
-    const price = p.price ?? 0;
-    const val = price * s.trimShares;
-    const sc = score(s.t);
-
-    // Apply backtested guards
-    if (momentumGuard(s.t)) continue;  // up >2% today — skip
-    if (regimeGuard(s.t)) continue;    // high-vol name in bull market — skip
-
-    const sellScore = compositeUrgency(s.t, sc);
-    const frameworkScore = sc;
-
-    // Add regime context to rationale
-    const regimeNote = HIGH_VOL.has(s.t) && !isBull
-      ? ' ⚑ Sell signal active: bear market regime confirmed.'
-      : HIGH_VOL.has(s.t) && isBull
-      ? ' ⚑ Backtest warning: this name runs hard in bull markets — size trim conservatively.'
-      : '';
-
-    candidates.push({
-      type:'STOCK', ticker:s.t, name:s.n, sellScore,
-      val, action:s.action, account:s.acct,
-      gtcTarget: price ? '$'+Math.round(price * s.gtcPct) : 'GTC',
-      currentPrice: price ? '$'+price.toFixed(2) : '—',
-      rationale: s.why + regimeNote,
-      urgency: sellScore >= 40 ? 'HIGH' : sellScore >= 28 ? 'MEDIUM' : 'LOW',
-      breakdown: axisLabel(s.t) + ` · Composite urgency: ${sellScore.toFixed(1)}/100`,
-      shares: s.trimShares
-    });
-  }
-
-  // ── FUND CANDIDATES ────────────────────────────────────────────
-  // ── Fund sell candidates — scored on same 5-axis framework as stocks ─
-  // Higher score = stronger sell signal. Consistent with stocks (higher sellScore = sell first).
-  const fundDefs = [
-    { key:'SCBDJI',  n:'SCB Dow Jones (A)',      val:8449,  acct:'SCB',
-      why:'DIA tracks the Dow Jones — historically underperforms VOO by ~1-2% annually. Redundancy 1/10 — lowest redundancy score in the universe. DIA holds exactly the 30 stocks you own directly: NVDA, MSFT, AAPL, AMZN, GOOG are all top DIA weights. 3yr earnings potential 16/25 is reasonable but entirely captured by your direct positions. Valuation 10/15 — Dow is near all-time highs. You are paying SCB management fee for zero incremental exposure. First priority sell.',
-    },
-    { key:'SCBSP500', n:'SCB S&P 500 (A)',       val:12535, acct:'SCB',
-      why:'Redundancy 3/10 — VOO in GTN US already covers S&P 500. SCBS&P500 + VOO + direct mega-caps = same index held three times. Valuation 10/15 — S&P 500 near all-time highs, limited near-term upside. 3yr earnings 18/25 solid but fully captured by VOO. Largest absolute value to unlock — highest priority by dollar impact.',
-    },
-    { key:'SCBNDQ',  n:'SCB Nasdaq 100 (A)',     val:2983,  acct:'SCB',
-      why:'Redundancy 2/10 — QQQ in GTN US plus direct NVDA/GOOG/AAPL/META/MSFT gives Nasdaq exposure four separate ways. Valuation 9/15 — Nasdaq near recent highs. 3yr earnings 18/25 solid but zero incremental exposure. Smallest SCB position — cleanest exit.',
-    },
-    { key:'SCBGENOM', n:'SCB Genomic Revolution', val:745,  acct:'SCB',
-      why:'3yr Earnings 6/25 — worst earnings score in the fund universe. ARKG-style genomics has underperformed since 2021 with no commercial thesis materialisation. Runway 10/20 — structural tailwind exists but timing is wrong. Redundancy 9/10 — fully unique in your book, but uniqueness of a losing theme is not a reason to hold. Exit at next NAV.',
-    },
-    { key:'SCBNNO',  n:'SCB Innovation (A)',      val:1741, acct:'SCB',
-      why:'3yr Earnings 8/25 and Moat 10/30 — ARK Innovation-style strategy peaked in 2021. Negative real returns since inception for most ARK-style funds. Runway 11/20 — the "innovation" theme has been superseded by AI infrastructure specifically. Your direct NBIS, CRDO, ANET express the actual theme with higher conviction.',
-    },
-    { key:'KTGESG',  n:'KT-GESG-A (Global ESG)', val:3475, acct:'KT',
-      why:'Moat 14/30 — ESG screen actively excludes NVDA, Meta, and other core AI names due to governance/environmental scores. The filter works against your thesis. 3yr Earnings 14/25 — low-vol ESG tilt underperforms in AI-driven bull markets. Valuation 11/15 — fair value but wrong vehicle entirely.',
-    },
-  ];
-
-  for (const f of fundDefs) {
-    const sc = score(f.key);
-    const sellScore = 100 - sc; // consistent with stocks: lower framework score = higher sell urgency
-    candidates.push({
-      type:'FUND', ticker:f.n, name:f.n, sellScore,
-      val:f.val, action:'SELL', account:f.acct+' mutual fund',
-      gtcTarget:'Next NAV date', currentPrice:'฿ NAV daily',
-      rationale:f.why,
-      urgency: sellScore >= 50 ? 'HIGH' : sellScore >= 40 ? 'MEDIUM' : 'LOW',
-      breakdown: axisLabel(f.key),
-      shares:null
-    });
-  }
-
-  // ── Sort all candidates by sellScore desc (consistent direction) ─
-  // Funds and stocks on same scale — higher sellScore = sell first
-  const allCandidates = candidates.sort((a,b) => b.sellScore - a.sellScore);
-
-  // ── Budget: take top candidates until 10% limit reached ──────────
-  // No separate fund/stock budget — let score determine order
-  const final = [];
-  let totalSell = 0;
-
-  for (const c of allCandidates) {
-    // For large funds, include even if they exceed budget — show the full picture
-    // but flag as exceeding budget in the label
-    if (totalSell >= budget) break;
-    final.push(c);
-    totalSell += c.val;
-    if (final.length >= 6) break;
-  }
-
-  const pct = (totalSell / lastTotal * 100).toFixed(1);
-  renderSells({
-    sells: final,
-    total_sell_value: '$'+Math.round(totalSell).toLocaleString(),
-    pct_of_portfolio: pct+'%',
-    regime_badge: regimeBadge
-  });
-}
-
-async function callClaude(prompt) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-calls': 'true'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-      messages: [{ role: 'user', content: prompt }]
-    })
-  });
-  if (!res.ok) throw new Error('API ' + res.status);
-  const data = await res.json();
-  const text = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
-  const m = text.match(/\{[\s\S]*\}/);
-  if (!m) throw new Error('No JSON returned');
-  return JSON.parse(m[0]);
-}
-
-function renderSignals(data) {
-  const typeStyles = {
-    'COMBINED BUY': { cls:'buy-card',   label:'✦ COMBINED BUY',  tagCls:'tag-green'  },
-    'FACTOR BUY':   { cls:'buy-card',   label:'✦ FACTOR BUY',    tagCls:'tag-blue'   },
-    'BRED TRIM':    { cls:'sell-card',  label:'⚠ BRED TRIM',     tagCls:'tag-amber'  },
-    'BANKER WEAK':  { cls:'sell-card',  label:'⚠ BANKER WEAK',   tagCls:'tag-amber'  },
-    'BULL DAY':     { cls:'hold-card',  label:'↗ BULL DAY',      tagCls:'tag-green'  },
-    'BEAR DAY':     { cls:'sell-card',  label:'↘ BEAR DAY',      tagCls:'tag-red'    },
-    'NEUTRAL':      { cls:'watch-card', label:'— NEUTRAL',        tagCls:'tag-grey'   },
-    'HOLD':         { cls:'hold-card',  label:'· HOLD',           tagCls:'tag-grey'   },
-    // Legacy
-    'WATCH':        { cls:'watch-card', label:'👁 WATCH',         tagCls:'tag-amber'  },
-    'MOMENTUM':     { cls:'hold-card',  label:'↗ MOMENTUM',      tagCls:'tag-green'  },
-    'RISK':         { cls:'sell-card',  label:'⚠ RISK',           tagCls:'tag-red'    },
-    'OPPORTUNITY':  { cls:'buy-card',   label:'✦ OPPORTUNITY',   tagCls:'tag-blue'   },
-  };
-
-  // Backtest summary bar at top
-  const btSummary = `
-    <div style="background:var(--surface2);border:1px solid var(--border-light);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:11px;font-family:'DM Mono',monospace;">
-      <span style="color:var(--text3);letter-spacing:.08em;text-transform:uppercase;font-size:9px;">Combined model backtest (43,200 obs · VOO benchmark)</span><br>
-      <span style="color:var(--green)">Factor+V3 DFV: 61.2% beat VOO · +0.71% alpha</span>
-      <span style="color:var(--text3);margin:0 8px">·</span>
-      <span style="color:var(--blue)">Factor only: 56.2% · +0.55%</span>
-      <span style="color:var(--text3);margin:0 8px">·</span>
-      <span style="color:var(--red)">DFV alone: 43.0% · −1.26% (never use alone)</span>
-    </div>`;
-
-  const html = `
-    <div class="ana-section-title">Signals · Combined Factor + DFV/BRED · ${data.signals?.length ?? 0} active</div>
-    ${btSummary}
-    <div class="signal-grid">
-      ${(data.signals || []).map(s => {
-        const style = typeStyles[s.type] || typeStyles['HOLD'];
-        const p = prices[s.ticker];
-        const dayChg = p?.change ?? s.chg ?? 0;
-        const dayColor = dayChg >= 0 ? 'var(--green)' : 'var(--red)';
-        const actionColor = s.action === 'Add' ? 'var(--green)'
-          : s.action === 'Trim' ? 'var(--amber)'
-          : s.action === 'Buy'  ? 'var(--green)'
-          : s.action === 'Hold' ? 'var(--text3)' : 'var(--red)';
-
-        return `
-        <div class="signal-card ${style.cls}" onclick="openDrawer('${s.ticker}')" style="cursor:pointer;">
-          <div class="sc-header">
-            <div>
-              <div class="sc-ticker">${s.ticker}</div>
-              <div class="sc-name" style="font-size:10px;margin-top:2px;">${s.price ?? '—'}
-                ${dayChg !== 0 ? `<span style="color:${dayColor};margin-left:4px;">${dayChg>=0?'+':''}${dayChg.toFixed(2)}%</span>` : ''}
-              </div>
-            </div>
-            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-              <span class="tag ${style.tagCls}" style="font-size:9px;">${style.label}</span>
-              <span class="tag" style="font-size:9px;color:${actionColor};border-color:${actionColor};background:transparent;">${s.action}</span>
-            </div>
-          </div>
-          <div style="font-size:11px;color:var(--text2);margin-bottom:6px;font-family:'DM Mono',monospace;">${s.headline}</div>
-          <div class="sc-body">${s.detail}</div>
-        </div>`;
-      }).join('')}
-    </div>`;
-  document.getElementById('signalsContent').innerHTML = html;
-}
-
-function renderBuys(data) {
-  const buys = data.buys || [];
-  const btNote = data.backtest_note
-    ? `<div style="font-size:11px;color:var(--text3);margin-bottom:14px;font-family:'DM Mono',monospace;">
-        VOO benchmark: your portfolio beats VOO +22% avg annually (buy&hold baseline).
-        Backtested: Conviction Add +82% avg 12m · DCF Proxy +79% · Framework alone +33%.
-        Priority: ADD to existing high-conviction → NEW via DCF × moat → Watchlist last.
-       </div>`
-    : '';
-
-  const html = `
-    <div class="ana-section-title">Buy Ideas · Backtested Hybrid Model</div>
-    ${btNote}
-    <div class="signal-grid">
-      ${buys.map(b => {
-        const typeColor = b.category === 'Add to existing' ? 'var(--green)'
-          : b.category === 'Watchlist (val gate)' ? 'var(--text3)'
-          : 'var(--blue)';
-        const typeTag = b.category === 'Add to existing' ? 'tag-green'
-          : b.category === 'Watchlist (val gate)' ? 'tag-grey'
-          : 'tag-blue';
-        return `
-        <div class="signal-card buy-card" style="${b.category==='Watchlist (val gate)' ? 'opacity:0.7;' : ''}">
-          <div class="sc-header">
-            <div>
-              <div class="sc-ticker">${b.ticker}</div>
-              <div class="sc-name">${b.account}</div>
-            </div>
-            <div style="text-align:right;">
-              <span class="tag ${typeTag}">${b.category}</span>
-              <div style="font-size:10px;color:var(--text3);margin-top:4px;">Score ${b.score}/100${b.dcf ? ` · DCF ${b.dcf}` : ''}</div>
-            </div>
-          </div>
-          <div class="sc-body">${b.thesis}</div>
-          <div class="sc-accounts">
-            Entry: ${b.entry} · Target: ${b.target} · Size: ${b.size}
-          </div>
-        </div>`;
-      }).join('')}
-    </div>`;
-  document.getElementById('buyContent').innerHTML = html;
-}
-
-function renderSells(data) {
-  const sells = data.sells || [];
-  const totalSellVal = data.total_sell_value || '—';
-  const pctPort = data.pct_of_portfolio || '—';
-
-  const html = `
-    <div class="ana-section-title">Sell Guidance · Max 10% of portfolio · Total: ${totalSellVal} (${pctPort})</div>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:6px;font-family:'DM Mono',monospace;">Framework: Moat/30 · 3yr Earnings/25 · Runway/20 · Valuation/15 · Redundancy/10 — stocks and funds on same scale</div>
-    <div style="margin-bottom:14px;">${data.regime_badge || ''}</div>
-    ${sells.map(s => {
-      const sellScore = s.sellScore ?? s.score ?? 0;
-      const val = s.val ?? 0;
-      const isFund = s.type === 'FUND';
-      const urgencyColor = s.urgency === 'HIGH' ? 'var(--red)' : s.urgency === 'MEDIUM' ? 'var(--amber)' : 'var(--text3)';
-      // Framework score = 100 - sellScore (sellScore is already inverted for sorting)
-      const frameworkScore = 100 - sellScore;
-      const scoreLabel = `Score ${frameworkScore}/100`;
-      return `
-      <div class="signal-card sell-card" style="margin-bottom:10px;">
-        <div class="sc-header">
-          <div>
-            <div class="sc-ticker">
-              ${s.ticker}
-              <span class="tag ${isFund ? 'tag-blue' : 'tag-grey'}" style="margin-left:6px;font-size:9px;">${isFund ? 'FUND' : 'STOCK'}</span>
-              <span class="tag tag-red" style="margin-left:4px;font-size:9px;">${scoreLabel}</span>
-            </div>
-            <div class="sc-name">${s.action}${s.shares ? ' · '+s.shares+' shares' : ''} · ${s.account}</div>
-          </div>
-          <div style="text-align:right;">
-            <span class="tag" style="font-size:10px;border:1px solid ${urgencyColor};color:${urgencyColor};background:transparent;">${s.urgency}</span>
-            <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--green);margin-top:4px;" class="amt">${val > 0 ? '$'+Math.round(val).toLocaleString() : '—'}</div>
-          </div>
-        </div>
-        <div class="sc-body">${s.rationale}</div>
-        ${s.breakdown ? `<div style="margin-top:8px;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);background:var(--bg);padding:6px 10px;border-radius:4px;">${s.breakdown}</div>` : ''}
-        <div class="sc-accounts">
-          Current: ${s.currentPrice ?? s.current_price ?? '—'} · Target: ${s.gtcTarget ?? s.gtc_target ?? '—'} · Est. proceeds: <span class="amt">${val > 0 ? '$'+Math.round(val).toLocaleString() : '—'}</span>
-        </div>
-      </div>`;
-    }).join('')}`;
-  document.getElementById('sellContent').innerHTML = html;
-}
-
-// ── Payload render functions (consume signals_payload.json from Colab) ──
-
-function payloadSignalColor(signal) {
-  return signal === 'BUY'  ? 'var(--green)' :
-         signal === 'SELL' ? 'var(--red)'   : 'var(--text3)';
-}
+// ── Payload render functions (consume signals_payload.json) ──
 
 function renderSignalsFromPayload(payload) {
   const signals = payload.analytics?.signals || [];
   const runDate = payload.run_date || '';
+  const th      = sigThresholds(payload);
   if (!signals.length) {
     document.getElementById('signalsContent').innerHTML =
       '<div class="placeholder">No signals in payload file.</div>';
     return;
   }
-  // Show all signals sorted by buy_score desc, top 30
-  const top = signals.slice(0, 30);
-  const html = `
-    <div class="ana-section-title">Portfolio Signals · ${runDate} · ${signals.length} tickers scanned</div>
+  // Everything that carries a label other than HOLD / NO DATA, sells first.
+  const order = ['EXIT','REDUCE','TRIM','STRONG BUY','BUY','FW BLOCKED','WATCH'];
+  const active = signals
+    .filter(s => order.includes(sigLabel(s)))
+    .sort((a, b) => order.indexOf(sigLabel(a)) - order.indexOf(sigLabel(b)) || (b.buy_score||0) - (a.buy_score||0));
+  const sm = payload.summary || {};
+  const head = `
+    <div class="ana-section-title">Active Signals · ${runDate} · ${signals.length} tickers scanned</div>
     <div style="font-size:11px;color:var(--text3);margin-bottom:12px;font-family:'DM Mono',monospace;">
-      Factor+DFV V3: 4/4 horizons validated · Factor Value backbone +65.7% at 504d ·
-      Strong buy: ${payload.summary?.strong_buy||0} · Factor zone: ${payload.summary?.factor_zone||0}
-    </div>
+      ${active.length} active · same labels as Rankings, Buy Ideas, Sell Guidance and the emails ·
+      Gate open: ${sm.gates ?? sm.factor_zone ?? 0}
+    </div>`;
+  if (!active.length) {
+    document.getElementById('signalsContent').innerHTML = head +
+      '<div class="placeholder">No active signals. Every ticker is HOLD today.</div>';
+    return;
+  }
+  const html = head + `
     <div class="signal-grid">
-      ${top.map(s => {
-        const sigCol  = payloadSignalColor(s.signal);
+      ${active.map(s => {
+        const st      = LABEL_STYLE[sigLabel(s)] || LABEL_STYLE.HOLD;
         const distStr = s.dist_252h != null ? `${s.dist_252h}% from 252d high` : '';
         const maStr   = s.vs_200ma  != null ? `${s.vs_200ma > 0 ? '+' : ''}${s.vs_200ma}% vs 200d MA` : '';
-        const flags   = [
-          s.fdfv3        ? '★ F+DFV3' : s.factor ? '↑ Factor' : '',
-          s.dfv3 && !s.factor ? '⚡ DFV3'  : '',
-          s.pfd          ? '◆ PFD'   : '',
-          s.triple       ? '⚡ 63d run' : '',
-          s.banker_weak  ? '⚠ WB'    : '',
-        ].filter(Boolean).join(' · ');
-        const scoreBar = `<div style="display:inline-flex;align-items:center;gap:4px;">
-          <div style="width:${s.buy_score}px;max-width:80px;height:5px;background:${s.buy_score>=60?'var(--green)':s.buy_score>=30?'var(--amber)':'var(--red)'};border-radius:2px;"></div>
-          <span style="font-size:10px;color:var(--text3)">${s.buy_score}</span></div>`;
+        const isSell  = SELL_LABELS.includes(sigLabel(s));
         return `
-        <div class="signal-card" style="border-left:2px solid ${sigCol};">
+        <div class="signal-card" style="border-left:2px solid ${st.color};">
           <div class="sc-header">
             <div>
               <div class="sc-ticker">${s.ticker}${s.is_holding ? ' <span style="font-size:9px;color:var(--blue);font-weight:400">HELD</span>' : ''}</div>
               <div class="sc-name" style="color:var(--text3);">${distStr}${distStr&&maStr?' · ':''}${maStr}</div>
             </div>
             <div style="text-align:right;">
-              <span class="tag" style="font-size:10px;border-color:${sigCol};color:${sigCol};background:transparent;">${s.signal}</span>
-              <div style="margin-top:4px;">${scoreBar}</div>
+              ${labelBadge(s, th)}
+              <div style="margin-top:4px;font-size:10px;color:var(--text3);font-family:'DM Mono',monospace">
+                ${isSell ? `sell ${s.sell_score}` : `buy ${s.buy_score}`}${s.framework_score ? ` · FW ${s.framework_score}` : ''}
+              </div>
             </div>
           </div>
-          ${flags ? `<div style="font-size:10px;color:var(--text3);margin-bottom:5px;font-family:'DM Mono',monospace;">${flags}</div>` : ''}
-          <div class="sc-body" style="font-size:11px;">${s.guidance}</div>
-          ${s.factor_sep != null ? `<div style="margin-top:5px;font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;">
-            Historical factor α: <span style="color:${s.factor_sep>0?'var(--green)':'var(--red)'}">${s.factor_sep>0?'+':''}${s.factor_sep}%</span> at 252d
-          </div>` : ''}
-          ${s.sell_score != null && s.sell_score > 0 ? `<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-            <span style="font-size:10px;color:var(--text3);">Sell signal</span>
-            <span style="font-size:11px;font-weight:600;padding:1px 7px;border-radius:3px;background:${s.sell_action==='EXIT'?'#8b0000':s.sell_action==='REDUCE'?'#c0392b':s.sell_action==='TRIM'?'#e67e22':'transparent'};color:${s.sell_action!=='HOLD'?'#fff':'var(--text3)'}">${s.sell_action} ${s.sell_score}</span>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:5px;font-family:'DM Mono',monospace;">
+            ${isSell ? (s.sell_flags && s.sell_flags !== '—' ? s.sell_flags : '') : buyBreakdown(s)}
           </div>
-          <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'DM Mono',monospace;">${s.sell_flags||''}</div>` : ''}
+          <div class="sc-body" style="font-size:11px;">${labelTitle(s, th)}. ${s.guidance || ''}</div>
         </div>`;
       }).join('')}
     </div>`;
@@ -4044,77 +3419,36 @@ function renderBuysFromPayload(payload) {
   const allSigs  = payload.analytics?.signals || [];
   const runDate  = payload.run_date || '';
   const market   = payload.market || {};
+  const th       = sigThresholds(payload);
   const cnnScore = market.cnn_score || 50;
   const vixZ     = market.vix_zscore || 0;
   const vixCur   = market.vix_current || 20;
   const vixLabel = market.vix_label || 'Neutral';
 
-  // VIX z-score buy limits (replaces CNN for buy caps):
-  // HIGH VIX (fear/panic) → more buys | LOW VIX (complacency) → fewer buys
-  const strongLimit  = vixZ > 2 ? 6 : vixZ > 1 ? 4 : vixZ > -1 ? 3 : vixZ > -2 ? 2 : 1;
-  const regularLimit = vixZ > 2 ? 6 : vixZ > 1 ? 5 : vixZ > -1 ? 3 : vixZ > -2 ? 2 : 1;
-  // Use scanner-provided caps if available (authoritative)
-  const finalStrongLimit  = market.strong_cap  || strongLimit;
-  const finalRegularLimit = market.regular_cap || regularLimit;
-
-  // Single unified ranked list — sorted by buy_score descending.
-  // Minimum bar: score >= 40 AND FW >= 60 AND factor gate open (or fdfv3).
-  // No separate strong/regular split that causes lower-score tickers to
-  // appear above higher-score ones. Tier label shown on the card itself.
-  const totalLimit = Math.max(finalStrongLimit, finalRegularLimit);
-  const allBuys = allSigs
-    .filter(s => {
-      const fw = s.framework_score || 0;
-      const score = s.buy_score || 0;
-      const hasSignal = s.fdfv3 || (s.factor && !s.fdfv3);
-      return hasSignal && score >= 40 && fw >= 60 && s.signal !== 'WEAK_BUY';
-    })
-    .sort((a, b) => {
-      // Held positions first, then by buy_score desc, then FW desc
-      if (a.is_holding !== b.is_holding) return a.is_holding ? -1 : 1;
-      if (b.buy_score !== a.buy_score) return b.buy_score - a.buy_score;
-      return (b.framework_score || 0) - (a.framework_score || 0);
-    })
-    .slice(0, totalLimit);
-
-  // Keep legacy vars for section headers (unused now but referenced below)
-  const strongBuys  = allBuys.filter(s => s.fdfv3);
-  const regularBuys = allBuys.filter(s => !s.fdfv3);
+  // This tab does no scoring, filtering or capping of its own. It lists the
+  // rows the scanner labelled, grouped by that label. The buy cap has already
+  // been applied by the scanner (capped buys arrive as WATCH + buy_capped).
+  const byScore = (a, b) => (b.buy_score||0) - (a.buy_score||0) || (b.framework_score||0) - (a.framework_score||0);
+  const buys    = allSigs.filter(s => BUY_LABELS.includes(sigLabel(s))).sort(byScore);
+  const blocked = allSigs.filter(s => sigLabel(s) === 'FW BLOCKED').sort(byScore);
+  const watch   = allSigs.filter(s => sigLabel(s) === 'WATCH').sort(byScore);
 
   const el = document.getElementById('buyContent');
 
-  if (!allBuys.length) {
-    el.innerHTML = '<div class="placeholder">No buy signals meeting criteria. Threshold: score≥40 + FW≥60 + factor gate open. Waiting for higher-conviction setups.</div>';
-    return;
-  }
-
-  function buyCard(s, tier) {
-    const isStrong = tier === 'strong';
-    const accentColor = isStrong ? 'var(--green)' : '#0891b2';
-    const tierLabel   = isStrong ? '★★ STRONG BUY' : '★ FACTOR BUY';
+  function buyCard(s) {
+    const st = LABEL_STYLE[sigLabel(s)] || LABEL_STYLE.HOLD;
+    const accentColor = st.color;
     const fw = s.framework_score;
-    const fwColor = fw >= 85 ? 'var(--green)' : fw >= 70 ? '#0891b2' : 'var(--amber)';
+    const fwColor = ({Core:'var(--green)', Good:'#0891b2'})[(s.framework && s.framework.band) || (fw >= 85 ? 'Core' : fw >= 70 ? 'Good' : '')] || 'var(--amber)';
     const dayChg = s.change_pct || 0;
     const dayColor = dayChg >= 0 ? 'var(--green)' : 'var(--red)';
-
-    // ── Signal breakdown ──────────────────────────────────────────────
-    const signals_fired = [];
-    if (s.factor)       signals_fired.push(`<span style="color:var(--green)">Factor +40</span>`);
-    if (s.fdfv3)        signals_fired.push(`<span style="color:var(--green)">DFV V3 +25</span>`);
-    if (s.pfd)          signals_fired.push(`<span style="color:#0891b2">PFD +8</span>`);
-    if (s.triple)       signals_fired.push(`<span style="color:#8b5cf6">Triple +10</span>`);
-    if (s.insider_score)signals_fired.push(`<span style="color:var(--amber)">Insider +${s.insider_score}</span>`);
-    if (s.pead_score)   signals_fired.push(`<span style="color:#a78bfa">PEAD +${s.pead_score}</span>`);
-    if (s.sector_buy_boost) signals_fired.push(`<span style="color:#0891b2">Sector +${s.sector_buy_boost}</span>`);
-    if (s.banker_weak)  signals_fired.push(`<span style="color:var(--amber)">BankerWeak −20</span>`);
-    if (s.rbear)        signals_fired.push(`<span style="color:var(--amber)">RBear −10</span>`);
-
+    const bd = buyBreakdown(s);
     return `<div class="signal-card" style="border-left:3px solid ${accentColor};margin-bottom:10px;">
       <div class="sc-header">
         <div>
           <div class="sc-ticker">${s.ticker}
             ${s.is_holding ? '<span class="tag tag-red" style="margin-left:6px;font-size:9px;">HELD</span>' : '<span style="border:1px solid var(--border);color:var(--text3);font-size:9px;padding:1px 5px;border-radius:2px;margin-left:4px">CAND</span>'}
-            <span style="margin-left:8px;font-size:10px;font-weight:700;color:${accentColor}">${tierLabel}</span>
+            <span style="margin-left:8px">${labelBadge(s, th)}</span>
           </div>
           <div class="sc-name">
             $${(s.price||0).toFixed(2)}
@@ -4130,144 +3464,115 @@ function renderBuysFromPayload(payload) {
           <div style="font-size:9px;color:var(--text3)">framework</div>` : ''}
         </div>
       </div>
-      <!-- Signal breakdown -->
-      ${signals_fired.length ? `<div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);margin:6px 0 4px;">
-        Signals: ${signals_fired.join(' &nbsp;·&nbsp; ')}
-        &nbsp;=&nbsp; <span style="color:${accentColor};font-weight:600">${s.buy_score} total</span>
+      ${bd ? `<div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);margin:6px 0 4px;">
+        ${bd} &nbsp;=&nbsp; <span style="color:${accentColor};font-weight:600">${s.buy_score}</span>
       </div>` : ''}
+      <div style="font-size:11px;color:var(--text2);margin:4px 0">${labelTitle(s, th)}</div>
       <div style="display:flex;gap:16px;margin:6px 0;font-size:11px;font-family:'DM Mono',monospace;color:var(--text3)">
-        <span title="DFV lift">DFV lift: <b style="color:${isStrong?'var(--green)':'var(--text)'}">${(s.dfv_lift||0).toFixed(1)}</b></span>
+        ${s.run_12m !== undefined ? `<span>vs 252d high: <b>${s.dist_252h}%</b></span>
+        <span>vs 200d MA: <b>${s.vs_200ma > 0 ? '+' : ''}${s.vs_200ma}%</b></span>
+        <span title="12-month return divided by volatility; the gate needs more than 0.6">12m run: <b>${s.run_12m ?? '—'}</b></span>` : ''}
         ${s.factor_sep != null ? `<span>Hist α: <b style="color:${s.factor_sep>0?'var(--green)':'var(--red)'}">${s.factor_sep>0?'+':''}${s.factor_sep}%</b></span>` : ''}
-        ${s.triple ? '<span style="color:#8b5cf6">⚡ 3x momentum</span>' : ''}
-        ${s.banker_weak ? '<span style="color:var(--amber)">⚠ Banker Weak</span>' : ''}
       </div>
       <div class="sc-body">${s.guidance || ''}</div>
-      ${s.sell_score > 0 && s.sell_action && s.sell_action !== 'HOLD'
-        ? `<div style="margin-top:6px;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3)">
-            Sell signal: <span style="color:${s.sell_action==='EXIT'?'var(--red)':s.sell_action==='REDUCE'?'#f97316':'var(--amber)'}">${s.sell_action} ${s.sell_score}</span>
-            ${s.sell_flags && s.sell_flags!=='—' ? '· ' + s.sell_flags : ''}
-           </div>`
-        : ''}
     </div>`;
   }
+
+  const section = (title, rows, note) => rows.length
+    ? `<div class="ana-section-title" style="margin-top:14px">${title} · ${rows.length}</div>
+       ${note ? `<div style="font-size:11px;color:var(--text3);margin-bottom:8px">${note}</div>` : ''}
+       ${rows.map(buyCard).join('')}`
+    : '';
 
   let html = `<div style="margin-bottom:6px;font-size:11px;color:var(--text3);font-family:'DM Mono',monospace">
     ${runDate}
     · VIX: <span style="color:${vixZ > 1 ? 'var(--green)' : vixZ < -1 ? 'var(--red)' : 'var(--text3)'};font-weight:600">${vixCur.toFixed(1)} z=${vixZ.toFixed(1)} (${vixLabel})</span>
-    · CNN: <span style="color:${cnnScore < 40 ? 'var(--green)' : cnnScore > 75 ? 'var(--red)' : 'var(--text3)'}">${cnnScore.toFixed(0)}</span>
-    · Cap: ${totalLimit} · Ranked by score
+    · CNN: ${market.cnn_ok === false ? 'n/a' : cnnScore.toFixed(0)}
+    · Buy cap: ${market.strong_cap ?? '—'} strong + ${market.regular_cap ?? '—'} regular
+    · Buy = score ≥${th.buy} and FW ≥${th.fw_min_buy}
+    · Model ${payload.model_version || 'v2'}
   </div>`;
 
-  // Single ranked list — highest score first regardless of tier
-  html += allBuys.map(s => buyCard(s, s.fdfv3 ? 'strong' : 'regular')).join('');
-
-  html += `<div style="margin-top:12px;font-size:10px;color:var(--text3);background:var(--s2);padding:8px 12px;border-radius:6px;font-family:'DM Mono',monospace">
-    ★★ = Factor+DFV V3 both firing · ★ = Factor only (waiting for DFV V3) · Sorted by score · Full universe in Rankings tab
-  </div>`;
+  html += buys.length
+    ? section('Buy signals', buys)
+    : `<div class="placeholder" style="margin:10px 0">No buy signals today. Nothing scored ≥${th.buy} with FW ≥${th.fw_min_buy}.</div>`;
+  html += section('FW blocked — score qualifies, framework does not', blocked,
+                  'Not buys. The technical score cleared the bar but the framework score is below the minimum.');
+  html += section('Watch — not yet a buy', watch,
+                  `Two of the three buy conditions met and the third close (score ${th.watch}–${th.buy - 1}), or a qualified buy pushed out by today's cap.`);
 
   el.innerHTML = html;
 }
 
 function renderSellsFromPayload(payload) {
-  // Uses sell_action/sell_score from signals_payload.json (set by sell_side_scorer.py)
-  // Validated signals: near_high (-15.8% 252d) · CMF_dist (-9.1%) · ATR_ext (-13.4%) · RVz>2 (-1.4% 30d)
+  // Lists held positions the scanner labelled TRIM / REDUCE / EXIT. The
+  // scanner's portfolio sell cap is already applied — no second cap here.
   const allSigs  = payload.analytics?.signals || [];
   const market   = payload.market || {};
   const runDate  = payload.run_date || '';
+  const th       = sigThresholds(payload);
 
-  const cnnScore = market.cnn_score || 50;
-  const cnnLabel = market.cnn_label || 'Neutral';
-  const cnnColor = cnnScore > 75 ? 'var(--red)' : cnnScore > 50 ? 'var(--amber)' : 'var(--green)';
+  const order = {EXIT:3, REDUCE:2, TRIM:1};
+  const sells = allSigs
+    .filter(s => SELL_LABELS.includes(sigLabel(s)))
+    .sort((a, b) => (order[sigLabel(b)] - order[sigLabel(a)]) || (b.sell_score||0) - (a.sell_score||0));
 
-  // CNN-aware sell limits:
-  // Extreme Greed (>80): show up to 6 — more selling warranted
-  // Greed (60-80):       show up to 4
-  // Neutral (40-60):     show up to 3 (default)
-  // Fear (<40):          show up to 2 — market already pricing in weakness
-  // Extreme Fear (<20):  show up to 1 — never pile on at lows
-  const sellLimit = cnnScore > 80 ? 6 : cnnScore > 60 ? 4 : cnnScore > 40 ? 3 : cnnScore > 20 ? 2 : 1;
-
-  const newSells = allSigs
-    .filter(s => s.sell_action && s.sell_action !== 'HOLD' && s.is_holding)
-    .sort((a, b) => {
-      const order = {EXIT:4, REDUCE:3, TRIM:2};
-      const ao = order[a.sell_action] || 0;
-      const bo = order[b.sell_action] || 0;
-      if (bo !== ao) return bo - ao;
-      return (b.sell_score||0) - (a.sell_score||0);
-    })
-    .slice(0, sellLimit);
-
-  const sells = newSells;
+  // Framework damping multiplies a 0-100 score, so a high framework score puts
+  // REDUCE/EXIT out of reach no matter what the price does. Say so plainly.
+  const heldDirect = allSigs.filter(s => s.is_holding && s.sell_ceiling && !s.proxy && sigLabel(s) !== 'NO DATA');
+  const nNoReduce  = heldDirect.filter(s => ['HOLD', 'TRIM'].includes(s.sell_ceiling)).length;
+  const nNoTrim    = heldDirect.filter(s => s.sell_ceiling === 'HOLD').length;
+  const ceilNote   = heldDirect.length
+    ? `<br>Reach of this model: ${nNoReduce} of ${heldDirect.length} held stocks can never score REDUCE or EXIT (framework damping caps them)${nNoTrim ? `, ${nNoTrim} can never score TRIM` : ''}. It does not look at position size.`
+    : '';
+  const legend = `TRIM ≥${th.trim} · REDUCE ≥${th.reduce} · EXIT ≥${th.exit} (after framework damping) · sell cap ${market.sell_cap ?? '—'} held positions${ceilNote}`;
 
   if (!sells.length) {
     document.getElementById('sellContent').innerHTML =
-      '<div class="placeholder">No sell signals active. Portfolio within 10% cap — all holdings clean.</div>';
+      `<div class="placeholder">No sell signals on held positions today.<br><span style="font-size:11px">${legend}</span></div>`;
     return;
   }
 
-  const ac = a => a==='EXIT'?'#8b0000':a==='REDUCE'?'#c0392b':a==='TRIM'?'#e67e22':'var(--amber)';
-  const usingNew = newSells.length > 0;
-
   const html = `
-    <div class="ana-section-title">Sell Priority · ${runDate} · ${sells.length} position(s) flagged · Cap: ${sellLimit} (CNN ${cnnScore.toFixed(0)})</div>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:10px;font-family:'DM Mono',monospace;">
-      ${usingNew
-        ? `Validated signals: near_high · CMF_dist@high · ATR_ext · RVz>2 · Thresholds: TRIM≥35 · REDUCE≥55 · EXIT≥70`
-        : `Sell score: Banker Weak +40 · RSI divergence +30 · Momentum overextended +15 · Framework &lt;65 +25`
-      }
-      &nbsp;·&nbsp; CNN F&amp;G: <span style="color:${cnnColor};font-weight:600">${cnnScore.toFixed(0)} (${cnnLabel})</span>
-    </div>
+    <div class="ana-section-title">Sell Guidance · ${runDate} · ${sells.length} held position(s) flagged</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:10px;font-family:'DM Mono',monospace;">${legend}</div>
     ${sells.map(s => {
       const score   = s.sell_score || 0;
       const raw     = s.sell_score_raw || score;
       const fw      = s.framework_score || 0;
-      const action  = s.sell_action || 'HOLD';
-      if (action === 'HOLD') return '';
-      const acColor = ac(action);
+      const st      = LABEL_STYLE[sigLabel(s)];
       const distPct = s.sell_dist != null ? s.sell_dist
                     : s.dist_252h != null ? s.dist_252h : null;
       return `
-      <div class="signal-card sell-card" style="margin-bottom:10px;border-left:3px solid ${acColor};">
+      <div class="signal-card sell-card" style="margin-bottom:10px;border-left:3px solid ${st.color};">
         <div class="sc-header">
           <div>
             <div class="sc-ticker">${s.ticker}
-              ${s.is_holding ? '<span class="tag tag-red" style="margin-left:6px;font-size:9px;">HELD</span>' : ''}
+              <span class="tag tag-red" style="margin-left:6px;font-size:9px;">HELD</span>
             </div>
             <div class="sc-name">$${s.price?.toLocaleString()} · ${s.change_pct >= 0 ? '+' : ''}${s.change_pct}% today
               ${distPct != null ? ` · ${distPct}% from 252d high` : ''}
             </div>
           </div>
           <div style="text-align:right;">
-            <span style="background:${acColor};color:#fff;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:700;">${action}</span>
+            ${labelBadge(s, th, true)}
             <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);margin-top:3px;">
-              ${raw && raw !== score ? `Raw ${raw} → <b style="color:${score>=78?'var(--red)':score>=65?'var(--amber)':'#f59e0b'}">${score}</b>` : `Score: <b>${score}</b>`}
+              ${raw && raw !== score ? `Raw ${raw} → <b>${score}</b>` : `Score: <b>${score}</b>`}
               ${fw ? ` · FW ${fw}` : ''}
             </div>
           </div>
         </div>
         ${s.sell_flags && s.sell_flags !== '—'
-          ? `<div style="font-size:10px;color:var(--text3);margin:5px 0;font-family:'DM Mono',monospace;">${s.sell_flags}</div>`
-          : s.banker_weak || s.triple || s.rbear ? `<div style="font-size:10px;color:var(--text3);margin:5px 0;font-family:'DM Mono',monospace;">${[s.banker_weak?'⚠ Banker Weak':'',s.triple?'⚡ Overextended':'',s.rbear?'↘ RSI div':''].filter(Boolean).join(' · ')}</div>` : ''
-        }
+          ? `<div style="font-size:10px;color:var(--text3);margin:5px 0;font-family:'DM Mono',monospace;">${s.sell_flags}</div>` : ''}
         ${s.sell_caution && s.sell_caution !== '—'
-          ? `<div style="font-size:10px;color:var(--amber);font-family:'DM Mono',monospace;margin-bottom:4px;">Caution: ${s.sell_caution}</div>`
-          : ''
-        }
+          ? `<div style="font-size:10px;color:var(--amber);font-family:'DM Mono',monospace;margin-bottom:4px;">Caution: ${s.sell_caution}</div>` : ''}
         <div style="display:flex;gap:14px;margin-top:6px;font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);">
           ${s.sell_weekly_rsi != null ? `<span>wRSI: ${s.sell_weekly_rsi}</span>` : ''}
           ${s.sell_cmf != null ? `<span>CMF: ${s.sell_cmf}</span>` : ''}
           ${s.sell_rv_z != null ? `<span>RV-Z: ${s.sell_rv_z}</span>` : ''}
-          <span>FW: <b style="color:${(s.framework_score||0)>=80?'var(--green)':(s.framework_score||0)>=65?'#0891b2':'var(--amber)'}">${s.framework_score || '—'}/100</b></span>
         </div>
-        ${fw ? `<div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);margin-top:4px;background:var(--s2);padding:5px 8px;border-radius:4px;">
-          FW ${fw} damping already applied by scanner · score ${score} is post-damp → ${action}
-        </div>` : ''}
       </div>`;
-    }).join('')}
-    <div style="margin-top:10px;font-size:10px;color:var(--text3);background:var(--s2);padding:8px 12px;border-radius:6px;">
-      Holding style: buy-and-hold years · cash months · single signals not enough — look for confluence
-    </div>`;
+    }).join('')}`;
 
   document.getElementById('sellContent').innerHTML = html;
 }
@@ -4504,7 +3809,7 @@ setTimeout(async () => {
         'if(t){localStorage.setItem(\'gh_pat\',t);location.reload();}' +
         'return false;">Set token</a> · or make repo public';
     } else {
-      updEl.textContent = '⚠ Signals unavailable — GitHub fetch failed. Click Run Live Analysis to use AI fallback.';
+      updEl.textContent = '⚠ Signals unavailable — GitHub fetch failed. Click Reload Signals to retry.';
     }
   }
 })();

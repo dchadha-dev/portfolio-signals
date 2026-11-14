@@ -1,0 +1,1972 @@
+{
+ "_readme": [
+  "Framework score inputs. See FRAMEWORK.md.",
+  "legacy: the old single hand total. Used only as a placeholder for axes that have neither data nor a hand value.",
+  "hand: hand sub-scores on the ORIGINAL rubric scale (moat /30, quality /25, growth /20, valuation /20). The scorer converts them pro rata to the live weights (moat /40, quality /30, growth /20, valuation /10). quality, growth and valuation are overridden by fundamentals when available.",
+  "moat_answers: five true/false answers to the moat questions in FRAMEWORK.md, 8 points each. When set, replaces hand.moat.",
+  "moat_date: YYYY-MM-DD the moat was last judged. null or older than 120 days is flagged on the dashboard.",
+  "kind \"fund\": ETFs and funds keep their legacy score; no fundamentals are applied."
+ ],
+ "tickers": {
+  "NVDA": {
+   "legacy": 93,
+   "hand": {
+    "moat": 28,
+    "quality": 23,
+    "growth": 18,
+    "valuation": 13
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "CRDO": {
+   "legacy": 93,
+   "hand": {
+    "moat": 27,
+    "quality": 15,
+    "growth": 19,
+    "valuation": 14
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ASML": {
+   "legacy": 93,
+   "hand": {
+    "moat": 28,
+    "quality": 21,
+    "growth": 18,
+    "valuation": 15
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "AVGO": {
+   "legacy": 92,
+   "hand": {
+    "moat": 26,
+    "quality": 22,
+    "growth": 17,
+    "valuation": 14
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ANET": {
+   "legacy": 91,
+   "hand": {
+    "moat": 26,
+    "quality": 21,
+    "growth": 18,
+    "valuation": 14
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "DDOG": {
+   "legacy": 90,
+   "hand": {
+    "moat": 24,
+    "quality": 20,
+    "growth": 18,
+    "valuation": 13
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "MELI": {
+   "legacy": 90,
+   "hand": {
+    "moat": 23,
+    "quality": 18,
+    "growth": 19,
+    "valuation": 14
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "LLY": {
+   "legacy": 90,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "TSM": {
+   "legacy": 89,
+   "hand": {
+    "moat": 25,
+    "quality": 20,
+    "growth": 18,
+    "valuation": 13
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "MA": {
+   "legacy": 88,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "V": {
+   "legacy": 88,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "NBIS": {
+   "legacy": 87,
+   "hand": {
+    "moat": 22,
+    "quality": 16,
+    "growth": 18,
+    "valuation": 17
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "AMD": {
+   "legacy": 86,
+   "hand": {
+    "moat": 23,
+    "quality": 18,
+    "growth": 17,
+    "valuation": 14
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "NOW": {
+   "legacy": 86,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "MSCI": {
+   "legacy": 86,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "BKNG": {
+   "legacy": 85,
+   "hand": {
+    "moat": 23,
+    "quality": 20,
+    "growth": 15,
+    "valuation": 13
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ISRG": {
+   "legacy": 85,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SPGI": {
+   "legacy": 85,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "AMZN": {
+   "legacy": 84,
+   "hand": {
+    "moat": 24,
+    "quality": 19,
+    "growth": 17,
+    "valuation": 13
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "CRWD": {
+   "legacy": 84,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "KLAC": {
+   "legacy": 84,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "TMO": {
+   "legacy": 84,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "GOOG": {
+   "legacy": 83,
+   "hand": {
+    "moat": 24,
+    "quality": 20,
+    "growth": 17,
+    "valuation": 12
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "PANW": {
+   "legacy": 83,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "LRCX": {
+   "legacy": 83,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ZTS": {
+   "legacy": 83,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "MSFT": {
+   "legacy": 82,
+   "hand": {
+    "moat": 26,
+    "quality": 22,
+    "growth": 15,
+    "valuation": 11
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "META": {
+   "legacy": 82,
+   "hand": {
+    "moat": 24,
+    "quality": 20,
+    "growth": 16,
+    "valuation": 12
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "AMAT": {
+   "legacy": 82,
+   "hand": {
+    "moat": 21,
+    "quality": 18,
+    "growth": 17,
+    "valuation": 13
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "RMS.PA": {
+   "legacy": 82,
+   "hand": {
+    "moat": 24,
+    "quality": 21,
+    "growth": 14,
+    "valuation": 12
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "CDNS": {
+   "legacy": 82,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SNPS": {
+   "legacy": 82,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "AXON": {
+   "legacy": 82,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ICE": {
+   "legacy": 82,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "IDXX": {
+   "legacy": 82,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "COST": {
+   "legacy": 82,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "CMG": {
+   "legacy": 82,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "FICO": {
+   "legacy": 81,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "CME": {
+   "legacy": 81,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "AAPL": {
+   "legacy": 80,
+   "hand": {
+    "moat": 23,
+    "quality": 22,
+    "growth": 14,
+    "valuation": 11
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "CPRT": {
+   "legacy": 80,
+   "hand": {
+    "moat": 21,
+    "quality": 19,
+    "growth": 16,
+    "valuation": 13
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "NVO": {
+   "legacy": 80,
+   "hand": {
+    "moat": 22,
+    "quality": 20,
+    "growth": 17,
+    "valuation": 12
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "MC.PA": {
+   "legacy": 80,
+   "hand": {
+    "moat": 23,
+    "quality": 20,
+    "growth": 14,
+    "valuation": 12
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "CRM": {
+   "legacy": 80,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "NDAQ": {
+   "legacy": 80,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ADI": {
+   "legacy": 80,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "TXN": {
+   "legacy": 80,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "BX": {
+   "legacy": 80,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "MCD": {
+   "legacy": 80,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "RACE": {
+   "legacy": 79,
+   "hand": {
+    "moat": 21,
+    "quality": 19,
+    "growth": 14,
+    "valuation": 13
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "INTU": {
+   "legacy": 79,
+   "hand": {
+    "moat": 21,
+    "quality": 19,
+    "growth": 16,
+    "valuation": 12
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "MPWR": {
+   "legacy": 79,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "MRVL": {
+   "legacy": 79,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SPOT": {
+   "legacy": 79,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "HD": {
+   "legacy": 79,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SHOP": {
+   "legacy": 78,
+   "hand": {
+    "moat": 19,
+    "quality": 16,
+    "growth": 16,
+    "valuation": 13
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "PGR": {
+   "legacy": 78,
+   "hand": {
+    "moat": 19,
+    "quality": 17,
+    "growth": 15,
+    "valuation": 13
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "BRKB": {
+   "legacy": 78,
+   "hand": {
+    "moat": 22,
+    "quality": 19,
+    "growth": 13,
+    "valuation": 13
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ORCL": {
+   "legacy": 78,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "AXP": {
+   "legacy": 78,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "KKR": {
+   "legacy": 78,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "MSI": {
+   "legacy": 78,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "TTD": {
+   "legacy": 77,
+   "hand": {
+    "moat": 19,
+    "quality": 17,
+    "growth": 16,
+    "valuation": 13
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "NET": {
+   "legacy": 77,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "VRT": {
+   "legacy": 77,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "NFLX": {
+   "legacy": 76,
+   "hand": {
+    "moat": 20,
+    "quality": 18,
+    "growth": 14,
+    "valuation": 12
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "MU": {
+   "legacy": 76,
+   "hand": {
+    "moat": 18,
+    "quality": 16,
+    "growth": 16,
+    "valuation": 14
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ITX.MC": {
+   "legacy": 76,
+   "hand": {
+    "moat": 19,
+    "quality": 17,
+    "growth": 14,
+    "valuation": 14
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "VEEV": {
+   "legacy": 76,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "HEI": {
+   "legacy": 76,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "QCOM": {
+   "legacy": 76,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "JPM": {
+   "legacy": 76,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "JNJ": {
+   "legacy": 76,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ABT": {
+   "legacy": 76,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ABNB": {
+   "legacy": 76,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "MAR": {
+   "legacy": 76,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "CEG": {
+   "legacy": 76,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "DE": {
+   "legacy": 76,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "WMT": {
+   "legacy": 76,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ARM": {
+   "legacy": 76,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "UNH": {
+   "legacy": 75,
+   "hand": {
+    "moat": 20,
+    "quality": 17,
+    "growth": 14,
+    "valuation": 12
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "TEAM": {
+   "legacy": 75,
+   "hand": {
+    "moat": 19,
+    "quality": 17,
+    "growth": 15,
+    "valuation": 12
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "KNSL": {
+   "legacy": 75,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "BSX": {
+   "legacy": 75,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "FISV": {
+   "legacy": 74,
+   "hand": {
+    "moat": 19,
+    "quality": 16,
+    "growth": 14,
+    "valuation": 12
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "APP": {
+   "legacy": 74,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "IBKR": {
+   "legacy": 74,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "GS": {
+   "legacy": 74,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ABBV": {
+   "legacy": 74,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ELV": {
+   "legacy": 74,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "NVS": {
+   "legacy": 74,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "PODD": {
+   "legacy": 74,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "UBER": {
+   "legacy": 74,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "LOW": {
+   "legacy": 74,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "PG": {
+   "legacy": 74,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "CAT": {
+   "legacy": 74,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "WM": {
+   "legacy": 74,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "MS": {
+   "legacy": 73,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "CRWV": {
+   "legacy": 72,
+   "hand": {
+    "moat": 17,
+    "quality": 13,
+    "growth": 17,
+    "valuation": 10
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "RELX": {
+   "legacy": 72,
+   "hand": {
+    "moat": 20,
+    "quality": 18,
+    "growth": 15,
+    "valuation": 13
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ALAB": {
+   "legacy": 72,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SMH": {
+   "legacy": 72,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ON": {
+   "legacy": 72,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SCHW": {
+   "legacy": 72,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "UTHR": {
+   "legacy": 72,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "MEDP": {
+   "legacy": 72,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ONON": {
+   "legacy": 72,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "NKE": {
+   "legacy": 72,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "LULU": {
+   "legacy": 72,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "KO": {
+   "legacy": 72,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "PEP": {
+   "legacy": 72,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "MNST": {
+   "legacy": 72,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "DECK": {
+   "legacy": 72,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "NEE": {
+   "legacy": 72,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "GEV": {
+   "legacy": 72,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "CB": {
+   "legacy": 72,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "LSCC": {
+   "legacy": 71,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "CSCO": {
+   "legacy": 70,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "DASH": {
+   "legacy": 70,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "GE": {
+   "legacy": 70,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "LMT": {
+   "legacy": 70,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "VOO": {
+   "legacy": 82,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "S&P 500 — gold standard, lowest cost, maximum diversification"
+  },
+  "SPY": {
+   "legacy": 82,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "S&P 500 — same exposure as VOO, slightly higher fees"
+  },
+  "IVV": {
+   "legacy": 82,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "S&P 500 iShares — equivalent to VOO/SPY"
+  },
+  "QQQ": {
+   "legacy": 78,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Nasdaq-100 — quality tilt but tech concentration risk"
+  },
+  "DIA": {
+   "legacy": 72,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Dow Jones — 30 large caps, price-weighted, less optimal"
+  },
+  "VXF": {
+   "legacy": 70,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Vanguard Extended Market — US small/mid, higher vol"
+  },
+  "VXUS": {
+   "legacy": 68,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Vanguard Total International — broad but EM drag"
+  },
+  "XLK": {
+   "legacy": 76,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Technology sector — quality but concentration"
+  },
+  "XLV": {
+   "legacy": 74,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Healthcare sector — defensive quality"
+  },
+  "XLF": {
+   "legacy": 68,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Financials — cyclical, regulatory risk"
+  },
+  "XLI": {
+   "legacy": 68,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Industrials — cyclical"
+  },
+  "XLY": {
+   "legacy": 70,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Consumer discretionary — quality names but cyclical"
+  },
+  "XLE": {
+   "legacy": 58,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Energy — commodity-dependent, ESG headwinds"
+  },
+  "IEV": {
+   "legacy": 65,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "iShares Europe ETF — Europe quality drag vs US"
+  },
+  "EWJ": {
+   "legacy": 64,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Japan — structural quality, yen risk"
+  },
+  "URTH": {
+   "legacy": 72,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "MSCI World — global diversification, US-heavy"
+  },
+  "EWY": {
+   "legacy": 60,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "South Korea — Samsung-heavy, EM premium"
+  },
+  "EWZ": {
+   "legacy": 52,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Brazil — EM political/commodity risk"
+  },
+  "GLD": {
+   "legacy": 65,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Gold — inflation hedge, no yield, no moat"
+  },
+  "IEF": {
+   "legacy": 60,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "7-10yr Treasuries — rate duration risk"
+  },
+  "TLT": {
+   "legacy": 55,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "20yr+ Treasuries — high duration, volatile"
+  },
+  "TQQQ": {
+   "legacy": 48,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "3× Nasdaq — severe decay on sideways markets"
+  },
+  "FLAX": {
+   "legacy": 62,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Franklin FTSE Asia ex-Japan — broad Asia quality"
+  },
+  "VTI": {
+   "legacy": 82,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Vanguard Total Market — max diversification"
+  },
+  "IWF": {
+   "legacy": 76,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "iShares Russell 1000 Growth — quality growth tilt"
+  },
+  "XLG": {
+   "legacy": 74,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Invesco S&P Top 50 — mega-cap concentration"
+  },
+  "SCHB": {
+   "legacy": 81,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Schwab US Broad — VTI equivalent"
+  },
+  "ITOT": {
+   "legacy": 81,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "iShares Total US — VTI equivalent"
+  },
+  "VIG": {
+   "legacy": 78,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Vanguard Dividend Appreciation — quality dividend growth"
+  },
+  "DGRO": {
+   "legacy": 76,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "iShares Core Dividend Growth"
+  },
+  "VYM": {
+   "legacy": 72,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Vanguard High Dividend — value tilt, lower growth"
+  },
+  "SCHD": {
+   "legacy": 76,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Schwab US Dividend — quality/value filter, low cost"
+  },
+  "NOBL": {
+   "legacy": 74,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "S&P 500 Dividend Aristocrats"
+  },
+  "DGRW": {
+   "legacy": 75,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "WisdomTree Quality Dividend Growth"
+  },
+  "AIQ": {
+   "legacy": 65,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Global X AI & Technology — broad AI, quality holdings"
+  },
+  "QTUM": {
+   "legacy": 62,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Defiance Quantum — quantum/AI thesis, early stage"
+  },
+  "BOTZ": {
+   "legacy": 63,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Global X Robotics & AI — cyclical"
+  },
+  "WCLD": {
+   "legacy": 60,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "WisdomTree Cloud Computing"
+  },
+  "CLOU": {
+   "legacy": 58,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Global X Cloud Computing — elevated valuation risk"
+  },
+  "FIVG": {
+   "legacy": 60,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Defiance 5G"
+  },
+  "ARKG": {
+   "legacy": 44,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "ARK Genomic Revolution — speculative biotech"
+  },
+  "ARKK": {
+   "legacy": 42,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "ARK Innovation — aggressive, concentration risk"
+  },
+  "ARKW": {
+   "legacy": 44,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "ARK Next Gen Internet"
+  },
+  "ARKF": {
+   "legacy": 44,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "ARK Fintech Innovation"
+  },
+  "AAXJ": {
+   "legacy": 62,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "iShares Asia ex Japan — broad Asia, EM discount"
+  },
+  "INDA": {
+   "legacy": 68,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "iShares India — structural growth, higher valuation"
+  },
+  "KWEB": {
+   "legacy": 52,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "KraneShares China Internet — regulatory + geopolitical"
+  },
+  "FXI": {
+   "legacy": 50,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "iShares China Large Cap — SOE-heavy"
+  },
+  "VWO": {
+   "legacy": 60,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Vanguard EM — broad, commodity/political drag"
+  },
+  "BND": {
+   "legacy": 62,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Vanguard Total Bond"
+  },
+  "AGG": {
+   "legacy": 62,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "iShares Core US Agg"
+  },
+  "HYG": {
+   "legacy": 55,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "iShares High Yield — credit + cyclical risk"
+  },
+  "LQD": {
+   "legacy": 60,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "iShares IG Corporate"
+  },
+  "JEPI": {
+   "legacy": 70,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "JPM Equity Premium Income — quality income, upside capped by covered calls"
+  },
+  "VSS": {
+   "legacy": 68,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Vanguard Intl Small Cap — broad diversification, higher vol than large cap"
+  },
+  "XLB": {
+   "legacy": 62,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Materials Select Sector — cyclical, commodity-linked, no structural moat"
+  },
+  "CQQQ": {
+   "legacy": 52,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Invesco China Tech — regulatory + geopolitical risk, same profile as KWEB"
+  },
+  "AIQG": {
+   "legacy": 65,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "Global X AI UCITS — mirrors AIQ exposure, UCITS wrapper"
+  },
+  "QNTM.L": {
+   "legacy": 58,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "VanEck Quantum UCITS — early-stage theme, thinner liquidity than QTUM"
+  },
+  "GME": {
+   "legacy": 25,
+   "moat_answers": null,
+   "moat_date": null,
+   "note": "GameStop — no durable moat, weak fundamentals, sentiment-driven"
+  },
+  "ACLS": {
+   "legacy": 68,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "COHR": {
+   "legacy": 68,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "GLW": {
+   "legacy": 68,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "TSEM": {
+   "legacy": 68,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "DELL": {
+   "legacy": 68,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "BAC": {
+   "legacy": 68,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "OWL": {
+   "legacy": 68,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "MDT": {
+   "legacy": 68,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ALGN": {
+   "legacy": 68,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "RCL": {
+   "legacy": 68,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SBUX": {
+   "legacy": 68,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "CL": {
+   "legacy": 68,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ULTA": {
+   "legacy": 68,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "CCJ": {
+   "legacy": 68,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "XOM": {
+   "legacy": 68,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "RTX": {
+   "legacy": 68,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "AER": {
+   "legacy": 68,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "PDD": {
+   "legacy": 68,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "HDB": {
+   "legacy": 68,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "CVX": {
+   "legacy": 67,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "GILD": {
+   "legacy": 66,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "UL": {
+   "legacy": 66,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "CAVA": {
+   "legacy": 66,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SONY": {
+   "legacy": 66,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "TM": {
+   "legacy": 65,
+   "hand": {
+    "moat": 17,
+    "quality": 13,
+    "growth": 11,
+    "valuation": 14
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "O": {
+   "legacy": 65,
+   "hand": {
+    "moat": 15,
+    "quality": 14,
+    "growth": 11,
+    "valuation": 14
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SNOW": {
+   "legacy": 65,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "IBM": {
+   "legacy": 65,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "TOST": {
+   "legacy": 65,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "DIS": {
+   "legacy": 65,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "RMBS": {
+   "legacy": 64,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "FSLR": {
+   "legacy": 64,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "UPS": {
+   "legacy": 64,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "PI": {
+   "legacy": 64,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "C": {
+   "legacy": 62,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "UHS": {
+   "legacy": 62,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "CELH": {
+   "legacy": 62,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SE": {
+   "legacy": 62,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "TCOM": {
+   "legacy": 62,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "EXPE": {
+   "legacy": 62,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SHEL": {
+   "legacy": 62,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "EQNR": {
+   "legacy": 62,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "VLO": {
+   "legacy": 62,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "OXY": {
+   "legacy": 62,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "FDX": {
+   "legacy": 62,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "BABA": {
+   "legacy": 62,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "INFY": {
+   "legacy": 62,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "FIVN": {
+   "legacy": 62,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ADBE": {
+   "legacy": 61,
+   "hand": {
+    "moat": 17,
+    "quality": 17,
+    "growth": 11,
+    "valuation": 8
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "STX": {
+   "legacy": 60,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "BIIB": {
+   "legacy": 60,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "DKNG": {
+   "legacy": 60,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "HIMS": {
+   "legacy": 60,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "EQT": {
+   "legacy": 60,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "BKR": {
+   "legacy": 60,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "BEP": {
+   "legacy": 60,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "RIO": {
+   "legacy": 60,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "FCX": {
+   "legacy": 60,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "COIN": {
+   "legacy": 58,
+   "hand": {
+    "moat": 14,
+    "quality": 10,
+    "growth": 16,
+    "valuation": 8
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "WDC": {
+   "legacy": 58,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "PFE": {
+   "legacy": 58,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "CVNA": {
+   "legacy": 58,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "PLNT": {
+   "legacy": 58,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "HAL": {
+   "legacy": 58,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "FORM": {
+   "legacy": 58,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "HSBC": {
+   "legacy": 58,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SNDK": {
+   "legacy": 58,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "VICR": {
+   "legacy": 58,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "GDX": {
+   "legacy": 58,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SLV": {
+   "legacy": 55,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "LIT": {
+   "legacy": 60,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "TSLA": {
+   "legacy": 56,
+   "hand": {
+    "moat": 14,
+    "quality": 11,
+    "growth": 13,
+    "valuation": 7
+   },
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "RDDT": {
+   "legacy": 56,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "BP": {
+   "legacy": 56,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "MMM": {
+   "legacy": 56,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "JD": {
+   "legacy": 56,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "FUTU": {
+   "legacy": 55,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SOFI": {
+   "legacy": 54,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ENPH": {
+   "legacy": 54,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "BIDU": {
+   "legacy": 54,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "NVTS": {
+   "legacy": 52,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "HPE": {
+   "legacy": 52,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "HOOD": {
+   "legacy": 52,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "MRNA": {
+   "legacy": 52,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SMCI": {
+   "legacy": 52,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "NXE": {
+   "legacy": 52,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "T": {
+   "legacy": 52,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "VZ": {
+   "legacy": 52,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "RKLB": {
+   "legacy": 52,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "GRAB": {
+   "legacy": 50,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SYM": {
+   "legacy": 50,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "HIMX": {
+   "legacy": 48,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "BE": {
+   "legacy": 48,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "BA": {
+   "legacy": 48,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "IREN": {
+   "legacy": 48,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "ASTS": {
+   "legacy": 46,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SOUN": {
+   "legacy": 44,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SEDG": {
+   "legacy": 44,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SERV": {
+   "legacy": 42,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "INTC": {
+   "legacy": 42,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "DNN": {
+   "legacy": 42,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "APLD": {
+   "legacy": 42,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "AAL": {
+   "legacy": 40,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "EOSE": {
+   "legacy": 38,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "MSTR": {
+   "legacy": 38,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "IONQ": {
+   "legacy": 36,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "NEXT": {
+   "legacy": 35,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "KEEL": {
+   "legacy": 32,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "QBTS": {
+   "legacy": 28,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "RGTI": {
+   "legacy": 28,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "QUBT": {
+   "legacy": 24,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "QUCY": {
+   "legacy": 20,
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SCB_SP500": {
+   "legacy": 63,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SCB_NDQ": {
+   "legacy": 61,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SCB_SEMI": {
+   "legacy": 72,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SCB_WORLD": {
+   "legacy": 68,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SCB_GOLD": {
+   "legacy": 65,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SCB_NK225": {
+   "legacy": 62,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SCB_SET50": {
+   "legacy": 55,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SCB_DJ": {
+   "legacy": 56,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SCB_AIEM": {
+   "legacy": 64,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SCB_FINTECH": {
+   "legacy": 60,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SCB_AUTO": {
+   "legacy": 52,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SCB_INNOV": {
+   "legacy": 47,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SCB_GENO": {
+   "legacy": 48,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SCB_CHINA": {
+   "legacy": 54,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SCB_EV": {
+   "legacy": 58,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "SCB_BUSAA": {
+   "legacy": 62,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "KT_INDIA": {
+   "legacy": 70,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "KT_WORLD": {
+   "legacy": 65,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "KT_WTAI": {
+   "legacy": 68,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "KT_BLOCK": {
+   "legacy": 55,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "KT_TECH": {
+   "legacy": 64,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  },
+  "KT_ESG": {
+   "legacy": 58,
+   "kind": "fund",
+   "moat_answers": null,
+   "moat_date": null
+  }
+ }
+}

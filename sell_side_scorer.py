@@ -84,8 +84,11 @@ def _calc_rsi(series, period=14):
     rs = avg_gain / avg_loss.replace(0, float("nan"))
     return 100 - (100 / (1 + rs))
 
-def compute_sell_signals(cl, hi, lo, vol):
-    if cl is None or len(cl) < 20: return {}
+def sell_frame(cl, hi, lo, vol):
+    """Full history of the sell-side inputs for one ticker. compute_sell_signals()
+    returns the last row of this frame; validate_signals.py backtests the whole
+    frame, so live scoring and validation can never drift apart."""
+    if cl is None or len(cl) < 20: return pd.DataFrame()
     # Ensure hi/lo/vol are valid series — fall back to close if needed
     if hi is None or len(hi) < len(cl): hi = cl
     if lo is None or len(lo) < len(cl): lo = cl
@@ -121,7 +124,11 @@ def compute_sell_signals(cl, hi, lo, vol):
     df["rv_z"]      = (df["rv20"]-df["rv_mean3y"]) / df["rv_std3y"].replace(0,float("nan"))
     df["rv_z2"]     = df["rv_z"] > 2.0
     df["rv_z3"]     = df["rv_z"] > 3.0
-    df = df.dropna(subset=["dist"])
+    return df.dropna(subset=["dist"])
+
+
+def compute_sell_signals(cl, hi, lo, vol):
+    df = sell_frame(cl, hi, lo, vol)
     if len(df)==0: return {}
     last = df.iloc[-1]
     def safe(v): return None if (isinstance(v,float) and v!=v) else v
@@ -277,6 +284,9 @@ def fetch_market_signals():
         "cnn_score": 50, "cnn_label": "Neutral",
         "sp500_extended": False, "buffett_extended": False,
         "vix_current": 20.0, "vix_zscore": 0.0, "vix_label": "Neutral",
+        # False until the CNN endpoint actually answers. The defaults above are
+        # indistinguishable from a real "Neutral 50" reading otherwise.
+        "cnn_ok": False, "vix_ok": False,
     }
     # ── CNN Fear & Greed (kept for cap logic / display only) ──────────
     try:
@@ -285,7 +295,9 @@ def fetch_market_signals():
         d = r.json()
         result["cnn_score"] = float(d["fear_and_greed"]["score"])
         result["cnn_label"] = d["fear_and_greed"]["rating"]
-    except: pass
+        result["cnn_ok"]    = True
+    except Exception as e:
+        print(f"CNN Fear & Greed fetch failed ({str(e)[:60]}) — using neutral default 50")
 
     # ── VIX z-score (used for sell score multiplier) ──────────────────
     # z-score vs 252d mean: >+2=extreme fear, <-2=extreme greed (complacency)
@@ -306,7 +318,9 @@ def fetch_market_signals():
         result["vix_current"] = round(vix_last, 1)
         result["vix_zscore"]  = vix_z
         result["vix_label"]   = vix_label
-    except: pass
+        result["vix_ok"]      = True
+    except Exception as e:
+        print(f"VIX fetch failed ({str(e)[:60]}) — sell multiplier and buy caps use neutral defaults")
 
     # ── S&P500 and Buffett extension (kept as sell boosters) ──────────
     try:
@@ -345,7 +359,7 @@ def score_ticker(ticker, sell_sigs, market, sector_states, framework_score=None)
         dist_pct = dist
         if dist_pct > -10:  # within 10% of high
             # Linear: 0% below = 35pts, 10% below = 0pts
-            near_score = max(0, 35 * (1 + dist_pct / 10))
+            near_score = min(35, max(0, 35 * (1 + dist_pct / 10)))
             score += near_score
             if near_score >= 20:
                 flags.append(f"near_high({dist_pct:+.1f}%)+{near_score:.0f}")
@@ -418,10 +432,12 @@ def score_ticker(ticker, sell_sigs, market, sector_states, framework_score=None)
     sector_boost = 0
     for sector in TICKER_SECTORS.get(ticker, []):
         sector_data = sector_states.get(sector, {})
-        # Handle both old bool format and new dict format
+        # Legacy bool format meant "sector extended" and adds to the sell score.
+        # The dict format carries 'entry_signal', which is a BUY tailwind (a dip
+        # in an outperforming sector) and must never raise a sell score — it is
+        # consumed on the buy side in signal_scanner.build_payload().
         if isinstance(sector_data, dict):
-            if sector_data.get('entry_signal'):
-                sector_boost = 5; flags.append(f"{sector}_entry+5"); break
+            continue
         elif sector_data:
             sector_boost = 5; flags.append(f"{sector}_ext+5"); break
 
@@ -444,15 +460,12 @@ def score_ticker(ticker, sell_sigs, market, sector_states, framework_score=None)
     # FW=90: ×0.57
     # FW=100:×0.50
     fw = framework_score
-    if fw is not None and fw > 0:
-        fw_damp = round(1.0 - 0.50 * ((fw / 100) ** 1.5), 3)
-        if fw >= 70:
-            caution.append(f"FW{fw}(×{fw_damp:.2f})")
-    else:
-        fw_damp = 1.0
+    damp = fw_damp(fw)
+    if fw is not None and fw >= 63:   # band 'Good' or better (framework_scorer.BUY_MIN)
+        caution.append(f"FW{fw}(×{damp:.2f})")
 
     score_raw = score  # save pre-damp for payload
-    score = min(100, round(score * fw_damp, 1))
+    score = min(100, round(score * damp, 1))
 
     if   score >= EXIT_T:   action = "EXIT"
     elif score >= REDUCE_T: action = "REDUCE"
@@ -460,6 +473,20 @@ def score_ticker(ticker, sell_sigs, market, sector_states, framework_score=None)
     else:                   action = "HOLD"
 
     return score, score_raw, action, " | ".join(flags) or "—", " | ".join(caution) or "—"
+
+def fw_damp(framework_score):
+    fw = framework_score
+    return round(1.0 - 0.50 * ((fw / 100) ** 1.5), 3) if (fw is not None and fw > 0) else 1.0
+
+
+def sell_ceiling(framework_score):
+    """Strongest sell action reachable for a given framework score, with every
+    input at its maximum (raw 95, VIX x1.30, both market add-ons -> capped at 100,
+    then FW damping). Because damping is multiplicative on a 0-100 score, a high
+    framework score makes REDUCE/EXIT mathematically unreachable."""
+    top = 100 * fw_damp(framework_score)
+    return "EXIT" if top >= EXIT_T else "REDUCE" if top >= REDUCE_T else "TRIM" if top >= TRIM_T else "HOLD"
+
 
 def score_all(universe_rows, market, sector_states):
     """
