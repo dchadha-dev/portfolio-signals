@@ -12,6 +12,8 @@ on:
       - 'signal_scanner.py'
       - 'sell_side_scorer.py'
       - 'validated_params.json'
+      - 'framework_scorer.py'
+      - 'framework_scores.json'
 
 jobs:
   scan:
