@@ -97,27 +97,54 @@ def _blend(parts, axis_max, need):
 # ── COMPUTED AXES ─────────────────────────────────────────────────────
 # All margin / return / growth inputs are in percent (45.0 = 45%).
 
+def _profitable(m):
+    eps = _num(m.get('eps_ttm'))
+    return eps is not None and eps > 0
+
+
+def _is_financial(m):
+    """Banks, brokers and insurers report no gross margin or free-cash-flow margin,
+    and their leverage is the business model. The quality rubric does not apply."""
+    return _num(m.get('gross_margin')) is None and _num(m.get('fcf_margin')) is None
+
+
 def quality_points(m):
-    """Financial quality, 0-25. Thresholds follow the written rubric: gross margin
-    60%+, ROIC 20%+, strong cash generation, little debt."""
-    return _blend([
-        (_lin(m.get('gross_margin'), 20, 60, 7), 7),
-        (_lin(m.get('fcf_margin'),    0, 25, 6), 6),
-        (_lin(m.get('roic'),          5, 20, 7), 7),
+    """Financial quality, 0-25. Return on capital carries most weight because it
+    is the one measure that works across retailers, software and industrials;
+    gross margin is down-weighted so low-margin, high-turnover models (COST) are
+    not punished for their business model. Missing inputs score zero rather than
+    being rescaled away, and loss-makers keep at most 60%."""
+    if not m or _is_financial(m):
+        return None
+    parts = [
+        (_lin(m.get('roic'),          5, 25, 10), 10),
+        (_lin(m.get('fcf_margin'),    0, 20,  6),  6),
+        (_lin(m.get('gross_margin'), 20, 60,  4),  4),
         (_lin(m.get('net_debt_to_equity'), 1.5, 0.0, 5), 5),
-    ], AXES['quality'], need=2)
+    ]
+    if sum(p is not None for p, _ in parts) < 3:
+        return None
+    pts = AXES['quality'] * sum((p or 0.0) for p, _ in parts) / 25.0
+    if not _profitable(m):
+        pts = min(pts, 0.6 * AXES['quality'])
+    return round(pts, 1)
 
 
 def growth_points(m):
-    """Growth, 0-20. Realised growth only — it cannot see the size of the market ahead."""
+    """Growth, 0-20. Realised growth only — it cannot see the size of the market
+    ahead. Loss-makers keep at most 60%: fast growth from a tiny, unprofitable
+    base is not the same thing as a growing business."""
     rev3, rev1 = m.get('rev_growth_3y'), m.get('rev_growth_ttm')
     if _num(rev3) is None and _num(rev1) is None:
         return None
-    return _blend([
+    pts = _blend([
         (_lin(rev3, 0, 25, 10), 10),
         (_lin(rev1, 0, 30, 6), 6),
         (_lin(m.get('eps_growth_3y'), 0, 25, 4), 4),
     ], AXES['growth'], need=1)
+    if not _profitable(m):
+        pts = min(pts, 0.6 * AXES['growth'])
+    return pts
 
 
 def current_pe(m, price=None):
@@ -130,11 +157,14 @@ def current_pe(m, price=None):
 
 def valuation_points(m, price=None):
     """Valuation, 0-20; higher = cheaper. Half from P/E against the stock's own
-    5-year median, half from P/E divided by growth. Loss-makers fall back to
-    price/sales against its own history."""
+    5-year median, half from P/E divided by growth.
+
+    Loss-makers have no earnings to value, so they get at most 5: price/sales
+    against its own history, and nothing at all above 15x sales. A stock that has
+    fallen from a bubble valuation is not cheap just because it is cheaper."""
     pe = current_pe(m, price)
-    rel = peg = None
     if pe:
+        rel = peg = None
         med = _num(m.get('pe_5y_median'))
         if med and med > 0:
             rel = _lin(pe / med, 1.3, 0.7, 10)
@@ -142,12 +172,14 @@ def valuation_points(m, price=None):
         if g is None or g <= 0:
             g = _num(m.get('rev_growth_3y'))
         if g and g > 0:
-            peg = _lin(pe / g, 3.0, 1.0, 10)
-    else:
-        ps, med = _num(m.get('ps_ttm')), _num(m.get('ps_5y_median'))
-        if ps and med and med > 0:
-            rel = _lin(ps / med, 1.3, 0.7, 10)
-    return _blend([(rel, 10), (peg, 10)], AXES['valuation'], need=1)
+            peg = _lin(pe / min(g, 50.0), 3.0, 1.0, 10)   # cap growth at 50%: no stock is cheap on 300% growth
+        return _blend([(rel, 10), (peg, 10)], AXES['valuation'], need=1)
+    ps, med = _num(m.get('ps_ttm')), _num(m.get('ps_5y_median'))
+    if ps is None:
+        return None
+    if ps > 15:
+        return 0.0
+    return round(_lin(ps / med, 1.3, 0.7, 5), 1) if med and med > 0 else 0.0
 
 
 COMPUTED = {'quality': lambda m, p: quality_points(m),
