@@ -23,22 +23,40 @@ Each input scores zero at the first figure and full marks at the second, in a st
 
 ### Financial quality (30)
 
+Two paths, depending on the company's stage.
+
+**Profitable companies, and loss-makers that are not scaling:**
+
 | Input | Weight | Zero at | Full at | Why |
 |---|---|---|---|---|
-| Return on capital | 10 of 25 | 5% | 25% | The best single test of a good business, and it works for retailers, software and industrials alike |
+| Return on capital | 10 of 25 | 5% | 25% | The best single test of a good business, and it compares across industries |
 | Free-cash-flow margin | 6 of 25 | 0% | 20% | Profits that turn into cash |
-| Gross margin | 4 of 25 | 20% | 60% | Pricing power; kept small so high-volume, low-margin models (Costco) are not punished for their business model |
-| Debt to equity | 5 of 25 | 1.5× | 0 | Balance-sheet risk |
+| Gross margin | 4 of 25 | 20% | 60% | Pricing power |
+| Balance sheet | 5 of 25 | see below | | Can the debt be serviced |
 
-The four weights add to 25 and are scaled up to 30.
+**Scaling loss-makers** lose money while growing revenue 30%+ a year on gross margins of 50%+. The unit economics work and the losses are spending ahead of revenue (NBIS, NET, CRWV), so return on capital and cash flow describe them badly. They are judged on:
 
-Adjustments:
+| Input | Weight | Zero at | Full at |
+|---|---|---|---|
+| Gross margin | 12 of 25 | 40% | 75% |
+| Revenue growth, last 12 months | 8 of 25 | 30% | 100% |
+| Balance sheet | 5 of 25 | see below | |
 
-- **Missing inputs score zero.** A company that does not report free cash flow does not get the benefit of the doubt. If fewer than three inputs exist, the axis is not computed at all.
-- **Loss-makers keep at most 60% of the axis (18 of 30).**
-- **Buybacks.** Finnhub reports debt over book equity, so companies that have bought back most of their shares look insolvent (McDonald's 41×, Lowe's 52×). If the ratio is above 3 but return on capital is 15%+ and free-cash-flow margin 10%+, the debt input gets half points instead of zero.
+Both paths are out of 25 and scaled to 30.
+
+**Margins are judged half against the industry.** Each margin scores half on the absolute scale above and half against the median of its industry peers: zero at half the median, full at 1.5×. This stops hardware, retail and industrials being marked down for their business model. Industry labels come from Finnhub. Where those are too coarse, an `industry` field in `framework_scores.json` overrides them; AAPL, DELL, HPE, SMCI, STX, WDC and SNDK are set to "Technology Hardware", because Finnhub files them under "Technology" beside the software companies. An industry needs at least 5 peers with data; otherwise only the absolute scale is used.
+
+**Balance sheet.** Interest coverage (operating profit divided by interest) is used when Finnhub reports it: zero at 2×, full at 12×. Unlike debt-to-equity, it is not distorted when buybacks shrink book equity.
+
+- A negative figure on a profitable company means it earns more interest on its cash than it pays on its debt (PANW, LULU), so it gets full points.
+- On a loss-maker, a negative figure only reflects the losses, so the balance sheet is judged on debt-to-equity instead: full at 0, zero at 1.5×. Above 3×, with return on capital 15%+ and free-cash-flow margin 10%+, debt-to-equity gets half points, because there the ratio reflects buybacks rather than risk.
+
+**Other rules:**
+
+- **Missing inputs score zero.** On the profitable path, fewer than three inputs means the axis is not computed.
+- **Every loss-maker keeps at most 60% of quality (18 of 30).** This is the only place losses are penalised. Growth is not capped, and valuation has its own rule for companies with no earnings, so one fact is not punished three times.
 - **Implausible figures are ignored.** A free-cash-flow margin above 100% (NBIS showed 3,571%) is treated as unknown.
-- **Banks, brokers and insurers** report no gross or free-cash-flow margin, and leverage is their business model. The rubric does not fit, so quality and growth fall back to your hand score.
+- **Banks, brokers and insurers** report no gross or free-cash-flow margin, and leverage is their business model. Quality and growth fall back to your hand score.
 
 ### Growth (20)
 
@@ -48,7 +66,7 @@ Adjustments:
 | Last-12-month revenue growth | 6 | 0% | 30% |
 | 3-year EPS growth, per year | 4 | 0% | 25% |
 
-Missing inputs are dropped and the rest rescaled; at least one revenue figure is needed. Loss-makers keep at most 60% of the axis (12 of 20), because fast growth from a tiny, unprofitable base is not the same thing as a growing business.
+Missing inputs are dropped and the rest rescaled; at least one revenue figure is needed. There is no cap for loss-makers, because their losses are already counted in quality.
 
 ### Valuation (10)
 
@@ -114,5 +132,6 @@ Fundamentals older than 45 days are ignored, and the scorer falls back to hand o
 - **Growth is backward-looking.** A company at an inflection scores low until the numbers arrive, and a cyclical is judged at whatever point in the cycle it is in (P/S helps valuation here, but not growth).
 - **Growth favours growth companies.** Full marks need 25% a year, so steady compounders (P&G 2%, Coca-Cola 4%) score low on this axis. That is deliberate for a growth-oriented portfolio, but it is a choice.
 - **Return on capital is GAAP-based.** Companies with heavy stock compensation or recent large acquisitions (Palo Alto 1.6%) look worse than their cash economics.
+- **Industry comparison is only as good as the peer group.** With 227 stocks, many industries have fewer than 5 peers and fall back to the absolute scale. Peer medians also move with the cycle: in a memory boom, DELL's 20% gross margin is judged against peers near 50%.
 - **190 of 230 stocks still have no real moat judgement,** only a placeholder from the old total. Until those are answered, 40% of most scores is the old number.
 - **Non-US listings, ETFs and funds stay hand-scored.**

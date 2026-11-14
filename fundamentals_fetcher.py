@@ -16,6 +16,7 @@ check on AAPL so a silent mismatch is visible in the Actions log.
 """
 
 import json, os, statistics, sys, time
+from collections import Counter
 from datetime import datetime, timezone
 
 import requests
@@ -39,6 +40,10 @@ FIELDS = {
                                    'epsInclExtraItemsTTM'],                                                 []),
     'pe_ttm':             (RATIO, ['peTTM', 'peBasicExclExtraTTM', 'peExclExtraTTM', 'peInclExtraTTM'],     []),
     'ps_ttm':             (RATIO, ['psTTM', 'psAnnual'],                                                    []),
+    # Interest coverage (operating profit / interest expense). Unlike debt/equity it
+    # is not distorted when buybacks shrink book equity.
+    'interest_coverage':  (RATIO, ['netInterestCoverageTTM', 'netInterestCoverageAnnual',
+                                   'interestCoverageTTM', 'interestCoverageAnnual'],                        []),
 }
 HISTORY = {'pe_5y_median': ['peTTM', 'pe'], 'ps_5y_median': ['psTTM', 'ps']}
 
@@ -83,19 +88,31 @@ def normalise(raw):
     return out
 
 
-def fetch_one(symbol, token, session):
-    r = session.get('https://finnhub.io/api/v1/stock/metric',
-                    params={'symbol': symbol, 'metric': 'all', 'token': token}, timeout=20)
+def _get(session, path, params):
+    r = session.get('https://finnhub.io/api/v1/' + path, params=params, timeout=20)
     if r.status_code == 429:
         time.sleep(30)
-        r = session.get('https://finnhub.io/api/v1/stock/metric',
-                        params={'symbol': symbol, 'metric': 'all', 'token': token}, timeout=20)
+        r = session.get('https://finnhub.io/api/v1/' + path, params=params, timeout=20)
     if r.status_code != 200:
         return None, f'http {r.status_code}'
     try:
         return r.json(), None
     except ValueError:
         return None, 'bad json'
+
+
+def fetch_one(symbol, token, session):
+    return _get(session, 'stock/metric', {'symbol': symbol, 'metric': 'all', 'token': token})
+
+
+def fetch_industry(symbol, token, session):
+    """Finnhub's industry label (e.g. 'Semiconductors', 'Retail'), used to compare
+    margins with peers instead of against one template for every business."""
+    prof, err = _get(session, 'stock/profile2', {'symbol': symbol, 'token': token})
+    if err or not isinstance(prof, dict):
+        return None
+    ind = prof.get('finnhubIndustry')
+    return ind.strip() if isinstance(ind, str) and ind.strip() else None
 
 
 def sanity_check(tickers):
@@ -132,8 +149,13 @@ def main():
             errors[t] = err
         else:
             seen_keys.update((raw.get('metric') or {}).keys())
+            seen_keys.update('series.annual.' + k for k in ((raw.get('series') or {}).get('annual') or {}).keys())
             m = normalise(raw)
             if m:
+                time.sleep(RATE_LIMIT_SLEEP)
+                ind = fetch_industry(finnhub_symbol(t), token, session)
+                if ind:
+                    m['industry'] = ind
                 tickers[t] = m
             else:
                 errors[t] = 'no usable fields'
@@ -141,7 +163,7 @@ def main():
             print(f'  {i + 1}/{len(universe)} fetched, {len(tickers)} usable')
         time.sleep(RATE_LIMIT_SLEEP)
 
-    coverage = {k: sum(1 for m in tickers.values() if k in m) for k in list(FIELDS) + list(HISTORY)}
+    coverage = {k: sum(1 for m in tickers.values() if k in m) for k in list(FIELDS) + list(HISTORY) + ['industry']}
     problems = sanity_check(tickers)
     unmatched = {name: FIELDS[name][1] for name in FIELDS
                  if FIELDS[name][1] and not any(k in seen_keys for k in FIELDS[name][1])}
@@ -150,7 +172,11 @@ def main():
         'source': 'finnhub /stock/metric?metric=all',
         'health': {'requested': len(universe), 'usable': len(tickers), 'coverage': coverage,
                    'sanity_problems': problems, 'aliases_never_seen': unmatched,
-                   'errors': dict(list(errors.items())[:80])},
+                   'errors': dict(list(errors.items())[:80]),
+                   # every debt/interest/EBITDA field Finnhub returned, so better leverage
+                   # measures can be chosen from real names rather than guessed
+                   'debt_keys_seen': sorted(k for k in seen_keys if any(w in k.lower() for w in ('debt', 'interest', 'ebitd', 'leverage', 'coverage'))),
+                   'industries': dict(sorted(Counter(m.get('industry') for m in tickers.values() if m.get('industry')).items(), key=lambda kv: -kv[1]))},
         'tickers': tickers,
     }
     # Never overwrite a good file with an empty or implausible one.

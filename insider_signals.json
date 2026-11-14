@@ -1,60 +1,16 @@
 {
   "health": {
-    "timestamp": "2026-11-14 01:27 UTC",
+    "timestamp": "2026-11-14 02:00 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
     "n_insider_signals": 7,
     "n_politician_signals": 0,
     "n_combined_signals": 7,
-    "elapsed_seconds": 224.7,
+    "elapsed_seconds": 284.4,
     "retry_required": false,
     "retry_reason": []
   },
   "signals": {
-    "KEEL": {
-      "buy_score_boost": 20,
-      "insider_score": 20,
-      "politician_score": 0,
-      "insider_n": 2,
-      "insider_cluster": true,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "KEEL",
-          "date": "2026-11-13",
-          "value_usd": 47000,
-          "shares": 25000,
-          "price": 1.88,
-          "name": "Freedman Amy",
-          "title": "Director",
-          "is_cluster": true
-        },
-        {
-          "ticker": "KEEL",
-          "date": "2026-11-13",
-          "value_usd": 29100,
-          "shares": 15000,
-          "price": 1.94,
-          "name": "Freedman Amy",
-          "title": "Director",
-          "is_cluster": true
-        },
-        {
-          "ticker": "KEEL",
-          "date": "2026-11-10",
-          "value_usd": 28350,
-          "shares": 15000,
-          "price": 1.89,
-          "name": "Hofmeister Edith",
-          "title": "Director",
-          "is_cluster": true
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-11-14"
-    },
     "NBIS": {
       "buy_score_boost": 10,
       "insider_score": 10,
@@ -153,6 +109,64 @@
       "politician_trades": [],
       "as_of": "2026-11-14"
     },
+    "GRAB": {
+      "buy_score_boost": 20,
+      "insider_score": 20,
+      "politician_score": 0,
+      "insider_n": 2,
+      "insider_cluster": true,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "GRAB",
+          "date": "2026-09-21",
+          "value_usd": 866839,
+          "shares": 299571,
+          "price": 2.89,
+          "name": "Hungate Alexander Charles",
+          "title": "Director, Officer, President and COO",
+          "is_cluster": true
+        },
+        {
+          "ticker": "GRAB",
+          "date": "2026-09-21",
+          "value_usd": 29876310,
+          "shares": 10350000,
+          "price": 2.89,
+          "name": "Tan Anthony Ping Yeow",
+          "title": "Director, Officer, Chief Executive Officer",
+          "is_cluster": true
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-11-14"
+    },
+    "CRM": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "CRM",
+          "date": "2026-09-21",
+          "value_usd": 999451,
+          "shares": 4176,
+          "price": 239.33,
+          "name": "Kirk David Blair",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-11-14"
+    },
     "APLD": {
       "buy_score_boost": 20,
       "insider_score": 20,
@@ -181,6 +195,50 @@
           "price": 18.86,
           "name": "Zhang Jason Gechen",
           "title": "Officer, President",
+          "is_cluster": true
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-11-14"
+    },
+    "KEEL": {
+      "buy_score_boost": 20,
+      "insider_score": 20,
+      "politician_score": 0,
+      "insider_n": 2,
+      "insider_cluster": true,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "KEEL",
+          "date": "2026-11-13",
+          "value_usd": 47000,
+          "shares": 25000,
+          "price": 1.88,
+          "name": "Freedman Amy",
+          "title": "Director",
+          "is_cluster": true
+        },
+        {
+          "ticker": "KEEL",
+          "date": "2026-11-13",
+          "value_usd": 29100,
+          "shares": 15000,
+          "price": 1.94,
+          "name": "Freedman Amy",
+          "title": "Director",
+          "is_cluster": true
+        },
+        {
+          "ticker": "KEEL",
+          "date": "2026-11-10",
+          "value_usd": 28350,
+          "shares": 15000,
+          "price": 1.89,
+          "name": "Hofmeister Edith",
+          "title": "Director",
           "is_cluster": true
         }
       ],
@@ -246,64 +304,6 @@
           "name": "Cannon-Brookes Michael",
           "title": "Director, Officer, TenPercentOwner, CEO, Co-Founder",
           "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-11-14"
-    },
-    "CRM": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "CRM",
-          "date": "2026-09-21",
-          "value_usd": 999451,
-          "shares": 4176,
-          "price": 239.33,
-          "name": "Kirk David Blair",
-          "title": "Director",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-11-14"
-    },
-    "GRAB": {
-      "buy_score_boost": 20,
-      "insider_score": 20,
-      "politician_score": 0,
-      "insider_n": 2,
-      "insider_cluster": true,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "GRAB",
-          "date": "2026-09-21",
-          "value_usd": 866839,
-          "shares": 299571,
-          "price": 2.89,
-          "name": "Hungate Alexander Charles",
-          "title": "Director, Officer, President and COO",
-          "is_cluster": true
-        },
-        {
-          "ticker": "GRAB",
-          "date": "2026-09-21",
-          "value_usd": 29876310,
-          "shares": 10350000,
-          "price": 2.89,
-          "name": "Tan Anthony Ping Yeow",
-          "title": "Director, Officer, Chief Executive Officer",
-          "is_cluster": true
         }
       ],
       "politician_trades": [],

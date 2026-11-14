@@ -6,7 +6,7 @@ Framework score = "is this business worth owning?", 0-100.
 Four axes, 100 points:
 
     Moat               40   judgement — five yes/no questions, 8 points each
-    Financial quality  30   computed  — return on capital, FCF margin, gross margin, leverage
+    Financial quality  30   computed  — return on capital, FCF and gross margin (half vs industry), interest cover
     Growth             20   computed  — 3y revenue CAGR, TTM revenue growth, 3y EPS growth
     Valuation          10   computed  — P/E and P/S against the stock's own 5y medians, P/E to growth
 
@@ -125,12 +125,45 @@ def _fcf_margin(m):
     return v if v is not None and v <= 100 else None
 
 
+INDUSTRY_MIN_PEERS = 5   # industry comparison only when at least this many peers report the figure
+SCALING_MIN_GROWTH = 30  # loss-maker growing revenue at least this fast (TTM, %) ...
+SCALING_MIN_GM = 50      # ... with at least this gross margin is judged as "scaling", not "failing"
+
+
+def _margin_points(m, key, value, lo, hi, pts):
+    """A margin scored half on its absolute level and half against the median of
+    its industry peers (zero at half the median, full at 1.5x). Hardware, retail
+    and industrials run structurally lower margins than software; judging them
+    only against one absolute scale marks them down for their business model
+    rather than for being worse at it. Without enough peers: absolute only."""
+    absolute = _lin(value, lo, hi, pts)
+    med = _num(m.get('_ind_' + key))
+    if absolute is None or med is None or med <= 0:
+        return absolute
+    relative = _lin(value / med, 0.5, 1.5, pts)
+    return (absolute + relative) / 2
+
+
 def _leverage_points(m, pts):
-    """Debt to equity, full points at 0, none at 1.5. Finnhub's figure is gross
-    debt over book equity, so companies that have bought back most of their
-    equity (MCD 41x, LOW 52x, HD 3x) look insolvent when they are not. When the
-    ratio is above 3 but the business earns 15%+ on capital with real free cash
-    flow, the ratio says more about buybacks than risk: half points."""
+    """Balance-sheet risk.
+
+    Preferred: interest coverage (operating profit / interest), zero at 2x, full
+    at 12x. It measures whether the debt can be serviced and, unlike debt/equity,
+    is not distorted when buybacks shrink book equity.
+
+    Fallback: debt / equity, full at 0, zero at 1.5. Companies that have bought
+    back most of their equity (MCD 41x, LOW 52x) look insolvent on this measure,
+    so when the ratio is above 3 but return on capital is 15%+ and free cash flow
+    10%+, it gets half points."""
+    cov = _num(m.get('interest_coverage'))
+    if cov is not None and cov >= 0:
+        return _lin(cov, 2, 12, pts)
+    if cov is not None and _profitable(m):
+        # Negative on a profitable company means it earns more interest on its
+        # cash than it pays on its debt (PANW, LULU, SNDK): no debt risk.
+        return float(pts)
+    # Negative on a loss-maker means operating losses, which says nothing about
+    # debt: judge the balance sheet on debt/equity instead.
     de = _num(m.get('net_debt_to_equity'))
     if de is None:
         return None
@@ -140,22 +173,46 @@ def _leverage_points(m, pts):
     return _lin(de, 1.5, 0.0, pts)
 
 
+def is_scaling(m):
+    """Loss-making by choice: fast revenue growth on high gross margins, i.e. the
+    unit economics work and the losses are spending ahead of revenue (NBIS, NET).
+    Return on capital and free cash flow describe that stage badly."""
+    gm, r1 = _num(m.get('gross_margin')), _num(m.get('rev_growth_ttm'))
+    return (not _profitable(m)) and gm is not None and gm >= SCALING_MIN_GM and r1 is not None and r1 >= SCALING_MIN_GROWTH
+
+
 def quality_points(m):
-    """Financial quality, 0-30. Return on capital carries the most weight because
-    it is the one measure that works across retailers, software and industrials;
-    gross margin is down-weighted so low-margin, high-turnover models (COST) are
-    not punished for their business model. Missing inputs score zero rather than
-    being rescaled away, and loss-makers keep at most 60%."""
+    """Financial quality, 0-30.
+
+    Profitable companies (and loss-makers that are not scaling):
+        return on capital 10, free-cash-flow margin 6, gross margin 4, balance sheet 5
+    Return on capital carries the most weight because it compares across industries.
+    The two margins are scored half against their industry. Missing inputs score
+    zero rather than being rescaled away.
+
+    Scaling loss-makers (see is_scaling): gross margin 12, revenue growth 8
+    (30% -> 0, 100% -> full), balance sheet 5.
+
+    Every loss-maker keeps at most 60% of the axis. This is the only place losses
+    are penalised (plus the separate rule for valuing a company with no earnings);
+    growth is not capped, so one fact is not punished three times."""
     if not m or _is_financial(m):
         return None
-    parts = [
-        (_lin(m.get('roic'),          5, 25, 10), 10),
-        (_lin(_fcf_margin(m),         0, 20,  6),  6),
-        (_lin(m.get('gross_margin'), 20, 60,  4),  4),
-        (_leverage_points(m, 5),                   5),
-    ]
-    if sum(p is not None for p, _ in parts) < 3:
-        return None
+    if is_scaling(m):
+        parts = [
+            (_margin_points(m, 'gross_margin', _num(m.get('gross_margin')), 40, 75, 12), 12),
+            (_lin(min(_num(m.get('rev_growth_ttm')), 100.0), SCALING_MIN_GROWTH, 100, 8), 8),
+            (_leverage_points(m, 5), 5),
+        ]
+    else:
+        parts = [
+            (_lin(m.get('roic'), 5, 25, 10), 10),
+            (_margin_points(m, 'fcf_margin', _fcf_margin(m), 0, 20, 6), 6),
+            (_margin_points(m, 'gross_margin', _num(m.get('gross_margin')), 20, 60, 4), 4),
+            (_leverage_points(m, 5), 5),
+        ]
+        if sum(p is not None for p, _ in parts) < 3:
+            return None
     pts = AXES['quality'] * sum((p or 0.0) for p, _ in parts) / 25.0
     if not _profitable(m):
         pts = min(pts, 0.6 * AXES['quality'])
@@ -164,22 +221,44 @@ def quality_points(m):
 
 def growth_points(m):
     """Growth, 0-20. Realised growth only — it cannot see the size of the market
-    ahead, and it judges a cyclical at the point of the cycle it is in.
-    Loss-makers keep at most 60%: fast growth from a tiny, unprofitable base is
-    not the same thing as a growing business."""
+    ahead, and it judges a cyclical at the point of the cycle it is in. Not capped
+    for loss-makers: their losses are already counted in quality and valuation."""
     if not m or _is_financial(m):
         return None
     rev3, rev1 = m.get('rev_growth_3y'), m.get('rev_growth_ttm')
     if _num(rev3) is None and _num(rev1) is None:
         return None
-    pts = _blend([
+    return _blend([
         (_lin(rev3, 0, 25, 10), 10),
         (_lin(rev1, 0, 30, 6), 6),
         (_lin(m.get('eps_growth_3y'), 0, 25, 4), 4),
     ], AXES['growth'], need=1)
-    if not _profitable(m):
-        pts = min(pts, 0.6 * AXES['growth'])
-    return pts
+
+
+def industry_medians(fundamentals):
+    """{industry: {'gross_margin': median, 'fcf_margin': median}} over industries
+    with at least INDUSTRY_MIN_PEERS reporting companies."""
+    import statistics
+    groups = {}
+    for m in fundamentals.values():
+        ind = m.get('industry')
+        if not ind or _is_financial(m):
+            continue
+        g = groups.setdefault(ind, {'gross_margin': [], 'fcf_margin': []})
+        if _num(m.get('gross_margin')) is not None:
+            g['gross_margin'].append(_num(m['gross_margin']))
+        if _fcf_margin(m) is not None:
+            g['fcf_margin'].append(_fcf_margin(m))
+    return {ind: {k: statistics.median(v) for k, v in g.items() if len(v) >= INDUSTRY_MIN_PEERS}
+            for ind, g in groups.items()}
+
+
+def with_industry(m, medians):
+    """Copy of m with its industry's medians attached as _ind_* keys."""
+    if not m or not m.get('industry'):
+        return m
+    meds = medians.get(m['industry']) or {}
+    return dict(m, **{'_ind_' + k: v for k, v in meds.items()}) if meds else m
 
 
 def current_pe(m, price=None):
@@ -309,6 +388,8 @@ def score_ticker(entry, metrics=None, price=None, today=None):
         'moat_stale': (not is_fund) and (sources['moat'] != 'hand' or moat_age is None or moat_age > STALE_DAYS),
         'moat_reason': entry.get('moat_reason'),
         'pe': (lambda v: None if v is None else round(v, 1))(current_pe(metrics, price)),
+        'industry': metrics.get('industry'),
+        'scaling': bool(metrics) and is_scaling(metrics),
     }
 
 
@@ -346,9 +427,14 @@ def score_all(prices=None, today=None, entries=None, fundamentals=None):
     if fundamentals is None:
         fundamentals, _ = load_fundamentals(today=today)
     prices = prices or {}
+    # Finnhub's industry labels are coarse ("Technology" holds DELL beside ADBE);
+    # an "industry" field in framework_scores.json overrides it.
+    fundamentals = {t: (dict(m, industry=entries[t]['industry']) if entries.get(t, {}).get('industry') else m)
+                    for t, m in fundamentals.items()}
+    meds = industry_medians(fundamentals)
     out = {}
     for t, e in entries.items():
-        d = score_ticker(e, fundamentals.get(t), prices.get(t), today)
+        d = score_ticker(e, with_industry(fundamentals.get(t), meds), prices.get(t), today)
         if d:
             out[t] = d
     return out

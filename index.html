@@ -2494,6 +2494,8 @@ function renderRankings() {
     const lines = ax.map(([k,n,m]) => `${n} ${f.parts[k]}/${m} (${src[f.sources[k]] || f.sources[k]})`);
     let t = `${f.band} · ` + lines.join(' · ');
     if (f.pe != null) t += ` · P/E ${f.pe}`;
+    if (f.industry) t += ` · vs ${f.industry} peers`;
+    if (f.scaling) t += ' · judged as a scaling loss-maker';
     if (f.legacy != null) t += ` · old score ${f.legacy}`;
     if (f.kind === 'fund') t = `${f.band} · fund/ETF, hand-scored · old score ${f.legacy}`;
     else if (f.moat_stale) t += f.sources.moat === 'legacy' ? ' · moat never judged' : ' · moat judgement undated or older than 120 days';

@@ -166,3 +166,11 @@ Extreme readings (25%+ dip together with 10%+ cushion) returned +37.5 on the rep
 **Effect with live data.** 120 stocks passed the old gate; 87 pass the new one. 50 fall below it and 17 rise above it. Holdings that fall below: NBIS (87 → 52), AMAT (82 → 59), CPRT (80 → 61), MRVL (79 → 61), BRKB (78 → 49), TEAM (75 → 54), CRWV (72 → 40). The largest falls are slow growers and cyclicals near a trough (DE, TMO, HD); the largest rises are profitable fast growers the old hand scores had underrated (RDDT, SNDK).
 
 **Not done.** The score is still unvalidated against returns. 190 stocks have no real moat judgement, so 40% of their score is still the old number. Growth rewards growth companies by design (full marks at 25% a year). Sell thresholds were not re-tuned for the new scale.
+
+**Second revision (14 Nov), after review of NBIS and DELL.**
+
+- *Losses were penalised three times* (quality cap, growth cap, valuation cap). The growth cap is removed. Loss-makers growing 30%+ on 50%+ gross margins are now judged on gross margin, growth and balance sheet instead of return on capital and cash flow, still capped at 60% of quality. NBIS 52 → 67, CRWV 40 → 61, NET 49 → 59; IONQ 34 → 42 and QUBT 25 → 33 stay well below the gate.
+- *One template for every business model.* Gross and free-cash-flow margins are now scored half against industry peers (Finnhub industry, with an override for hardware makers that Finnhub files beside software).
+- *Debt/equity is distorted by buybacks.* Interest coverage now leads where Finnhub reports it (209 of 227 stocks); a negative figure on a profitable company is read as net interest income.
+- DELL moves only 47 → 49. Against hardware peers its margins are still well below the median (gross 20% against 49%, free cash flow 8% against 25%), and revenue grew 3.5% a year over three years. That is the data, not the template.
+
