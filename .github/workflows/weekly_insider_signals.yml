@@ -99,7 +99,7 @@ jobs:
           else
             git diff --staged --quiet || git commit -m "chore: insider signals update $(date -u '+%Y-%m-%d') UTC"
           fi
-          git pull --rebase origin main
+          git pull --rebase origin "${GITHUB_REF_NAME}"
           git push
 
       # NOTE: No Netlify deploy hook — dashboard fetches JSON directly from GitHub API.

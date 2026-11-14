@@ -42,7 +42,7 @@ jobs:
           git add signals_payload.json live_prices.json weekly_signals_log.json
           if [ -f signal_ledger.json ]; then git add signal_ledger.json; fi
           git diff --staged --quiet || git commit -m "chore: signals update $(date -u '+%Y-%m-%d %H:%M') UTC"
-          git pull --rebase origin main
+          git pull --rebase origin "${GITHUB_REF_NAME}"
           git push
 
       # NOTE: No Netlify deploy hook — dashboard fetches JSON directly from GitHub API.

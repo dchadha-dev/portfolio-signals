@@ -54,7 +54,7 @@ jobs:
           git config user.name  "Validation Bot"
           git config user.email "bot@portfolio-signals"
           git stash
-          git pull --rebase origin main
+          git pull --rebase origin "${GITHUB_REF_NAME}"
           git stash pop || true
           git add validated_params.json
           if [ -f validation_honest.json ]; then git add validation_honest.json; fi
