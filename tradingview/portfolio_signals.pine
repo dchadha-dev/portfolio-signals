@@ -1,0 +1,150 @@
+//@version=5
+indicator("Portfolio Signals v3", overlay=true, max_labels_count=500)
+
+// Same buy and sell logic as the Portfolio Signals scanner (signal_scanner.py,
+// sell_side_scorer.py, model v3), minus the inputs a chart cannot see:
+//   - insider / politician and earnings-surprise (PEAD) boosts: excluded on purpose
+//   - sector-rotation boost and the daily caps on the number of buys and sells
+// Enter the stock's framework score from the dashboard (hover the FW number) so
+// the BUY gate and the sell damping match. Use a daily chart.
+
+// ── INPUTS ───────────────────────────────────────────────────────────
+fw_score  = input.int(0,  "Framework score from dashboard (0 = not set)", minval=0, maxval=100)
+is_fund   = input.bool(false, "This is a fund / ETF (BUY needs 48, not 63)")
+held      = input.bool(true,  "I hold this (show TRIM / REDUCE / EXIT)")
+use_vix   = input.bool(true,  "Adjust sell score for VIX, like the scanner")
+use_spx   = input.bool(true,  "Add +5 to sell score when S&P 500 is 15%+ above its 200d MA")
+show_buy  = input.bool(true,  "Show buy-side labels")
+show_sell = input.bool(true,  "Show sell-side labels")
+show_bg   = input.bool(true,  "Shade setup zones")
+show_tbl  = input.bool(true,  "Show score table")
+
+// Thresholds: identical to the scanner. Change them there, not here.
+BUY_T = 80, WATCH_T = 60
+FW_MIN = is_fund ? 48 : 63
+TRIM_T = 52, REDUCE_T = 65, EXIT_T = 78
+
+// ── FEATURES (daily) ─────────────────────────────────────────────────
+high252 = ta.highest(close, 252)[1]                     // 252d closing high, excluding today
+dist    = (close - high252) / high252
+ma200   = ta.sma(close, 200)
+trend   = (close - ma200) / ma200
+pct_ret = close / close[1] - 1
+ret252  = close / close[252] - 1
+vol252  = ta.stdev(pct_ret, 252) * math.sqrt(252)
+quality = vol252 > 0 ? math.max(math.min(ret252 / vol252 / 3, 1), 0) : 0   // 12m return / vol, /3, clipped 0-1
+
+// ── BUY SCORE v3: a dip in a strong stock ────────────────────────────
+// Strong 12m run (return/vol > 0.6) 25 · near-miss (> 0.3) 15
+// 5%+ above 200d MA 25             · within 5% either side 15
+// 20%+ below 252d high 30          · 15-20% below 15
+// Deep dip 25%+ with the full gate +10
+strong    = quality > 0.20
+strong_nm = quality > 0.10
+up        = trend > 0.05
+up_nm     = trend > -0.05
+dip       = dist < -0.20
+near      = dist < -0.15
+gate      = strong and up and dip
+deep      = gate and dist < -0.25
+
+pts_run   = strong ? 25 : strong_nm ? 15 : 0
+pts_trend = up ? 25 : up_nm ? 15 : 0
+pts_dip   = dip ? 30 : near ? 15 : 0
+pts_deep  = deep ? 10 : 0
+buy_score = pts_run + pts_trend + pts_dip + pts_deep
+
+fw_set   = fw_score > 0
+fw_ok    = not fw_set or fw_score >= FW_MIN
+st_buy   = gate and buy_score >= BUY_T and fw_ok
+st_block = gate and buy_score >= BUY_T and not fw_ok
+st_watch = not gate and near and buy_score >= WATCH_T
+
+// ── SELL SCORE (continuous) ──────────────────────────────────────────
+near_high = dist > -0.05
+tr_val  = math.max(high - low, math.abs(high - close[1]), math.abs(low - close[1]))
+atr14   = ta.sma(tr_val, 14)
+sma_atr = atr14 > 0 ? (close - ma200) / atr14 : 0
+hl      = high - low
+mfm     = hl > 0 ? ((close - low) - (high - close)) / hl : 0
+cmf20   = math.sum(mfm * volume, 20) / math.sum(volume, 20)
+rv20    = ta.stdev(math.log(close / close[1]), 20) * math.sqrt(252)
+rv_mean = ta.sma(rv20, 756)
+rv_std  = ta.stdev(rv20, 756)
+rv_z    = rv_std > 0 ? (rv20 - rv_mean) / rv_std : 0
+
+s_near = dist > -0.10 ? math.min(35.0, math.max(0.0, 35.0 * (1 + dist / 0.10))) : 0.0
+s_cmf  = near_high and cmf20 < 0 ? math.min(30.0, math.abs(cmf20) * 30.0) : 0.0
+s_atr  = near_high and sma_atr > 2.0 ? math.min(20.0, (sma_atr - 2.0) / 3.0 * 20.0) : 0.0
+s_rv   = rv_z > 1.0 ? math.min(10.0, (rv_z - 1.0) / 2.0 * 10.0) : 0.0
+
+vix      = request.security("CBOE:VIX", "D", close)
+vix_z    = (vix - ta.sma(vix, 252)) / ta.stdev(vix, 252)
+vix_mult = not use_vix or na(vix_z) ? 1.0 : vix_z > 2 ? 0.75 : vix_z > 1 ? 0.90 : vix_z > -1 ? 1.00 : vix_z > -2 ? 1.15 : 1.30
+spy      = request.security("AMEX:SPY", "D", close)
+spx_ext  = use_spx and spy / ta.sma(spy, 200) - 1 > 0.15 ? 5.0 : 0.0
+fw_damp  = fw_set ? 1.0 - 0.5 * math.pow(fw_score / 100.0, 1.5) : 1.0
+
+sell_raw   = math.min(100.0, (s_near + s_cmf + s_atr + s_rv) * vix_mult + spx_ext)
+sell_score = math.round(math.min(100.0, sell_raw * fw_damp))
+st_exit    = held and sell_score >= EXIT_T
+st_reduce  = held and sell_score >= REDUCE_T and not st_exit
+st_trim    = held and sell_score >= TRIM_T and not st_exit and not st_reduce
+
+// ── ONE LABEL PER BAR, SAME NAMES AND PRIORITY AS THE DASHBOARD ──────
+// Sell labels outrank buy labels, as in the scanner.
+label_now = st_exit ? "EXIT" : st_reduce ? "REDUCE" : st_trim ? "TRIM" : st_buy ? "BUY" : st_block ? "FW BLOCKED" : st_watch ? "WATCH" : "HOLD"
+changed   = label_now != label_now[1]
+
+// Shading
+bgcolor(show_bg and gate ? color.new(color.green, 88) : na, title="Gate open: dip in a strong stock")
+bgcolor(show_bg and st_watch ? color.new(color.teal, 93) : na, title="WATCH: one move from a buy")
+bgcolor(show_bg and near_high ? color.new(color.red, 93) : na, title="Within 5% of 252d high")
+
+plot(ma200,   "200d MA",   color=color.new(color.gray, 40), linewidth=1)
+plot(high252, "252d high", color=color.new(color.orange, 50), style=plot.style_stepline, linewidth=1)
+
+// A label only when the state changes, so the chart shows entries, not one label per day.
+if changed and show_buy and label_now == "BUY"
+    label.new(bar_index, low, "BUY " + str.tostring(buy_score), style=label.style_label_up, color=color.green, textcolor=color.white, size=size.small)
+if changed and show_buy and label_now == "FW BLOCKED"
+    label.new(bar_index, low, "FW BLOCKED " + str.tostring(buy_score), style=label.style_label_up, color=color.new(color.orange, 10), textcolor=color.white, size=size.tiny)
+if changed and show_buy and label_now == "WATCH"
+    label.new(bar_index, low, "WATCH " + str.tostring(buy_score), style=label.style_label_up, color=color.new(color.teal, 10), textcolor=color.white, size=size.tiny)
+if changed and show_sell and label_now == "EXIT"
+    label.new(bar_index, high, "EXIT " + str.tostring(sell_score), style=label.style_label_down, color=color.maroon, textcolor=color.white, size=size.small)
+if changed and show_sell and label_now == "REDUCE"
+    label.new(bar_index, high, "REDUCE " + str.tostring(sell_score), style=label.style_label_down, color=color.red, textcolor=color.white, size=size.tiny)
+if changed and show_sell and label_now == "TRIM"
+    label.new(bar_index, high, "TRIM " + str.tostring(sell_score), style=label.style_label_down, color=color.new(color.orange, 10), textcolor=color.white, size=size.tiny)
+
+// ── SCORE TABLE ──────────────────────────────────────────────────────
+var table tb = table.new(position.top_right, 2, 9, border_width=1)
+if show_tbl and barstate.islast
+    c_lab = label_now == "BUY" ? color.green : label_now == "FW BLOCKED" ? color.orange : label_now == "WATCH" ? color.teal : label_now == "HOLD" ? color.gray : color.red
+    table.cell(tb, 0, 0, "Label", text_color=color.white, bgcolor=color.new(color.black, 30))
+    table.cell(tb, 1, 0, label_now, text_color=color.white, bgcolor=c_lab)
+    table.cell(tb, 0, 1, "Buy score", bgcolor=color.new(color.gray, 80))
+    table.cell(tb, 1, 1, str.tostring(buy_score) + " / 90", bgcolor=color.new(color.gray, 80))
+    table.cell(tb, 0, 2, "12m run " + str.tostring(quality * 3, "#.##"), bgcolor=color.new(color.gray, 90))
+    table.cell(tb, 1, 2, str.tostring(pts_run) + " / 25", bgcolor=color.new(color.gray, 90))
+    table.cell(tb, 0, 3, "vs 200d MA " + str.tostring(trend * 100, "#.#") + "%", bgcolor=color.new(color.gray, 90))
+    table.cell(tb, 1, 3, str.tostring(pts_trend) + " / 25", bgcolor=color.new(color.gray, 90))
+    table.cell(tb, 0, 4, "vs 252d high " + str.tostring(dist * 100, "#.#") + "%", bgcolor=color.new(color.gray, 90))
+    table.cell(tb, 1, 4, str.tostring(pts_dip + pts_deep) + " / 40", bgcolor=color.new(color.gray, 90))
+    table.cell(tb, 0, 5, "Framework", bgcolor=color.new(color.gray, 80))
+    table.cell(tb, 1, 5, fw_set ? str.tostring(fw_score) + (fw_ok ? " ok" : " < " + str.tostring(FW_MIN)) : "not set", bgcolor=color.new(color.gray, 80))
+    table.cell(tb, 0, 6, "Sell score", bgcolor=color.new(color.gray, 80))
+    table.cell(tb, 1, 6, str.tostring(sell_score) + " / 100", bgcolor=color.new(color.gray, 80))
+    table.cell(tb, 0, 7, "VIX x" + str.tostring(vix_mult, "#.##") + (spx_ext > 0 ? " · S&P ext +5" : ""), bgcolor=color.new(color.gray, 90))
+    table.cell(tb, 1, 7, fw_set ? "FW damp x" + str.tostring(fw_damp, "#.##") : "", bgcolor=color.new(color.gray, 90))
+    table.cell(tb, 0, 8, timeframe.isdaily ? "Excludes insider / PEAD" : "Use a DAILY chart", text_color=timeframe.isdaily ? color.gray : color.red)
+    table.cell(tb, 1, 8, "")
+
+// ── ALERTS ───────────────────────────────────────────────────────────
+alertcondition(changed and label_now == "BUY",        "BUY",        "Portfolio Signals: BUY on {{ticker}}")
+alertcondition(changed and label_now == "WATCH",      "WATCH",      "Portfolio Signals: WATCH on {{ticker}}")
+alertcondition(changed and label_now == "FW BLOCKED", "FW BLOCKED", "Portfolio Signals: buy setup blocked by framework score on {{ticker}}")
+alertcondition(changed and label_now == "TRIM",       "TRIM",       "Portfolio Signals: TRIM on {{ticker}}")
+alertcondition(changed and label_now == "REDUCE",     "REDUCE",     "Portfolio Signals: REDUCE on {{ticker}}")
+alertcondition(changed and label_now == "EXIT",       "EXIT",       "Portfolio Signals: EXIT on {{ticker}}")
