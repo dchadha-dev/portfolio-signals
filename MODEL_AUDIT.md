@@ -178,3 +178,13 @@ Extreme readings (25%+ dip together with 10%+ cushion) returned +37.5 on the rep
 
 Funds no longer reuse the old single total. They have their own score (cost 25, track record against a benchmark 35, consistency 15, concentration 10, conviction 15), computed from dividend-adjusted prices on every scan. Expense ratios for Thai feeder funds are estimates until checked against factsheets.
 
+**Insider and PEAD data quality (14 Nov).** Both overlays stay capped at +25 combined and cannot cross a label boundary; they are still unvalidated against returns because no history of either input exists.
+
+*PEAD* (`pead_signals_fetcher.py`). Of 22 live signals, 12 failed the new rules:
+- The fallback for tickers missing from the free earnings calendar used the fiscal period end (e.g. 2026-09-30) as the announcement date, so signals fired on quarter-ends rather than on reports. It now asks the calendar for each ticker's own announcement date.
+- Finnhub's free tier gives three prior quarters, so a company that beat by a cent or two each time had a near-zero spread and the next ordinary beat scored as a 12-34 sigma event (CRM 12.1, NBIS 33.6). The spread now has a floor of 5% of the estimate, so a signal needs a beat of at least 7.5%.
+- Surprises are no longer computed for loss-makers (estimate or actual not positive), or where the beat exceeds 50% of the estimate, which is almost always a GAAP-versus-adjusted mismatch or a one-off gain (CRM 78%, GRAB 158%, SEDG 629%).
+- Existing signals written under the old rules are dropped on the next weekly run; genuine ones within the 14-day window are re-found.
+
+*Insider* (`signal_scanner.py`, `validate_insider`). A reported purchase price more than 25% away from the stock's close on the trade date is treated as a data error (wrong share class, foreign listing, parsing error) and ignored, and the insider score is recomputed from the purchases that remain. Purchases with no price within a week of the trade date cannot be verified and are ignored too.
+
