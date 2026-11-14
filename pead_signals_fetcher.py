@@ -43,6 +43,11 @@ CALENDAR_LOOKBACK_DAYS = 14     # extended from 7 — Finnhub calendar has gaps 
 HISTORY_QUARTERS       = 8      # quarters of EPS history for SUE std_dev
 SUE_THRESHOLD          = 1.5    # absolute SUE trigger
 STD_DEV_FLOOR          = 0.02   # minimum std_dev to prevent zero-division
+REL_STD_FLOOR          = 0.05   # ...and at least 5% of |estimate|: Finnhub's free tier gives
+                                #    only 3 prior quarters, too few for a stable std_dev
+MIN_HISTORY_QUARTERS   = 3      # fewer prior quarters than this: no signal
+MAX_REL_SURPRISE       = 0.50   # a beat above 50% of the estimate is usually a GAAP vs adjusted
+                                #    mismatch or a one-off gain, not an earnings surprise
 PEAD_HOLD_DAYS         = 60     # signal expires 60 days after announce date
 SIGNAL_BUY_SCORE_BOOST = 10     # pts added to buy score when SUE > threshold
 RATE_LIMIT_SLEEP       = 1.0    # seconds between Finnhub calls (free tier)
@@ -100,41 +105,33 @@ def fetch_recent_reporters(token):
     except Exception as e:
         print(f'  Pass 1 error: {e}')
 
-    # ── Pass 2: Direct EPS check for tickers not in calendar ─────────
-    # For each universe ticker not already found, fetch EPS history
-    # and check if the most recent quarter is within the lookback window.
+    # ── Pass 2: per-ticker calendar for tickers the broad calendar missed ─
+    # The free-tier broad calendar has gaps, so each remaining ticker is asked
+    # for its own announcements in the window. The old fallback used the EPS
+    # history's fiscal "period" (e.g. 2026-09-30) as if it were the announcement
+    # date, which fired signals on quarter-ends rather than on the report.
     us_tickers_remaining = [
         t for t in UNIVERSE if '.' not in t and t not in calendar_tickers
     ]
-    print(f'  Pass 2: Direct EPS check for {len(us_tickers_remaining)} remaining tickers...')
+    print(f'  Pass 2: per-ticker calendar for {len(us_tickers_remaining)} remaining tickers...')
     pass2_found = 0
     for ticker in us_tickers_remaining:
         try:
             time.sleep(RATE_LIMIT_SLEEP)
             r = requests.get(
-                'https://finnhub.io/api/v1/stock/earnings',
-                params={'symbol': ticker, 'token': token},
+                'https://finnhub.io/api/v1/calendar/earnings',
+                params={'from': start_str, 'to': end_str, 'symbol': ticker, 'token': token},
                 timeout=15,
             )
             if r.status_code != 200:
                 continue
-            data = r.json()
-            if not isinstance(data, list) or not data:
-                continue
-            # Most recent quarter
-            latest = data[0]
-            period = latest.get('period', '')
-            if not period:
-                continue
-            # Check if period date is within lookback window
-            try:
-                period_date = datetime.strptime(period[:10], '%Y-%m-%d').date()
-            except:
-                continue
-            if start_date <= period_date <= end_date:
-                # Verify it has actual EPS (not just an estimate)
-                if latest.get('actual') is not None:
-                    reporters.append((ticker, period[:10]))
+            items = [i for i in r.json().get('earningsCalendar', [])
+                     if (i.get('symbol') or '').upper() == ticker and i.get('date')
+                     and i.get('epsActual') is not None]
+            if items:
+                d = max(i['date'] for i in items)
+                if start_str <= d[:10] <= end_str:
+                    reporters.append((ticker, d[:10]))
                     calendar_tickers.add(ticker)
                     pass2_found += 1
         except Exception:
@@ -210,7 +207,7 @@ def compute_sue(history, current_actual, current_estimate):
 
     if len(history) < 2:
         # Not enough history — use floor std_dev
-        std_dev = STD_DEV_FLOOR
+        std_dev = max(STD_DEV_FLOOR, REL_STD_FLOOR * abs(current_estimate))
     else:
         surprises = [q['surprise'] for q in history]
         n         = len(surprises)
@@ -218,9 +215,11 @@ def compute_sue(history, current_actual, current_estimate):
         variance  = sum((s - mean) ** 2 for s in surprises) / (n - 1)
         std_dev   = math.sqrt(variance)
 
-        # Safety check: apply floor if std_dev is too small
-        if std_dev < STD_DEV_FLOOR:
-            std_dev = STD_DEV_FLOOR
+        # Safety check: apply floor if std_dev is too small. With three prior
+        # quarters a company that beat by 1-2 cents each time has a std_dev near
+        # zero, and the next ordinary beat looks like a 10-sigma event (CRM 12,
+        # NBIS 34). The relative floor (5% of the estimate, so a signal needs a beat of at least 7.5%) keeps the scale sensible.
+        std_dev = max(std_dev, STD_DEV_FLOOR, REL_STD_FLOOR * abs(current_estimate))
 
     sue = surprise / std_dev
     return round(sue, 3), round(std_dev, 4), round(surprise, 4)
@@ -228,7 +227,24 @@ def compute_sue(history, current_actual, current_estimate):
 
 # ── STEP 3: BUILD SIGNALS ─────────────────────────────────────────────
 
-def process_ticker(ticker, announce_date, token):
+def reject_reason(history_n, actual, estimate, date_source='calendar'):
+    """Why a surprise should not become a signal, or None if it is usable.
+
+    PEAD is documented for companies with real earnings, measured against a
+    stable history, on the actual announcement date. Anything else is noise."""
+    if date_source != 'calendar':
+        return 'no confirmed announcement date'
+    if history_n < MIN_HISTORY_QUARTERS:
+        return f'only {history_n} prior quarters'
+    if estimate is None or estimate <= 0 or actual is None or actual <= 0:
+        return 'loss-making (EPS estimate or actual not positive)'
+    if abs(actual - estimate) > MAX_REL_SURPRISE * abs(estimate):
+        return f'surprise {abs(actual - estimate) / abs(estimate):.0%} of estimate: likely accounting-basis mismatch or one-off'
+    return None
+
+
+
+def process_ticker(ticker, announce_date, token, date_source='calendar'):
     """
     Fetch EPS history, compute SUE, return signal dict if SUE > threshold.
     Returns None if no signal.
@@ -245,6 +261,11 @@ def process_ticker(ticker, announce_date, token):
 
     # Use remaining history (quarters 1+) as the std_dev base
     historical_surprises = history[1:]
+
+    why = reject_reason(len(historical_surprises), actual, estimate, date_source)
+    if why:
+        print(f'  {ticker}: skipped, {why}')
+        return None
 
     sue, std_dev, surprise = compute_sue(historical_surprises, actual, estimate)
 
@@ -274,7 +295,8 @@ def process_ticker(ticker, announce_date, token):
         'actual_eps':      actual,
         'estimate_eps':    estimate,
         'std_dev':         std_dev,
-        'std_dev_floored': std_dev == STD_DEV_FLOOR,
+        'std_dev_floored': std_dev <= max(STD_DEV_FLOOR, REL_STD_FLOOR * abs(estimate)) + 1e-4,
+        'date_source':     date_source,
         'history_quarters':len(historical_surprises),
         'buy_score_boost': SIGNAL_BUY_SCORE_BOOST,
         'as_of':           str(date.today()),
@@ -295,6 +317,18 @@ def load_existing_signals():
         today   = str(date.today())
         active  = {t: s for t, s in signals.items()
                    if s.get('expires_at', '2000-01-01') >= today}
+        # Re-check signals written before the quality rules existed.
+        kept = {}
+        for t, s in active.items():
+            why = reject_reason(s.get('history_quarters', 0), s.get('actual_eps'), s.get('estimate_eps'),
+                                s.get('date_source', 'period'))
+            if why:
+                print(f'  Dropped existing {t}: {why}')
+                continue
+            if 'date_source' not in s or s.get('std_dev', 0) < REL_STD_FLOOR * abs(s.get('estimate_eps') or 0):
+                continue   # pre-fix SUE scale; will be recomputed on its next report
+            kept[t] = s
+        active = kept
         expired = len(signals) - len(active)
         if expired > 0:
             print(f'  Removed {expired} expired PEAD signals')

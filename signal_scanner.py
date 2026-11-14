@@ -165,6 +165,44 @@ def buy_breakdown(last, insider_boost=0, pead_boost=0, sector_boost=0):
     return parts
 
 # ── INSIDER & POLITICIAN SIGNALS ──────────────────────────────────────
+INSIDER_PRICE_TOLERANCE = 0.25   # a reported buy price more than 25% from that day's close is a data error
+
+
+def validate_insider(ins_data, close_series):
+    """Drop insider buys whose reported price is not close to the stock's actual
+    price on the trade date, then rescore from the buys that survive.
+
+    Form 4 filings for foreign issuers, share-class mix-ups and parsing errors
+    produce prices that are not this ticker's price (a TSM 'purchase' at $71,
+    when the ADR traded far higher). Returns (ins_data, n_dropped)."""
+    buys = ins_data.get('insider_buys') or []
+    if not buys or close_series is None or len(close_series) == 0:
+        return ins_data, 0
+    import pandas as pd
+    s = close_series.dropna()
+    good = []
+    for b in buys:
+        try:
+            d = pd.Timestamp(b.get('date'))
+            ref = s.loc[:d + pd.Timedelta(days=1)]
+            if len(ref) == 0 or (d - ref.index[-1]).days > 7:
+                continue                      # no price near the trade date: cannot verify
+            px = float(ref.iloc[-1]); bp = float(b.get('price') or 0)
+            if px > 0 and bp > 0 and abs(bp / px - 1) <= INSIDER_PRICE_TOLERANCE:
+                good.append(b)
+        except Exception:
+            continue
+    dropped = len(buys) - len(good)
+    if dropped == 0:
+        return ins_data, 0
+    n = len(set(b.get('name') for b in good))
+    ins_score = 0 if n == 0 else (20 if n >= 2 else 10)
+    pol = ins_data.get('politician_score', 0)
+    out = dict(ins_data, insider_buys=good, insider_n=n, insider_cluster=n >= 2,
+               insider_score=ins_score, buy_score_boost=min(25, ins_score + pol))
+    return out, dropped
+
+
 def load_insider_signals():
     """Load pre-fetched insider/politician signals. Gracefully returns {} if missing/stale."""
     try:
@@ -830,7 +868,9 @@ def build_payload(all_signals, ticker_alpha, live_prices, closes, highs, lows, v
         buy = technical_buy_score(last)
 
         # ── INSIDER / POLITICIAN BOOST ────────────────────────────────
-        ins_data        = insider_signals.get(t, {})
+        ins_data, ins_dropped = validate_insider(insider_signals.get(t, {}), closes[t] if t in closes.columns else None)
+        if ins_dropped:
+            print(f'  {t}: ignored {ins_dropped} insider buy(s) with prices far from the market price')
         insider_boost   = ins_data.get('buy_score_boost', 0)
         insider_score   = ins_data.get('insider_score', 0)
         pol_score       = ins_data.get('politician_score', 0)
