@@ -58,12 +58,15 @@ FUND_BUY_MIN = 48     # funds and ETFs (was 55)
 def legacy_on_new_scale(legacy):
     return max(0.0, min(100.0, LEGACY_A + LEGACY_B * legacy))
 
+# The four sources of a durable competitive advantage, plus durability. Market
+# share and pricing power are deliberately absent: they are what a moat produces,
+# and the quality and growth axes already measure them from data.
 MOAT_QUESTIONS = (
-    'Would a typical customer face real cost, risk or disruption in switching away?',
-    'Does the product get better or cheaper as more customers use it (network or scale effects)?',
-    'Does it own technology, IP, data or licences a well-funded rival could not replicate in five years?',
-    'Has it held or gained market share and pricing power over the last five years?',
-    'Is it number one or two in its core market?',
+    'Switching costs: would a typical customer face real cost, risk or disruption in leaving?',
+    'Network effects: does the product become more valuable to each user as more users join?',
+    'Intangibles: does it own brands, patents, data, licences or permits a well-funded rival could not replicate in five years?',
+    'Cost advantage: can it make or deliver its product structurally cheaper than rivals (scale, process know-how, location, or a market that only supports one or two players)?',
+    'Durability: is it on the right side of the main technology shift in its market, as the disruptor or clearly immune, rather than the one being disrupted?',
 )
 
 
