@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-14 07:29 UTC",
+ "updated": "2026-11-14 07:45 UTC",
  "note": "excess = ticker return minus equal-weight scanner universe over the same trading days, in %",
  "summary": {},
  "state": {
@@ -14,9 +14,9 @@
   "TEAM": "WATCH",
   "CRWD": "WATCH",
   "VLO": "WATCH",
-  "CSCO": "WATCH",
+  "CSCO": "HOLD",
   "QTUM": "HOLD",
-  "CRM": "WATCH",
+  "CRM": "HOLD",
   "LLY": "HOLD",
   "TMO": "HOLD",
   "PG": "HOLD",
@@ -52,7 +52,7 @@
   "MRNA": "WATCH",
   "ENPH": "HOLD",
   "ULTA": "HOLD",
-  "SNOW": "WATCH",
+  "SNOW": "HOLD",
   "APLD": "HOLD",
   "ADI": "HOLD",
   "TXN": "HOLD",
