@@ -1,13 +1,13 @@
 {
   "health": {
-    "timestamp": "2026-11-14 07:30 UTC",
+    "timestamp": "2026-11-16 07:33 UTC",
     "tickers_checked": 33,
     "new_signals": 4,
     "total_signals": 4,
-    "expired_removed": 0,
+    "expired_removed": 2,
     "sue_threshold": 1.5,
     "hold_days": 60,
-    "elapsed_seconds": 144.2
+    "elapsed_seconds": 138.8
   },
   "signals": {
     "TTD": {
@@ -23,7 +23,7 @@
       "date_source": "calendar",
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-11-14"
+      "as_of": "2026-11-16"
     },
     "ANET": {
       "ticker": "ANET",
@@ -38,7 +38,7 @@
       "date_source": "calendar",
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-11-14"
+      "as_of": "2026-11-16"
     },
     "DDOG": {
       "ticker": "DDOG",
@@ -53,7 +53,7 @@
       "date_source": "calendar",
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-11-14"
+      "as_of": "2026-11-16"
     },
     "ALAB": {
       "ticker": "ALAB",
@@ -68,7 +68,7 @@
       "date_source": "calendar",
       "history_quarters": 3,
       "buy_score_boost": 10,
-      "as_of": "2026-11-14"
+      "as_of": "2026-11-16"
     }
   }
 }

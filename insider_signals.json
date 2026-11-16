@@ -1,12 +1,12 @@
 {
   "health": {
-    "timestamp": "2026-11-14 07:43 UTC",
+    "timestamp": "2026-11-16 07:46 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
     "n_insider_signals": 7,
     "n_politician_signals": 0,
     "n_combined_signals": 7,
-    "elapsed_seconds": 255.3,
+    "elapsed_seconds": 213.8,
     "retry_required": false,
     "retry_reason": []
   },
@@ -53,197 +53,7 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-11-14"
-    },
-    "APLD": {
-      "buy_score_boost": 20,
-      "insider_score": 20,
-      "politician_score": 0,
-      "insider_n": 2,
-      "insider_cluster": true,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "APLD",
-          "date": "2026-10-19",
-          "value_usd": 1006686,
-          "shares": 55803,
-          "price": 18.04,
-          "name": "Cummins Wes",
-          "title": "Director, Officer, CEO; Chairman",
-          "is_cluster": true
-        },
-        {
-          "ticker": "APLD",
-          "date": "2026-10-19",
-          "value_usd": 5658000,
-          "shares": 300000,
-          "price": 18.86,
-          "name": "Zhang Jason Gechen",
-          "title": "Officer, President",
-          "is_cluster": true
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-11-14"
-    },
-    "CRM": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "CRM",
-          "date": "2026-09-21",
-          "value_usd": 999451,
-          "shares": 4176,
-          "price": 239.33,
-          "name": "Kirk David Blair",
-          "title": "Director",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-11-14"
-    },
-    "NBIS": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "NBIS",
-          "date": "2026-10-30",
-          "value_usd": 25074,
-          "shares": 148,
-          "price": 169.42,
-          "name": "Grimme Arne",
-          "title": "Director",
-          "is_cluster": false
-        },
-        {
-          "ticker": "NBIS",
-          "date": "2026-10-29",
-          "value_usd": 32603,
-          "shares": 205,
-          "price": 159.04,
-          "name": "Grimme Arne",
-          "title": "Director",
-          "is_cluster": false
-        },
-        {
-          "ticker": "NBIS",
-          "date": "2026-10-29",
-          "value_usd": 25136,
-          "shares": 148,
-          "price": 169.84,
-          "name": "Grimme Arne",
-          "title": "Director",
-          "is_cluster": false
-        },
-        {
-          "ticker": "NBIS",
-          "date": "2026-10-26",
-          "value_usd": 57823,
-          "shares": 357,
-          "price": 161.97,
-          "name": "Grimme Arne",
-          "title": "Director",
-          "is_cluster": false
-        },
-        {
-          "ticker": "NBIS",
-          "date": "2026-10-26",
-          "value_usd": 32591,
-          "shares": 205,
-          "price": 158.98,
-          "name": "Grimme Arne",
-          "title": "Director",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-11-14"
-    },
-    "ENPH": {
-      "buy_score_boost": 20,
-      "insider_score": 20,
-      "politician_score": 0,
-      "insider_n": 2,
-      "insider_cluster": true,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "ENPH",
-          "date": "2026-11-03",
-          "value_usd": 30590,
-          "shares": 1000,
-          "price": 30.59,
-          "name": "Trivedi Shanker",
-          "title": "Director",
-          "is_cluster": true
-        },
-        {
-          "ticker": "ENPH",
-          "date": "2026-11-02",
-          "value_usd": 267514,
-          "shares": 10000,
-          "price": 26.75,
-          "name": "Kothandaraman Badrinarayanan",
-          "title": "Director, Officer, President & CEO",
-          "is_cluster": true
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-11-14"
-    },
-    "GRAB": {
-      "buy_score_boost": 20,
-      "insider_score": 20,
-      "politician_score": 0,
-      "insider_n": 2,
-      "insider_cluster": true,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "GRAB",
-          "date": "2026-09-21",
-          "value_usd": 866839,
-          "shares": 299571,
-          "price": 2.89,
-          "name": "Hungate Alexander Charles",
-          "title": "Director, Officer, President and COO",
-          "is_cluster": true
-        },
-        {
-          "ticker": "GRAB",
-          "date": "2026-09-21",
-          "value_usd": 29876310,
-          "shares": 10350000,
-          "price": 2.89,
-          "name": "Tan Anthony Ping Yeow",
-          "title": "Director, Officer, Chief Executive Officer",
-          "is_cluster": true
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-11-14"
+      "as_of": "2026-11-16"
     },
     "TEAM": {
       "buy_score_boost": 10,
@@ -307,7 +117,197 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-11-14"
+      "as_of": "2026-11-16"
+    },
+    "APLD": {
+      "buy_score_boost": 20,
+      "insider_score": 20,
+      "politician_score": 0,
+      "insider_n": 2,
+      "insider_cluster": true,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "APLD",
+          "date": "2026-10-19",
+          "value_usd": 1006686,
+          "shares": 55803,
+          "price": 18.04,
+          "name": "Cummins Wes",
+          "title": "Director, Officer, CEO; Chairman",
+          "is_cluster": true
+        },
+        {
+          "ticker": "APLD",
+          "date": "2026-10-19",
+          "value_usd": 5658000,
+          "shares": 300000,
+          "price": 18.86,
+          "name": "Zhang Jason Gechen",
+          "title": "Officer, President",
+          "is_cluster": true
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-11-16"
+    },
+    "ENPH": {
+      "buy_score_boost": 20,
+      "insider_score": 20,
+      "politician_score": 0,
+      "insider_n": 2,
+      "insider_cluster": true,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "ENPH",
+          "date": "2026-11-03",
+          "value_usd": 30590,
+          "shares": 1000,
+          "price": 30.59,
+          "name": "Trivedi Shanker",
+          "title": "Director",
+          "is_cluster": true
+        },
+        {
+          "ticker": "ENPH",
+          "date": "2026-11-02",
+          "value_usd": 267514,
+          "shares": 10000,
+          "price": 26.75,
+          "name": "Kothandaraman Badrinarayanan",
+          "title": "Director, Officer, President & CEO",
+          "is_cluster": true
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-11-16"
+    },
+    "GRAB": {
+      "buy_score_boost": 20,
+      "insider_score": 20,
+      "politician_score": 0,
+      "insider_n": 2,
+      "insider_cluster": true,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "GRAB",
+          "date": "2026-09-21",
+          "value_usd": 866839,
+          "shares": 299571,
+          "price": 2.89,
+          "name": "Hungate Alexander Charles",
+          "title": "Director, Officer, President and COO",
+          "is_cluster": true
+        },
+        {
+          "ticker": "GRAB",
+          "date": "2026-09-21",
+          "value_usd": 29876310,
+          "shares": 10350000,
+          "price": 2.89,
+          "name": "Tan Anthony Ping Yeow",
+          "title": "Director, Officer, Chief Executive Officer",
+          "is_cluster": true
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-11-16"
+    },
+    "NBIS": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "NBIS",
+          "date": "2026-10-30",
+          "value_usd": 25074,
+          "shares": 148,
+          "price": 169.42,
+          "name": "Grimme Arne",
+          "title": "Director",
+          "is_cluster": false
+        },
+        {
+          "ticker": "NBIS",
+          "date": "2026-10-29",
+          "value_usd": 32603,
+          "shares": 205,
+          "price": 159.04,
+          "name": "Grimme Arne",
+          "title": "Director",
+          "is_cluster": false
+        },
+        {
+          "ticker": "NBIS",
+          "date": "2026-10-29",
+          "value_usd": 25136,
+          "shares": 148,
+          "price": 169.84,
+          "name": "Grimme Arne",
+          "title": "Director",
+          "is_cluster": false
+        },
+        {
+          "ticker": "NBIS",
+          "date": "2026-10-26",
+          "value_usd": 57823,
+          "shares": 357,
+          "price": 161.97,
+          "name": "Grimme Arne",
+          "title": "Director",
+          "is_cluster": false
+        },
+        {
+          "ticker": "NBIS",
+          "date": "2026-10-26",
+          "value_usd": 32591,
+          "shares": 205,
+          "price": 158.98,
+          "name": "Grimme Arne",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-11-16"
+    },
+    "CRM": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "CRM",
+          "date": "2026-09-21",
+          "value_usd": 999451,
+          "shares": 4176,
+          "price": 239.33,
+          "name": "Kirk David Blair",
+          "title": "Director",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-11-16"
     }
   }
 }
