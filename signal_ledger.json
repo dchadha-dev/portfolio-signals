@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-18 03:56 UTC",
+ "updated": "2026-11-18 19:13 UTC",
  "note": "excess = ticker return minus equal-weight scanner universe over the same trading days, in %",
  "summary": {},
  "state": {
@@ -12,7 +12,7 @@
   "FIVN": "WATCH",
   "AMD": "FW BLOCKED",
   "TEAM": "WATCH",
-  "CRWD": "BUY",
+  "CRWD": "HOLD",
   "VLO": "FW BLOCKED",
   "CSCO": "HOLD",
   "QTUM": "HOLD",
@@ -78,7 +78,7 @@
   "CVX": "HOLD",
   "BP": "HOLD",
   "SHEL": "HOLD",
-  "EQNR": "WATCH",
+  "EQNR": "HOLD",
   "DE": "HOLD",
   "WM": "HOLD",
   "FDX": "HOLD",
