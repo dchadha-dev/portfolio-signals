@@ -1,24 +1,6 @@
 {
-  "last_updated": "2026-11-17 19:31 UTC",
+  "last_updated": "2026-11-18 03:56 UTC",
   "entries": [
-    {
-      "ticker": "AMD",
-      "signal_type": "WATCH",
-      "score": 73,
-      "sell_score": 6.0,
-      "timestamp": "2026-11-11 02:21",
-      "price": 515.21,
-      "dist_252h": -20.7,
-      "framework_score": 86,
-      "fdfv3": true,
-      "is_holding": true,
-      "status": "expired",
-      "current_score": 73,
-      "current_price": 515.21,
-      "expire_reason": "dfv3_faded",
-      "expire_detail": "DFV V3 lift dropped \u00b7 score 13",
-      "expired_at": "2026-11-11 18:14"
-    },
     {
       "ticker": "DELL",
       "signal_type": "WATCH",
@@ -287,7 +269,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 60,
-      "current_price": 25.73,
+      "current_price": 25.56,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -306,7 +288,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 80,
-      "current_price": 490.32,
+      "current_price": 503.41,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -325,7 +307,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 65,
-      "current_price": 141.87,
+      "current_price": 140.98,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -344,7 +326,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 80,
-      "current_price": 219.74,
+      "current_price": 219.58,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -363,7 +345,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 80,
-      "current_price": 362.45,
+      "current_price": 363.77,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -420,7 +402,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 55,
-      "current_price": 196.71,
+      "current_price": 194.52,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -458,7 +440,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 80,
-      "current_price": 205.95,
+      "current_price": 206.8,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -477,7 +459,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 55,
-      "current_price": 271.02,
+      "current_price": 272.94,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -496,7 +478,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 70,
-      "current_price": 1309.94,
+      "current_price": 1317.37,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -534,7 +516,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 70,
-      "current_price": 283.63,
+      "current_price": 284.8,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
