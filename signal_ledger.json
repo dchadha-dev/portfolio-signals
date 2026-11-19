@@ -1,18 +1,18 @@
 {
- "updated": "2026-11-19 03:54 UTC",
+ "updated": "2026-11-19 19:17 UTC",
  "note": "excess = ticker return minus equal-weight scanner universe over the same trading days, in %",
  "summary": {},
  "state": {
   "DELL": "HOLD",
   "HPE": "FW BLOCKED",
-  "PANW": "WATCH",
+  "PANW": "HOLD",
   "ARKG": "FW BLOCKED",
   "MU": "HOLD",
-  "LSCC": "WATCH",
-  "FIVN": "WATCH",
-  "AMD": "WATCH",
+  "LSCC": "HOLD",
+  "FIVN": "HOLD",
+  "AMD": "FW BLOCKED",
   "TEAM": "WATCH",
-  "CRWD": "WATCH",
+  "CRWD": "HOLD",
   "VLO": "FW BLOCKED",
   "CSCO": "HOLD",
   "QTUM": "HOLD",
@@ -601,6 +601,18 @@
    "sell_score": 0.4,
    "framework_score": 66,
    "is_holding": false,
+   "outcomes": {}
+  },
+  {
+   "ticker": "AMD",
+   "label": "FW BLOCKED",
+   "from": "WATCH",
+   "date": "2026-11-19",
+   "price": 481.64,
+   "buy_score": 90,
+   "sell_score": 6.1,
+   "framework_score": 51,
+   "is_holding": true,
    "outcomes": {}
   }
  ]

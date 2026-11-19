@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-19 03:54 UTC",
+  "last_updated": "2026-11-19 19:17 UTC",
   "entries": [
     {
       "ticker": "DELL",
@@ -123,12 +123,12 @@
       "framework_score": 49,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 60,
       "current_price": 24.39,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "trend_broken",
+      "expire_detail": "closed below the 200d MA",
+      "expired_at": "2026-11-19 19:17"
     },
     {
       "ticker": "AMD",
@@ -143,8 +143,8 @@
       "fdfv3": false,
       "is_holding": true,
       "status": "active",
-      "current_score": 65,
-      "current_price": 530.14,
+      "current_score": 90,
+      "current_price": 481.32,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -163,7 +163,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 65,
-      "current_price": 135.05,
+      "current_price": 133.64,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -201,7 +201,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 90,
-      "current_price": 343.7,
+      "current_price": 340.51,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -256,12 +256,12 @@
       "framework_score": 68,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 55,
       "current_price": 190.4,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "trend_broken",
+      "expire_detail": "closed below the 200d MA",
+      "expired_at": "2026-11-19 19:17"
     },
     {
       "ticker": "DELL",
@@ -296,7 +296,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 90,
-      "current_price": 196.79,
+      "current_price": 199.94,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -315,7 +315,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 55,
-      "current_price": 279.62,
+      "current_price": 274.49,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -334,7 +334,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 70,
-      "current_price": 1310.91,
+      "current_price": 1311.91,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -353,7 +353,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 55,
-      "current_price": 40.13,
+      "current_price": 39.76,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -372,7 +372,7 @@
       "is_holding": false,
       "status": "active",
       "current_score": 65,
-      "current_price": 300.91,
+      "current_price": 302.07,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -389,12 +389,12 @@
       "framework_score": 47,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 70,
       "current_price": 111.61,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "trend_broken",
+      "expire_detail": "closed below the 200d MA",
+      "expired_at": "2026-11-19 19:17"
     },
     {
       "ticker": "PANW",
@@ -408,12 +408,12 @@
       "framework_score": 53,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 339.92,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dip_recovered",
+      "expire_detail": "back within 20% of the 252d high \u00b7 score 50",
+      "expired_at": "2026-11-19 19:17"
     },
     {
       "ticker": "CRWD",
@@ -427,12 +427,12 @@
       "framework_score": 66,
       "fdfv3": false,
       "is_holding": false,
-      "status": "active",
+      "status": "expired",
       "current_score": 65,
       "current_price": 237.03,
-      "expire_reason": null,
-      "expire_detail": null,
-      "expired_at": null
+      "expire_reason": "dip_recovered",
+      "expire_detail": "back within 20% of the 252d high \u00b7 score 50",
+      "expired_at": "2026-11-19 19:17"
     }
   ]
 }
