@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-20 18:56 UTC",
+ "updated": "2026-11-21 03:37 UTC",
  "note": "excess = ticker return minus equal-weight scanner universe over the same trading days, in %",
  "summary": {},
  "state": {
@@ -55,7 +55,7 @@
   "SNOW": "HOLD",
   "APLD": "HOLD",
   "ADI": "HOLD",
-  "TXN": "HOLD",
+  "TXN": "WATCH",
   "MA": "HOLD",
   "V": "HOLD",
   "ICE": "HOLD",
@@ -134,7 +134,7 @@
   "GME": "HOLD",
   "URTH": "HOLD",
   "XLB": "HOLD",
-  "NET": "BUY",
+  "NET": "WATCH",
   "RCL": "HOLD",
   "VRT": "HOLD",
   "MSCI": "HOLD",
@@ -708,6 +708,30 @@
    "buy_score": 70,
    "sell_score": 6.2,
    "framework_score": 36,
+   "is_holding": false,
+   "outcomes": {}
+  },
+  {
+   "ticker": "NET",
+   "label": "WATCH",
+   "from": "BUY",
+   "date": "2026-11-20",
+   "price": 274.96,
+   "buy_score": 70,
+   "sell_score": 2.2,
+   "framework_score": 63,
+   "is_holding": false,
+   "outcomes": {}
+  },
+  {
+   "ticker": "TXN",
+   "label": "WATCH",
+   "from": "HOLD",
+   "date": "2026-11-20",
+   "price": 263.75,
+   "buy_score": 70,
+   "sell_score": 3.6,
+   "framework_score": 52,
    "is_holding": false,
    "outcomes": {}
   }
