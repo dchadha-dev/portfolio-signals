@@ -1,17 +1,17 @@
 {
   "health": {
-    "timestamp": "2026-11-16 07:46 UTC",
+    "timestamp": "2026-11-23 08:43 UTC",
     "insider_fetch_ok": true,
     "politician_fetch_ok": true,
-    "n_insider_signals": 7,
+    "n_insider_signals": 6,
     "n_politician_signals": 0,
-    "n_combined_signals": 7,
-    "elapsed_seconds": 213.8,
+    "n_combined_signals": 6,
+    "elapsed_seconds": 219.4,
     "retry_required": false,
     "retry_reason": []
   },
   "signals": {
-    "KEEL": {
+    "TSM": {
       "buy_score_boost": 20,
       "insider_score": 20,
       "politician_score": 0,
@@ -22,136 +22,38 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "KEEL",
-          "date": "2026-11-13",
-          "value_usd": 47000,
-          "shares": 25000,
-          "price": 1.88,
-          "name": "Freedman Amy",
-          "title": "Director",
+          "ticker": "TSM",
+          "date": "2026-11-20",
+          "value_usd": 121140,
+          "shares": 2000,
+          "price": 60.57,
+          "name": "Lu Lee-Chung",
+          "title": "Officer, VP",
           "is_cluster": true
         },
         {
-          "ticker": "KEEL",
-          "date": "2026-11-13",
-          "value_usd": 29100,
-          "shares": 15000,
-          "price": 1.94,
-          "name": "Freedman Amy",
-          "title": "Director",
+          "ticker": "TSM",
+          "date": "2026-11-20",
+          "value_usd": 181710,
+          "shares": 3000,
+          "price": 60.57,
+          "name": "Lu Lee-Chung",
+          "title": "Officer, VP",
           "is_cluster": true
         },
         {
-          "ticker": "KEEL",
-          "date": "2026-11-10",
-          "value_usd": 28350,
-          "shares": 15000,
-          "price": 1.89,
-          "name": "Hofmeister Edith",
+          "ticker": "TSM",
+          "date": "2026-11-18",
+          "value_usd": 500039,
+          "shares": 1375,
+          "price": 363.67,
+          "name": "BURNS URSULA M",
           "title": "Director",
           "is_cluster": true
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-11-16"
-    },
-    "TEAM": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "TEAM",
-          "date": "2026-11-13",
-          "value_usd": 229229,
-          "shares": 1500,
-          "price": 152.82,
-          "name": "Cannon-Brookes Michael",
-          "title": "Director, Officer, TenPercentOwner, CEO, Co-Founder",
-          "is_cluster": false
-        },
-        {
-          "ticker": "TEAM",
-          "date": "2026-11-13",
-          "value_usd": 30726,
-          "shares": 200,
-          "price": 153.63,
-          "name": "Cannon-Brookes Michael",
-          "title": "Director, Officer, TenPercentOwner, CEO, Co-Founder",
-          "is_cluster": false
-        },
-        {
-          "ticker": "TEAM",
-          "date": "2026-11-13",
-          "value_usd": 762097,
-          "shares": 5099,
-          "price": 149.46,
-          "name": "Cannon-Brookes Michael",
-          "title": "Director, Officer, TenPercentOwner, CEO, Co-Founder",
-          "is_cluster": false
-        },
-        {
-          "ticker": "TEAM",
-          "date": "2026-11-13",
-          "value_usd": 136371,
-          "shares": 901,
-          "price": 151.36,
-          "name": "Cannon-Brookes Michael",
-          "title": "Director, Officer, TenPercentOwner, CEO, Co-Founder",
-          "is_cluster": false
-        },
-        {
-          "ticker": "TEAM",
-          "date": "2026-11-13",
-          "value_usd": 846000,
-          "shares": 5700,
-          "price": 148.42,
-          "name": "Cannon-Brookes Michael",
-          "title": "Director, Officer, TenPercentOwner, CEO, Co-Founder",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-11-16"
-    },
-    "APLD": {
-      "buy_score_boost": 20,
-      "insider_score": 20,
-      "politician_score": 0,
-      "insider_n": 2,
-      "insider_cluster": true,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "APLD",
-          "date": "2026-10-19",
-          "value_usd": 1006686,
-          "shares": 55803,
-          "price": 18.04,
-          "name": "Cummins Wes",
-          "title": "Director, Officer, CEO; Chairman",
-          "is_cluster": true
-        },
-        {
-          "ticker": "APLD",
-          "date": "2026-10-19",
-          "value_usd": 5658000,
-          "shares": 300000,
-          "price": 18.86,
-          "name": "Zhang Jason Gechen",
-          "title": "Officer, President",
-          "is_cluster": true
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-11-16"
+      "as_of": "2026-11-23"
     },
     "ENPH": {
       "buy_score_boost": 20,
@@ -185,9 +87,127 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-11-16"
+      "as_of": "2026-11-23"
     },
-    "GRAB": {
+    "KEEL": {
+      "buy_score_boost": 20,
+      "insider_score": 20,
+      "politician_score": 0,
+      "insider_n": 3,
+      "insider_cluster": true,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "KEEL",
+          "date": "2026-11-16",
+          "value_usd": 50070,
+          "shares": 28942,
+          "price": 1.73,
+          "name": "WILSON LIAM DANIEL",
+          "title": "Officer, Chief Operating Officer",
+          "is_cluster": true
+        },
+        {
+          "ticker": "KEEL",
+          "date": "2026-11-13",
+          "value_usd": 47000,
+          "shares": 25000,
+          "price": 1.88,
+          "name": "Freedman Amy",
+          "title": "Director",
+          "is_cluster": true
+        },
+        {
+          "ticker": "KEEL",
+          "date": "2026-11-13",
+          "value_usd": 29100,
+          "shares": 15000,
+          "price": 1.94,
+          "name": "Freedman Amy",
+          "title": "Director",
+          "is_cluster": true
+        },
+        {
+          "ticker": "KEEL",
+          "date": "2026-11-10",
+          "value_usd": 28350,
+          "shares": 15000,
+          "price": 1.89,
+          "name": "Hofmeister Edith",
+          "title": "Director",
+          "is_cluster": true
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-11-23"
+    },
+    "TEAM": {
+      "buy_score_boost": 10,
+      "insider_score": 10,
+      "politician_score": 0,
+      "insider_n": 1,
+      "insider_cluster": false,
+      "politician_n": 0,
+      "politician_cluster": false,
+      "reporting_lag_days": null,
+      "insider_buys": [
+        {
+          "ticker": "TEAM",
+          "date": "2026-11-20",
+          "value_usd": 65741,
+          "shares": 470,
+          "price": 139.87,
+          "name": "Cannon-Brookes Michael",
+          "title": "Director, Officer, TenPercentOwner, CEO, Co-Founder",
+          "is_cluster": false
+        },
+        {
+          "ticker": "TEAM",
+          "date": "2026-11-20",
+          "value_usd": 889274,
+          "shares": 6400,
+          "price": 138.95,
+          "name": "Cannon-Brookes Michael",
+          "title": "Director, Officer, TenPercentOwner, CEO, Co-Founder",
+          "is_cluster": false
+        },
+        {
+          "ticker": "TEAM",
+          "date": "2026-11-20",
+          "value_usd": 382938,
+          "shares": 2775,
+          "price": 138.0,
+          "name": "Cannon-Brookes Michael",
+          "title": "Director, Officer, TenPercentOwner, CEO, Co-Founder",
+          "is_cluster": false
+        },
+        {
+          "ticker": "TEAM",
+          "date": "2026-11-20",
+          "value_usd": 129592,
+          "shares": 945,
+          "price": 137.13,
+          "name": "Cannon-Brookes Michael",
+          "title": "Director, Officer, TenPercentOwner, CEO, Co-Founder",
+          "is_cluster": false
+        },
+        {
+          "ticker": "TEAM",
+          "date": "2026-11-20",
+          "value_usd": 180139,
+          "shares": 1329,
+          "price": 135.54,
+          "name": "Cannon-Brookes Michael",
+          "title": "Director, Officer, TenPercentOwner, CEO, Co-Founder",
+          "is_cluster": false
+        }
+      ],
+      "politician_trades": [],
+      "as_of": "2026-11-23"
+    },
+    "APLD": {
       "buy_score_boost": 20,
       "insider_score": 20,
       "politician_score": 0,
@@ -198,28 +218,28 @@
       "reporting_lag_days": null,
       "insider_buys": [
         {
-          "ticker": "GRAB",
-          "date": "2026-09-21",
-          "value_usd": 866839,
-          "shares": 299571,
-          "price": 2.89,
-          "name": "Hungate Alexander Charles",
-          "title": "Director, Officer, President and COO",
+          "ticker": "APLD",
+          "date": "2026-10-19",
+          "value_usd": 1006686,
+          "shares": 55803,
+          "price": 18.04,
+          "name": "Cummins Wes",
+          "title": "Director, Officer, CEO; Chairman",
           "is_cluster": true
         },
         {
-          "ticker": "GRAB",
-          "date": "2026-09-21",
-          "value_usd": 29876310,
-          "shares": 10350000,
-          "price": 2.89,
-          "name": "Tan Anthony Ping Yeow",
-          "title": "Director, Officer, Chief Executive Officer",
+          "ticker": "APLD",
+          "date": "2026-10-19",
+          "value_usd": 5658000,
+          "shares": 300000,
+          "price": 18.86,
+          "name": "Zhang Jason Gechen",
+          "title": "Officer, President",
           "is_cluster": true
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-11-16"
+      "as_of": "2026-11-23"
     },
     "NBIS": {
       "buy_score_boost": 10,
@@ -283,31 +303,7 @@
         }
       ],
       "politician_trades": [],
-      "as_of": "2026-11-16"
-    },
-    "CRM": {
-      "buy_score_boost": 10,
-      "insider_score": 10,
-      "politician_score": 0,
-      "insider_n": 1,
-      "insider_cluster": false,
-      "politician_n": 0,
-      "politician_cluster": false,
-      "reporting_lag_days": null,
-      "insider_buys": [
-        {
-          "ticker": "CRM",
-          "date": "2026-09-21",
-          "value_usd": 999451,
-          "shares": 4176,
-          "price": 239.33,
-          "name": "Kirk David Blair",
-          "title": "Director",
-          "is_cluster": false
-        }
-      ],
-      "politician_trades": [],
-      "as_of": "2026-11-16"
+      "as_of": "2026-11-23"
     }
   }
 }
