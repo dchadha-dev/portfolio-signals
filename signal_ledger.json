@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-25 05:08 UTC",
+ "updated": "2026-11-25 20:19 UTC",
  "note": "excess = ticker return minus equal-weight scanner universe over the same trading days, in %",
  "summary": {},
  "state": {
@@ -10,7 +10,7 @@
   "MU": "HOLD",
   "LSCC": "HOLD",
   "FIVN": "WATCH",
-  "AMD": "WATCH",
+  "AMD": "HOLD",
   "TEAM": "WATCH",
   "CRWD": "BUY",
   "VLO": "FW BLOCKED",
@@ -55,7 +55,7 @@
   "SNOW": "HOLD",
   "APLD": "HOLD",
   "ADI": "HOLD",
-  "TXN": "WATCH",
+  "TXN": "HOLD",
   "MA": "HOLD",
   "V": "HOLD",
   "ICE": "HOLD",
