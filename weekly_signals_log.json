@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-26 04:34 UTC",
+  "last_updated": "2026-11-26 19:56 UTC",
   "entries": [
     {
       "ticker": "PANW",
@@ -72,7 +72,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 70,
-      "current_price": 163.99,
+      "current_price": 164.02,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -186,7 +186,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 65,
-      "current_price": 144.39,
+      "current_price": 144.42,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -281,7 +281,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 55,
-      "current_price": 342.34,
+      "current_price": 342.38,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
@@ -357,7 +357,7 @@
       "is_holding": true,
       "status": "active",
       "current_score": 65,
-      "current_price": 220.84,
+      "current_price": 220.88,
       "expire_reason": null,
       "expire_detail": null,
       "expired_at": null
