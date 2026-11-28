@@ -56,7 +56,7 @@ Both paths are out of 25 and scaled to 30.
 - **Missing inputs score zero.** On the profitable path, fewer than three inputs means the axis is not computed.
 - **Every loss-maker keeps at most 60% of quality (18 of 30).** This is the only place losses are penalised. Growth is not capped, and valuation has its own rule for companies with no earnings, so one fact is not punished three times.
 - **Implausible figures are ignored.** A free-cash-flow margin above 100% (NBIS showed 3,571%) is treated as unknown.
-- **Banks, brokers and insurers** report no gross or free-cash-flow margin, and leverage is their business model. Quality and growth fall back to your hand score.
+- **Banks, brokers and insurers** report no gross or free-cash-flow margin, and leverage is their business model. Quality and growth fall back to your hand score. The same applies to any stock flagged `"financial": true` in `framework_scores.json`: currently Berkshire, whose consolidated figures mix insurance, rail and utility debt (Finnhub showed interest coverage of 0.57x on a company with over $300bn in cash).
 
 ### Growth (20)
 

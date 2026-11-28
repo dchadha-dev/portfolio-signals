@@ -118,6 +118,8 @@ def _is_financial(m):
     their leverage is the business model and their 'revenue' is mostly interest.
     Neither the quality nor the growth rubric applies, so both fall back to hand
     or legacy values."""
+    if m.get('_financial'):
+        return True    # flagged in framework_scores.json ("financial": true)
     return _num(m.get('gross_margin')) is None and _num(m.get('fcf_margin')) is None
 
 
@@ -391,6 +393,12 @@ def score_ticker(entry, metrics=None, price=None, today=None):
     is_fund = entry.get('kind') == 'fund'  # ETFs and funds: no business to analyse
     if is_fund:
         metrics, hand, entry = {}, {}, dict(entry, moat_answers=None, hand={})
+    elif entry.get('financial') and metrics:
+        # Balance-sheet businesses (conglomerates with an insurer, brokers, asset
+        # managers that consolidate insurers or lend): interest is their business
+        # and consolidated debt belongs to subsidiaries, so the operating-company
+        # quality and growth rubrics misread them. Hand scores, as for banks.
+        metrics = dict(metrics, _financial=True)
 
     parts, sources = {}, {}
     for axis, axis_max in AXES.items():

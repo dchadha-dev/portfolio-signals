@@ -8,7 +8,8 @@
   "kind \"fund\": ETFs and funds keep their legacy score; no fundamentals are applied.",
   "industry: optional override of Finnhub's industry label, used to compare gross and free-cash-flow margins with true peers (Finnhub puts hardware makers in \"Technology\" with software). Needs 5+ peers with data.",
   "moat_by: who set the moat answers. \"claude-draft\" = awaiting review; \"claude, accepted by Dharam <date>\" = drafted by Claude and accepted; your own name once you override.",
-  "Funds (kind \"fund\"): ter = total expense ratio %, ter_source \"estimate\" for Thai funds until checked against the factsheet; top10 = top-10 holdings weight %; benchmark = ETF the track record is measured against; proxy = ETF used to price a Thai feeder fund; leveraged / single_asset flags; conviction = your view of the theme, Y / ? / N."
+  "Funds (kind \"fund\"): ter = total expense ratio %, ter_source \"estimate\" for Thai funds until checked against the factsheet; top10 = top-10 holdings weight %; benchmark = ETF the track record is measured against; proxy = ETF used to price a Thai feeder fund; leveraged / single_asset flags; conviction = your view of the theme, Y / ? / N.",
+  "financial: true marks a balance-sheet business (conglomerate with an insurer, broker, lender, asset manager that consolidates an insurer). Quality and growth then use hand or legacy values, as for banks; valuation stays computed."
  ],
  "tickers": {
   "NVDA": {
@@ -920,7 +921,8 @@
    ],
    "moat_date": "2026-11-14",
    "moat_reason": "Insurance float, BNSF rail network and low cost of capital",
-   "moat_by": "claude, accepted by Dharam 2026-11-14"
+   "moat_by": "claude, accepted by Dharam 2026-11-14",
+   "financial": true
   },
   "ORCL": {
    "legacy": 78,
